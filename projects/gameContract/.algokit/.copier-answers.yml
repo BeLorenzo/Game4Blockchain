@@ -1,0 +1,9 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 0.3.6
+_src_path: gh:algorandfoundation/algokit-typescript-template
+author_email: lorenzo.belotti1@studenti.unimi.it
+author_name: Lorenzo Belotti
+contract_name: game_contract
+preset_name: production
+project_name: gameContract
+
