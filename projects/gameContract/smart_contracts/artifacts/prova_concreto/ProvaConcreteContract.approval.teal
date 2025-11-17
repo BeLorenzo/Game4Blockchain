@@ -1,0 +1,2175 @@
+#pragma version 11
+#pragma typetrack false
+
+// @algorandfoundation/algorand-typescript/arc4/index.d.ts::Contract.approvalProgram() -> uint64:
+main:
+    intcblock 0 1 480 32 976 1458 496 488 978 1468 1460 1476 604800
+    bytecblock 0x00 "games" "gameIdCounter" "" 0x151f7c75
+    txn ApplicationID
+    bnz main_after_if_else@2
+    // smart_contracts/abstract_contract/contract.algo.ts:32
+    // gameIdCounter = GlobalState<uint64>({ initialValue: 0 })
+    bytec_2 // "gameIdCounter"
+    intc_0 // 0
+    app_global_put
+
+main_after_if_else@2:
+    // smart_contracts/prova_concreto/contract.algo.ts:9
+    // export class ProvaConcreteContract extends AbstractGameContract {
+    txn NumAppArgs
+    bz main___algots__.defaultCreate@18
+    txn OnCompletion
+    !
+    assert // OnCompletion must be NoOp
+    txn ApplicationID
+    assert
+    pushbytess 0x39a53253 0xbe9014ef 0x7484e238 0xc7047dc4 0xd98f68d6 0xff886748 0x2a40fb81 0x0c356221 0xbc3db1d7 // method "createNewGame(uint64,uint64,pay,pay,uint64,uint64)uint64", method "joinGame(uint64,pay)void", method "getRequiredMbr()uint64", method "commit(uint64,byte[32])void", method "reveal(uint64,byte[32],uint64)void", method "backOff(uint64)void", method "verifyDeadline(uint64)void", method "deleteGame(uint64)void", method "getGameInfo(uint64)(address[15],uint64,uint64,byte[32][15],bool[15],byte[32][15],bool[15],uint64,uint64,uint64,uint64,uint64,address)"
+    txna ApplicationArgs 0
+    match createNewGame joinGame main_getRequiredMbr_route@8 commit reveal backOff verifyDeadline deleteGame getGameInfo
+    err
+
+main_getRequiredMbr_route@8:
+    // smart_contracts/abstract_contract/contract.algo.ts:81
+    // public getRequiredMbr(): uint64 {
+    pushbytes 0x151f7c75000000000009a074
+    log
+    intc_1 // 1
+    return
+
+main___algots__.defaultCreate@18:
+    // smart_contracts/prova_concreto/contract.algo.ts:9
+    // export class ProvaConcreteContract extends AbstractGameContract {
+    txn OnCompletion
+    !
+    txn ApplicationID
+    !
+    &&
+    assert // OnCompletion must be NoOp && can only call when creating
+    intc_1 // 1
+    return
+
+
+// smart_contracts/prova_concreto/contract.algo.ts::ProvaConcreteContract.createNewGame[routing]() -> void:
+createNewGame:
+    // smart_contracts/prova_concreto/contract.algo.ts:23-30
+    // public createNewGame(
+    //   maxPlayers: uint64,
+    //   entryFee: uint64,
+    //   mbr: gtxn.PaymentTxn,
+    //   entryPayment: gtxn.PaymentTxn,
+    //   timerCommit: uint64,
+    //   timerReveal: uint64,
+    // ): uint64 {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    dup
+    txna ApplicationArgs 2
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    swap
+    txn GroupIndex
+    pushint 2 // 2
+    -
+    dup
+    cover 2
+    gtxns TypeEnum
+    intc_1 // pay
+    ==
+    assert // transaction type is pay
+    txn GroupIndex
+    intc_1 // 1
+    -
+    dup
+    cover 2
+    gtxns TypeEnum
+    intc_1 // pay
+    ==
+    assert // transaction type is pay
+    txna ApplicationArgs 3
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    swap
+    txna ApplicationArgs 4
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    swap
+    // smart_contracts/abstract_contract/contract.algo.ts:106
+    // assert(maxPlayers >= 2 && maxPlayers <= 15, 'Player number must be beetween 2-15')
+    pushint 2 // 2
+    >=
+    bz createNewGame_bool_false@4
+    dig 5
+    pushint 15 // 15
+    <=
+    bz createNewGame_bool_false@4
+    intc_1 // 1
+
+createNewGame_bool_merge@5:
+    // smart_contracts/abstract_contract/contract.algo.ts:106
+    // assert(maxPlayers >= 2 && maxPlayers <= 15, 'Player number must be beetween 2-15')
+    assert // Player number must be beetween 2-15
+    // smart_contracts/abstract_contract/contract.algo.ts:109
+    // assert(entryFee > 0 && entryFee <= 500_000_000, 'Participation fee must be beetween 1 - 500000000')
+    dig 4
+    bz createNewGame_bool_false@8
+    dig 4
+    pushint 500000000 // 500000000
+    <=
+    bz createNewGame_bool_false@8
+    intc_1 // 1
+
+createNewGame_bool_merge@9:
+    // smart_contracts/abstract_contract/contract.algo.ts:109
+    // assert(entryFee > 0 && entryFee <= 500_000_000, 'Participation fee must be beetween 1 - 500000000')
+    assert // Participation fee must be beetween 1 - 500000000
+    // smart_contracts/abstract_contract/contract.algo.ts:112
+    // assert(timerCommit >= 300 && timerCommit <= 604800, 'Commit timer must be beetween 5 minutes and 7 days')
+    dig 1
+    pushint 300 // 300
+    >=
+    bz createNewGame_bool_false@12
+    dig 1
+    intc 12 // 604800
+    <=
+    bz createNewGame_bool_false@12
+    intc_1 // 1
+
+createNewGame_bool_merge@13:
+    // smart_contracts/abstract_contract/contract.algo.ts:112
+    // assert(timerCommit >= 300 && timerCommit <= 604800, 'Commit timer must be beetween 5 minutes and 7 days')
+    assert // Commit timer must be beetween 5 minutes and 7 days
+    // smart_contracts/abstract_contract/contract.algo.ts:115
+    // assert(timerReveal >= 300 && timerReveal <= 604800, 'Reveal timer must be beetween 5 minutes and 7 days')
+    dup
+    pushint 300 // 300
+    >=
+    bz createNewGame_bool_false@16
+    dup
+    intc 12 // 604800
+    <=
+    bz createNewGame_bool_false@16
+    intc_1 // 1
+
+createNewGame_bool_merge@17:
+    // smart_contracts/abstract_contract/contract.algo.ts:115
+    // assert(timerReveal >= 300 && timerReveal <= 604800, 'Reveal timer must be beetween 5 minutes and 7 days')
+    assert // Reveal timer must be beetween 5 minutes and 7 days
+    // smart_contracts/abstract_contract/contract.algo.ts:118
+    // assert(mbr.receiver === Global.currentApplicationAddress, 'MBR payment must be to the contract')
+    dig 3
+    dup
+    gtxns Receiver
+    global CurrentApplicationAddress
+    ==
+    assert // MBR payment must be to the contract
+    // smart_contracts/abstract_contract/contract.algo.ts:119
+    // assert(mbr.amount >= this.getRequiredMbr(), 'Insufficient MBR')
+    gtxns Amount
+    // smart_contracts/abstract_contract/contract.algo.ts:82
+    // return 630900
+    pushint 630900 // 630900
+    // smart_contracts/abstract_contract/contract.algo.ts:119
+    // assert(mbr.amount >= this.getRequiredMbr(), 'Insufficient MBR')
+    >=
+    assert // Insufficient MBR
+    // smart_contracts/abstract_contract/contract.algo.ts:122
+    // assert(entryPayment.receiver === Global.currentApplicationAddress, 'Entry fee payment must be to the contract')
+    dig 2
+    dup
+    gtxns Receiver
+    global CurrentApplicationAddress
+    ==
+    assert // Entry fee payment must be to the contract
+    // smart_contracts/abstract_contract/contract.algo.ts:123
+    // assert(entryPayment.amount === entryFee, 'Payment amount must be the entry fee')
+    dup
+    gtxns Amount
+    dig 6
+    dup
+    cover 2
+    ==
+    assert // Payment amount must be the entry fee
+    // smart_contracts/abstract_contract/contract.algo.ts:125
+    // this.gameIdCounter.value = this.gameIdCounter.value + 1
+    intc_0 // 0
+    // smart_contracts/abstract_contract/contract.algo.ts:32
+    // gameIdCounter = GlobalState<uint64>({ initialValue: 0 })
+    bytec_2 // "gameIdCounter"
+    // smart_contracts/abstract_contract/contract.algo.ts:125
+    // this.gameIdCounter.value = this.gameIdCounter.value + 1
+    app_global_get_ex
+    assert // check GlobalState exists
+    intc_1 // 1
+    +
+    // smart_contracts/abstract_contract/contract.algo.ts:32
+    // gameIdCounter = GlobalState<uint64>({ initialValue: 0 })
+    bytec_2 // "gameIdCounter"
+    // smart_contracts/abstract_contract/contract.algo.ts:125
+    // this.gameIdCounter.value = this.gameIdCounter.value + 1
+    dig 1
+    app_global_put
+    // smart_contracts/abstract_contract/contract.algo.ts:128
+    // players: new StaticArray<Address, 15>(),
+    intc_2 // 480
+    bzero
+    // smart_contracts/abstract_contract/contract.algo.ts:132
+    // hasCommitted: new StaticArray<Bool, 15>(),
+    pushint 2 // 2
+    bzero
+    // smart_contracts/abstract_contract/contract.algo.ts:129
+    // currentPlayerCount: 0,
+    intc_0 // 0
+    // smart_contracts/abstract_contract/contract.algo.ts:127-141
+    // const newGame: GameState = {
+    //   players: new StaticArray<Address, 15>(),
+    //   currentPlayerCount: 0,
+    //   maxPlayers: maxPlayers,
+    //   commits: new StaticArray<StaticBytes<32>, 15>(),
+    //   hasCommitted: new StaticArray<Bool, 15>(),
+    //   hasRevealed: new StaticArray<Bool, 15>(),
+    //   moves: new StaticArray<StaticBytes<32>, 15>(),
+    //   balance: 0,
+    //   participationFee: entryFee,
+    //   deadline: 0,
+    //   timerCommit: timerCommit,
+    //   timerReveal: timerReveal,
+    //   winner: new Address(),
+    // }
+    itob
+    dig 2
+    dig 1
+    concat
+    dig 12
+    itob
+    concat
+    dig 3
+    concat
+    dig 2
+    concat
+    uncover 3
+    concat
+    uncover 2
+    concat
+    dig 1
+    concat
+    uncover 3
+    itob
+    concat
+    swap
+    concat
+    dig 4
+    itob
+    concat
+    dig 3
+    itob
+    concat
+    // smart_contracts/abstract_contract/contract.algo.ts:140
+    // winner: new Address(),
+    pushbytes base32(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA) // addr AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ
+    // smart_contracts/abstract_contract/contract.algo.ts:127-141
+    // const newGame: GameState = {
+    //   players: new StaticArray<Address, 15>(),
+    //   currentPlayerCount: 0,
+    //   maxPlayers: maxPlayers,
+    //   commits: new StaticArray<StaticBytes<32>, 15>(),
+    //   hasCommitted: new StaticArray<Bool, 15>(),
+    //   hasRevealed: new StaticArray<Bool, 15>(),
+    //   moves: new StaticArray<StaticBytes<32>, 15>(),
+    //   balance: 0,
+    //   participationFee: entryFee,
+    //   deadline: 0,
+    //   timerCommit: timerCommit,
+    //   timerReveal: timerReveal,
+    //   winner: new Address(),
+    // }
+    concat
+    // smart_contracts/abstract_contract/contract.algo.ts:143
+    // this.games(this.gameIdCounter.value).value = clone(newGame)
+    dig 1
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    // smart_contracts/abstract_contract/contract.algo.ts:143
+    // this.games(this.gameIdCounter.value).value = clone(newGame)
+    swap
+    box_put
+    // smart_contracts/abstract_contract/contract.algo.ts:146
+    // this.joinGame(this.gameIdCounter.value, entryPayment)
+    swap
+    callsub smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame
+    // smart_contracts/abstract_contract/contract.algo.ts:148
+    // return this.gameIdCounter.value
+    intc_0 // 0
+    // smart_contracts/abstract_contract/contract.algo.ts:32
+    // gameIdCounter = GlobalState<uint64>({ initialValue: 0 })
+    bytec_2 // "gameIdCounter"
+    // smart_contracts/abstract_contract/contract.algo.ts:148
+    // return this.gameIdCounter.value
+    app_global_get_ex
+    assert // check GlobalState exists
+    // smart_contracts/prova_concreto/contract.algo.ts:23-30
+    // public createNewGame(
+    //   maxPlayers: uint64,
+    //   entryFee: uint64,
+    //   mbr: gtxn.PaymentTxn,
+    //   entryPayment: gtxn.PaymentTxn,
+    //   timerCommit: uint64,
+    //   timerReveal: uint64,
+    // ): uint64 {
+    itob
+    bytec 4 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+createNewGame_bool_false@16:
+    intc_0 // 0
+    b createNewGame_bool_merge@17
+
+createNewGame_bool_false@12:
+    intc_0 // 0
+    b createNewGame_bool_merge@13
+
+createNewGame_bool_false@8:
+    intc_0 // 0
+    b createNewGame_bool_merge@9
+
+createNewGame_bool_false@4:
+    intc_0 // 0
+    b createNewGame_bool_merge@5
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame[routing]() -> void:
+joinGame:
+    // smart_contracts/abstract_contract/contract.algo.ts:42
+    // public joinGame(gameId: uint64, payment: gtxn.PaymentTxn): void {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    txn GroupIndex
+    intc_1 // 1
+    -
+    dup
+    gtxns TypeEnum
+    intc_1 // pay
+    ==
+    assert // transaction type is pay
+    callsub smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame
+    intc_1 // 1
+    return
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.commit[routing]() -> void:
+commit:
+    bytec_3 // ""
+    dupn 3
+    // smart_contracts/abstract_contract/contract.algo.ts:156
+    // public commit(gameId: uint64, commitment: StaticBytes<32>): void {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    txna ApplicationArgs 2
+    dup
+    cover 2
+    len
+    intc_3 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    // smart_contracts/abstract_contract/contract.algo.ts:158
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    dupn 2
+    // smart_contracts/abstract_contract/contract.algo.ts:158
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    box_len
+    bury 1
+    assert // Game does not exist
+    // smart_contracts/abstract_contract/contract.algo.ts:160
+    // const game = clone(this.games(gameId).value)
+    box_get
+    pop
+    dup
+    // smart_contracts/abstract_contract/contract.algo.ts:163
+    // let playerIndex: uint64 = game.maxPlayers // Impossible value as default
+    intc 7 // 488
+    extract_uint64
+    // smart_contracts/abstract_contract/contract.algo.ts:164
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    intc_0 // 0
+
+commit_while_top@2:
+    // smart_contracts/abstract_contract/contract.algo.ts:164
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dig 2
+    intc_2 // 480
+    extract_uint64
+    dup
+    bury 7
+    dig 1
+    >
+    bz commit_after_while@6
+    // smart_contracts/abstract_contract/contract.algo.ts:165
+    // if (game.players[i].native === Txn.sender) {
+    dig 2
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    dig 1
+    intc_3 // 32
+    *
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    txn Sender
+    ==
+    bz commit_after_if_else@5
+    dup
+
+commit_block@7:
+    // smart_contracts/abstract_contract/contract.algo.ts:172
+    // assert(playerIndex < game.maxPlayers, 'You are not a player in this game')
+    dup
+    dig 3
+    dup
+    cover 2
+    <
+    assert // You are not a player in this game
+    // smart_contracts/abstract_contract/contract.algo.ts:175
+    // assert(game.currentPlayerCount === game.maxPlayers, 'The game is not full yet')
+    dig 7
+    ==
+    assert // The game is not full yet
+    // smart_contracts/abstract_contract/contract.algo.ts:178
+    // assert(!game.hasCommitted[playerIndex].native, 'You have already committed')
+    dig 3
+    dup
+    cover 2
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    dig 1
+    pushint 15 // 15
+    <
+    assert // index access is out of bounds
+    dig 1
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    intc_0 // 0
+    getbit
+    !
+    assert // You have already committed
+    // smart_contracts/abstract_contract/contract.algo.ts:181
+    // game.commits[playerIndex] = commitment
+    dig 1
+    intc 6 // 496
+    intc_2 // 480
+    extract3
+    dig 1
+    intc_3 // 32
+    *
+    dig 8
+    replace3 // on error: index access is out of bounds
+    uncover 2
+    intc 6 // 496
+    uncover 2
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:182
+    // game.hasCommitted[playerIndex] = new Bool(true)
+    dup
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    uncover 2
+    intc_1 // 1
+    setbit
+    intc 4 // 976
+    swap
+    replace3
+    bury 3
+    // smart_contracts/abstract_contract/contract.algo.ts:184
+    // let allCommitted = true
+    intc_1 // 1
+    bury 9
+    intc_0 // 0
+    bury 7
+
+commit_for_header@9:
+    // smart_contracts/abstract_contract/contract.algo.ts:185
+    // for (const b of game.hasCommitted) {
+    dig 6
+    pushint 15 // 15
+    <
+    dup
+    bury 9
+    bz commit_block@15
+    dig 2
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    dig 8
+    assert // index access is out of bounds
+    dig 7
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    // smart_contracts/abstract_contract/contract.algo.ts:186
+    // if (!b.native) {
+    intc_0 // 0
+    getbit
+    bnz commit_after_if_else@12
+    // smart_contracts/abstract_contract/contract.algo.ts:187
+    // allCommitted = false
+    intc_0 // 0
+    bury 9
+
+commit_block@15:
+    // smart_contracts/abstract_contract/contract.algo.ts:192
+    // if (allCommitted) {
+    dig 8
+    bz commit_after_if_else@17
+    // smart_contracts/abstract_contract/contract.algo.ts:193
+    // game.deadline = Global.latestTimestamp + game.timerReveal
+    global LatestTimestamp
+    dig 3
+    dup
+    cover 2
+    pushint 1492 // 1492
+    extract_uint64
+    +
+    itob
+    intc 11 // 1476
+    swap
+    replace3
+    bury 3
+
+commit_after_if_else@17:
+    // smart_contracts/abstract_contract/contract.algo.ts:197
+    // this.games(gameId).value = clone(game)
+    dig 3
+    dig 3
+    box_put
+    // smart_contracts/abstract_contract/contract.algo.ts:156
+    // public commit(gameId: uint64, commitment: StaticBytes<32>): void {
+    intc_1 // 1
+    return
+
+commit_after_if_else@12:
+    dig 6
+    intc_1 // 1
+    +
+    bury 7
+    b commit_for_header@9
+
+commit_after_if_else@5:
+    // smart_contracts/abstract_contract/contract.algo.ts:164
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dup
+    intc_1 // 1
+    +
+    bury 1
+    b commit_while_top@2
+
+commit_after_while@6:
+    dig 1
+    b commit_block@7
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.reveal[routing]() -> void:
+reveal:
+    intc_0 // 0
+    bytec_3 // ""
+    dupn 6
+    // smart_contracts/abstract_contract/contract.algo.ts:206
+    // public reveal(gameId: uint64, move: StaticBytes<32>, salt: uint64): void {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    txna ApplicationArgs 2
+    dup
+    cover 2
+    len
+    dup
+    intc_3 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    txna ApplicationArgs 3
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    cover 2
+    // smart_contracts/abstract_contract/contract.algo.ts:208
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    swap
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    dup
+    cover 2
+    // smart_contracts/abstract_contract/contract.algo.ts:208
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    dup
+    box_len
+    bury 1
+    assert // Game does not exist
+    // smart_contracts/abstract_contract/contract.algo.ts:211
+    // assert(move.native.length <= 32, 'Move exceeds maximum allowed size')
+    swap
+    intc_3 // 32
+    <=
+    assert // Move exceeds maximum allowed size
+    // smart_contracts/abstract_contract/contract.algo.ts:213
+    // const game = clone(this.games(gameId).value)
+    box_get
+    pop
+    dup
+    // smart_contracts/abstract_contract/contract.algo.ts:216
+    // let playerIndex: uint64 = game.maxPlayers
+    intc 7 // 488
+    extract_uint64
+    // smart_contracts/abstract_contract/contract.algo.ts:217
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    intc_0 // 0
+
+reveal_while_top@2:
+    // smart_contracts/abstract_contract/contract.algo.ts:217
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dig 2
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    >
+    bz reveal_after_while@6
+    // smart_contracts/abstract_contract/contract.algo.ts:218
+    // if (game.players[i].native === Txn.sender) {
+    dig 2
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    dig 1
+    intc_3 // 32
+    *
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    txn Sender
+    ==
+    bz reveal_after_if_else@5
+    dup
+    bury 7
+
+reveal_block@7:
+    // smart_contracts/abstract_contract/contract.algo.ts:223
+    // assert(playerIndex < game.maxPlayers, 'You are not a player in this game')
+    dig 6
+    dup
+    dig 3
+    <
+    assert // You are not a player in this game
+    // smart_contracts/abstract_contract/contract.algo.ts:226
+    // assert(game.hasCommitted[playerIndex].native, 'You have not committed')
+    dig 3
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    dup
+    bury 16
+    dig 1
+    pushint 15 // 15
+    <
+    assert // index access is out of bounds
+    swap
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    intc_0 // 0
+    getbit
+    assert // You have not committed
+    // smart_contracts/abstract_contract/contract.algo.ts:229
+    // let allCommitted = true
+    intc_1 // 1
+    bury 13
+    intc_0 // 0
+    bury 9
+
+reveal_for_header@9:
+    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // for (const b of game.hasCommitted) {
+    dig 8
+    pushint 15 // 15
+    <
+    dup
+    bury 12
+    bz reveal_block@15
+    dig 10
+    assert // index access is out of bounds
+    dig 13
+    dig 9
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    // smart_contracts/abstract_contract/contract.algo.ts:231
+    // if (!b.native) {
+    intc_0 // 0
+    getbit
+    bnz reveal_after_if_else@12
+    // smart_contracts/abstract_contract/contract.algo.ts:232
+    // allCommitted = false
+    intc_0 // 0
+    bury 13
+
+reveal_block@15:
+    // smart_contracts/abstract_contract/contract.algo.ts:236
+    // assert(allCommitted, 'Cannot reveal: not all players have committed yet')
+    dig 12
+    assert // Cannot reveal: not all players have committed yet
+    // smart_contracts/abstract_contract/contract.algo.ts:239
+    // assert(!game.hasRevealed[playerIndex].native, 'You have already revealed')
+    dig 2
+    dup
+    intc 5 // 1458
+    pushint 2 // 2
+    extract3
+    dig 8
+    dup
+    cover 2
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    intc_0 // 0
+    getbit
+    !
+    assert // You have already revealed
+    // smart_contracts/abstract_contract/contract.algo.ts:242
+    // const computedHash = op.sha256(move.native.concat(op.itob(salt)))
+    dig 6
+    itob
+    dig 8
+    dup
+    cover 4
+    swap
+    concat
+    sha256
+    // smart_contracts/abstract_contract/contract.algo.ts:245
+    // assert(computedHash === game.commits[playerIndex].native, 'Commitment does not match')
+    dig 2
+    intc 6 // 496
+    intc_2 // 480
+    extract3
+    dig 2
+    intc_3 // 32
+    *
+    swap
+    dig 1
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    uncover 2
+    ==
+    assert // Commitment does not match
+    // smart_contracts/abstract_contract/contract.algo.ts:248
+    // game.moves[playerIndex] = move
+    dig 2
+    intc 8 // 978
+    intc_2 // 480
+    extract3
+    swap
+    uncover 4
+    replace3 // on error: index access is out of bounds
+    uncover 2
+    intc 8 // 978
+    uncover 2
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:249
+    // game.hasRevealed[playerIndex] = new Bool(true)
+    dup
+    intc 5 // 1458
+    pushint 2 // 2
+    extract3
+    uncover 2
+    intc_1 // 1
+    setbit
+    intc 5 // 1458
+    swap
+    replace3
+    bury 3
+    // smart_contracts/abstract_contract/contract.algo.ts:252
+    // let allRevealed = true
+    intc_1 // 1
+    bury 12
+    intc_0 // 0
+    bury 8
+
+reveal_for_header@17:
+    // smart_contracts/abstract_contract/contract.algo.ts:253
+    // for (const b of game.hasRevealed) {
+    dig 7
+    pushint 15 // 15
+    <
+    dup
+    bury 11
+    bz reveal_block@23
+    dig 2
+    intc 5 // 1458
+    pushint 2 // 2
+    extract3
+    dig 10
+    assert // index access is out of bounds
+    dig 8
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    // smart_contracts/abstract_contract/contract.algo.ts:254
+    // if (!b.native) {
+    intc_0 // 0
+    getbit
+    bnz reveal_after_if_else@20
+    // smart_contracts/abstract_contract/contract.algo.ts:255
+    // allRevealed = false
+    intc_0 // 0
+    bury 12
+
+reveal_block@23:
+    // smart_contracts/abstract_contract/contract.algo.ts:260
+    // if (allRevealed) {
+    dig 11
+    bz reveal_after_if_else@25
+    // smart_contracts/abstract_contract/contract.algo.ts:261
+    // game.deadline = 0
+    intc_0 // 0
+    itob
+    dig 3
+    intc 11 // 1476
+    uncover 2
+    replace3
+    bury 3
+
+reveal_after_if_else@25:
+    // smart_contracts/abstract_contract/contract.algo.ts:266
+    // this.games(gameId).value = clone(game)
+    dig 3
+    dig 3
+    box_put
+    // smart_contracts/abstract_contract/contract.algo.ts:206
+    // public reveal(gameId: uint64, move: StaticBytes<32>, salt: uint64): void {
+    intc_1 // 1
+    return
+
+reveal_after_if_else@20:
+    dig 7
+    intc_1 // 1
+    +
+    bury 8
+    b reveal_for_header@17
+
+reveal_after_if_else@12:
+    dig 8
+    intc_1 // 1
+    +
+    bury 9
+    b reveal_for_header@9
+
+reveal_after_if_else@5:
+    // smart_contracts/abstract_contract/contract.algo.ts:217
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dup
+    intc_1 // 1
+    +
+    bury 1
+    b reveal_while_top@2
+
+reveal_after_while@6:
+    dig 1
+    bury 7
+    b reveal_block@7
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.backOff[routing]() -> void:
+backOff:
+    bytec_3 // ""
+    // smart_contracts/abstract_contract/contract.algo.ts:273
+    // public backOff(gameId: uint64): void {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    // smart_contracts/abstract_contract/contract.algo.ts:275
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    dupn 2
+    // smart_contracts/abstract_contract/contract.algo.ts:275
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    box_len
+    bury 1
+    assert // Game does not exist
+    // smart_contracts/abstract_contract/contract.algo.ts:276
+    // const game = clone(this.games(gameId).value)
+    box_get
+    pop
+    dup
+    // smart_contracts/abstract_contract/contract.algo.ts:279
+    // let playerIndex: uint64 = game.maxPlayers
+    intc 7 // 488
+    extract_uint64
+    // smart_contracts/abstract_contract/contract.algo.ts:280
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    intc_0 // 0
+
+backOff_while_top@2:
+    // smart_contracts/abstract_contract/contract.algo.ts:280
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dig 2
+    intc_2 // 480
+    extract_uint64
+    dup
+    bury 6
+    dig 1
+    >
+    bz backOff_after_while@6
+    // smart_contracts/abstract_contract/contract.algo.ts:281
+    // if (game.players[i].native === Txn.sender) {
+    dig 2
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    dig 1
+    intc_3 // 32
+    *
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    txn Sender
+    ==
+    bz backOff_after_if_else@5
+    dup
+
+backOff_block@7:
+    // smart_contracts/abstract_contract/contract.algo.ts:286
+    // assert(playerIndex < game.maxPlayers, 'You are not a player in this game')
+    dup
+    dig 3
+    dup
+    cover 2
+    <
+    assert // You are not a player in this game
+    // smart_contracts/abstract_contract/contract.algo.ts:289
+    // assert(game.currentPlayerCount < game.maxPlayers, 'You cannot withdraw after the game has started')
+    dig 6
+    dup
+    uncover 2
+    <
+    assert // You cannot withdraw after the game has started
+    // smart_contracts/abstract_contract/contract.algo.ts:292-297
+    // itxn
+    //   .payment({
+    //     receiver: Txn.sender,
+    //     amount: game.participationFee,
+    //   })
+    //   .submit()
+    itxn_begin
+    // smart_contracts/abstract_contract/contract.algo.ts:294
+    // receiver: Txn.sender,
+    txn Sender
+    // smart_contracts/abstract_contract/contract.algo.ts:295
+    // amount: game.participationFee,
+    dig 5
+    dup
+    cover 2
+    intc 9 // 1468
+    extract_uint64
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/abstract_contract/contract.algo.ts:292-296
+    // itxn
+    //   .payment({
+    //     receiver: Txn.sender,
+    //     amount: game.participationFee,
+    //   })
+    intc_1 // 1
+    itxn_field TypeEnum
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/abstract_contract/contract.algo.ts:292-297
+    // itxn
+    //   .payment({
+    //     receiver: Txn.sender,
+    //     amount: game.participationFee,
+    //   })
+    //   .submit()
+    itxn_submit
+    // smart_contracts/abstract_contract/contract.algo.ts:299
+    // game.players[playerIndex] = game.players[game.currentPlayerCount]
+    dup
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    uncover 2
+    intc_3 // 32
+    *
+    dig 1
+    swap
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    dig 3
+    intc_3 // 32
+    *
+    uncover 2
+    dig 1
+    uncover 3
+    replace3 // on error: index access is out of bounds
+    uncover 2
+    swap
+    replace2 0
+    // smart_contracts/abstract_contract/contract.algo.ts:300
+    // game.commits[playerIndex] = game.commits[game.currentPlayerCount]
+    dup
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    intc 6 // 496
+    intc_2 // 480
+    extract3
+    swap
+    intc_3 // 32
+    *
+    dig 1
+    swap
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    dig 3
+    swap
+    replace3 // on error: index access is out of bounds
+    intc 6 // 496
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:301
+    // game.hasCommitted[playerIndex] = game.hasCommitted[game.currentPlayerCount]
+    dup
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    dig 1
+    pushint 15 // 15
+    <
+    assert // index access is out of bounds
+    dup
+    uncover 2
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    intc_0 // 0
+    getbit
+    dig 4
+    pushint 15 // 15
+    <
+    assert // index access is out of bounds
+    dig 4
+    swap
+    setbit
+    intc 4 // 976
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:302
+    // game.hasRevealed[playerIndex] = game.hasRevealed[game.currentPlayerCount]
+    dup
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    intc 5 // 1458
+    pushint 2 // 2
+    extract3
+    dig 1
+    pushint 15 // 15
+    <
+    assert // index access is out of bounds
+    dup
+    uncover 2
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    intc_0 // 0
+    getbit
+    swap
+    uncover 4
+    uncover 2
+    setbit
+    intc 5 // 1458
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:303
+    // game.moves[playerIndex] = game.moves[game.currentPlayerCount]
+    dup
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    intc 8 // 978
+    intc_2 // 480
+    extract3
+    swap
+    intc_3 // 32
+    *
+    dig 1
+    swap
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    swap
+    uncover 3
+    uncover 2
+    replace3 // on error: index access is out of bounds
+    intc 8 // 978
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:306
+    // game.currentPlayerCount -= 1
+    dup
+    intc_2 // 480
+    extract_uint64
+    intc_1 // 1
+    -
+    itob
+    intc_2 // 480
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:307
+    // game.balance -= game.participationFee
+    dup
+    intc 10 // 1460
+    extract_uint64
+    dig 1
+    intc 9 // 1468
+    extract_uint64
+    -
+    itob
+    intc 10 // 1460
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:310
+    // this.games(gameId).value = clone(game)
+    dig 4
+    swap
+    box_put
+    // smart_contracts/abstract_contract/contract.algo.ts:273
+    // public backOff(gameId: uint64): void {
+    intc_1 // 1
+    return
+
+backOff_after_if_else@5:
+    // smart_contracts/abstract_contract/contract.algo.ts:280
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dup
+    intc_1 // 1
+    +
+    bury 1
+    b backOff_while_top@2
+
+backOff_after_while@6:
+    dig 1
+    b backOff_block@7
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.verifyDeadline[routing]() -> void:
+verifyDeadline:
+    bytec_3 // ""
+    dupn 11
+    // smart_contracts/abstract_contract/contract.algo.ts:318
+    // public verifyDeadline(gameId: uint64): void {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    // smart_contracts/abstract_contract/contract.algo.ts:319
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    dupn 2
+    // smart_contracts/abstract_contract/contract.algo.ts:319
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    box_len
+    bury 1
+    assert // Game does not exist
+    // smart_contracts/abstract_contract/contract.algo.ts:320
+    // const game = clone(this.games(gameId).value)
+    box_get
+    pop
+    dup
+    // smart_contracts/abstract_contract/contract.algo.ts:321
+    // const preDelBox = op.minBalance(Global.currentApplicationAddress)
+    global CurrentApplicationAddress
+    min_balance
+    swap
+    // smart_contracts/abstract_contract/contract.algo.ts:324
+    // if (game.deadline === 0) return
+    intc 11 // 1476
+    extract_uint64
+    dup
+    bz verifyDeadline_after_inlined_smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.verifyDeadline@35
+    // smart_contracts/abstract_contract/contract.algo.ts:327
+    // assert(Global.latestTimestamp >= game.deadline, 'The deadline has not been reached yet')
+    global LatestTimestamp
+    dig 1
+    >=
+    assert // The deadline has not been reached yet
+    // smart_contracts/abstract_contract/contract.algo.ts:330
+    // let allCommitted = true
+    intc_1 // 1
+    bury 16
+    intc_0 // 0
+    bury 12
+
+verifyDeadline_for_header@4:
+    // smart_contracts/abstract_contract/contract.algo.ts:331
+    // for (const b of game.hasCommitted) {
+    dig 11
+    pushint 15 // 15
+    <
+    dup
+    bury 16
+    bz verifyDeadline_block@10
+    dig 2
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    dig 15
+    assert // index access is out of bounds
+    dig 12
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    // smart_contracts/abstract_contract/contract.algo.ts:332
+    // if (!b.native) {
+    intc_0 // 0
+    getbit
+    bnz verifyDeadline_after_if_else@7
+    // smart_contracts/abstract_contract/contract.algo.ts:333
+    // allCommitted = false
+    intc_0 // 0
+    bury 16
+
+verifyDeadline_block@10:
+    // smart_contracts/abstract_contract/contract.algo.ts:339
+    // let revealedCount: uint64 = 0
+    intc_0 // 0
+    bury 8
+    intc_0 // 0
+    bury 11
+
+verifyDeadline_for_header@12:
+    // smart_contracts/abstract_contract/contract.algo.ts:340
+    // for (const b of game.hasRevealed) {
+    dig 10
+    pushint 15 // 15
+    <
+    dup
+    bury 15
+    bz verifyDeadline_after_for@17
+    dig 2
+    intc 5 // 1458
+    pushint 2 // 2
+    extract3
+    dig 14
+    assert // index access is out of bounds
+    dig 11
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    // smart_contracts/abstract_contract/contract.algo.ts:341
+    // if (b.native) revealedCount = revealedCount + 1
+    intc_0 // 0
+    getbit
+    bz verifyDeadline_after_if_else@15
+    dig 7
+    intc_1 // 1
+    +
+    bury 8
+
+verifyDeadline_after_if_else@15:
+    dig 10
+    intc_1 // 1
+    +
+    bury 11
+    b verifyDeadline_for_header@12
+
+verifyDeadline_after_for@17:
+    // smart_contracts/abstract_contract/contract.algo.ts:345
+    // if (!allCommitted || revealedCount === 0) {
+    dig 15
+    bz verifyDeadline_if_body@19
+    dig 7
+    bnz verifyDeadline_after_if_else@27
+
+verifyDeadline_if_body@19:
+    // smart_contracts/abstract_contract/contract.algo.ts:347
+    // for (let i: uint64 = 0; i < game.hasCommitted.length; i = i + 1) {
+    intc_0 // 0
+    bury 13
+
+verifyDeadline_while_top@20:
+    // smart_contracts/abstract_contract/contract.algo.ts:347
+    // for (let i: uint64 = 0; i < game.hasCommitted.length; i = i + 1) {
+    dig 12
+    pushint 15 // 15
+    <
+    dup
+    bury 7
+    bz verifyDeadline_after_while@25
+    // smart_contracts/abstract_contract/contract.algo.ts:348
+    // if (game.hasCommitted[i].native) {
+    dig 2
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    dig 6
+    assert // index access is out of bounds
+    dig 13
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    intc_0 // 0
+    getbit
+    bz verifyDeadline_after_if_else@24
+    // smart_contracts/abstract_contract/contract.algo.ts:349-355
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: game.participationFee,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    //   .submit()
+    itxn_begin
+    // smart_contracts/abstract_contract/contract.algo.ts:351
+    // receiver: game.players[i].native,
+    dig 2
+    dup
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    dig 14
+    intc_3 // 32
+    *
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    // smart_contracts/abstract_contract/contract.algo.ts:352
+    // amount: game.participationFee,
+    swap
+    intc 9 // 1468
+    extract_uint64
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/abstract_contract/contract.algo.ts:349-354
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: game.participationFee,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    intc_1 // 1
+    itxn_field TypeEnum
+    // smart_contracts/abstract_contract/contract.algo.ts:353
+    // fee: 0, // Fee is covered by the outer transaction group
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/abstract_contract/contract.algo.ts:349-355
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: game.participationFee,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    //   .submit()
+    itxn_submit
+
+verifyDeadline_after_if_else@24:
+    // smart_contracts/abstract_contract/contract.algo.ts:347
+    // for (let i: uint64 = 0; i < game.hasCommitted.length; i = i + 1) {
+    dig 12
+    intc_1 // 1
+    +
+    bury 13
+    b verifyDeadline_while_top@20
+
+verifyDeadline_after_while@25:
+    // smart_contracts/abstract_contract/contract.algo.ts:360
+    // this.games(gameId).delete()
+    dig 3
+    box_del
+    pop
+    // smart_contracts/abstract_contract/contract.algo.ts:363
+    // const postDelBox = op.minBalance(Global.currentApplicationAddress)
+    global CurrentApplicationAddress
+    min_balance
+    // smart_contracts/abstract_contract/contract.algo.ts:366
+    // const mbrToReturn: uint64 = preDelBox - postDelBox
+    dig 2
+    swap
+    -
+    // smart_contracts/abstract_contract/contract.algo.ts:367-373
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    //   .submit()
+    itxn_begin
+    // smart_contracts/abstract_contract/contract.algo.ts:369
+    // receiver: game.players[0].native,
+    dig 3
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    extract 0 32 // on error: index access is out of bounds
+    itxn_field Receiver
+    itxn_field Amount
+    // smart_contracts/abstract_contract/contract.algo.ts:367-372
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    intc_1 // 1
+    itxn_field TypeEnum
+    // smart_contracts/abstract_contract/contract.algo.ts:371
+    // fee: 0, // Fee is covered by the outer transaction group
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/abstract_contract/contract.algo.ts:367-373
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    //   .submit()
+    itxn_submit
+
+verifyDeadline_after_inlined_smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.verifyDeadline@35:
+    // smart_contracts/abstract_contract/contract.algo.ts:318
+    // public verifyDeadline(gameId: uint64): void {
+    intc_1 // 1
+    return
+
+verifyDeadline_after_if_else@27:
+    // smart_contracts/abstract_contract/contract.algo.ts:378
+    // const share: uint64 = game.balance / revealedCount
+    dig 2
+    intc 10 // 1460
+    extract_uint64
+    dup
+    dig 9
+    dup
+    cover 3
+    /
+    bury 9
+    // smart_contracts/abstract_contract/contract.algo.ts:379
+    // const remainder: uint64 = game.balance % revealedCount // Handle "dust"
+    swap
+    %
+    bury 9
+    // smart_contracts/abstract_contract/contract.algo.ts:381
+    // for (let i: uint64 = 0; i < game.hasRevealed.length; i = i + 1) {
+    intc_0 // 0
+    bury 10
+
+verifyDeadline_while_top@28:
+    // smart_contracts/abstract_contract/contract.algo.ts:381
+    // for (let i: uint64 = 0; i < game.hasRevealed.length; i = i + 1) {
+    dig 9
+    pushint 15 // 15
+    <
+    dup
+    bury 6
+    bz verifyDeadline_after_while@33
+    // smart_contracts/abstract_contract/contract.algo.ts:382
+    // if (game.hasRevealed[i].native) {
+    dig 2
+    intc 5 // 1458
+    pushint 2 // 2
+    extract3
+    dig 5
+    assert // index access is out of bounds
+    dig 10
+    getbit
+    bytec_0 // 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    intc_0 // 0
+    getbit
+    bz verifyDeadline_after_if_else@32
+    // smart_contracts/abstract_contract/contract.algo.ts:383-389
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: share,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    //   .submit()
+    itxn_begin
+    // smart_contracts/abstract_contract/contract.algo.ts:385
+    // receiver: game.players[i].native,
+    dig 2
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    dig 10
+    intc_3 // 32
+    *
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    dig 7
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/abstract_contract/contract.algo.ts:383-388
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: share,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    intc_1 // 1
+    itxn_field TypeEnum
+    // smart_contracts/abstract_contract/contract.algo.ts:387
+    // fee: 0, // Fee is covered by the outer transaction group
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/abstract_contract/contract.algo.ts:383-389
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: share,
+    //     fee: 0, // Fee is covered by the outer transaction group
+    //   })
+    //   .submit()
+    itxn_submit
+
+verifyDeadline_after_if_else@32:
+    // smart_contracts/abstract_contract/contract.algo.ts:381
+    // for (let i: uint64 = 0; i < game.hasRevealed.length; i = i + 1) {
+    dig 9
+    intc_1 // 1
+    +
+    bury 10
+    b verifyDeadline_while_top@28
+
+verifyDeadline_after_while@33:
+    // smart_contracts/abstract_contract/contract.algo.ts:394
+    // this.games(gameId).delete()
+    dig 3
+    box_del
+    pop
+    // smart_contracts/abstract_contract/contract.algo.ts:397
+    // const postDelBox = op.minBalance(Global.currentApplicationAddress)
+    global CurrentApplicationAddress
+    min_balance
+    // smart_contracts/abstract_contract/contract.algo.ts:400
+    // const mbrToReturn: uint64 = preDelBox - postDelBox
+    dig 2
+    swap
+    -
+    // smart_contracts/abstract_contract/contract.algo.ts:403-409
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn + remainder,
+    //     fee: 0,
+    //   })
+    //   .submit()
+    itxn_begin
+    // smart_contracts/abstract_contract/contract.algo.ts:405
+    // receiver: game.players[0].native,
+    dig 3
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    extract 0 32 // on error: index access is out of bounds
+    // smart_contracts/abstract_contract/contract.algo.ts:406
+    // amount: mbrToReturn + remainder,
+    swap
+    dig 10
+    +
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/abstract_contract/contract.algo.ts:403-408
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn + remainder,
+    //     fee: 0,
+    //   })
+    intc_1 // 1
+    itxn_field TypeEnum
+    // smart_contracts/abstract_contract/contract.algo.ts:407
+    // fee: 0,
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/abstract_contract/contract.algo.ts:403-409
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn + remainder,
+    //     fee: 0,
+    //   })
+    //   .submit()
+    itxn_submit
+    // smart_contracts/abstract_contract/contract.algo.ts:318
+    // public verifyDeadline(gameId: uint64): void {
+    b verifyDeadline_after_inlined_smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.verifyDeadline@35
+
+verifyDeadline_after_if_else@7:
+    dig 11
+    intc_1 // 1
+    +
+    bury 12
+    b verifyDeadline_for_header@4
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.deleteGame[routing]() -> void:
+deleteGame:
+    // smart_contracts/abstract_contract/contract.algo.ts:424
+    // public deleteGame(gameId: uint64): void {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    // smart_contracts/abstract_contract/contract.algo.ts:426
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    dupn 2
+    // smart_contracts/abstract_contract/contract.algo.ts:426
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    box_len
+    bury 1
+    assert // Game does not exist
+    // smart_contracts/abstract_contract/contract.algo.ts:428
+    // const game = clone(this.games(gameId).value)
+    box_get
+    pop
+    dup
+    // smart_contracts/abstract_contract/contract.algo.ts:431
+    // assert(Txn.sender === game.players[0].native, 'Only the creator can delete the game')
+    txn Sender
+    dig 1
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    dup
+    cover 3
+    extract 0 32 // on error: index access is out of bounds
+    dup
+    cover 3
+    ==
+    assert // Only the creator can delete the game
+    // smart_contracts/abstract_contract/contract.algo.ts:433
+    // assert(game.currentPlayerCount < game.maxPlayers, 'Game has started, deletion not possible')
+    dup
+    intc_2 // 480
+    extract_uint64
+    dup
+    uncover 2
+    intc 7 // 488
+    extract_uint64
+    <
+    assert // Game has started, deletion not possible
+    // smart_contracts/abstract_contract/contract.algo.ts:436
+    // const preDelBox = op.minBalance(Global.currentApplicationAddress)
+    global CurrentApplicationAddress
+    min_balance
+    // smart_contracts/abstract_contract/contract.algo.ts:439
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    intc_0 // 0
+
+deleteGame_while_top@2:
+    // smart_contracts/abstract_contract/contract.algo.ts:439
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dup
+    dig 3
+    <
+    bz deleteGame_after_while@5
+    // smart_contracts/abstract_contract/contract.algo.ts:440-446
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: game.participationFee,
+    //     fee: 0,
+    //   })
+    //   .submit()
+    itxn_begin
+    // smart_contracts/abstract_contract/contract.algo.ts:442
+    // receiver: game.players[i].native,
+    dupn 2
+    intc_3 // 32
+    *
+    dig 6
+    swap
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    // smart_contracts/abstract_contract/contract.algo.ts:443
+    // amount: game.participationFee,
+    dig 7
+    intc 9 // 1468
+    extract_uint64
+    itxn_field Amount
+    itxn_field Receiver
+    // smart_contracts/abstract_contract/contract.algo.ts:440-445
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: game.participationFee,
+    //     fee: 0,
+    //   })
+    intc_1 // 1
+    itxn_field TypeEnum
+    // smart_contracts/abstract_contract/contract.algo.ts:444
+    // fee: 0,
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/abstract_contract/contract.algo.ts:440-446
+    // itxn
+    //   .payment({
+    //     receiver: game.players[i].native,
+    //     amount: game.participationFee,
+    //     fee: 0,
+    //   })
+    //   .submit()
+    itxn_submit
+    // smart_contracts/abstract_contract/contract.algo.ts:439
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    intc_1 // 1
+    +
+    bury 1
+    b deleteGame_while_top@2
+
+deleteGame_after_while@5:
+    // smart_contracts/abstract_contract/contract.algo.ts:449
+    // this.games(gameId).delete()
+    dig 6
+    box_del
+    pop
+    // smart_contracts/abstract_contract/contract.algo.ts:452
+    // const postDelBox = op.minBalance(Global.currentApplicationAddress)
+    global CurrentApplicationAddress
+    min_balance
+    // smart_contracts/abstract_contract/contract.algo.ts:455
+    // const mbrToReturn: uint64 = preDelBox - postDelBox
+    dig 2
+    swap
+    -
+    // smart_contracts/abstract_contract/contract.algo.ts:456-462
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn,
+    //     fee: 0,
+    //   })
+    //   .submit()
+    itxn_begin
+    itxn_field Amount
+    dig 3
+    itxn_field Receiver
+    // smart_contracts/abstract_contract/contract.algo.ts:456-461
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn,
+    //     fee: 0,
+    //   })
+    intc_1 // 1
+    itxn_field TypeEnum
+    // smart_contracts/abstract_contract/contract.algo.ts:460
+    // fee: 0,
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/abstract_contract/contract.algo.ts:456-462
+    // itxn
+    //   .payment({
+    //     receiver: game.players[0].native,
+    //     amount: mbrToReturn,
+    //     fee: 0,
+    //   })
+    //   .submit()
+    itxn_submit
+    // smart_contracts/abstract_contract/contract.algo.ts:424
+    // public deleteGame(gameId: uint64): void {
+    intc_1 // 1
+    return
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.getGameInfo[routing]() -> void:
+getGameInfo:
+    // smart_contracts/abstract_contract/contract.algo.ts:465
+    // public getGameInfo(gameId: uint64): GameState {
+    txna ApplicationArgs 1
+    dup
+    len
+    pushint 8 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    btoi
+    // smart_contracts/abstract_contract/contract.algo.ts:466
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    // smart_contracts/abstract_contract/contract.algo.ts:466
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    dup
+    box_len
+    bury 1
+    assert // Game does not exist
+    // smart_contracts/abstract_contract/contract.algo.ts:467
+    // return this.games(gameId).value
+    box_get
+    pop
+    // smart_contracts/abstract_contract/contract.algo.ts:465
+    // public getGameInfo(gameId: uint64): GameState {
+    bytec 4 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+
+// smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame(gameId: uint64, payment: uint64) -> void:
+smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame:
+    // smart_contracts/abstract_contract/contract.algo.ts:42
+    // public joinGame(gameId: uint64, payment: gtxn.PaymentTxn): void {
+    proto 2 0
+    // smart_contracts/abstract_contract/contract.algo.ts:44
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    frame_dig -2
+    itob
+    // smart_contracts/abstract_contract/contract.algo.ts:35
+    // games = BoxMap<uint64, GameState>({ keyPrefix: 'games' })
+    bytec_1 // "games"
+    swap
+    concat
+    dupn 2
+    // smart_contracts/abstract_contract/contract.algo.ts:44
+    // assert(this.games(gameId).exists, 'Game does not exist')
+    box_len
+    bury 1
+    assert // Game does not exist
+    // smart_contracts/abstract_contract/contract.algo.ts:45
+    // const game = clone(this.games(gameId).value)
+    box_get
+    pop
+    dupn 2
+    // smart_contracts/abstract_contract/contract.algo.ts:47
+    // assert(game.currentPlayerCount < game.maxPlayers, 'Game is full')
+    intc_2 // 480
+    extract_uint64
+    dup
+    uncover 2
+    dup
+    intc 7 // 488
+    extract_uint64
+    uncover 2
+    >
+    assert // Game is full
+    // smart_contracts/abstract_contract/contract.algo.ts:49
+    // assert(payment.receiver === Global.currentApplicationAddress, 'Payment must be to the contract')
+    frame_dig -1
+    gtxns Receiver
+    global CurrentApplicationAddress
+    ==
+    assert // Payment must be to the contract
+    // smart_contracts/abstract_contract/contract.algo.ts:51
+    // assert(payment.amount === game.participationFee, 'Payment amount must match the participation fee')
+    frame_dig -1
+    gtxns Amount
+    dup
+    uncover 2
+    intc 9 // 1468
+    extract_uint64
+    ==
+    assert // Payment amount must match the participation fee
+    // smart_contracts/abstract_contract/contract.algo.ts:53
+    // let alreadyJoined = false
+    intc_0 // 0
+    // smart_contracts/abstract_contract/contract.algo.ts:54
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    dup
+
+smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_while_top@1:
+    // smart_contracts/abstract_contract/contract.algo.ts:54
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    frame_dig 5
+    frame_dig 2
+    <
+    bz smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_block@6
+    // smart_contracts/abstract_contract/contract.algo.ts:55
+    // if (game.players[i].native === Txn.sender) {
+    frame_dig 1
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    frame_dig 5
+    intc_3 // 32
+    *
+    intc_3 // 32
+    extract3 // on error: index access is out of bounds
+    txn Sender
+    ==
+    bz smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_after_if_else@4
+    // smart_contracts/abstract_contract/contract.algo.ts:56
+    // alreadyJoined = true
+    intc_1 // 1
+    frame_bury 4
+
+smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_block@6:
+    // smart_contracts/abstract_contract/contract.algo.ts:60
+    // assert(!alreadyJoined, 'Player already joined')
+    frame_dig 4
+    !
+    assert // Player already joined
+    // smart_contracts/abstract_contract/contract.algo.ts:63
+    // game.players[game.currentPlayerCount] = new Address(Txn.sender)
+    txn Sender
+    frame_dig 1
+    dup
+    cover 2
+    intc_0 // 0
+    intc_2 // 480
+    extract3
+    frame_dig 2
+    intc_3 // 32
+    *
+    uncover 2
+    replace3 // on error: index access is out of bounds
+    replace2 0
+    // smart_contracts/abstract_contract/contract.algo.ts:64
+    // game.commits[game.currentPlayerCount] = new StaticBytes<32>(bzero(32))
+    intc_3 // 32
+    bzero
+    dig 1
+    intc_2 // 480
+    extract_uint64
+    dig 2
+    intc 6 // 496
+    intc_2 // 480
+    extract3
+    swap
+    intc_3 // 32
+    *
+    dig 2
+    replace3 // on error: index access is out of bounds
+    uncover 2
+    intc 6 // 496
+    uncover 2
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:65
+    // game.moves[game.currentPlayerCount] = new StaticBytes<32>(bzero(32))
+    dup
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    intc 8 // 978
+    intc_2 // 480
+    extract3
+    swap
+    intc_3 // 32
+    *
+    uncover 3
+    replace3 // on error: index access is out of bounds
+    intc 8 // 978
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:66
+    // game.hasRevealed[game.currentPlayerCount] = new Bool(false)
+    dup
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    intc 5 // 1458
+    pushint 2 // 2
+    extract3
+    dig 1
+    pushint 15 // 15
+    <
+    assert // index access is out of bounds
+    swap
+    intc_0 // 0
+    setbit
+    intc 5 // 1458
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:67
+    // game.hasCommitted[game.currentPlayerCount] = new Bool(false)
+    dup
+    intc_2 // 480
+    extract_uint64
+    dig 1
+    intc 4 // 976
+    pushint 2 // 2
+    extract3
+    dig 1
+    pushint 15 // 15
+    <
+    assert // index access is out of bounds
+    swap
+    // smart_contracts/abstract_contract/contract.algo.ts:66
+    // game.hasRevealed[game.currentPlayerCount] = new Bool(false)
+    intc_0 // 0
+    // smart_contracts/abstract_contract/contract.algo.ts:67
+    // game.hasCommitted[game.currentPlayerCount] = new Bool(false)
+    setbit
+    intc 4 // 976
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:69
+    // game.currentPlayerCount += 1
+    dup
+    intc_2 // 480
+    extract_uint64
+    intc_1 // 1
+    +
+    itob
+    intc_2 // 480
+    swap
+    replace3
+    // smart_contracts/abstract_contract/contract.algo.ts:70
+    // game.balance = Uint64(game.balance + payment.amount)
+    dup
+    intc 10 // 1460
+    extract_uint64
+    frame_dig 3
+    +
+    itob
+    intc 10 // 1460
+    swap
+    replace3
+    dup
+    frame_bury 1
+    // smart_contracts/abstract_contract/contract.algo.ts:72
+    // if (game.currentPlayerCount === game.maxPlayers) game.deadline = Global.latestTimestamp + game.timerCommit
+    dup
+    intc_2 // 480
+    extract_uint64
+    swap
+    intc 7 // 488
+    extract_uint64
+    ==
+    bz smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_after_if_else@8
+    global LatestTimestamp
+    frame_dig 1
+    dup
+    cover 2
+    pushint 1484 // 1484
+    extract_uint64
+    +
+    itob
+    intc 11 // 1476
+    swap
+    replace3
+    frame_bury 1
+
+smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_after_if_else@8:
+    // smart_contracts/abstract_contract/contract.algo.ts:74
+    // this.games(gameId).value = clone(game)
+    frame_dig 0
+    frame_dig 1
+    box_put
+    retsub
+
+smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_after_if_else@4:
+    // smart_contracts/abstract_contract/contract.algo.ts:54
+    // for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
+    frame_dig 5
+    intc_1 // 1
+    +
+    frame_bury 5
+    b smart_contracts/abstract_contract/contract.algo.ts::AbstractGameContract.joinGame_while_top@1
