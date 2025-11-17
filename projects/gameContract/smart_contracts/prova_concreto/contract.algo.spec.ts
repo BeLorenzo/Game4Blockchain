@@ -7,12 +7,11 @@ describe('GameContract', () => {
   const context = new TestExecutionContext()
 
   it('Creates a new game', () => {
-    // Arrange
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
-    const maxPlayers = context.any.uint64(2, 50)
+    const maxPlayers = context.any.uint64(2, 15)
     const entryFee = 100000
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const mbrPayment = context.any.txn.payment({
       receiver: app.address,
       amount: mbr,
@@ -24,12 +23,9 @@ describe('GameContract', () => {
     const timerCommit = context.any.uint64(1, 604800)
     const timerReveal = context.any.uint64(1, 604800)
 
-    // Act
     const gameId = contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal)
-
     const game = contract.games(gameId).value
 
-    // Assert
     expect(gameId.valueOf()).toBeGreaterThan(0)
     expect(game.balance === entryFee)
     expect(game.players.length === 1)
@@ -39,12 +35,11 @@ describe('GameContract', () => {
   })
 
   it('Allows a player to join a game', () => {
-    // Arrange
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
     const maxPlayers = context.any.uint64(5, 10)
     const entryFee = context.any.uint64(1, 100000)
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const mbrPayment = context.any.txn.payment({
       receiver: app.address,
       amount: mbr,
@@ -53,13 +48,11 @@ describe('GameContract', () => {
       receiver: app.address,
       amount: entryFee,
     })
-    const timerCommit = context.any.uint64(1, 604800)
-    const timerReveal = context.any.uint64(1, 604800)
+    const timerCommit = context.any.uint64(300, 604800)
+    const timerReveal = context.any.uint64(300, 604800)
 
-    // Crea il gioco
     const gameId = contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal)
 
-    // Simula un nuovo account per il join
     const joiningAccount = context.any.account()
     const joinPayment = context.any.txn.payment({
       sender: joiningAccount,
@@ -67,7 +60,6 @@ describe('GameContract', () => {
       amount: entryFee,
     })
 
-    // Act
     context.txn.createScope([context.any.txn.applicationCall({ sender: joiningAccount, appId: app })]).execute(() => {
       contract.joinGame(gameId, joinPayment)
     })
@@ -83,7 +75,6 @@ describe('GameContract', () => {
       contract.joinGame(gameId, secondJoinPayment)
     })
 
-    // Assert
     const game = contract.games(gameId).value
     expect(gameId.valueOf()).toBeGreaterThanOrEqual(1)
     expect(game.balance === entryFee * 3)
@@ -108,7 +99,7 @@ describe('GameContract', () => {
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
     const maxPlayers = 2
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const entryFee = context.any.uint64(1, 100000)
     const mbrPayment = context.any.txn.payment({ receiver: app.address, amount: mbr })
     const entryPayment = context.any.txn.payment({ receiver: app.address, amount: entryFee })
@@ -155,7 +146,6 @@ describe('GameContract', () => {
     context.txn.createScope([context.any.txn.applicationCall({ appId: app })]).execute(() => {
       gameId = contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal)
     })
-    // Pagamento verso un altro account
     const wrongReceiver = context.any.account()
     const joinPayment = context.any.txn.payment({
       receiver: wrongReceiver,
@@ -177,7 +167,6 @@ describe('GameContract', () => {
     context.txn.createScope([context.any.txn.applicationCall({ appId: app })]).execute(() => {
       gameId = contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal)
     })
-    // Pagamento con importo sbagliato
     const joinPayment = context.any.txn.payment({
       receiver: app.address,
       amount: entryFee + 1,
@@ -198,7 +187,6 @@ describe('GameContract', () => {
     context.txn.createScope([context.any.txn.applicationCall({ appId: app })]).execute(() => {
       gameId = contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal)
     })
-    // Prova a joinare di nuovo con lo stesso account
     const joinPayment = context.any.txn.payment({
       receiver: app.address,
       amount: entryFee,
@@ -217,7 +205,7 @@ describe('GameContract', () => {
     const timerReveal = context.any.uint64(1, 604800)
     expect(() =>
       contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal),
-    ).toThrow('At least 2 players are required')
+    ).toThrow('Player number must be beetween 2-15')
   })
 
   it('should throw error if commit timer is too short', () => {
@@ -231,7 +219,7 @@ describe('GameContract', () => {
     const timerReveal = context.any.uint64(300, 604800)
     expect(() =>
       contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal),
-    ).toThrow('Commit timer must be greater than 5 minutes')
+    ).toThrow('Commit timer must be beetween 5 minutes and 7 days')
   })
 
   it('should throw error if reveal timer is too long', () => {
@@ -245,16 +233,15 @@ describe('GameContract', () => {
     const timerReveal = context.any.uint64(604800)
     expect(() =>
       contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal),
-    ).toThrow('Reveal timer cannot exceed 7 days')
+    ).toThrow('Reveal timer must be beetween 5 minutes and 7 days')
   })
 
   it('The creator can delete the game', () => {
-    // Arrange
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
-    const maxPlayers = context.any.uint64(2, 50)
+    const maxPlayers = context.any.uint64(2, 15)
     const entryFee = 100000
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const mbrPayment = context.any.txn.payment({
       receiver: app.address,
       amount: mbr,
@@ -275,12 +262,11 @@ describe('GameContract', () => {
   })
 
   it('The creator can delete the game even with some partecipants', () => {
-    // Arrange
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
     const maxPlayers = 5
     const entryFee = 1000000
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const mbrPayment = context.any.txn.payment({
       receiver: app.address,
       amount: mbr,
@@ -324,12 +310,11 @@ describe('GameContract', () => {
   })
 
   it('The creator cannot delete the game if it is full', () => {
-    // Arrange
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
     const maxPlayers = 3
     const entryFee = 1000000
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const mbrPayment = context.any.txn.payment({
       receiver: app.address,
       amount: mbr,
@@ -374,12 +359,11 @@ describe('GameContract', () => {
   })
 
   it('Only the creator can delete the game', () => {
-    // Arrange
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
     const maxPlayers = 3
     const entryFee = 1000000
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const mbrPayment = context.any.txn.payment({
       receiver: app.address,
       amount: mbr,
@@ -423,13 +407,13 @@ describe('GameContract', () => {
     ).toThrowError('Only the creator can delete the game')
   })
 
+  //Non riesco a capire come testare se avvengono o no delle inner transaction
   it('allows a player to back off before the game starts', () => {
-    // Arrange
     const contract = context.contract.create(ProvaConcreteContract)
     const app = context.ledger.getApplicationForContract(contract)
     const maxPlayers = 5
     const entryFee = 100000
-    const mbr = contract.getRequiredMbr(maxPlayers)
+    const mbr = contract.getRequiredMbr()
     const mbrPayment = context.any.txn.payment({
       receiver: app.address,
       amount: mbr,
@@ -441,7 +425,6 @@ describe('GameContract', () => {
     const timerCommit = context.any.uint64(300, 604800)
     const timerReveal = context.any.uint64(300, 604800)
 
-    // Crea il gioco
     let gameId: uint64
     let oldPlayerCount: uint64
     let oldBalance: uint64
@@ -449,7 +432,6 @@ describe('GameContract', () => {
       gameId = contract.createNewGame(maxPlayers, entryFee, mbrPayment, entryPayment, timerCommit, timerReveal)
     })
 
-    // Un nuovo giocatore si unisce
     const player = context.any.account()
     const joinPayment = context.any.txn.payment({
       sender: player,
@@ -462,11 +444,9 @@ describe('GameContract', () => {
       oldBalance = contract.games(gameId).value.balance
     })
 
-    // Act: il giocatore fa backOff
     context.txn.createScope([context.any.txn.applicationCall({ sender: player, appId: app })]).execute(() => {
       contract.backOff(gameId)
 
-      // Verifica che la partecipationFee sia stata rimborsata tramite inner transaction
       const itxnGroup = context.txn.lastGroup.lastItxnGroup()
       let found = false
       for (const itxn of itxnGroup.itxns) {
@@ -477,7 +457,6 @@ describe('GameContract', () => {
       }
       expect(found).toBe(true)
 
-      // Verifica che il giocatore sia stato rimosso e il balance aggiornato
       const game = contract.games(gameId).value
       expect(game.currentPlayerCount).toBe(oldPlayerCount - 1)
       expect(game.balance).toBe(oldBalance - entryFee)

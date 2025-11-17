@@ -1,18 +1,20 @@
+import { Config } from '@algorandfoundation/algokit-utils'
+import { registerDebugEventHandlers } from '@algorandfoundation/algokit-utils-debug'
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing'
 import { TransactionSignerAccount } from '@algorandfoundation/algokit-utils/types/account'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Account } from 'algosdk'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { ProvaConcreteContractFactory } from '../artifacts/prova_concreto/ProvaConcreteContractClient'
 
 describe('GameContract contract', () => {
   const localnet = algorandFixture()
-  /* beforeAll(() => {
+  beforeAll(() => {
     Config.configure({
       debug: true,
     })
     registerDebugEventHandlers()
-  })*/
+  })
   beforeEach(localnet.newScope)
 
   const deploy = async (account: Account & TransactionSignerAccount) => {
@@ -30,14 +32,12 @@ describe('GameContract contract', () => {
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
 
-    // Example arguments for the contract call
     const maxPlayers = 5
     const entryFee = 100_000
     const timerCommit = 300
     const timerReveal = 300
 
     const mbr = (await client.send.getRequiredMbr()).return!
-    // Crea le transazioni di pagamento richieste
     const mbrPayment = algorand.createTransaction.payment({
       sender: testAccount.addr,
       receiver: client.appAddress,
@@ -50,7 +50,6 @@ describe('GameContract contract', () => {
       amount: AlgoAmount.MicroAlgos(entryFee),
     })
 
-    // Call the contract method to create a new game
     const result = await client.send.createNewGame({
       args: {
         maxPlayers,
@@ -63,11 +62,9 @@ describe('GameContract contract', () => {
       sender: testAccount.addr,
     })
 
-    // Retrieve the game state (you may need a method like getGame or similar)
     const gameId = result.return!
     const game = (await client.state.box.games.value(gameId))!
 
-    // Assert
     expect(Number(gameId)).toBeGreaterThan(0)
     expect(Number(game.balance)).toBe(entryFee)
     expect(game.players.length).toBe(15)
@@ -313,10 +310,9 @@ describe('GameContract contract', () => {
     const timerReveal = 300
     const mbr = (await client.send.getRequiredMbr()).return!
 
-    // MBR payment verso un altro indirizzo
     const mbrPayment = algorand.createTransaction.payment({
       sender: testAccount.addr,
-      receiver: testAccount.addr, // Non il contratto!
+      receiver: testAccount.addr,
       amount: AlgoAmount.MicroAlgos(mbr),
     })
     const entryPayment = algorand.createTransaction.payment({
@@ -344,7 +340,6 @@ describe('GameContract contract', () => {
     const timerReveal = 300
     const mbr = (await client.send.getRequiredMbr()).return!
 
-    // MBR payment troppo basso
     const mbrPayment = algorand.createTransaction.payment({
       sender: testAccount.addr,
       receiver: client.appAddress,
@@ -380,10 +375,9 @@ describe('GameContract contract', () => {
       receiver: client.appAddress,
       amount: AlgoAmount.MicroAlgos(mbr),
     })
-    // entryPayment verso un altro indirizzo
     const entryPayment = algorand.createTransaction.payment({
       sender: testAccount.addr,
-      receiver: testAccount.addr, // Non il contratto!
+      receiver: testAccount.addr,
       amount: AlgoAmount.MicroAlgos(entryFee),
     })
 
@@ -411,7 +405,6 @@ describe('GameContract contract', () => {
       receiver: client.appAddress,
       amount: AlgoAmount.MicroAlgos(mbr),
     })
-    // entryPayment con importo sbagliato
     const entryPayment = algorand.createTransaction.payment({
       sender: testAccount.addr,
       receiver: client.appAddress,
@@ -431,7 +424,6 @@ describe('GameContract contract', () => {
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
 
-    // Parametri per la creazione della partita
     const maxPlayers = 5
     const entryFee = 100_000
     const timerCommit = 300
@@ -439,7 +431,7 @@ describe('GameContract contract', () => {
     const mbr = (await client.send.getRequiredMbr()).return!
     const dispenser = await algorand.account.localNetDispenser()
     await algorand.account.ensureFunded(testAccount.addr, dispenser, AlgoAmount.MicroAlgos(200000))
-    // Pagamenti necessari
+
     const mbrPayment = algorand.createTransaction.payment({
       sender: testAccount.addr,
       receiver: client.appAddress,
@@ -451,14 +443,12 @@ describe('GameContract contract', () => {
       amount: AlgoAmount.MicroAlgos(entryFee),
     })
 
-    // Crea la partita
     const result = await client.send.createNewGame({
       args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
       sender: testAccount.addr,
     })
     const gameId = result.return!
 
-    // Primo joiner
     const joiner1 = algorand.account.random()
     const joinPayment1 = algorand.createTransaction.payment({
       sender: joiner1.addr,
@@ -472,7 +462,6 @@ describe('GameContract contract', () => {
       sender: joiner1.addr,
     })
 
-    // Secondo joiner
     const joiner2 = algorand.account.random()
     const joinPayment2 = algorand.createTransaction.payment({
       sender: joiner2.addr,
@@ -486,10 +475,8 @@ describe('GameContract contract', () => {
       sender: joiner2.addr,
     })
 
-    // Recupera lo stato aggiornato della partita
     const game = (await client.state.box.games.value(gameId))!
 
-    // Assert: verifica che i giocatori siano stati aggiunti
     expect(Number(game.currentPlayerCount)).toBe(3) // creator + 2 joiner
     expect(game.players[0]).toEqual(testAccount.addr.toString())
     expect(game.players[1]).toEqual(joiner1.addr.toString())
@@ -501,7 +488,6 @@ describe('GameContract contract', () => {
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
 
-    // Parametri per la creazione della partita
     const maxPlayers = 2
     const entryFee = 100_000
     const timerCommit = 300
@@ -509,7 +495,7 @@ describe('GameContract contract', () => {
     const mbr = (await client.send.getRequiredMbr()).return!
     const dispenser = await algorand.account.localNetDispenser()
     await algorand.account.ensureFunded(testAccount.addr, dispenser, AlgoAmount.MicroAlgos(200000))
-    // Pagamenti necessari
+
     const mbrPayment = algorand.createTransaction.payment({
       sender: testAccount.addr,
       receiver: client.appAddress,
@@ -521,14 +507,12 @@ describe('GameContract contract', () => {
       amount: AlgoAmount.MicroAlgos(entryFee),
     })
 
-    // Crea la partita
     const result = await client.send.createNewGame({
       args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
       sender: testAccount.addr,
     })
     const gameId = result.return!
 
-    // Primo joiner
     const joiner1 = algorand.account.random()
     const joinPayment1 = algorand.createTransaction.payment({
       sender: joiner1.addr,
@@ -542,7 +526,6 @@ describe('GameContract contract', () => {
       sender: joiner1.addr,
     })
 
-    // Secondo joiner
     const joiner2 = algorand.account.random()
     const joinPayment2 = algorand.createTransaction.payment({
       sender: joiner2.addr,

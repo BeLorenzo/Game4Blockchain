@@ -25,7 +25,6 @@ import type { GameState } from './gameState.algo'
  * the specific game logic. It should not be deployed directly.
  *
  * Subclasses should add specific game methods and logic,
- * and decorate the concrete class with the @contract decorator for export and deployment.
  */
 export class AbstractGameContract extends Contract {
   /**Last game id*/
@@ -207,7 +206,7 @@ export class AbstractGameContract extends Contract {
     // Verify the game exists
     assert(this.games(gameId).exists, 'Game does not exist')
 
-    // Check move size limit *before* loading the box for gas efficiency
+    // Check move size limit
     assert(move.native.length <= 32, 'Move exceeds maximum allowed size')
 
     const game = clone(this.games(gameId).value)

@@ -8,18 +8,12 @@ import { GameState } from '../abstract_contract/gameState.algo'
  */
 export class ProvaConcreteContract extends AbstractGameContract {
   /**
-   * Implementazione "vuota" (no-op) richiesta dall'astratto.
-   * Ci permette di testare il resto senza che `reveal` fallisca.
+   * Implementazione "vuota" richiesta dall'astratto.
    */
   protected chooseWinner(game: GameState): void {
-    // Non fare nulla, è solo un segnaposto per i test
     return
   }
 
-  /**
-   * METODO PUBBLICO DI TEST:
-   * Espone il metodo 'protected createGame' per i test di unità.
-   */
   public createNewGame(
     maxPlayers: uint64,
     entryFee: uint64,

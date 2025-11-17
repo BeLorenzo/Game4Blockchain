@@ -51,7 +51,7 @@ main___algots__.defaultCreate@18:
 
 // smart_contracts/prova_concreto/contract.algo.ts::ProvaConcreteContract.createNewGame[routing]() -> void:
 createNewGame:
-    // smart_contracts/prova_concreto/contract.algo.ts:23-30
+    // smart_contracts/prova_concreto/contract.algo.ts:17-24
     // public createNewGame(
     //   maxPlayers: uint64,
     //   entryFee: uint64,
@@ -327,7 +327,7 @@ createNewGame_bool_merge@17:
     // return this.gameIdCounter.value
     app_global_get_ex
     assert // check GlobalState exists
-    // smart_contracts/prova_concreto/contract.algo.ts:23-30
+    // smart_contracts/prova_concreto/contract.algo.ts:17-24
     // public createNewGame(
     //   maxPlayers: uint64,
     //   entryFee: uint64,
