@@ -24,6 +24,8 @@ describe('GameContract contract', () => {
     })
 
     const { appClient } = await factory.deploy({ onUpdate: 'append', onSchemaBreak: 'append', suppressLog: true })
+    localnet.algorand.account.ensureFunded(appClient.appAddress, account.addr, AlgoAmount.MicroAlgos(200_000))
+
     return { client: appClient }
   }
 
@@ -540,5 +542,463 @@ describe('GameContract contract', () => {
         sender: joiner2.addr,
       }),
     ).rejects.toThrow('Game is full')
+  })
+
+  test('delete game and refund players', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+    const maxPlayers = 3
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const joiner = algorand.account.random()
+    const joinPayment = algorand.createTransaction.payment({
+      sender: joiner.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+    await algorand.account.ensureFundedFromEnvironment(joiner.addr, AlgoAmount.MicroAlgos(300_000))
+    await client.send.joinGame({
+      args: { gameId, payment: joinPayment },
+      sender: joiner.addr,
+    })
+
+    await client.send.deleteGame({
+      args: { gameId },
+      sender: testAccount.addr,
+      coverAppCallInnerTransactionFees: true,
+      maxFee: AlgoAmount.MicroAlgos(4000),
+    })
+    await expect(
+      client.send.deleteGame({
+        args: { gameId },
+        sender: testAccount.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgos(15000),
+      }),
+    ).rejects.toThrow('Game does not exist')
+  })
+
+  test('deleteGame fallisce se chiamato da non-creatore', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+    const maxPlayers = 3
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const notCreator = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(notCreator.addr, AlgoAmount.MicroAlgos(200_000))
+
+    await expect(
+      client.send.deleteGame({
+        args: { gameId },
+        sender: notCreator.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgos(4000),
+      }),
+    ).rejects.toThrow('Only the creator can delete the game')
+  })
+
+  test('deleteGame fallisce se il gioco è già iniziato', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+    const maxPlayers = 3
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    for (let i = 1; i < maxPlayers; i++) {
+      const joiner = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(joiner.addr, AlgoAmount.MicroAlgos(200_000))
+      const joinPayment = algorand.createTransaction.payment({
+        sender: joiner.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(entryFee),
+      })
+      await client.send.joinGame({
+        args: { gameId, payment: joinPayment },
+        sender: joiner.addr,
+      })
+    }
+
+    await expect(
+      client.send.deleteGame({
+        args: { gameId },
+        sender: testAccount.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgos(4000),
+      }),
+    ).rejects.toThrow('Game has started, deletion not possible')
+  })
+
+  test('backOff: il giocatore può ritirarsi prima che il gioco inizi', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+    const maxPlayers = 3
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const joiner = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(joiner.addr, AlgoAmount.MicroAlgos(200_000))
+    const joinPayment = algorand.createTransaction.payment({
+      sender: joiner.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+    await client.send.joinGame({
+      args: { gameId, payment: joinPayment },
+      sender: joiner.addr,
+    })
+
+    await client.send.backOff({
+      args: { gameId },
+      sender: joiner.addr,
+      coverAppCallInnerTransactionFees: true,
+      maxFee: AlgoAmount.MicroAlgos(4000),
+    })
+
+    const game = await client.state.box.games.value(gameId)
+    expect(Number(game?.currentPlayerCount)).toBe(1)
+    expect(Number(game?.balance)).toBe(entryFee)
+  })
+
+  test('backOff: fallisce se non sei un giocatore', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+    const maxPlayers = 3
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const stranger = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(stranger.addr, AlgoAmount.MicroAlgos(200_000))
+
+    await expect(
+      client.send.backOff({
+        args: { gameId },
+        sender: stranger.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgos(4000),
+      }),
+    ).rejects.toThrow('You are not a player in this game')
+  })
+
+  test('backOff: fallisce se il gioco è già iniziato', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+    const maxPlayers = 7
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    for (let i = 1; i < maxPlayers; i++) {
+      const joiner = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(joiner.addr, AlgoAmount.MicroAlgos(200_000))
+      const joinPayment = algorand.createTransaction.payment({
+        sender: joiner.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(entryFee),
+      })
+      await client.send.joinGame({
+        args: { gameId, payment: joinPayment },
+        sender: joiner.addr,
+      })
+    }
+
+    await expect(
+      client.send.backOff({
+        args: { gameId },
+        sender: testAccount.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgos(4000),
+      }),
+    ).rejects.toThrow('You cannot withdraw after the game has started')
+  })
+
+  test('commit: un giocatore può committare se il gioco è pieno e non ha già committato', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    const maxPlayers = 2
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const joiner = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(joiner.addr, AlgoAmount.MicroAlgos(200_000))
+    const joinPayment = algorand.createTransaction.payment({
+      sender: joiner.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+    await client.send.joinGame({
+      args: { gameId, payment: joinPayment },
+      sender: joiner.addr,
+    })
+
+    const commitment1 = new Uint8Array(32)
+    await client.send.commit({
+      args: { gameId, commitment: commitment1 },
+      sender: testAccount.addr,
+    })
+
+    const commitment2 = new Uint8Array(32)
+    await client.send.commit({
+      args: { gameId, commitment: commitment2 },
+      sender: joiner.addr,
+    })
+
+    const game = await client.state.box.games.value(gameId)
+    expect(game?.hasCommitted[0]).toBe(true)
+    expect(game?.hasCommitted[1]).toBe(true)
+    expect(game?.deadline).toBeGreaterThan(0)
+  })
+
+  test('errore se chiamante non giocatore', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    const maxPlayers = 2
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const stranger = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(stranger.addr, AlgoAmount.MicroAlgos(200_000))
+    const commitment = new Uint8Array(32)
+    await expect(
+      client.send.commit({
+        args: { gameId, commitment },
+        sender: stranger.addr,
+      }),
+    ).rejects.toThrow('You are not a player in this game')
+  })
+
+  test('errore commit con gioco non pieno', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    const maxPlayers = 2
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const commitment = new Uint8Array(32)
+    await expect(
+      client.send.commit({
+        args: { gameId, commitment },
+        sender: testAccount.addr,
+      }),
+    ).rejects.toThrow('The game is not full yet')
+  })
+
+  test('errore già committato', async () => {
+    const { testAccount, algorand } = localnet.context
+    const { client } = await deploy(testAccount)
+    const maxPlayers = 2
+    const entryFee = 100_000
+    const timerCommit = 300
+    const timerReveal = 300
+    const mbr = (await client.send.getRequiredMbr()).return!
+    const mbrPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(mbr),
+    })
+    const entryPayment = algorand.createTransaction.payment({
+      sender: testAccount.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+
+    const result = await client.send.createNewGame({
+      args: { maxPlayers, entryFee, mbr: mbrPayment, entryPayment, timerCommit, timerReveal },
+      sender: testAccount.addr,
+    })
+    const gameId = result.return!
+
+    const joiner = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(joiner.addr, AlgoAmount.MicroAlgos(200_000))
+    const joinPayment = algorand.createTransaction.payment({
+      sender: joiner.addr,
+      receiver: client.appAddress,
+      amount: AlgoAmount.MicroAlgos(entryFee),
+    })
+    await client.send.joinGame({
+      args: { gameId, payment: joinPayment },
+      sender: joiner.addr,
+    })
+
+    const commitment = new Uint8Array(32)
+    await client.send.commit({
+      args: { gameId, commitment: commitment },
+      sender: testAccount.addr,
+    })
+
+    await expect(
+      client.send.commit({
+        args: { gameId, commitment },
+        sender: testAccount.addr,
+      }),
+    ).rejects.toThrow('You have already committed')
   })
 })

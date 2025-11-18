@@ -431,9 +431,6 @@ export class AbstractGameContract extends Contract {
     // Verify the game has not started
     assert(game.currentPlayerCount < game.maxPlayers, 'Game has started, deletion not possible')
 
-    // Calculate MBR before deleting the box
-    const preDelBox = op.minBalance(Global.currentApplicationAddress)
-
     // Refund all players (entry fee)
     for (let i: uint64 = 0; i < game.currentPlayerCount; i = i + 1) {
       itxn
@@ -444,6 +441,8 @@ export class AbstractGameContract extends Contract {
         })
         .submit()
     }
+    // Calculate MBR before deleting the box
+    const preDelBox = op.minBalance(Global.currentApplicationAddress)
 
     this.games(gameId).delete()
 
