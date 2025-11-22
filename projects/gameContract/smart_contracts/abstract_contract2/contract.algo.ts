@@ -13,12 +13,11 @@ import {
 import { Address } from '@algorandfoundation/algorand-typescript/arc4'
 import { itob, sha256 } from '@algorandfoundation/algorand-typescript/op'
 
-interface GameConfig {
+export interface GameConfig {
   startAt: uint64 // Timestamp: Game start time
   endCommitAt: uint64 // Timestamp: Commit phase deadline
   endRevealAt: uint64 // Timestamp: Reveal phase deadline
   participation: uint64 // Entry fee in microAlgo
-  sessionCreator: Address // Address of the session administrator
 }
 
 /**
@@ -34,7 +33,7 @@ interface GameConfig {
  * or real-time winner tracking.
  */
 export class GameContract extends Contract {
-  /** * Global monotonic counter for generating unique session IDs.
+  /** * Global counter for generating unique session IDs.
    */
   sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
 
@@ -60,12 +59,13 @@ export class GameContract extends Contract {
 
   /**
    * Initializes a new game session and reserves storage.
-   * * @param config - The configuration object defining timelines and fees.
+   * @param config - The configuration object defining timelines and fees.
    * @param mbrPayment - Payment transaction covering MBR for session config and balance boxes.
+   * @param mbr - The mbr necessary for extra specialized structure, 0 inf not necessary
    * @returns The unique uint64 ID of the newly created session.
    * @throws Error if timelines are invalid or MBR payment is incorrect.
    */
-  public createSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn): uint64 {
+  public createSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn, mbr: uint64): uint64 {
     // 1. Verify timeline consistency
     assert(config.startAt < config.endCommitAt, 'Invalid timeline: start must be before commit end')
     assert(config.endCommitAt < config.endRevealAt, 'Invalid timeline: commit end must be before reveal end')
@@ -78,7 +78,7 @@ export class GameContract extends Contract {
     // Box 'sbal': Key (4 prefix + 8 ID = 12) + Value (8 bytes uint64)
     const balanceMBR = this.getBoxMBR(12, 8)
 
-    const totalMBR: uint64 = configMBR + balanceMBR
+    const totalMBR: uint64 = configMBR + balanceMBR + mbr
 
     // 3. Verify payment
     assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment must be sent to contract')
@@ -100,8 +100,9 @@ export class GameContract extends Contract {
    * @param commit - The SHA256 hash of the player's move (choice + salt).
    * @param payment - The participation fee payment.
    * @param mbrPayment - The MBR payment for the player's storage box.
+   * @param mbr - The mbr necessary for extra specialized structure, 0 inf not necessary
    */
-  public joinSession(sessionID: uint64, commit: bytes, payment: gtxn.PaymentTxn, mbrPayment: gtxn.PaymentTxn): void {
+  public joinSession(sessionID: uint64, commit: bytes, payment: gtxn.PaymentTxn, mbrPayment: gtxn.PaymentTxn, mbr : uint64): void {
     assert(this.gameSessions(sessionID).exists, 'Session does not exist')
     const config = clone(this.gameSessions(sessionID).value)
     const currentTime = Global.latestTimestamp
@@ -116,7 +117,7 @@ export class GameContract extends Contract {
 
     // 3. Verify MBR Payment
     // Key: Prefix(4) + SHA256(32) = 36 bytes | Value: SHA256(32) = 32 bytes
-    const requiredMBR = this.getBoxMBR(36, 32)
+    const requiredMBR :uint64 = this.getBoxMBR(36, 32) + mbr
     assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
     assert(mbrPayment.amount === requiredMBR, 'Insufficient MBR payment for player storage')
 
@@ -169,7 +170,7 @@ export class GameContract extends Contract {
    * refunds the Minimum Balance Requirement (MBR) to the player.
    * This method can be called after the game ends, regardless of whether
    * the session still exists or has been cleaned up.
-   * * @param sessionID - The session ID.
+   * @param sessionID - The session ID.
   public reclaimMBR(sessionID: uint64): void {
     // 1. Safety Check (Only if session still exists)
     if (this.gameSessions(sessionID).exists) {
@@ -204,25 +205,23 @@ export class GameContract extends Contract {
   })
   .submit()
 }
+
+/**
+ * Deletes global session data (Config & Balance).
+ * @param sessionID - The ID of the session to delete.
+protected cleanupSession(sessionID: uint64): void {
+  assert(Global.latestTimestamp >= this.gameSessions(sessionID).value.endRevealAt, 'Cannot cleanup active session')
+  
+  this.gameSessions(sessionID).delete()
+  this.sessionBalances(sessionID).delete()
+}
 */
-
-  /**
-   * Deletes global session data (Config & Balance).
-   * Does NOT delete individual player data (players must call reclaimMBR).
-   * * @param sessionID - The ID of the session to delete.
-   */
-  protected cleanupSession(sessionID: uint64): void {
-    assert(Global.latestTimestamp >= this.gameSessions(sessionID).value.endRevealAt, 'Cannot cleanup active session')
-
-    this.gameSessions(sessionID).delete()
-    this.sessionBalances(sessionID).delete()
-  }
 
   /**
    * Calculates the Algorand Minimum Balance Requirement for a box.
    * Formula: 2500 + 400 * (KeySize + ValueSize)
    */
-  private getBoxMBR(keySize: uint64, valueSize: uint64): uint64 {
+  protected getBoxMBR(keySize: uint64, valueSize: uint64): uint64 {
     return 2500 + 400 * (keySize + valueSize)
   }
 
@@ -248,7 +247,7 @@ export class GameContract extends Contract {
    * Generates the storage key for player data.
    * Format: SHA256(sessionID + playerAddress) -> 32 Bytes
    */
-  private getPlayerKey(sessionID: uint64, player: Address): bytes {
+  protected getPlayerKey(sessionID: uint64, player: Address): bytes {
     return sha256(itob(sessionID).concat(player.bytes))
   }
 }

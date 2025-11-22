@@ -1,5 +1,5 @@
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import { WeeklyGameFactory } from '../artifacts/weeklyGame/WeeklyGameClient'
+import { RockPaperScissorsFactory } from '../artifacts/RockPaperScissors/RockPaperScissorsClient'
 
 export async function deploy() {
   // Initialize Algorand client using environment variables or default LocalNet config:
@@ -13,7 +13,7 @@ export async function deploy() {
 
   // Create a typed factory for the contract
   // This provides type-safe interaction with the contract
-  const typedFactory = algorand.client.getTypedAppFactory(WeeklyGameFactory, {
+  const typedFactory = algorand.client.getTypedAppFactory(RockPaperScissorsFactory, {
     defaultSender: deployer.addr,
   })
 
