@@ -1,117 +1,127 @@
 import type { bytes, uint64 } from '@algorandfoundation/algorand-typescript'
-import {
-  Account,
-  assert,
-  BoxMap,
-  Bytes,
-  clone,
-  Global,
-  gtxn,
-  itxn,
-  Txn,
-  Uint64,
-} from '@algorandfoundation/algorand-typescript'
-import { bzero } from '@algorandfoundation/algorand-typescript/op'
-
-import { GameContract, GameConfig } from '../abstract_contract2/contract.algo'
-import { ALGORAND_ZERO_ADDRESS_STRING } from 'algosdk'
+import { assert, BoxMap, clone, Global, gtxn, itxn, Txn, Uint64 } from '@algorandfoundation/algorand-typescript'
 import { Address } from '@algorandfoundation/algorand-typescript/arc4'
+import { GameConfig, GameContract } from '../abstract_contract2/contract.algo'
 
-interface SessionPlayers{
+/**
+ * Tracks the two players participating in a specific session.
+ */
+interface SessionPlayers {
   p1: Address
   p2: Address
 }
 
 /**
- * Contratto concreto per il gioco Sasso-Carta-Forbice tra due giocatori
- * Estende un contratto astratto GameContract che gestisce la logica comune di sessione.
+ * Concrete implementation of Rock-Paper-Scissors.
+ * Extends the abstract GameContract to handle the specific 2-player logic and win conditions.
  */
 export class RockPaperScissors extends GameContract {
-  // Mappa: sessionID -> Array con i due giocatori
+  /**
+   * Maps SessionID to the two player addresses.
+   * Key: Prefix 'spl' + SessionID
+   */
   sessionPlayers = BoxMap<uint64, SessionPlayers>({ keyPrefix: 'spl' })
 
-  // Mappa: sessionID -> Booleano (0 o 1) per tracciare se il gioco è finito
+  /**
+   * Status flag to prevent double payouts.
+   * Key: Prefix 'gfn' + SessionID
+   * Value: 0 (Active) | 1 (Finished)
+   */
   gameFinished = BoxMap<uint64, uint64>({ keyPrefix: 'gfn' })
 
   /**
-   * Crea una nuova sessione di gioco
+   * Initializes a new RPS session.
+   * Calculates the extended MBR required for storing player slots and game status.
+   *
+   * @param config - Game configuration (timelines and fee).
+   * @param mbrPayment - Payment transaction to cover MBR.
    */
-  public createNewSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn): uint64 {
+  public createSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn): uint64 {
+    const totalMBR: uint64 = this.getRequiredMBR('newGame')
 
-    // Calcola MBR per le box aggiuntive (esempio: chiave 11 byte, value 64 e 8 byte)
-    const playersMBR: uint64 = super.getBoxMBR(11, 64)
-    const stateMBR: uint64 = super.getBoxMBR(11, 8)
-    const totalMBR: uint64 = playersMBR + stateMBR
+    assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment must be sent to contract')
+    assert(mbrPayment.amount === totalMBR, 'Payment must cover exact MBR for session data')
 
-    // Delega al contratto astratto per creare la sessione principale
-    const sessionID = super.createSession(config, mbrPayment, totalMBR)
+    // Delegate basic session creation to parent
+    const sessionID = super.create(config)
 
-    // Inizializza le strutture aggiuntive
+    // Initialize local storage
     const zeroAddress = Global.zeroAddress
     this.sessionPlayers(sessionID).value = {
       p1: new Address(zeroAddress),
       p2: new Address(zeroAddress),
     }
     this.gameFinished(sessionID).value = 0
+
     return sessionID
   }
 
   /**
-   * Unisce un giocatore alla sessione (massimo 2 giocatori)
+   * Joins the session, assigning the player to an empty slot (P1 or P2).
+   * Enforces a maximum of 2 players per session.
+   *
+   * @param sessionID - The ID of the session i want to partecipate
+   * @param commit - The has of myChoice + salt
+   * @param payment - The payment needed to partecipate
+   * @param mbrPayment - The payment for the needed space
    */
-  public joinSession(
-    sessionID: uint64,
-    commit: bytes,
-    payment: gtxn.PaymentTxn,
-    mbrPayment: gtxn.PaymentTxn,
-  ): void {
-    assert(this.sessionExists(sessionID), 'Sessione non esistente')
+  public joinSession(sessionID: uint64, commit: bytes, payment: gtxn.PaymentTxn, mbrPayment: gtxn.PaymentTxn): void {
+    assert(this.sessionExists(sessionID), 'Session does not exist')
 
     const players = clone(this.sessionPlayers(sessionID).value)
     const senderAddress = new Address(Txn.sender)
     const zeroAddress = new Address(Global.zeroAddress)
 
-    assert(players.p1.native !== senderAddress.native && players.p2.native !== senderAddress.native, 'Giocatore già in sessione')
+    assert(
+      players.p1.native !== senderAddress.native && players.p2.native !== senderAddress.native,
+      'Player already joined this session',
+    )
 
-    // 1. Trova lo slot libero e aggiorna
+    // Verify MBR for player data storage
+    const requiredMBR: uint64 = this.getRequiredMBR('join')
+    assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
+    assert(mbrPayment.amount === requiredMBR, 'Insufficient MBR payment for player storage')
+
+    // Assign slot
     if (players.p1.native === zeroAddress.native) {
-      players.p1 = senderAddress // Assegna il mittente allo slot P1
+      players.p1 = senderAddress
     } else if (players.p2.native === zeroAddress.native) {
-      players.p2 = senderAddress // Assegna il mittente allo slot P2
+      players.p2 = senderAddress
     } else {
-      assert(false, 'La sessione è piena (2 giocatori)')
+      assert(false, 'Session is full (Max 2 players)')
     }
+    super.join(sessionID, commit, payment)
 
-    // Join logica comune del contratto astratto
-    super.joinSession(sessionID, commit, payment, mbrPayment, 0)
+    // Update player slots
+    this.sessionPlayers(sessionID).value = clone(players)
+  }
 
-    this.sessionPlayers(sessionID).value = clone(players)  
-}
-
-/**
-   * Rivela la mossa e, se entrambi hanno rivelato, determina il vincitore
+  /**
+   * Reveals a move. If both players have revealed, immediately triggers winner determination.
+   *
+   * @param sessionID - The ID of the session
+   * @param choice - 0 (Rock), 1 (Paper), 2 (Scissors).
+   * @param salt - The salt used for the secret commit
    */
   public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
-    // 0 = sasso, 1 = carta, 2 = forbice
-    assert(choice < Uint64(3), 'Scelta non valida: deve essere 0, 1 o 2')
+    assert(choice < Uint64(3), 'Invalid choice: must be 0, 1, or 2')
 
-if (this.gameFinished(sessionID).value) {
-        return;
+    if (this.gameFinished(sessionID).value) {
+      return
     }
 
-    // Delego il controllo di commit/reveal al contratto astratto
-    super.revealMove(sessionID, choice, salt)
+    // Delegate commit verification to parent
+    super.reveal(sessionID, choice, salt)
 
     const players = clone(this.sessionPlayers(sessionID).value)
+    const zeroAddress = new Address(Global.zeroAddress)
 
-    // Solo se entrambi gli slot sono stati riempiti
-    if (players.p1.native !== new Address(Global.zeroAddress).native && 
-        players.p2.native !== new Address(Global.zeroAddress).native) {
-
+    // Check if both slots are filled (game actually started)
+    if (players.p1.native !== zeroAddress.native && players.p2.native !== zeroAddress.native) {
       const key1 = super.getPlayerKey(sessionID, players.p1)
       const key2 = super.getPlayerKey(sessionID, players.p2)
 
-      // Verifico se entrambi i commit sono stati rivelati (se le PlayerBox esistono)
+      // If both players have successfully revealed (Choice boxes exist), end the game
       if (this.playerChoice(key1).exists && this.playerChoice(key2).exists) {
         this.determineWinner(sessionID)
       }
@@ -119,42 +129,46 @@ if (this.gameFinished(sessionID).value) {
   }
 
   /**
-   * Determina il vincitore e distribuisce il premio
+   * Core logic to determine the winner and distribute the pot.
+   * Marks the session as finished to prevent re-entrancy/double spending.
    */
   private determineWinner(sessionID: uint64): void {
-    assert(!this.gameFinished(sessionID).value, "Premio già distribuito")
-    const players = clone(this.sessionPlayers(sessionID).value)
+    assert(!this.gameFinished(sessionID).value, 'Prize already distributed')
 
+    const players = clone(this.sessionPlayers(sessionID).value)
     const choice1: uint64 = this.getPlayerChoice(sessionID, players.p1)
     const choice2: uint64 = this.getPlayerChoice(sessionID, players.p2)
-
     const balance: uint64 = this.getSessionBalance(sessionID)
-
 
     const ROCK = 0
     const PAPER = 1
     const SCISSORS = 2
 
-    // Pareggio: dividi il premio
+    // Draw
     if (choice1 === choice2) {
-      const half : uint64 = balance / 2
+      const half: uint64 = balance / 2
       this.distributePrize(players.p1, half)
       this.distributePrize(players.p2, half)
-    } else if (
-      (choice1 === ROCK && choice2 === SCISSORS) || 
-      (choice1 === PAPER && choice2 === ROCK) || 
-      (choice1 === SCISSORS && choice2 === PAPER) 
+    }
+    // P1 Wins
+    else if (
+      (choice1 === ROCK && choice2 === SCISSORS) ||
+      (choice1 === PAPER && choice2 === ROCK) ||
+      (choice1 === SCISSORS && choice2 === PAPER)
     ) {
       this.distributePrize(players.p1, balance)
-    } else {
+    }
+    // P2 Wins
+    else {
       this.distributePrize(players.p2, balance)
     }
 
-    // FIX 1: Segna il gioco come finito
+    // Mark game as finished
     this.gameFinished(sessionID).value = 1
   }
+
   /**
-   * Paga il premio a un giocatore tramite inner transaction
+   * Helper to send Algorand via Inner Transaction.
    */
   private distributePrize(winner: Address, amount: uint64): void {
     itxn
@@ -164,5 +178,24 @@ if (this.gameFinished(sessionID).value) {
         fee: 0,
       })
       .submit()
+  }
+
+  /**
+   * Calculates the MBR requirements for this specific game type.
+   * Adds the cost of 'sessionPlayers' and 'gameFinished' boxes to the parent's requirements.
+   */
+  public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
+    if (command === 'newGame') {
+      // Box 'spl': KeyPrefix(3) + ID(8) = 11 bytes | Value (32*2) = 64 bytes
+      const playersMBR: uint64 = super.getBoxMBR(11, 64)
+      // Box 'gfn': KeyPrefix(3) + ID(8) = 11 bytes | Value (uint64) = 8 bytes
+      const stateMBR: uint64 = super.getBoxMBR(11, 8)
+
+      return playersMBR + stateMBR + super.getRequiredMBR('newGame')
+    } else if (command === 'join') {
+      return super.getRequiredMBR('join')
+    } else {
+      assert(false, 'Command not supported')
+    }
   }
 }

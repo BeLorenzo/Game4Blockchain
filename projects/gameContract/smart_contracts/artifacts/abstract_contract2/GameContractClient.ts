@@ -23,7 +23,7 @@ import { TransactionComposer, AppCallMethodCall, AppMethodCallTransactionArgumen
 import { SendParams, SendSingleTransactionResult, SendAtomicTransactionComposerResults } from '@algorandfoundation/algokit-utils/types/transaction'
 import { Address, encodeAddress, modelsv2, OnApplicationComplete, Transaction, TransactionSigner } from 'algosdk'
 
-export const APP_SPEC: Arc56Contract = {"name":"GameContract","structs":{"ObjectB555233E":[{"name":"startAt","type":"uint64"},{"name":"endCommitAt","type":"uint64"},{"name":"endRevealAt","type":"uint64"},{"name":"participation","type":"uint64"}]},"methods":[{"name":"createSession","args":[{"type":"(uint64,uint64,uint64,uint64)","struct":"ObjectB555233E","name":"config","desc":"- The configuration object defining timelines and fees."},{"type":"pay","name":"mbrPayment","desc":"- Payment transaction covering MBR for session config and balance boxes."},{"type":"uint64","name":"mbr","desc":"- The mbr necessary for extra specialized structure, 0 inf not necessary"}],"returns":{"type":"uint64","desc":"The unique uint64 ID of the newly created session."},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Initializes a new game session and reserves storage.","events":[],"recommendations":{}},{"name":"joinSession","args":[{"type":"uint64","name":"sessionID","desc":"- The target session ID."},{"type":"byte[]","name":"commit","desc":"- The SHA256 hash of the player's move (choice + salt)."},{"type":"pay","name":"payment","desc":"- The participation fee payment."},{"type":"pay","name":"mbrPayment","desc":"- The MBR payment for the player's storage box."},{"type":"uint64","name":"mbr","desc":"- The mbr necessary for extra specialized structure, 0 inf not necessary"}],"returns":{"type":"void"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Allows a player to join an active session by committing a hashed move.\n*","events":[],"recommendations":{}},{"name":"revealMove","args":[{"type":"uint64","name":"sessionID","desc":"- The session ID."},{"type":"uint64","name":"choice","desc":"- The actual move (uint64)."},{"type":"byte[]","name":"salt","desc":"- The secret salt used for the commit hash."}],"returns":{"type":"void"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Reveals a player's previously committed move during the reveal phase.\nSwaps the 'Commit' box for a smaller 'Choice' box.\n*","events":[],"recommendations":{}}],"arcs":[22,28],"desc":"Abstract contract implementing a generic Commit-Reveal scheme for N-player games.\n*","networks":{},"state":{"schema":{"global":{"ints":1,"bytes":0},"local":{"ints":0,"bytes":0}},"keys":{"global":{"sessionIDCounter":{"keyType":"AVMString","valueType":"AVMUint64","key":"c2Vzc2lvbklEQ291bnRlcg==","desc":"* Global counter for generating unique session IDs."}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{"playerCommit":{"keyType":"AVMBytes","valueType":"AVMBytes","desc":"* Storage for player commits.\nKey: Hash(sessionID + playerAddress) [36 bytes]\nValue: Hash(choice + salt) [32 bytes]","prefix":"cGNvbQ=="},"playerChoice":{"keyType":"AVMBytes","valueType":"uint64","desc":"* Storage for revealed choices.\nKey: Hash(sessionID + playerAddress) [36 bytes]\nValue: Player Choice [8 bytes]","prefix":"cGNobw=="},"gameSessions":{"keyType":"uint64","valueType":"ObjectB555233E","desc":"* Configuration storage for each active session.","prefix":"Z3M="},"sessionBalances":{"keyType":"uint64","valueType":"uint64","desc":"* Tracks the total pot (collected participation fees) for a specific session.","prefix":"c2JhbA=="}}}},"bareActions":{"create":["NoOp"],"call":[]},"sourceInfo":{"approval":{"sourceInfo":[{"pc":[355],"errorMessage":"Box must have value"},{"pc":[286],"errorMessage":"Commit phase has ended"},{"pc":[421],"errorMessage":"Commit phase is still active"},{"pc":[294],"errorMessage":"Fee receiver must be the contract"},{"pc":[280],"errorMessage":"Game session has not started yet"},{"pc":[306],"errorMessage":"Incorrect participation fee amount"},{"pc":[327],"errorMessage":"Insufficient MBR payment for player storage"},{"pc":[455],"errorMessage":"Invalid reveal: hash mismatch"},{"pc":[147],"errorMessage":"Invalid start time: cannot start in the past"},{"pc":[143],"errorMessage":"Invalid timeline: commit end must be before reveal end"},{"pc":[136],"errorMessage":"Invalid timeline: start must be before commit end"},{"pc":[160],"errorMessage":"MBR payment must be sent to contract"},{"pc":[321],"errorMessage":"MBR payment receiver must be contract"},{"pc":[440],"errorMessage":"No commit found for this player"},{"pc":[55],"errorMessage":"OnCompletion must be NoOp"},{"pc":[95],"errorMessage":"OnCompletion must be NoOp && can only call when creating"},{"pc":[165],"errorMessage":"Payment must cover exact MBR for session config and balance"},{"pc":[342],"errorMessage":"Player already registered in this session"},{"pc":[427],"errorMessage":"Reveal phase has ended"},{"pc":[268,409],"errorMessage":"Session does not exist"},{"pc":[169],"errorMessage":"check GlobalState exists"},{"pc":[217,387],"errorMessage":"invalid array length header"},{"pc":[106],"errorMessage":"invalid number of bytes for ObjectB555233E"},{"pc":[224,394],"errorMessage":"invalid number of bytes for arc4.dynamic_array<arc4.uint8>"},{"pc":[124,210,255,371,380],"errorMessage":"invalid number of bytes for arc4.uint64"},{"pc":[116,237,247],"errorMessage":"transaction type is pay"}],"pcOffsetMethod":"none"},"clear":{"sourceInfo":[],"pcOffsetMethod":"none"}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYXJjNC9pbmRleC5kLnRzOjpDb250cmFjdC5hcHByb3ZhbFByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICBpbnRjYmxvY2sgMSA4IDAgMgogICAgYnl0ZWNibG9jayAic2Vzc2lvbklEQ291bnRlciIgImdzIiAic2JhbCIgInBjb20iCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYm56IG1haW5fYWZ0ZXJfaWZfZWxzZUAyCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MzgKICAgIC8vIHNlc3Npb25JRENvdW50ZXIgPSBHbG9iYWxTdGF0ZTx1aW50NjQ+KHsgaW5pdGlhbFZhbHVlOiAwIH0pCiAgICBieXRlY18wIC8vICJzZXNzaW9uSURDb3VudGVyIgogICAgaW50Y18yIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CgptYWluX2FmdGVyX2lmX2Vsc2VAMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czozNQogICAgLy8gZXhwb3J0IGNsYXNzIEdhbWVDb250cmFjdCBleHRlbmRzIENvbnRyYWN0IHsKICAgIHR4biBOdW1BcHBBcmdzCiAgICBieiBtYWluX19fYWxnb3RzX18uZGVmYXVsdENyZWF0ZUAxMgogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBtdXN0IGJlIE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBhc3NlcnQKICAgIHB1c2hieXRlc3MgMHg3YWE2YzgyMiAweGJlNmFmOWNhIDB4N2U2MDAyM2MgLy8gbWV0aG9kICJjcmVhdGVTZXNzaW9uKCh1aW50NjQsdWludDY0LHVpbnQ2NCx1aW50NjQpLHBheSx1aW50NjQpdWludDY0IiwgbWV0aG9kICJqb2luU2Vzc2lvbih1aW50NjQsYnl0ZVtdLHBheSxwYXksdWludDY0KXZvaWQiLCBtZXRob2QgInJldmVhbE1vdmUodWludDY0LHVpbnQ2NCxieXRlW10pdm9pZCIKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDAKICAgIG1hdGNoIGNyZWF0ZVNlc3Npb24gam9pblNlc3Npb24gcmV2ZWFsTW92ZQogICAgZXJyCgptYWluX19fYWxnb3RzX18uZGVmYXVsdENyZWF0ZUAxMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czozNQogICAgLy8gZXhwb3J0IGNsYXNzIEdhbWVDb250cmFjdCBleHRlbmRzIENvbnRyYWN0IHsKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICAhCiAgICAmJgogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBtdXN0IGJlIE5vT3AgJiYgY2FuIG9ubHkgY2FsbCB3aGVuIGNyZWF0aW5nCiAgICBpbnRjXzAgLy8gMQogICAgcmV0dXJuCgoKLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjpHYW1lQ29udHJhY3QuY3JlYXRlU2Vzc2lvbltyb3V0aW5nXSgpIC0+IHZvaWQ6CmNyZWF0ZVNlc3Npb246CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6NjgKICAgIC8vIHB1YmxpYyBjcmVhdGVTZXNzaW9uKGNvbmZpZzogR2FtZUNvbmZpZywgbWJyUGF5bWVudDogZ3R4bi5QYXltZW50VHhuLCBtYnI6IHVpbnQ2NCk6IHVpbnQ2NCB7CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAxCiAgICBkdXAKICAgIGxlbgogICAgcHVzaGludCAzMiAvLyAzMgogICAgPT0KICAgIGFzc2VydCAvLyBpbnZhbGlkIG51bWJlciBvZiBieXRlcyBmb3IgT2JqZWN0QjU1NTIzM0UKICAgIHR4biBHcm91cEluZGV4CiAgICBpbnRjXzAgLy8gMQogICAgLQogICAgZHVwCiAgICBndHhucyBUeXBlRW51bQogICAgaW50Y18wIC8vIHBheQogICAgPT0KICAgIGFzc2VydCAvLyB0cmFuc2FjdGlvbiB0eXBlIGlzIHBheQogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMgogICAgZHVwCiAgICBsZW4KICAgIGludGNfMSAvLyA4CiAgICA9PQogICAgYXNzZXJ0IC8vIGludmFsaWQgbnVtYmVyIG9mIGJ5dGVzIGZvciBhcmM0LnVpbnQ2NAogICAgYnRvaQogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjcwCiAgICAvLyBhc3NlcnQoY29uZmlnLnN0YXJ0QXQgPCBjb25maWcuZW5kQ29tbWl0QXQsICdJbnZhbGlkIHRpbWVsaW5lOiBzdGFydCBtdXN0IGJlIGJlZm9yZSBjb21taXQgZW5kJykKICAgIGRpZyAyCiAgICBpbnRjXzIgLy8gMAogICAgZXh0cmFjdF91aW50NjQKICAgIGRpZyAzCiAgICBpbnRjXzEgLy8gOAogICAgZXh0cmFjdF91aW50NjQKICAgIGR1cDIKICAgIDwKICAgIGFzc2VydCAvLyBJbnZhbGlkIHRpbWVsaW5lOiBzdGFydCBtdXN0IGJlIGJlZm9yZSBjb21taXQgZW5kCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6NzEKICAgIC8vIGFzc2VydChjb25maWcuZW5kQ29tbWl0QXQgPCBjb25maWcuZW5kUmV2ZWFsQXQsICdJbnZhbGlkIHRpbWVsaW5lOiBjb21taXQgZW5kIG11c3QgYmUgYmVmb3JlIHJldmVhbCBlbmQnKQogICAgZGlnIDQKICAgIHB1c2hpbnQgMTYgLy8gMTYKICAgIGV4dHJhY3RfdWludDY0CiAgICA8CiAgICBhc3NlcnQgLy8gSW52YWxpZCB0aW1lbGluZTogY29tbWl0IGVuZCBtdXN0IGJlIGJlZm9yZSByZXZlYWwgZW5kCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6NzIKICAgIC8vIGFzc2VydChjb25maWcuc3RhcnRBdCA+PSBHbG9iYWwubGF0ZXN0VGltZXN0YW1wLCAnSW52YWxpZCBzdGFydCB0aW1lOiBjYW5ub3Qgc3RhcnQgaW4gdGhlIHBhc3QnKQogICAgZ2xvYmFsIExhdGVzdFRpbWVzdGFtcAogICAgPj0KICAgIGFzc2VydCAvLyBJbnZhbGlkIHN0YXJ0IHRpbWU6IGNhbm5vdCBzdGFydCBpbiB0aGUgcGFzdAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjgxCiAgICAvLyBjb25zdCB0b3RhbE1CUjogdWludDY0ID0gY29uZmlnTUJSICsgYmFsYW5jZU1CUiArIG1icgogICAgcHVzaGludCA0MjYwMCAvLyA0MjYwMAogICAgKwogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjg0CiAgICAvLyBhc3NlcnQobWJyUGF5bWVudC5yZWNlaXZlciA9PT0gR2xvYmFsLmN1cnJlbnRBcHBsaWNhdGlvbkFkZHJlc3MsICdNQlIgcGF5bWVudCBtdXN0IGJlIHNlbnQgdG8gY29udHJhY3QnKQogICAgZGlnIDEKICAgIGd0eG5zIFJlY2VpdmVyCiAgICBnbG9iYWwgQ3VycmVudEFwcGxpY2F0aW9uQWRkcmVzcwogICAgPT0KICAgIGFzc2VydCAvLyBNQlIgcGF5bWVudCBtdXN0IGJlIHNlbnQgdG8gY29udHJhY3QKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czo4NQogICAgLy8gYXNzZXJ0KG1iclBheW1lbnQuYW1vdW50ID09PSB0b3RhbE1CUiwgJ1BheW1lbnQgbXVzdCBjb3ZlciBleGFjdCBNQlIgZm9yIHNlc3Npb24gY29uZmlnIGFuZCBiYWxhbmNlJykKICAgIHN3YXAKICAgIGd0eG5zIEFtb3VudAogICAgPT0KICAgIGFzc2VydCAvLyBQYXltZW50IG11c3QgY292ZXIgZXhhY3QgTUJSIGZvciBzZXNzaW9uIGNvbmZpZyBhbmQgYmFsYW5jZQogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjg3CiAgICAvLyBjb25zdCBzZXNzaW9uSUQgPSB0aGlzLnNlc3Npb25JRENvdW50ZXIudmFsdWUKICAgIGludGNfMiAvLyAwCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MzgKICAgIC8vIHNlc3Npb25JRENvdW50ZXIgPSBHbG9iYWxTdGF0ZTx1aW50NjQ+KHsgaW5pdGlhbFZhbHVlOiAwIH0pCiAgICBieXRlY18wIC8vICJzZXNzaW9uSURDb3VudGVyIgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjg3CiAgICAvLyBjb25zdCBzZXNzaW9uSUQgPSB0aGlzLnNlc3Npb25JRENvdW50ZXIudmFsdWUKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgR2xvYmFsU3RhdGUgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6OTAKICAgIC8vIHRoaXMuZ2FtZVNlc3Npb25zKHNlc3Npb25JRCkudmFsdWUgPSBjbG9uZShjb25maWcpCiAgICBkdXAKICAgIGl0b2IKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czo1NAogICAgLy8gZ2FtZVNlc3Npb25zID0gQm94TWFwPHVpbnQ2NCwgR2FtZUNvbmZpZz4oeyBrZXlQcmVmaXg6ICdncycgfSkKICAgIGJ5dGVjXzEgLy8gImdzIgogICAgZGlnIDEKICAgIGNvbmNhdAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjkwCiAgICAvLyB0aGlzLmdhbWVTZXNzaW9ucyhzZXNzaW9uSUQpLnZhbHVlID0gY2xvbmUoY29uZmlnKQogICAgdW5jb3ZlciAzCiAgICBib3hfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6NTgKICAgIC8vIHNlc3Npb25CYWxhbmNlcyA9IEJveE1hcDx1aW50NjQsIHVpbnQ2ND4oeyBrZXlQcmVmaXg6ICdzYmFsJyB9KQogICAgYnl0ZWNfMiAvLyAic2JhbCIKICAgIGRpZyAxCiAgICBjb25jYXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czo5MQogICAgLy8gdGhpcy5zZXNzaW9uQmFsYW5jZXMoc2Vzc2lvbklEKS52YWx1ZSA9IDAKICAgIGludGNfMiAvLyAwCiAgICBpdG9iCiAgICBib3hfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6OTIKICAgIC8vIHRoaXMuc2Vzc2lvbklEQ291bnRlci52YWx1ZSA9IHNlc3Npb25JRCArIDEKICAgIHN3YXAKICAgIGludGNfMCAvLyAxCiAgICArCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MzgKICAgIC8vIHNlc3Npb25JRENvdW50ZXIgPSBHbG9iYWxTdGF0ZTx1aW50NjQ+KHsgaW5pdGlhbFZhbHVlOiAwIH0pCiAgICBieXRlY18wIC8vICJzZXNzaW9uSURDb3VudGVyIgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjkyCiAgICAvLyB0aGlzLnNlc3Npb25JRENvdW50ZXIudmFsdWUgPSBzZXNzaW9uSUQgKyAxCiAgICBzd2FwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjY4CiAgICAvLyBwdWJsaWMgY3JlYXRlU2Vzc2lvbihjb25maWc6IEdhbWVDb25maWcsIG1iclBheW1lbnQ6IGd0eG4uUGF5bWVudFR4biwgbWJyOiB1aW50NjQpOiB1aW50NjQgewogICAgcHVzaGJ5dGVzIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzAgLy8gMQogICAgcmV0dXJuCgoKLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjpHYW1lQ29udHJhY3Quam9pblNlc3Npb25bcm91dGluZ10oKSAtPiB2b2lkOgpqb2luU2Vzc2lvbjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxMDUKICAgIC8vIHB1YmxpYyBqb2luU2Vzc2lvbihzZXNzaW9uSUQ6IHVpbnQ2NCwgY29tbWl0OiBieXRlcywgcGF5bWVudDogZ3R4bi5QYXltZW50VHhuLCBtYnJQYXltZW50OiBndHhuLlBheW1lbnRUeG4sIG1iciA6IHVpbnQ2NCk6IHZvaWQgewogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQogICAgZHVwCiAgICBsZW4KICAgIGludGNfMSAvLyA4CiAgICA9PQogICAgYXNzZXJ0IC8vIGludmFsaWQgbnVtYmVyIG9mIGJ5dGVzIGZvciBhcmM0LnVpbnQ2NAogICAgYnRvaQogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMgogICAgZHVwCiAgICBpbnRjXzIgLy8gMAogICAgZXh0cmFjdF91aW50MTYgLy8gb24gZXJyb3I6IGludmFsaWQgYXJyYXkgbGVuZ3RoIGhlYWRlcgogICAgaW50Y18zIC8vIDIKICAgICsKICAgIGRpZyAxCiAgICBsZW4KICAgID09CiAgICBhc3NlcnQgLy8gaW52YWxpZCBudW1iZXIgb2YgYnl0ZXMgZm9yIGFyYzQuZHluYW1pY19hcnJheTxhcmM0LnVpbnQ4PgogICAgZXh0cmFjdCAyIDAKICAgIHR4biBHcm91cEluZGV4CiAgICBpbnRjXzMgLy8gMgogICAgLQogICAgZHVwCiAgICBndHhucyBUeXBlRW51bQogICAgaW50Y18wIC8vIHBheQogICAgPT0KICAgIGFzc2VydCAvLyB0cmFuc2FjdGlvbiB0eXBlIGlzIHBheQogICAgdHhuIEdyb3VwSW5kZXgKICAgIGludGNfMCAvLyAxCiAgICAtCiAgICBkdXAKICAgIGd0eG5zIFR5cGVFbnVtCiAgICBpbnRjXzAgLy8gcGF5CiAgICA9PQogICAgYXNzZXJ0IC8vIHRyYW5zYWN0aW9uIHR5cGUgaXMgcGF5CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAzCiAgICBkdXAKICAgIGxlbgogICAgaW50Y18xIC8vIDgKICAgID09CiAgICBhc3NlcnQgLy8gaW52YWxpZCBudW1iZXIgb2YgYnl0ZXMgZm9yIGFyYzQudWludDY0CiAgICBidG9pCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTA2CiAgICAvLyBhc3NlcnQodGhpcy5nYW1lU2Vzc2lvbnMoc2Vzc2lvbklEKS5leGlzdHMsICdTZXNzaW9uIGRvZXMgbm90IGV4aXN0JykKICAgIHVuY292ZXIgNAogICAgaXRvYgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjU0CiAgICAvLyBnYW1lU2Vzc2lvbnMgPSBCb3hNYXA8dWludDY0LCBHYW1lQ29uZmlnPih7IGtleVByZWZpeDogJ2dzJyB9KQogICAgYnl0ZWNfMSAvLyAiZ3MiCiAgICBkaWcgMQogICAgY29uY2F0CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTA2CiAgICAvLyBhc3NlcnQodGhpcy5nYW1lU2Vzc2lvbnMoc2Vzc2lvbklEKS5leGlzdHMsICdTZXNzaW9uIGRvZXMgbm90IGV4aXN0JykKICAgIGR1cAogICAgYm94X2xlbgogICAgYnVyeSAxCiAgICBhc3NlcnQgLy8gU2Vzc2lvbiBkb2VzIG5vdCBleGlzdAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjEwNwogICAgLy8gY29uc3QgY29uZmlnID0gY2xvbmUodGhpcy5nYW1lU2Vzc2lvbnMoc2Vzc2lvbklEKS52YWx1ZSkKICAgIGJveF9nZXQKICAgIHBvcAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjEwOAogICAgLy8gY29uc3QgY3VycmVudFRpbWUgPSBHbG9iYWwubGF0ZXN0VGltZXN0YW1wCiAgICBnbG9iYWwgTGF0ZXN0VGltZXN0YW1wCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTExCiAgICAvLyBhc3NlcnQoY3VycmVudFRpbWUgPj0gY29uZmlnLnN0YXJ0QXQsICdHYW1lIHNlc3Npb24gaGFzIG5vdCBzdGFydGVkIHlldCcpCiAgICBkaWcgMQogICAgaW50Y18yIC8vIDAKICAgIGV4dHJhY3RfdWludDY0CiAgICBkaWcgMQogICAgPD0KICAgIGFzc2VydCAvLyBHYW1lIHNlc3Npb24gaGFzIG5vdCBzdGFydGVkIHlldAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjExMgogICAgLy8gYXNzZXJ0KGN1cnJlbnRUaW1lIDw9IGNvbmZpZy5lbmRDb21taXRBdCwgJ0NvbW1pdCBwaGFzZSBoYXMgZW5kZWQnKQogICAgZGlnIDEKICAgIGludGNfMSAvLyA4CiAgICBleHRyYWN0X3VpbnQ2NAogICAgPD0KICAgIGFzc2VydCAvLyBDb21taXQgcGhhc2UgaGFzIGVuZGVkCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTE1CiAgICAvLyBhc3NlcnQocGF5bWVudC5yZWNlaXZlciA9PT0gR2xvYmFsLmN1cnJlbnRBcHBsaWNhdGlvbkFkZHJlc3MsICdGZWUgcmVjZWl2ZXIgbXVzdCBiZSB0aGUgY29udHJhY3QnKQogICAgZGlnIDQKICAgIGd0eG5zIFJlY2VpdmVyCiAgICBnbG9iYWwgQ3VycmVudEFwcGxpY2F0aW9uQWRkcmVzcwogICAgPT0KICAgIGFzc2VydCAvLyBGZWUgcmVjZWl2ZXIgbXVzdCBiZSB0aGUgY29udHJhY3QKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxMTYKICAgIC8vIGFzc2VydChwYXltZW50LmFtb3VudCA9PT0gY29uZmlnLnBhcnRpY2lwYXRpb24sICdJbmNvcnJlY3QgcGFydGljaXBhdGlvbiBmZWUgYW1vdW50JykKICAgIHVuY292ZXIgNAogICAgZ3R4bnMgQW1vdW50CiAgICBzd2FwCiAgICBwdXNoaW50IDI0IC8vIDI0CiAgICBleHRyYWN0X3VpbnQ2NAogICAgZGlnIDEKICAgID09CiAgICBhc3NlcnQgLy8gSW5jb3JyZWN0IHBhcnRpY2lwYXRpb24gZmVlIGFtb3VudAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjIyNQogICAgLy8gcmV0dXJuIDI1MDAgKyA0MDAgKiAoa2V5U2l6ZSArIHZhbHVlU2l6ZSkKICAgIHB1c2hpbnQgMjk3MDAgLy8gMjk3MDAKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxMjAKICAgIC8vIGNvbnN0IHJlcXVpcmVkTUJSIDp1aW50NjQgPSB0aGlzLmdldEJveE1CUigzNiwgMzIpICsgbWJyCiAgICB1bmNvdmVyIDMKICAgICsKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxMjEKICAgIC8vIGFzc2VydChtYnJQYXltZW50LnJlY2VpdmVyID09PSBHbG9iYWwuY3VycmVudEFwcGxpY2F0aW9uQWRkcmVzcywgJ01CUiBwYXltZW50IHJlY2VpdmVyIG11c3QgYmUgY29udHJhY3QnKQogICAgZGlnIDMKICAgIGd0eG5zIFJlY2VpdmVyCiAgICBnbG9iYWwgQ3VycmVudEFwcGxpY2F0aW9uQWRkcmVzcwogICAgPT0KICAgIGFzc2VydCAvLyBNQlIgcGF5bWVudCByZWNlaXZlciBtdXN0IGJlIGNvbnRyYWN0CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTIyCiAgICAvLyBhc3NlcnQobWJyUGF5bWVudC5hbW91bnQgPT09IHJlcXVpcmVkTUJSLCAnSW5zdWZmaWNpZW50IE1CUiBwYXltZW50IGZvciBwbGF5ZXIgc3RvcmFnZScpCiAgICB1bmNvdmVyIDMKICAgIGd0eG5zIEFtb3VudAogICAgPT0KICAgIGFzc2VydCAvLyBJbnN1ZmZpY2llbnQgTUJSIHBheW1lbnQgZm9yIHBsYXllciBzdG9yYWdlCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MjUxCiAgICAvLyByZXR1cm4gc2hhMjU2KGl0b2Ioc2Vzc2lvbklEKS5jb25jYXQocGxheWVyLmJ5dGVzKSkKICAgIGRpZyAxCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTI0CiAgICAvLyBjb25zdCBwbGF5ZXJBZGRyID0gbmV3IEFkZHJlc3MoVHhuLnNlbmRlcikKICAgIHR4biBTZW5kZXIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoyNTEKICAgIC8vIHJldHVybiBzaGEyNTYoaXRvYihzZXNzaW9uSUQpLmNvbmNhdChwbGF5ZXIuYnl0ZXMpKQogICAgY29uY2F0CiAgICBzaGEyNTYKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czo0NAogICAgLy8gcGxheWVyQ29tbWl0ID0gQm94TWFwPGJ5dGVzLCBieXRlcz4oeyBrZXlQcmVmaXg6ICdwY29tJyB9KQogICAgYnl0ZWNfMyAvLyAicGNvbSIKICAgIHN3YXAKICAgIGNvbmNhdAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjEyOAogICAgLy8gYXNzZXJ0KCF0aGlzLnBsYXllckNvbW1pdChwbGF5ZXJLZXkpLmV4aXN0cywgJ1BsYXllciBhbHJlYWR5IHJlZ2lzdGVyZWQgaW4gdGhpcyBzZXNzaW9uJykKICAgIGR1cAogICAgYm94X2xlbgogICAgYnVyeSAxCiAgICAhCiAgICBhc3NlcnQgLy8gUGxheWVyIGFscmVhZHkgcmVnaXN0ZXJlZCBpbiB0aGlzIHNlc3Npb24KICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxMzAKICAgIC8vIHRoaXMucGxheWVyQ29tbWl0KHBsYXllcktleSkudmFsdWUgPSBjb21taXQKICAgIGR1cAogICAgYm94X2RlbAogICAgcG9wCiAgICB1bmNvdmVyIDMKICAgIGJveF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czo1OAogICAgLy8gc2Vzc2lvbkJhbGFuY2VzID0gQm94TWFwPHVpbnQ2NCwgdWludDY0Pih7IGtleVByZWZpeDogJ3NiYWwnIH0pCiAgICBieXRlY18yIC8vICJzYmFsIgogICAgdW5jb3ZlciAyCiAgICBjb25jYXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxMzEKICAgIC8vIHRoaXMuc2Vzc2lvbkJhbGFuY2VzKHNlc3Npb25JRCkudmFsdWUgKz0gcGF5bWVudC5hbW91bnQKICAgIGR1cAogICAgYm94X2dldAogICAgYXNzZXJ0IC8vIEJveCBtdXN0IGhhdmUgdmFsdWUKICAgIGJ0b2kKICAgIHVuY292ZXIgMgogICAgKwogICAgaXRvYgogICAgYm94X3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjEwNQogICAgLy8gcHVibGljIGpvaW5TZXNzaW9uKHNlc3Npb25JRDogdWludDY0LCBjb21taXQ6IGJ5dGVzLCBwYXltZW50OiBndHhuLlBheW1lbnRUeG4sIG1iclBheW1lbnQ6IGd0eG4uUGF5bWVudFR4biwgbWJyIDogdWludDY0KTogdm9pZCB7CiAgICBpbnRjXzAgLy8gMQogICAgcmV0dXJuCgoKLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjpHYW1lQ29udHJhY3QucmV2ZWFsTW92ZVtyb3V0aW5nXSgpIC0+IHZvaWQ6CnJldmVhbE1vdmU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTQxCiAgICAvLyBwdWJsaWMgcmV2ZWFsTW92ZShzZXNzaW9uSUQ6IHVpbnQ2NCwgY2hvaWNlOiB1aW50NjQsIHNhbHQ6IGJ5dGVzKTogdm9pZCB7CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAxCiAgICBkdXAKICAgIGxlbgogICAgaW50Y18xIC8vIDgKICAgID09CiAgICBhc3NlcnQgLy8gaW52YWxpZCBudW1iZXIgb2YgYnl0ZXMgZm9yIGFyYzQudWludDY0CiAgICBidG9pCiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAyCiAgICBkdXAKICAgIGxlbgogICAgaW50Y18xIC8vIDgKICAgID09CiAgICBhc3NlcnQgLy8gaW52YWxpZCBudW1iZXIgb2YgYnl0ZXMgZm9yIGFyYzQudWludDY0CiAgICBidG9pCiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAzCiAgICBkdXAKICAgIGludGNfMiAvLyAwCiAgICBleHRyYWN0X3VpbnQxNiAvLyBvbiBlcnJvcjogaW52YWxpZCBhcnJheSBsZW5ndGggaGVhZGVyCiAgICBpbnRjXzMgLy8gMgogICAgKwogICAgZGlnIDEKICAgIGxlbgogICAgPT0KICAgIGFzc2VydCAvLyBpbnZhbGlkIG51bWJlciBvZiBieXRlcyBmb3IgYXJjNC5keW5hbWljX2FycmF5PGFyYzQudWludDg+CiAgICBleHRyYWN0IDIgMAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjE0MgogICAgLy8gYXNzZXJ0KHRoaXMuZ2FtZVNlc3Npb25zKHNlc3Npb25JRCkuZXhpc3RzLCAnU2Vzc2lvbiBkb2VzIG5vdCBleGlzdCcpCiAgICB1bmNvdmVyIDIKICAgIGl0b2IKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czo1NAogICAgLy8gZ2FtZVNlc3Npb25zID0gQm94TWFwPHVpbnQ2NCwgR2FtZUNvbmZpZz4oeyBrZXlQcmVmaXg6ICdncycgfSkKICAgIGJ5dGVjXzEgLy8gImdzIgogICAgZGlnIDEKICAgIGNvbmNhdAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjE0MgogICAgLy8gYXNzZXJ0KHRoaXMuZ2FtZVNlc3Npb25zKHNlc3Npb25JRCkuZXhpc3RzLCAnU2Vzc2lvbiBkb2VzIG5vdCBleGlzdCcpCiAgICBkdXAKICAgIGJveF9sZW4KICAgIGJ1cnkgMQogICAgYXNzZXJ0IC8vIFNlc3Npb24gZG9lcyBub3QgZXhpc3QKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxNDQKICAgIC8vIGNvbnN0IGNvbmZpZyA9IGNsb25lKHRoaXMuZ2FtZVNlc3Npb25zKHNlc3Npb25JRCkudmFsdWUpCiAgICBib3hfZ2V0CiAgICBwb3AKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxNDUKICAgIC8vIGNvbnN0IGN1cnJlbnRUaW1lID0gR2xvYmFsLmxhdGVzdFRpbWVzdGFtcAogICAgZ2xvYmFsIExhdGVzdFRpbWVzdGFtcAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjE0OAogICAgLy8gYXNzZXJ0KGN1cnJlbnRUaW1lID49IGNvbmZpZy5lbmRDb21taXRBdCwgJ0NvbW1pdCBwaGFzZSBpcyBzdGlsbCBhY3RpdmUnKQogICAgZGlnIDEKICAgIGludGNfMSAvLyA4CiAgICBleHRyYWN0X3VpbnQ2NAogICAgZGlnIDEKICAgIDw9CiAgICBhc3NlcnQgLy8gQ29tbWl0IHBoYXNlIGlzIHN0aWxsIGFjdGl2ZQogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjE0OQogICAgLy8gYXNzZXJ0KGN1cnJlbnRUaW1lIDw9IGNvbmZpZy5lbmRSZXZlYWxBdCwgJ1JldmVhbCBwaGFzZSBoYXMgZW5kZWQnKQogICAgc3dhcAogICAgcHVzaGludCAxNiAvLyAxNgogICAgZXh0cmFjdF91aW50NjQKICAgIDw9CiAgICBhc3NlcnQgLy8gUmV2ZWFsIHBoYXNlIGhhcyBlbmRlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjE1MQogICAgLy8gY29uc3QgcGxheWVyQWRkciA9IG5ldyBBZGRyZXNzKFR4bi5zZW5kZXIpCiAgICB0eG4gU2VuZGVyCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MjUxCiAgICAvLyByZXR1cm4gc2hhMjU2KGl0b2Ioc2Vzc2lvbklEKS5jb25jYXQocGxheWVyLmJ5dGVzKSkKICAgIGNvbmNhdAogICAgc2hhMjU2CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6NDQKICAgIC8vIHBsYXllckNvbW1pdCA9IEJveE1hcDxieXRlcywgYnl0ZXM+KHsga2V5UHJlZml4OiAncGNvbScgfSkKICAgIGJ5dGVjXzMgLy8gInBjb20iCiAgICBkaWcgMQogICAgY29uY2F0CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTU0CiAgICAvLyBhc3NlcnQodGhpcy5wbGF5ZXJDb21taXQocGxheWVyS2V5KS5leGlzdHMsICdObyBjb21taXQgZm91bmQgZm9yIHRoaXMgcGxheWVyJykKICAgIGR1cAogICAgYm94X2xlbgogICAgYnVyeSAxCiAgICBhc3NlcnQgLy8gTm8gY29tbWl0IGZvdW5kIGZvciB0aGlzIHBsYXllcgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjE1NwogICAgLy8gY29uc3Qgc3RvcmVkQ29tbWl0ID0gdGhpcy5wbGF5ZXJDb21taXQocGxheWVyS2V5KS52YWx1ZQogICAgZHVwCiAgICBib3hfZ2V0CiAgICBwb3AKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxNTgKICAgIC8vIGNvbnN0IGNvbXB1dGVkQ29tbWl0ID0gc2hhMjU2KGl0b2IoY2hvaWNlKS5jb25jYXQoc2FsdCkpCiAgICB1bmNvdmVyIDQKICAgIGl0b2IKICAgIGR1cAogICAgdW5jb3ZlciA1CiAgICBjb25jYXQKICAgIHNoYTI1NgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjE2MAogICAgLy8gYXNzZXJ0KGNvbXB1dGVkQ29tbWl0ID09PSBzdG9yZWRDb21taXQsICdJbnZhbGlkIHJldmVhbDogaGFzaCBtaXNtYXRjaCcpCiAgICB1bmNvdmVyIDIKICAgID09CiAgICBhc3NlcnQgLy8gSW52YWxpZCByZXZlYWw6IGhhc2ggbWlzbWF0Y2gKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czo1MAogICAgLy8gcGxheWVyQ2hvaWNlID0gQm94TWFwPGJ5dGVzLCB1aW50NjQ+KHsga2V5UHJlZml4OiAncGNobycgfSkKICAgIHB1c2hieXRlcyAicGNobyIKICAgIHVuY292ZXIgMwogICAgY29uY2F0CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTY1CiAgICAvLyB0aGlzLnBsYXllckNob2ljZShwbGF5ZXJLZXkpLnZhbHVlID0gY2hvaWNlCiAgICBzd2FwCiAgICBib3hfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6MTY2CiAgICAvLyB0aGlzLnBsYXllckNvbW1pdChwbGF5ZXJLZXkpLmRlbGV0ZSgpCiAgICBib3hfZGVsCiAgICBwb3AKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdDIvY29udHJhY3QuYWxnby50czoxNDEKICAgIC8vIHB1YmxpYyByZXZlYWxNb3ZlKHNlc3Npb25JRDogdWludDY0LCBjaG9pY2U6IHVpbnQ2NCwgc2FsdDogYnl0ZXMpOiB2b2lkIHsKICAgIGludGNfMCAvLyAxCiAgICByZXR1cm4K","clear":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYmFzZS1jb250cmFjdC5kLnRzOjpCYXNlQ29udHJhY3QuY2xlYXJTdGF0ZVByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICBwdXNoaW50IDEgLy8gMQogICAgcmV0dXJuCg=="},"byteCode":{"approval":"CyAEAQgAAiYEEHNlc3Npb25JRENvdW50ZXICZ3MEc2JhbARwY29tMRhAAAMoJGcxG0EAJDEZFEQxGESCAwR6psgiBL5q+coEfmACPDYaAI4DAAsAdAEVADEZFDEYFBBEIkM2GgFJFYEgEkQxFiIJSTgQIhJENhoCSRUjEkQXSwIkW0sDI1tKDERLBIEQWwxEMgcPRIHozAIISwE4BzIKEkRMOAgSRCQoZURJFilLAVBPA78qSwFQJBa/TCIIKExngAQVH3x1TFCwIkM2GgFJFSMSRBc2GgJJJFklCEsBFRJEVwIAMRYlCUk4ECISRDEWIglJOBAiEkQ2GgNJFSMSRBdPBBYpSwFQSb1FAUS+SDIHSwEkW0sBDkRLASNbDkRLBDgHMgoSRE8EOAhMgRhbSwESRIGE6AFPAwhLAzgHMgoSRE8DOAgSREsBMQBQAStMUEm9RQEUREm8SE8DvypPAlBJvkQXTwIIFr8iQzYaAUkVIxJEFzYaAkkVIxJEFzYaA0kkWSUISwEVEkRXAgBPAhYpSwFQSb1FAUS+SDIHSwEjW0sBDkRMgRBbDkQxAFABK0sBUEm9RQFESb5ITwQWSU8FUAFPAhJEgARwY2hvTwNQTL+8SCJD","clear":"C4EBQw=="},"events":[],"templateVariables":{}} as unknown as Arc56Contract
+export const APP_SPEC: Arc56Contract = {"name":"GameContract","structs":{"ObjectB555233E":[{"name":"startAt","type":"uint64"},{"name":"endCommitAt","type":"uint64"},{"name":"endRevealAt","type":"uint64"},{"name":"participation","type":"uint64"}]},"methods":[],"arcs":[22,28],"desc":"Abstract contract implementing a generic Commit-Reveal scheme for N-player games.","networks":{},"state":{"schema":{"global":{"ints":1,"bytes":0},"local":{"ints":0,"bytes":0}},"keys":{"global":{"sessionIDCounter":{"keyType":"AVMString","valueType":"AVMUint64","key":"c2Vzc2lvbklEQ291bnRlcg==","desc":"Global counter for generating unique session IDs."}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{"playerCommit":{"keyType":"AVMBytes","valueType":"AVMBytes","desc":"Storage for player commits.\nKey: Hash(sessionID + playerAddress) [36 bytes]\nValue: Hash(choice + salt) [32 bytes]","prefix":"cGNvbQ=="},"playerChoice":{"keyType":"AVMBytes","valueType":"uint64","desc":"Storage for revealed choices.\nKey: Hash(sessionID + playerAddress) [36 bytes]\nValue: Player Choice [8 bytes]","prefix":"cGNobw=="},"gameSessions":{"keyType":"uint64","valueType":"ObjectB555233E","desc":"Configuration storage for each active session.","prefix":"Z3M="},"sessionBalances":{"keyType":"uint64","valueType":"uint64","desc":"Tracks the total pot (collected participation fees) for a specific session.","prefix":"c2JhbA=="}}}},"bareActions":{"create":["NoOp"],"call":[]},"sourceInfo":{"approval":{"sourceInfo":[{"pc":[38],"errorMessage":"OnCompletion must be NoOp && can only call when creating"}],"pcOffsetMethod":"none"},"clear":{"sourceInfo":[],"pcOffsetMethod":"none"}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYXJjNC9pbmRleC5kLnRzOjpDb250cmFjdC5hcHByb3ZhbFByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYm56IG1haW5fYWZ0ZXJfaWZfZWxzZUAyCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QyL2NvbnRyYWN0LmFsZ28udHM6NDMKICAgIC8vIHNlc3Npb25JRENvdW50ZXIgPSBHbG9iYWxTdGF0ZTx1aW50NjQ+KHsgaW5pdGlhbFZhbHVlOiAwIH0pCiAgICBwdXNoYnl0ZXMgInNlc3Npb25JRENvdW50ZXIiCiAgICBwdXNoaW50IDAgLy8gMAogICAgYXBwX2dsb2JhbF9wdXQKCm1haW5fYWZ0ZXJfaWZfZWxzZUAyOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0Mi9jb250cmFjdC5hbGdvLnRzOjM5CiAgICAvLyBleHBvcnQgY2xhc3MgR2FtZUNvbnRyYWN0IGV4dGVuZHMgQ29udHJhY3QgewogICAgdHhuIE51bUFwcEFyZ3MKICAgICEKICAgIGFzc2VydAogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgICEKICAgICYmCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIG11c3QgYmUgTm9PcCAmJiBjYW4gb25seSBjYWxsIHdoZW4gY3JlYXRpbmcKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K","clear":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYmFzZS1jb250cmFjdC5kLnRzOjpCYXNlQ29udHJhY3QuY2xlYXJTdGF0ZVByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICBwdXNoaW50IDEgLy8gMQogICAgcmV0dXJuCg=="},"byteCode":{"approval":"CzEYQAAVgBBzZXNzaW9uSURDb3VudGVygQBnMRsURDEZFDEYFBBEgQFD","clear":"C4EBQw=="},"events":[],"templateVariables":{}} as unknown as Arc56Contract
 
 /**
  * A state record containing binary data
@@ -87,64 +87,11 @@ export type GameContractArgs = {
    * The object representation of the arguments for each method
    */
   obj: {
-    'createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64': {
-      /**
-       * - The configuration object defining timelines and fees.
-       */
-      config: ObjectB555233E
-      /**
-       * - Payment transaction covering MBR for session config and balance boxes.
-       */
-      mbrPayment: AppMethodCallTransactionArgument
-      /**
-       * - The mbr necessary for extra specialized structure, 0 inf not necessary
-       */
-      mbr: bigint | number
-    }
-    'joinSession(uint64,byte[],pay,pay,uint64)void': {
-      /**
-       * - The target session ID.
-       */
-      sessionId: bigint | number
-      /**
-       * - The SHA256 hash of the player's move (choice + salt).
-       */
-      commit: Uint8Array
-      /**
-       * - The participation fee payment.
-       */
-      payment: AppMethodCallTransactionArgument
-      /**
-       * - The MBR payment for the player's storage box.
-       */
-      mbrPayment: AppMethodCallTransactionArgument
-      /**
-       * - The mbr necessary for extra specialized structure, 0 inf not necessary
-       */
-      mbr: bigint | number
-    }
-    'revealMove(uint64,uint64,byte[])void': {
-      /**
-       * - The session ID.
-       */
-      sessionId: bigint | number
-      /**
-       * - The actual move (uint64).
-       */
-      choice: bigint | number
-      /**
-       * - The secret salt used for the commit hash.
-       */
-      salt: Uint8Array
-    }
   }
   /**
    * The tuple representation of the arguments for each method
    */
   tuple: {
-    'createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64': [config: ObjectB555233E, mbrPayment: AppMethodCallTransactionArgument, mbr: bigint | number]
-    'joinSession(uint64,byte[],pay,pay,uint64)void': [sessionId: bigint | number, commit: Uint8Array, payment: AppMethodCallTransactionArgument, mbrPayment: AppMethodCallTransactionArgument, mbr: bigint | number]
-    'revealMove(uint64,uint64,byte[])void': [sessionId: bigint | number, choice: bigint | number, salt: Uint8Array]
   }
 }
 
@@ -152,9 +99,6 @@ export type GameContractArgs = {
  * The return type for each method
  */
 export type GameContractReturns = {
-  'createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64': bigint
-  'joinSession(uint64,byte[],pay,pay,uint64)void': void
-  'revealMove(uint64,uint64,byte[])void': void
 }
 
 /**
@@ -164,25 +108,7 @@ export type GameContractTypes = {
   /**
    * Maps method signatures / names to their argument and return types.
    */
-  methods:
-    & Record<'createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64' | 'createSession', {
-      argsObj: GameContractArgs['obj']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']
-      argsTuple: GameContractArgs['tuple']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']
-      /**
-       * The unique uint64 ID of the newly created session.
-       */
-      returns: GameContractReturns['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']
-    }>
-    & Record<'joinSession(uint64,byte[],pay,pay,uint64)void' | 'joinSession', {
-      argsObj: GameContractArgs['obj']['joinSession(uint64,byte[],pay,pay,uint64)void']
-      argsTuple: GameContractArgs['tuple']['joinSession(uint64,byte[],pay,pay,uint64)void']
-      returns: GameContractReturns['joinSession(uint64,byte[],pay,pay,uint64)void']
-    }>
-    & Record<'revealMove(uint64,uint64,byte[])void' | 'revealMove', {
-      argsObj: GameContractArgs['obj']['revealMove(uint64,uint64,byte[])void']
-      argsTuple: GameContractArgs['tuple']['revealMove(uint64,uint64,byte[])void']
-      returns: GameContractReturns['revealMove(uint64,uint64,byte[])void']
-    }>
+  methods: {}
   /**
    * Defines the shape of the state of the application.
    */
@@ -190,7 +116,7 @@ export type GameContractTypes = {
     global: {
       keys: {
         /**
-         * * Global counter for generating unique session IDs.
+         * Global counter for generating unique session IDs.
          */
         sessionIdCounter: bigint
       }
@@ -200,25 +126,25 @@ export type GameContractTypes = {
       keys: {}
       maps: {
         /**
-        * * Storage for player commits.
+        * Storage for player commits.
         Key: Hash(sessionID + playerAddress) [36 bytes]
         Value: Hash(choice + salt) [32 bytes]
 
          */
         playerCommit: Map<Uint8Array | string, Uint8Array>
         /**
-        * * Storage for revealed choices.
+        * Storage for revealed choices.
         Key: Hash(sessionID + playerAddress) [36 bytes]
         Value: Player Choice [8 bytes]
 
          */
         playerChoice: Map<Uint8Array | string, bigint>
         /**
-         * * Configuration storage for each active session.
+         * Configuration storage for each active session.
          */
         gameSessions: Map<bigint | number, ObjectB555233E>
         /**
-         * * Tracks the total pot (collected participation fees) for a specific session.
+         * Tracks the total pot (collected participation fees) for a specific session.
          */
         sessionBalances: Map<bigint | number, bigint>
       }
@@ -284,56 +210,6 @@ export type GameContractDeployParams = Expand<Omit<AppFactoryDeployParams, 'crea
  * Exposes methods for constructing `AppClient` params objects for ABI calls to the GameContract smart contract
  */
 export abstract class GameContractParamsFactory {
-  /**
-   * Constructs a no op call for the createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64 ABI method
-   *
-   * Initializes a new game session and reserves storage.
-   *
-   * @param params Parameters for the call
-   * @returns An `AppClientMethodCallParams` object for the call
-   */
-  static createSession(params: CallParams<GameContractArgs['obj']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'] | GameContractArgs['tuple']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
-    return {
-      ...params,
-      method: 'createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64' as const,
-      args: Array.isArray(params.args) ? params.args : [params.args.config, params.args.mbrPayment, params.args.mbr],
-    }
-  }
-  /**
-   * Constructs a no op call for the joinSession(uint64,byte[],pay,pay,uint64)void ABI method
-   *
-  * Allows a player to join an active session by committing a hashed move.
-  *
-
-   *
-   * @param params Parameters for the call
-   * @returns An `AppClientMethodCallParams` object for the call
-   */
-  static joinSession(params: CallParams<GameContractArgs['obj']['joinSession(uint64,byte[],pay,pay,uint64)void'] | GameContractArgs['tuple']['joinSession(uint64,byte[],pay,pay,uint64)void']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
-    return {
-      ...params,
-      method: 'joinSession(uint64,byte[],pay,pay,uint64)void' as const,
-      args: Array.isArray(params.args) ? params.args : [params.args.sessionId, params.args.commit, params.args.payment, params.args.mbrPayment, params.args.mbr],
-    }
-  }
-  /**
-   * Constructs a no op call for the revealMove(uint64,uint64,byte[])void ABI method
-   *
-  * Reveals a player's previously committed move during the reveal phase.
-  Swaps the 'Commit' box for a smaller 'Choice' box.
-  *
-
-   *
-   * @param params Parameters for the call
-   * @returns An `AppClientMethodCallParams` object for the call
-   */
-  static revealMove(params: CallParams<GameContractArgs['obj']['revealMove(uint64,uint64,byte[])void'] | GameContractArgs['tuple']['revealMove(uint64,uint64,byte[])void']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
-    return {
-      ...params,
-      method: 'revealMove(uint64,uint64,byte[])void' as const,
-      args: Array.isArray(params.args) ? params.args : [params.args.sessionId, params.args.choice, params.args.salt],
-    }
-  }
 }
 
 /**
@@ -574,47 +450,6 @@ export class GameContractClient {
       return this.appClient.params.bare.clearState(params)
     },
 
-    /**
-     * Makes a call to the GameContract smart contract using the `createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64` ABI method.
-     *
-     * Initializes a new game session and reserves storage.
-     *
-     * @param params The params for the smart contract call
-     * @returns The call params: The unique uint64 ID of the newly created session.
-     */
-    createSession: (params: CallParams<GameContractArgs['obj']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'] | GameContractArgs['tuple']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      return this.appClient.params.call(GameContractParamsFactory.createSession(params))
-    },
-
-    /**
-     * Makes a call to the GameContract smart contract using the `joinSession(uint64,byte[],pay,pay,uint64)void` ABI method.
-     *
-    * Allows a player to join an active session by committing a hashed move.
-    *
-
-     *
-     * @param params The params for the smart contract call
-     * @returns The call params
-     */
-    joinSession: (params: CallParams<GameContractArgs['obj']['joinSession(uint64,byte[],pay,pay,uint64)void'] | GameContractArgs['tuple']['joinSession(uint64,byte[],pay,pay,uint64)void']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      return this.appClient.params.call(GameContractParamsFactory.joinSession(params))
-    },
-
-    /**
-     * Makes a call to the GameContract smart contract using the `revealMove(uint64,uint64,byte[])void` ABI method.
-     *
-    * Reveals a player's previously committed move during the reveal phase.
-    Swaps the 'Commit' box for a smaller 'Choice' box.
-    *
-
-     *
-     * @param params The params for the smart contract call
-     * @returns The call params
-     */
-    revealMove: (params: CallParams<GameContractArgs['obj']['revealMove(uint64,uint64,byte[])void'] | GameContractArgs['tuple']['revealMove(uint64,uint64,byte[])void']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      return this.appClient.params.call(GameContractParamsFactory.revealMove(params))
-    },
-
   }
 
   /**
@@ -631,47 +466,6 @@ export class GameContractClient {
       return this.appClient.createTransaction.bare.clearState(params)
     },
 
-    /**
-     * Makes a call to the GameContract smart contract using the `createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64` ABI method.
-     *
-     * Initializes a new game session and reserves storage.
-     *
-     * @param params The params for the smart contract call
-     * @returns The call transaction: The unique uint64 ID of the newly created session.
-     */
-    createSession: (params: CallParams<GameContractArgs['obj']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'] | GameContractArgs['tuple']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      return this.appClient.createTransaction.call(GameContractParamsFactory.createSession(params))
-    },
-
-    /**
-     * Makes a call to the GameContract smart contract using the `joinSession(uint64,byte[],pay,pay,uint64)void` ABI method.
-     *
-    * Allows a player to join an active session by committing a hashed move.
-    *
-
-     *
-     * @param params The params for the smart contract call
-     * @returns The call transaction
-     */
-    joinSession: (params: CallParams<GameContractArgs['obj']['joinSession(uint64,byte[],pay,pay,uint64)void'] | GameContractArgs['tuple']['joinSession(uint64,byte[],pay,pay,uint64)void']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      return this.appClient.createTransaction.call(GameContractParamsFactory.joinSession(params))
-    },
-
-    /**
-     * Makes a call to the GameContract smart contract using the `revealMove(uint64,uint64,byte[])void` ABI method.
-     *
-    * Reveals a player's previously committed move during the reveal phase.
-    Swaps the 'Commit' box for a smaller 'Choice' box.
-    *
-
-     *
-     * @param params The params for the smart contract call
-     * @returns The call transaction
-     */
-    revealMove: (params: CallParams<GameContractArgs['obj']['revealMove(uint64,uint64,byte[])void'] | GameContractArgs['tuple']['revealMove(uint64,uint64,byte[])void']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      return this.appClient.createTransaction.call(GameContractParamsFactory.revealMove(params))
-    },
-
   }
 
   /**
@@ -686,50 +480,6 @@ export class GameContractClient {
      */
     clearState: (params?: Expand<AppClientBareCallParams & SendParams>) => {
       return this.appClient.send.bare.clearState(params)
-    },
-
-    /**
-     * Makes a call to the GameContract smart contract using the `createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64` ABI method.
-     *
-     * Initializes a new game session and reserves storage.
-     *
-     * @param params The params for the smart contract call
-     * @returns The call result: The unique uint64 ID of the newly created session.
-     */
-    createSession: async (params: CallParams<GameContractArgs['obj']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'] | GameContractArgs['tuple']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      const result = await this.appClient.send.call(GameContractParamsFactory.createSession(params))
-      return {...result, return: result.return as unknown as (undefined | GameContractReturns['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'])}
-    },
-
-    /**
-     * Makes a call to the GameContract smart contract using the `joinSession(uint64,byte[],pay,pay,uint64)void` ABI method.
-     *
-    * Allows a player to join an active session by committing a hashed move.
-    *
-
-     *
-     * @param params The params for the smart contract call
-     * @returns The call result
-     */
-    joinSession: async (params: CallParams<GameContractArgs['obj']['joinSession(uint64,byte[],pay,pay,uint64)void'] | GameContractArgs['tuple']['joinSession(uint64,byte[],pay,pay,uint64)void']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      const result = await this.appClient.send.call(GameContractParamsFactory.joinSession(params))
-      return {...result, return: result.return as unknown as (undefined | GameContractReturns['joinSession(uint64,byte[],pay,pay,uint64)void'])}
-    },
-
-    /**
-     * Makes a call to the GameContract smart contract using the `revealMove(uint64,uint64,byte[])void` ABI method.
-     *
-    * Reveals a player's previously committed move during the reveal phase.
-    Swaps the 'Commit' box for a smaller 'Choice' box.
-    *
-
-     *
-     * @param params The params for the smart contract call
-     * @returns The call result
-     */
-    revealMove: async (params: CallParams<GameContractArgs['obj']['revealMove(uint64,uint64,byte[])void'] | GameContractArgs['tuple']['revealMove(uint64,uint64,byte[])void']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
-      const result = await this.appClient.send.call(GameContractParamsFactory.revealMove(params))
-      return {...result, return: result.return as unknown as (undefined | GameContractReturns['revealMove(uint64,uint64,byte[])void'])}
     },
 
   }
@@ -840,30 +590,6 @@ export class GameContractClient {
     const resultMappers: Array<undefined | ((x: ABIReturn | undefined) => any)> = []
     return {
       /**
-       * Add a createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64 method call against the GameContract contract
-       */
-      createSession(params: CallParams<GameContractArgs['obj']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'] | GameContractArgs['tuple']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
-        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.createSession(params)))
-        resultMappers.push((v) => client.decodeReturnValue('createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64', v))
-        return this
-      },
-      /**
-       * Add a joinSession(uint64,byte[],pay,pay,uint64)void method call against the GameContract contract
-       */
-      joinSession(params: CallParams<GameContractArgs['obj']['joinSession(uint64,byte[],pay,pay,uint64)void'] | GameContractArgs['tuple']['joinSession(uint64,byte[],pay,pay,uint64)void']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
-        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.joinSession(params)))
-        resultMappers.push(undefined)
-        return this
-      },
-      /**
-       * Add a revealMove(uint64,uint64,byte[])void method call against the GameContract contract
-       */
-      revealMove(params: CallParams<GameContractArgs['obj']['revealMove(uint64,uint64,byte[])void'] | GameContractArgs['tuple']['revealMove(uint64,uint64,byte[])void']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
-        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.revealMove(params)))
-        resultMappers.push(undefined)
-        return this
-      },
-      /**
        * Add a clear state call to the GameContract contract
        */
       clearState(params: AppClientBareCallParams) {
@@ -898,44 +624,6 @@ export class GameContractClient {
   }
 }
 export type GameContractComposer<TReturns extends [...any[]] = []> = {
-  /**
-   * Calls the createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64 ABI method.
-   *
-   * Initializes a new game session and reserves storage.
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
-   */
-  createSession(params?: CallParams<GameContractArgs['obj']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'] | GameContractArgs['tuple']['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64']>): GameContractComposer<[...TReturns, GameContractReturns['createSession((uint64,uint64,uint64,uint64),pay,uint64)uint64'] | undefined]>
-
-  /**
-   * Calls the joinSession(uint64,byte[],pay,pay,uint64)void ABI method.
-   *
-  * Allows a player to join an active session by committing a hashed move.
-  *
-
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
-   */
-  joinSession(params?: CallParams<GameContractArgs['obj']['joinSession(uint64,byte[],pay,pay,uint64)void'] | GameContractArgs['tuple']['joinSession(uint64,byte[],pay,pay,uint64)void']>): GameContractComposer<[...TReturns, GameContractReturns['joinSession(uint64,byte[],pay,pay,uint64)void'] | undefined]>
-
-  /**
-   * Calls the revealMove(uint64,uint64,byte[])void ABI method.
-   *
-  * Reveals a player's previously committed move during the reveal phase.
-  Swaps the 'Commit' box for a smaller 'Choice' box.
-  *
-
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
-   */
-  revealMove(params?: CallParams<GameContractArgs['obj']['revealMove(uint64,uint64,byte[])void'] | GameContractArgs['tuple']['revealMove(uint64,uint64,byte[])void']>): GameContractComposer<[...TReturns, GameContractReturns['revealMove(uint64,uint64,byte[])void'] | undefined]>
-
   /**
    * Makes a clear_state call to an existing instance of the GameContract smart contract.
    *

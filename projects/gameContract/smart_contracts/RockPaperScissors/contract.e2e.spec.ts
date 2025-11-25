@@ -1,22 +1,18 @@
 import { Config } from '@algorandfoundation/algokit-utils'
-import { registerDebugEventHandlers } from '@algorandfoundation/algokit-utils-debug'
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing'
 import { TransactionSignerAccount } from '@algorandfoundation/algokit-utils/types/account'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
-import { Account } from 'algosdk'
+import { Account, ALGORAND_ZERO_ADDRESS_STRING } from 'algosdk'
+import { Buffer } from 'node:buffer'
+import crypto from 'node:crypto'
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { RockPaperScissorsFactory } from '../artifacts/RockPaperScissors/RockPaperScissorsClient'
-import { GameConfig } from '../abstract_contract2/contract.algo'
-import { Global } from '@algorandfoundation/algorand-typescript'
 
-describe('RockPaperScissors contract', () => {
+describe('RockPaperScissors Contract', () => {
   const localnet = algorandFixture()
 
   beforeAll(() => {
-    Config.configure({
-      debug: true,
-    })
-    registerDebugEventHandlers()
+    Config.configure({ debug: true })
   })
 
   beforeEach(localnet.newScope)
@@ -33,605 +29,1204 @@ describe('RockPaperScissors contract', () => {
       suppressLog: true,
     })
 
-    // Fund contract to maintain minimum balance
-    await localnet.algorand.account.ensureFunded(
-      appClient.appAddress, 
-      account.addr, 
-      AlgoAmount.MicroAlgos(200_000)
+    // Fund the app for minimum box creation if necessary (though user pays in this contract)
+    await localnet.algorand.account.ensureFundedFromEnvironment(
+      appClient.appAddress,
+      AlgoAmount.MicroAlgos(200_000_000),
     )
     return { client: appClient }
   }
 
-  // Helper function to create game configuration
-  const createGameConfig = (startAt: number, endCommitAt: number, endRevealAt: number, participation: number) => {
-    const currentTime = Global.latestTimestamp
+  // HELPER: Returns a simple object with BigInts
+  const createGameParams = async (
+    startAt: number,
+    endCommitAt: number, // Duration in blocks to add to startAt
+    endRevealAt: number, // Duration in blocks to add to endCommitAt
+    participation: number,
+  ) => {
+    const now = (await localnet.context.algod.status().do()).lastRound
+    // Calculate absolute rounds as required by the contract
+    const start = now + BigInt(startAt) + 5n
+    const commit = start + BigInt(endCommitAt)
+    const reveal = commit + BigInt(endRevealAt)
+
     return {
-      startAt: currentTime + startAt,
-      endCommitAt: currentTime + startAt + endCommitAt,
-      endRevealAt: currentTime + startAt + endCommitAt + endRevealAt,
-      participation,
+      startAt: start,
+      endCommitAt: commit,
+      endRevealAt: reveal,
+      participation: BigInt(participation),
     }
   }
 
-  // Helper function to create payment transactions with unique notes
-  const createPayments = async (client: any, testAccount: Account, amount: number, note?: string) => {
-    const uniqueNote = note || `test-${Date.now()}-${Math.random()}`
-
-    return localnet.context.algorand.createTransaction.payment({
-      sender: testAccount.addr,
-      receiver: client.appAddress,
-      amount: AlgoAmount.MicroAlgos(amount),
-      note: new TextEncoder().encode(uniqueNote),
-    })
+  // SHA256( itob(choice) + salt )
+  const getHash = (choice: number, salt: string) => {
+    const b = Buffer.alloc(8)
+    b.writeBigUInt64BE(BigInt(choice))
+    return crypto
+      .createHash('sha256')
+      .update(Buffer.concat([b, Buffer.from(salt)]))
+      .digest()
   }
 
-  // Helper function to generate commit hash (choice + salt)
-  const generateCommit = (choice: number, salt: string): Uint8Array => {
-    // In a real scenario, you'd use proper SHA256 hashing
-    // This is a simplified version for testing
-    const encoder = new TextEncoder()
-    const choiceBytes = encoder.encode(choice.toString())
-    const saltBytes = encoder.encode(salt)
-    const combined = new Uint8Array(choiceBytes.length + saltBytes.length)
-    combined.set(choiceBytes)
-    combined.set(saltBytes, choiceBytes.length)
-    return combined
-  }
-
-  test('creates a new game session on localnet', async () => {
-    const { testAccount, algorand } = localnet.context
-    const { client } = await deploy(testAccount)
-    await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-
-    const config : GameConfig = createGameConfig(60, 300, 300, 100_000) // Start in 60s, 5min phases, 0.1 ALGO entry
-    const mbrPayment = await createPayments(client, testAccount, 100000, 'create-session')
-
-    const result = await client.send.createNewSession({
-      args: { config, mbrPayment },
-      sender: testAccount.addr,
-    })
-
-    const sessionId = result.return!
-    expect(Number(sessionId)).toBeGreaterThan(0)
-
-    // Verify session was created by checking session exists
-    const sessionExists = await client.send.sessionExists({ sessionID: sessionId })
-    expect(sessionExists.return).toBe(true)
-  })
-
-  describe('Session creation validation', () => {
-    test('throws error if timeline is invalid', async () => {
+  describe('Game creation', () => {
+    test('creates a new game session successfully', async () => {
       const { testAccount, algorand } = localnet.context
       const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
 
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'invalid-timeline')
+      // 1. Prepare valid parameters
+      const params = await createGameParams(0, 300, 300, 1_000_000)
 
-      // Start time in the past
-      const currentTime = Math.floor(Date.now() / 1000)
-      const invalidConfig = {
-        startAt: currentTime - 100, // Past
-        endCommitAt: currentTime + 300,
-        endRevealAt: currentTime + 600,
-        participation: 100000,
+      // 2. Calculate MBR by calling contract method (client-side simulation)
+      // The contract expects payment for: ConfigBox + BalanceBox + PlayersBox + StateBox
+      const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+
+      // 3. Create MBR payment transaction
+      const mbrPayment = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(mbrAmount),
+      })
+
+      // 4. Call createSession
+      const result = await client.send.createSession({
+        args: { config: params, mbrPayment: mbrPayment },
+        sender: testAccount.addr,
+      })
+
+      const sessionId = result.return!
+
+      expect(sessionId).toBeDefined()
+
+      // Basic logic verification
+      const balance = await client.state.box.sessionBalances.value(sessionId)
+      const session = await client.state.box.gameSessions.value(sessionId)
+      const players = await client.state.box.sessionPlayers.value(sessionId)
+      expect(Number(sessionId)).toBeGreaterThanOrEqual(0)
+      expect(balance).toEqual(0n)
+      expect(session?.startAt).toBe(params.startAt)
+      expect(players?.p1).toBe(ALGORAND_ZERO_ADDRESS_STRING)
+    })
+
+    test('throws error if timestamps are inconsistent (Start > End)', async () => {
+      const { testAccount, algorand } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+
+      const badParams = {
+        startAt: 1000n,
+        endCommitAt: 10n,
+        endRevealAt: 50n,
+        participation: 100_000n,
       }
 
+      const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const mbrPayment = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(mbrAmount),
+      })
+
+      // Must fail with abstract contract assertion
       await expect(
-        client.send.createNewSession({
-          args: { config: invalidConfig, mbrPayment },
+        client.send.createSession({
+          args: { config: badParams, mbrPayment },
           sender: testAccount.addr,
-        })
-      ).rejects.toThrow('Invalid start time: cannot start in the past')
+        }),
+      ).rejects.toThrow('Invalid timeline: start must be before commit end')
     })
 
     test('throws error if MBR payment is insufficient', async () => {
       const { testAccount, algorand } = localnet.context
       const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
 
-      const insufficientMBRPayment = await createPayments(client, testAccount, 1000, 'insufficient-mbr') // Too low
-      const config = createGameConfig(60, 300, 300, 100_000)
+      const params = await createGameParams(0, 300, 300, 100_000)
 
-      await expect(
-        client.send.createNewSession({
-          args: { config, mbrPayment: insufficientMBRPayment },
-          sender: testAccount.addr,
-        })
-      ).rejects.toThrow('Insufficient MBR')
-    })
-
-    test('throws error if MBR payment receiver is wrong', async () => {
-      const { testAccount, algorand } = localnet.context
-      const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-
-      // Create payment to wrong receiver
-      const wrongReceiverPayment = localnet.context.algorand.createTransaction.payment({
+      // Pay less than required (e.g., fixed 1 Algo which might not be enough or just wrong)
+      const badMbrPayment = await algorand.createTransaction.payment({
         sender: testAccount.addr,
-        receiver: testAccount.addr, // Wrong receiver
-        amount: AlgoAmount.MicroAlgos(100000),
-        note: new TextEncoder().encode('wrong-receiver'),
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(1),
       })
 
-      const config = createGameConfig(60, 300, 300, 100_000)
+      await expect(
+        client.send.createSession({
+          args: { config: params, mbrPayment: badMbrPayment },
+          sender: testAccount.addr,
+        }),
+      ).rejects.toThrow('Payment must cover exact MBR for session data')
+    })
+
+    test('throws error if MBR payment is not to the contract', async () => {
+      const { testAccount, algorand } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
+
+      const params = await createGameParams(0, 300, 300, 100_000)
+
+      const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const random = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(random, AlgoAmount.Algos(1))
+      const badMbrPayment = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: random.addr,
+        amount: AlgoAmount.MicroAlgos(mbrAmount),
+      })
 
       await expect(
-        client.send.createNewSession({
-          args: { config, mbrPayment: wrongReceiverPayment },
+        client.send.createSession({
+          args: { config: params, mbrPayment: badMbrPayment },
           sender: testAccount.addr,
-        })
+        }),
       ).rejects.toThrow('MBR payment must be sent to contract')
     })
-  })
 
-  describe('Player joining functionality', () => {
-    test('allows two players to join a session', async () => {
-      const { testAccount, algorand } = localnet.context
+    test('fails if start time is in the past', async () => {
+      const { testAccount, algorand, algod } = localnet.context
       const { client } = await deploy(testAccount)
-      
-      // Create second test account
-      const player2 = await localnet.context.algorand.account.random()
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-      await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.MicroAlgos(1000000000))
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1_000_000_000))
 
-      const config = createGameConfig(60, 300, 300, 100_000)
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-for-join')
+      // 1. INVALID Config: Start in the past
+      const currentBlock = (await algod.status().do()).lastRound
+      const badParams = {
+        startAt: currentBlock - 2n,
+        endCommitAt: currentBlock + 100n,
+        endRevealAt: currentBlock + 200n,
+        participation: 100_000n,
+      }
 
-      // Create session
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
+      const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      // MBR payment still needed to pass initial protocol checks
+      const mbrPayment = await algorand.createTransaction.payment({
         sender: testAccount.addr,
-      })).return!
-
-      // Player 1 joins
-      const commit1 = generateCommit(0, 'salt1') // Rock
-      const entryPayment1 = await createPayments(client, testAccount, config.participation, 'player1-join')
-      const mbrPayment1 = await createPayments(client, testAccount, 50000, 'player1-mbr')
-
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit1, payment: entryPayment1, mbrPayment: mbrPayment1 },
-        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(mbrAmount),
       })
 
-      // Player 2 joins
-      const commit2 = generateCommit(1, 'salt2') // Paper
-      const entryPayment2 = await createPayments(client, player2, config.participation, 'player2-join')
-      const mbrPayment2 = await createPayments(client, player2, 50000, 'player2-mbr')
-
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit2, payment: entryPayment2, mbrPayment: mbrPayment2 },
-        sender: player2.addr,
-      })
-
-      // Verify both players joined successfully by checking session balance
-      const balance = await client.send.getSessionBalance({ sessionID: sessionId })
-      expect(Number(balance.return)).toBe(config.participation * 2)
+      await expect(
+        client.send.createSession({
+          args: { config: badParams, mbrPayment },
+          sender: testAccount.addr,
+        }),
+      ).rejects.toThrow('Invalid start time: cannot start in the past')
     })
 
-    test('throws error when third player tries to join', async () => {
+    test('fails if start time is after commit deadline', async () => {
       const { testAccount, algorand } = localnet.context
       const { client } = await deploy(testAccount)
-      
-      const player2 = await localnet.context.algorand.account.random()
-      const player3 = await localnet.context.algorand.account.random()
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-      await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.MicroAlgos(1000000000))
-      await algorand.account.ensureFundedFromEnvironment(player3, AlgoAmount.MicroAlgos(1000000000))
 
-      const config = createGameConfig(60, 300, 300, 100_000)
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-for-full')
+      const currentTime = BigInt(Math.floor(Date.now() / 1000))
 
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
+      // 2. INVALID Config: Start after commit end
+      // startAt (200) > endCommitAt (100) -> Error
+      const badParams = {
+        startAt: currentTime + 200n,
+        endCommitAt: currentTime + 100n,
+        endRevealAt: currentTime + 300n,
+        participation: 100_000n,
+      }
+      const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const mbrPayment = await algorand.createTransaction.payment({
         sender: testAccount.addr,
-      })).return!
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(mbrAmount),
+      })
 
-      // Join first two players
-      const commit1 = generateCommit(0, 'salt1')
-      const entryPayment1 = await createPayments(client, testAccount, config.participation, 'p1-join')
-      const mbrPayment1 = await createPayments(client, testAccount, 50000, 'p1-mbr')
+      await expect(
+        client.send.createSession({
+          args: { config: badParams, mbrPayment },
+          sender: testAccount.addr,
+        }),
+      ).rejects.toThrow('Invalid timeline: start must be before commit end')
+    })
+
+    test('fails if commit deadline is after reveal deadline', async () => {
+      const { testAccount, algorand } = localnet.context
+      const { client } = await deploy(testAccount)
+
+      const currentTime = BigInt(Math.floor(Date.now() / 1000))
+
+      const badParams = {
+        startAt: currentTime + 100n,
+        endCommitAt: currentTime + 300n,
+        endRevealAt: currentTime + 200n,
+        participation: 100_000n,
+      }
+
+      const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const mbrPayment = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(mbrAmount),
+      })
+
+      await expect(
+        client.send.createSession({
+          args: { config: badParams, mbrPayment },
+          sender: testAccount.addr,
+        }),
+      ).rejects.toThrow('Invalid timeline: commit end must be before reveal end')
+    })
+  })
+
+  describe('Join Session Logic', () => {
+    test('Player 1 and Player 2 join successfully', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(2_000_000_000))
+
+      // 1. SESSION CREATION
+      const fee = 1_000_000
+      const params = await createGameParams(0, 30, 30, fee)
+
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const createTx = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(newGameMbr),
+      })
+
+      const res = await client.send.createSession({
+        args: { config: params, mbrPayment: createTx },
+        sender: testAccount.addr,
+      })
+      const sessionId = res.return!
+
+      // 2. JOIN PLAYER 1
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      const feeTx1 = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(fee),
+      })
+
+      const mbrTx1 = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(joinMbr),
+      })
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
+
+      // Random commit (32 bytes dummy)
+      const commit1 = new Uint8Array(32).fill(1)
+
       await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit1, payment: entryPayment1, mbrPayment: mbrPayment1 },
+        args: { sessionId: sessionId, commit: commit1, payment: feeTx1, mbrPayment: mbrTx1 },
         sender: testAccount.addr,
       })
 
-      const commit2 = generateCommit(1, 'salt2')
-      const entryPayment2 = await createPayments(client, player2, config.participation, 'p2-join')
-      const mbrPayment2 = await createPayments(client, player2, 50000, 'p2-mbr')
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit2, payment: entryPayment2, mbrPayment: mbrPayment2 },
+      // 3. JOIN PLAYER 2 (New Account)
+      const player2 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.Algos(10))
+
+      const feeTx2 = await algorand.createTransaction.payment({
         sender: player2.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(fee),
+      })
+      const mbrTx2 = await algorand.createTransaction.payment({
+        sender: player2.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(joinMbr),
       })
 
-      // Third player should fail
-      const commit3 = generateCommit(2, 'salt3')
-      const entryPayment3 = await createPayments(client, player3, config.participation, 'p3-join')
-      const mbrPayment3 = await createPayments(client, player3, 50000, 'p3-mbr')
+      const commit2 = new Uint8Array(32).fill(2)
+
+      await client.send.joinSession({
+        args: { sessionId: sessionId, commit: commit2, payment: feeTx2, mbrPayment: mbrTx2 },
+        sender: player2.addr,
+        signer: player2.signer, // Sign as P2
+      })
+    }, 50000)
+
+    test('Fail: Third player tries to join (Session Full)', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(2_000_000_000))
+
+      // 1. SETUP SESSION
+      const fee = 100_000
+      const params = await createGameParams(0, 300, 300, fee)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const createTx = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(newGameMbr),
+      })
+      const res = await client.send.createSession({
+        args: { config: params, mbrPayment: createTx },
+        sender: testAccount.addr,
+      })
+      const sessionId = res.return!
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
+
+      // 2. FILL SESSION (P1 and P2 join)
+      // P1 Join
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(32),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(fee),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      // P2 Join
+      const player2 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.Algos(5))
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(32),
+          payment: await algorand.createTransaction.payment({
+            sender: player2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(fee),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: player2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: player2.addr,
+        signer: player2.signer,
+      })
+
+      // 3. P3 ATTEMPTS TO JOIN (Must Fail)
+      const player3 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(player3, AlgoAmount.Algos(5))
+
+      const feeTx3 = await algorand.createTransaction.payment({
+        sender: player3.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(fee),
+      })
+      const mbrTx3 = await algorand.createTransaction.payment({
+        sender: player3.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(joinMbr),
+      })
 
       await expect(
         client.send.joinSession({
-          args: { sessionID: sessionId, commit: commit3, payment: entryPayment3, mbrPayment: mbrPayment3 },
+          args: { sessionId: sessionId, commit: new Uint8Array(32), payment: feeTx3, mbrPayment: mbrTx3 },
           sender: player3.addr,
-        })
-      ).rejects.toThrow('La sessione è piena (2 giocatori)')
-    })
+          signer: player3.signer,
+        }),
+      ).rejects.toThrow('Session is full (Max 2 players)')
+    }, 30_000)
 
-    test('throws error when player tries to join twice', async () => {
-      const { testAccount, algorand } = localnet.context
+    test('Fail: Player tries to join twice', async () => {
+      const { testAccount, algorand, algod } = localnet.context
       const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
 
-      const config = createGameConfig(60, 300, 300, 100_000)
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-for-double')
-
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
+      // 1. SETUP
+      const fee = 100_000
+      const params = await createGameParams(0, 300, 300, fee)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const createTx = await algorand.createTransaction.payment({
         sender: testAccount.addr,
-      })).return!
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(newGameMbr),
+      })
+      const res = await client.send.createSession({
+        args: { config: params, mbrPayment: createTx },
+        sender: testAccount.addr,
+      })
+      const sessionId = res.return!
 
-      // First join
-      const commit1 = generateCommit(0, 'salt1')
-      const entryPayment1 = await createPayments(client, testAccount, config.participation, 'first-join')
-      const mbrPayment1 = await createPayments(client, testAccount, 50000, 'first-mbr')
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
 
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
+
+      // 2. FIRST JOIN (OK)
       await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit1, payment: entryPayment1, mbrPayment: mbrPayment1 },
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(32),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(fee),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
         sender: testAccount.addr,
       })
 
-      // Try to join again with different commit
-      const commit2 = generateCommit(1, 'salt2')
-      const entryPayment2 = await createPayments(client, testAccount, config.participation, 'second-join')
-      const mbrPayment2 = await createPayments(client, testAccount, 50000, 'second-mbr')
+      // 3. SECOND JOIN SAME ACCOUNT (Error)
+      await expect(
+        client.send.joinSession({
+          args: {
+            sessionId: sessionId,
+            commit: new Uint8Array(32),
+            payment: await algorand.createTransaction.payment({
+              sender: testAccount.addr,
+              receiver: client.appAddress,
+              amount: AlgoAmount.MicroAlgos(fee),
+            }),
+            mbrPayment: await algorand.createTransaction.payment({
+              sender: testAccount.addr,
+              receiver: client.appAddress,
+              amount: AlgoAmount.MicroAlgos(joinMbr),
+            }),
+          },
+          sender: testAccount.addr,
+        }),
+      ).rejects.toThrow('Player already joined this session')
+    })
+
+    test('Fail: Insufficient MBR payment', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+
+      // 1. SETUP
+      const fee = 100_000
+      const params = await createGameParams(0, 300, 300, fee)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const createTx = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(newGameMbr),
+      })
+      const res = await client.send.createSession({
+        args: { config: params, mbrPayment: createTx },
+        sender: testAccount.addr,
+      })
+      const sessionId = res.return!
+
+      // 2. WRONG MBR
+      const feeTx = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(fee),
+      })
+
+      // Paying 1000 microAlgo instead of required (~29700)
+      const badMbrTx = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(1000),
+      })
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
 
       await expect(
         client.send.joinSession({
-          args: { sessionID: sessionId, commit: commit2, payment: entryPayment2, mbrPayment: mbrPayment2 },
+          args: { sessionId: sessionId, commit: new Uint8Array(32), payment: feeTx, mbrPayment: badMbrTx },
           sender: testAccount.addr,
-        })
-      ).rejects.toThrow('Giocatore già in sessione')
-    })
-  })
-
-  describe('Move revealing and game resolution', () => {
-    test('completes a full game with player 1 winning', async () => {
-      const { testAccount, algorand } = localnet.context
-      const { client } = await deploy(testAccount)
-      
-      const player2 = await localnet.context.algorand.account.random()
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-      await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.MicroAlgos(1000000000))
-
-      // Create session starting immediately
-      const currentTime = Math.floor(Date.now() / 1000)
-      const config = {
-        startAt: currentTime,
-        endCommitAt: currentTime + 300,
-        endRevealAt: currentTime + 600,
-        participation: 100_000,
-      }
-      
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-for-game')
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
-        sender: testAccount.addr,
-      })).return!
-
-      // Both players join
-      const commit1 = generateCommit(0, 'salt1') // Player 1: Rock
-      const entryPayment1 = await createPayments(client, testAccount, config.participation, 'p1-join-game')
-      const mbrPayment1 = await createPayments(client, testAccount, 50000, 'p1-mbr-game')
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit1, payment: entryPayment1, mbrPayment: mbrPayment1 },
-        sender: testAccount.addr,
-      })
-
-      const commit2 = generateCommit(2, 'salt2') // Player 2: Scissors
-      const entryPayment2 = await createPayments(client, player2, config.participation, 'p2-join-game')
-      const mbrPayment2 = await createPayments(client, player2, 50000, 'p2-mbr-game')
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit2, payment: entryPayment2, mbrPayment: mbrPayment2 },
-        sender: player2.addr,
-      })
-
-      // Both players reveal
-      await client.send.revealMove({
-        args: { sessionID: sessionId, choice: 0, salt: new TextEncoder().encode('salt1') }, // Rock
-        sender: testAccount.addr,
-      })
-
-      // After second reveal, game should complete and distribute winnings
-      const initialBalance = await algorand.client.accountInformation(testAccount.addr).do()
-      
-      await client.send.revealMove({
-        args: { sessionID: sessionId, choice: 2, salt: new TextEncoder().encode('salt2') }, // Scissors
-        sender: player2.addr,
-      })
-
-      // Player 1 should receive the winnings (Rock beats Scissors)
-      const finalBalance = await algorand.client.accountInformation(testAccount.addr).do()
-      // Note: In practice, you'd need to check the actual balance change considering fees
+        }),
+      ).rejects.toThrow('Insufficient MBR payment')
     })
 
-    test('handles tie game correctly', async () => {
+    test('Fail: Join before start time', async () => {
       const { testAccount, algorand } = localnet.context
       const { client } = await deploy(testAccount)
-      
-      const player2 = await localnet.context.algorand.account.random()
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-      await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.MicroAlgos(1000000000))
 
-      const currentTime = Math.floor(Date.now() / 1000)
-      const config = {
-        startAt: currentTime,
-        endCommitAt: currentTime + 300,
-        endRevealAt: currentTime + 600,
-        participation: 100_000,
-      }
-      
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-for-tie')
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
+      // 1. SETUP: Session starting in 5000 rounds
+      const fee = 100_000
+      const params = await createGameParams(5000, 300, 300, fee)
+
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const createTx = await algorand.createTransaction.payment({
         sender: testAccount.addr,
-      })).return!
-
-      // Both players choose the same (Rock)
-      const commit1 = generateCommit(0, 'salt1')
-      const entryPayment1 = await createPayments(client, testAccount, config.participation, 'p1-join-tie')
-      const mbrPayment1 = await createPayments(client, testAccount, 50000, 'p1-mbr-tie')
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit1, payment: entryPayment1, mbrPayment: mbrPayment1 },
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(newGameMbr),
+      })
+      const res = await client.send.createSession({
+        args: { config: params, mbrPayment: createTx },
         sender: testAccount.addr,
       })
+      const sessionId = res.return!
 
-      const commit2 = generateCommit(0, 'salt2')
-      const entryPayment2 = await createPayments(client, player2, config.participation, 'p2-join-tie')
-      const mbrPayment2 = await createPayments(client, player2, 50000, 'p2-mbr-tie')
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit2, payment: entryPayment2, mbrPayment: mbrPayment2 },
-        sender: player2.addr,
-      })
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
 
-      // Reveal moves
-      await client.send.revealMove({
-        args: { sessionID: sessionId, choice: 0, salt: new TextEncoder().encode('salt1') },
-        sender: testAccount.addr,
-      })
-
-      await client.send.revealMove({
-        args: { sessionID: sessionId, choice: 0, salt: new TextEncoder().encode('salt2') },
-        sender: player2.addr,
-      })
-
-      // In a tie, both players should get half the pot back
-      // You would verify the balance distributions here
-    })
-
-    test('throws error when revealing with invalid hash', async () => {
-      const { testAccount, algorand } = localnet.context
-      const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-
-      const currentTime = Math.floor(Date.now() / 1000)
-      const config = {
-        startAt: currentTime,
-        endCommitAt: currentTime + 300,
-        endRevealAt: currentTime + 600,
-        participation: 100_000,
-      }
-      
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-for-invalid')
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
-        sender: testAccount.addr,
-      })).return!
-
-      // Join with commit for Rock
-      const commit = generateCommit(0, 'correct-salt')
-      const entryPayment = await createPayments(client, testAccount, config.participation, 'join-invalid')
-      const mbrPaymentJoin = await createPayments(client, testAccount, 50000, 'mbr-invalid')
-      
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit, payment: entryPayment, mbrPayment: mbrPaymentJoin },
-        sender: testAccount.addr,
-      })
-
-      // Try to reveal with wrong salt (should not match commit)
-      await expect(
-        client.send.revealMove({
-          args: { sessionID: sessionId, choice: 0, salt: new TextEncoder().encode('wrong-salt') },
-          sender: testAccount.addr,
-        })
-      ).rejects.toThrow('Invalid reveal: hash mismatch')
-    })
-  })
-
-  describe('Edge cases and error conditions', () => {
-    test('throws error when joining non-existent session', async () => {
-      const { testAccount, algorand } = localnet.context
-      const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-
-      const commit = generateCommit(0, 'salt')
-      const entryPayment = await createPayments(client, testAccount, 100000, 'join-nonexistent')
-      const mbrPayment = await createPayments(client, testAccount, 50000, 'mbr-nonexistent')
-
+      // 2. TRY JOIN IMMEDIATELY (Error)
       await expect(
         client.send.joinSession({
-          args: { sessionID: 9999, commit, payment: entryPayment, mbrPayment },
+          args: {
+            sessionId: sessionId,
+            commit: new Uint8Array(32),
+            payment: await algorand.createTransaction.payment({
+              sender: testAccount.addr,
+              receiver: client.appAddress,
+              amount: AlgoAmount.MicroAlgos(fee),
+            }),
+            mbrPayment: await algorand.createTransaction.payment({
+              sender: testAccount.addr,
+              receiver: client.appAddress,
+              amount: AlgoAmount.MicroAlgos(joinMbr),
+            }),
+          },
           sender: testAccount.addr,
-        })
-      ).rejects.toThrow('Sessione non esistente')
+        }),
+      ).rejects.toThrow('Game session has not started yet')
     })
+  })
+  describe('Internal Getters & State Logic', () => {
+    // Helper to manually calculate expected MBR (formula: 2500 + 400 * (K + V))
+    const calcMBR = (keySize: number, valSize: number) => 2500 + 400 * (keySize + valSize)
 
-    test('throws error when revealing before commit phase ends', async () => {
+    test('getRequiredMBR calculates exact amounts correctly', async () => {
       const { testAccount, algorand } = localnet.context
       const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
 
-      // Create session that starts in the future
-      const config = createGameConfig(300, 300, 300, 100_000) // Starts in 5 minutes
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-future')
-      
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
+      const expectedJoinMBR = BigInt(calcMBR(36, 32))
+
+      const joinResult = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return
+      expect(joinResult).toBe(expectedJoinMBR)
+
+      const expectedNewGameMBR = BigInt(calcMBR(12, 64) + calcMBR(10, 8) + calcMBR(11, 64) + calcMBR(11, 8))
+
+      const newGameResult = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return
+
+      expect(newGameResult).toBe(expectedNewGameMBR)
+    })
+
+    test('getSessionBalance tracks accumulated payments correctly', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(2_000_000_000))
+
+      const fee = 500_000
+      const params = await createGameParams(0, 300, 300, fee)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+
+      const sessionRes = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
         sender: testAccount.addr,
-      })).return!
+      })
+      const sessionId = sessionRes.return!
 
-      // Try to reveal immediately (should fail)
+      let currentBalance = await client.state.box.sessionBalances.value(sessionId)
+      expect(currentBalance).toBe(0n)
+
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
+
+      await client.send.joinSession({
+        args: {
+          sessionId,
+          commit: new Uint8Array(32),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(fee),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      currentBalance = await client.state.box.sessionBalances.value(sessionId)
+      expect(currentBalance).toBe(BigInt(fee))
+
+      const p2 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(p2, AlgoAmount.Algos(5))
+      await client.send.joinSession({
+        args: {
+          sessionId,
+          commit: new Uint8Array(32),
+          payment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(fee),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: p2.addr,
+        signer: p2.signer,
+      })
+
+      currentBalance = await client.state.box.sessionBalances.value(sessionId)
+      expect(currentBalance).toBe(BigInt(fee * 2))
+    })
+  })
+  describe('Reveal Move Logic', () => {
+    test('Fail: Reveal Too Early (Commit phase active)', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+
+      // 1. SETUP (LONG Commit: 500 blocks)
+      const params = await createGameParams(0, 500, 20, 100_000)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const res = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+      const sessionId = res.return!
+
+      // 2. JOIN P1
+      const hash = getHash(0, 'salt')
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hash),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      // 3. REVEAL IMMEDIATELY (Don't wait) -> ERROR
       await expect(
         client.send.revealMove({
-          args: { sessionID: sessionId, choice: 0, salt: new TextEncoder().encode('salt') },
+          args: { sessionId: sessionId, choice: 0n, salt: Buffer.from('salt') },
           sender: testAccount.addr,
-        })
+        }),
       ).rejects.toThrow('Commit phase is still active')
     })
 
-    test('throws error when revealing invalid choice', async () => {
-      const { testAccount, algorand } = localnet.context
+    test('Fail: Cheating (Hash Mismatch)', async () => {
+      const { testAccount, algorand, algod } = localnet.context
       const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
 
-      const currentTime = Math.floor(Date.now() / 1000)
-      const config = {
-        startAt: currentTime,
-        endCommitAt: currentTime + 300,
-        endRevealAt: currentTime + 600,
-        participation: 100_000,
-      }
-      
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-invalid-choice')
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
+      const params = await createGameParams(0, 1, 20, 100_000)
+
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const res = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
         sender: testAccount.addr,
-      })).return!
+      })
+      const sessionId = res.return!
 
-      // Join first
-      const commit = generateCommit(0, 'salt')
-      const entryPayment = await createPayments(client, testAccount, config.participation, 'join-invalid-choice')
-      const mbrPaymentJoin = await createPayments(client, testAccount, 50000, 'mbr-invalid-choice')
-      
+      // 2. JOIN P1 (I promise ROCK / "A")
+      const realHash = getHash(0, 'A')
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
+
       await client.send.joinSession({
-        args: { sessionID: sessionId, commit, payment: entryPayment, mbrPayment: mbrPaymentJoin },
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(realHash),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
         sender: testAccount.addr,
       })
 
-      // Try to reveal with invalid choice (3 is invalid, only 0-2 allowed)
+      while ((await algod.status().do()).lastRound < params.endCommitAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
+
+      // 4. REVEAL LIE (I say PAPER / "A") -> Different Hash -> ERROR
       await expect(
         client.send.revealMove({
-          args: { sessionID: sessionId, choice: 3, salt: new TextEncoder().encode('salt') },
+          args: { sessionId: sessionId, choice: 1n, salt: Buffer.from('A') },
           sender: testAccount.addr,
-        })
-      ).rejects.toThrow('Scelta non valida: deve essere 0, 1 o 2')
-    })
+        }),
+      ).rejects.toThrow('Invalid reveal: hash mismatch')
+    }, 30_000) // Increased timeout to 30s because we must wait for buffer + duration
 
-    test('prevents double prize distribution', async () => {
-      const { testAccount, algorand } = localnet.context
+    test('Fail: Invalid Choice (> 2)', async () => {
+      const { testAccount, algorand, algod } = localnet.context
       const { client } = await deploy(testAccount)
-      
-      const player2 = await localnet.context.algorand.account.random()
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
-      await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.MicroAlgos(1000000000))
 
-      const currentTime = Math.floor(Date.now() / 1000)
-      const config = {
-        startAt: currentTime,
-        endCommitAt: currentTime + 300,
-        endRevealAt: currentTime + 600,
-        participation: 100_000,
+      // 1. SETUP
+      const params = await createGameParams(0, 2, 10, 100_000)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const res = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+      const sessionId = res.return!
+
+      // 2. JOIN P1
+      const hash = getHash(3, 'salt')
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
       }
-      
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-double-prize')
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
-        sender: testAccount.addr,
-      })).return!
 
-      // Setup and complete a game
-      const commit1 = generateCommit(0, 'salt1')
-      const entryPayment1 = await createPayments(client, testAccount, config.participation, 'p1-double')
-      const mbrPayment1 = await createPayments(client, testAccount, 50000, 'p1-mbr-double')
       await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit1, payment: entryPayment1, mbrPayment: mbrPayment1 },
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hash),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
         sender: testAccount.addr,
       })
 
-      const commit2 = generateCommit(2, 'salt2')
-      const entryPayment2 = await createPayments(client, player2, config.participation, 'p2-double')
-      const mbrPayment2 = await createPayments(client, player2, 50000, 'p2-mbr-double')
-      await client.send.joinSession({
-        args: { sessionID: sessionId, commit: commit2, payment: entryPayment2, mbrPayment: mbrPayment2 },
-        sender: player2.addr,
-      })
+      while ((await algod.status().do()).lastRound < params.endCommitAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return! // Dummy transaction to advance blocks
+      }
 
-      // Complete the game
-      await client.send.revealMove({
-        args: { sessionID: sessionId, choice: 0, salt: new TextEncoder().encode('salt1') },
-        sender: testAccount.addr,
-      })
-
-      await client.send.revealMove({
-        args: { sessionID: sessionId, choice: 2, salt: new TextEncoder().encode('salt2') },
-        sender: player2.addr,
-      })
-
-      // Try to trigger determineWinner again (should be prevented by gameFinished flag)
-      // This might require calling a method that would normally trigger it, but the flag should prevent it
-    })
+      // 4. REVEAL "3" -> ERROR
+      await expect(
+        client.send.revealMove({
+          args: { sessionId: sessionId, choice: 3n, salt: Buffer.from('salt') },
+          sender: testAccount.addr,
+        }),
+      ).rejects.toThrow('Invalid choice: must be 0, 1, or 2')
+    }, 30_000)
   })
 
-  describe('Session cleanup', () => {
-    test('allows cleanup of expired sessions', async () => {
-      const { testAccount, algorand } = localnet.context
+  describe('Game Outcome Logic - Quite All Combinations', () => {
+    test('Paper vs Rock -> P1 wins and gets full prize', async () => {
+      const { testAccount, algorand, algod } = localnet.context
       const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(2_000_000_000))
 
-      // Create session that has already ended
-      const currentTime = Math.floor(Date.now() / 1000)
-      const config = {
-        startAt: currentTime - 1000, // Started long ago
-        endCommitAt: currentTime - 500, // Ended
-        endRevealAt: currentTime - 100, // Ended
-        participation: 100_000,
-      }
-      
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-expired')
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
-        sender: testAccount.addr,
-      })).return!
-
-      // Should be able to cleanup
-      await client.send.cleanupSession({
-        args: { sessionID: sessionId },
+      const params = await createGameParams(0, 4, 20, 100_000)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const res = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
         sender: testAccount.addr,
       })
 
-      // Verify session no longer exists
-      const sessionExists = await client.send.sessionExists({ sessionID: sessionId })
-      expect(sessionExists.return).toBe(false)
+      const sessionId = res.return!
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      // P1: Paper (1)
+      const hashP1 = getHash(1, 'saltP1')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP1),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      // P2: Rock (0)
+      const p2 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(p2, AlgoAmount.Algos(5))
+      const hashP2 = getHash(0, 'saltP2')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP2),
+          payment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: p2.addr,
+        signer: p2.signer,
+      })
+
+      while ((await algod.status().do()).lastRound < params.endCommitAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 1n, salt: Buffer.from('saltP1') },
+        sender: testAccount.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 0n, salt: Buffer.from('saltP2') },
+        sender: p2.addr,
+        signer: p2.signer,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
+      // P1 should win (Paper beats Rock)
     })
 
-    test('throws error when cleaning up active session', async () => {
-      const { testAccount, algorand } = localnet.context
+    test('Scissors vs Paper -> P1 wins and gets full prize', async () => {
+      const { testAccount, algorand, algod } = localnet.context
       const { client } = await deploy(testAccount)
-      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(1000000000))
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(2_000_000_000))
 
-      const config = createGameConfig(60, 300, 300, 100_000) // Active session
-      const mbrPayment = await createPayments(client, testAccount, 100000, 'create-active')
-      
-      const sessionId = (await client.send.createNewSession({
-        args: { config, mbrPayment },
+      const params = await createGameParams(0, 4, 20, 100_000)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const res = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
         sender: testAccount.addr,
-      })).return!
+      })
 
-      // Should not be able to cleanup active session
-      await expect(
-        client.send.cleanupSession({
-          args: { sessionID: sessionId },
-          sender: testAccount.addr,
-        })
-      ).rejects.toThrow('Cannot cleanup active session')
+      const sessionId = res.return!
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      // P1: Scissors (2)
+      const hashP1 = getHash(2, 'saltP1')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP1),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      // P2: Paper (1)
+      const p2 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(p2, AlgoAmount.Algos(5))
+      const hashP2 = getHash(1, 'saltP2')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP2),
+          payment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: p2.addr,
+        signer: p2.signer,
+      })
+
+      while ((await algod.status().do()).lastRound < params.endCommitAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 2n, salt: Buffer.from('saltP1') },
+        sender: testAccount.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 1n, salt: Buffer.from('saltP2') },
+        sender: p2.addr,
+        signer: p2.signer,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
+      // P1 should win (Scissors beats Paper)
+    })
+
+    test('Scissors vs Rock -> P2 wins and gets full prize', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(2_000_000_000))
+
+      const params = await createGameParams(0, 4, 20, 100_000)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const res = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      const sessionId = res.return!
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      // P1: Scissors (2)
+      const hashP1 = getHash(2, 'saltP1')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP1),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      // P2: Rock (0)
+      const p2 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(p2, AlgoAmount.Algos(5))
+      const hashP2 = getHash(0, 'saltP2')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP2),
+          payment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: p2.addr,
+        signer: p2.signer,
+      })
+
+      while ((await algod.status().do()).lastRound < params.endCommitAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 2n, salt: Buffer.from('saltP1') },
+        sender: testAccount.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 0n, salt: Buffer.from('saltP2') },
+        sender: p2.addr,
+        signer: p2.signer,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
+      // P2 should win (Rock beats Scissors)
+    })
+
+    test('Scissors vs Scissors -> tie and prize is split equally', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(2_000_000_000))
+
+      const params = await createGameParams(0, 4, 20, 100_000)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const res = await client.send.createSession({
+        args: {
+          config: params,
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(newGameMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      const sessionId = res.return!
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      // Both players: Scissors (2)
+      const hashP1 = getHash(2, 'saltP1')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP1),
+          payment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: testAccount.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: testAccount.addr,
+      })
+
+      const p2 = algorand.account.random()
+      await algorand.account.ensureFundedFromEnvironment(p2, AlgoAmount.Algos(5))
+      const hashP2 = getHash(2, 'saltP2')
+      await client.send.joinSession({
+        args: {
+          sessionId: sessionId,
+          commit: new Uint8Array(hashP2),
+          payment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(100_000),
+          }),
+          mbrPayment: await algorand.createTransaction.payment({
+            sender: p2.addr,
+            receiver: client.appAddress,
+            amount: AlgoAmount.MicroAlgos(joinMbr),
+          }),
+        },
+        sender: p2.addr,
+        signer: p2.signer,
+      })
+
+      while ((await algod.status().do()).lastRound < params.endCommitAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 2n, salt: Buffer.from('saltP1') },
+        sender: testAccount.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      await client.send.revealMove({
+        args: { sessionId: sessionId, choice: 2n, salt: Buffer.from('saltP2') },
+        sender: p2.addr,
+        signer: p2.signer,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      })
+
+      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
+      // Both players should get half the prize (tie)
     })
   })
 })

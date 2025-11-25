@@ -1,156 +1,198 @@
 import { assert, BoxMap, bytes, clone, Global, gtxn, itxn, Txn, uint64 } from '@algorandfoundation/algorand-typescript'
 import { Address } from '@algorandfoundation/algorand-typescript/arc4'
-import { itob, sha256 } from '@algorandfoundation/algorand-typescript/op'
-import { GameContract, GameConfig } from '../abstract_contract2/contract.algo'
+import { GameConfig, GameContract } from '../abstract_contract2/contract.algo'
 
-/**
- * Contratto concreto per il gioco settimanale con approccio pull
- * I giocatori devono richiedere esplicitamente la loro vincita
- */
+interface daysCount {
+  lun: uint64
+  mar: uint64
+  mer: uint64
+  gio: uint64
+  ven: uint64
+  sab: uint64
+  dom: uint64
+}
+
 export class WeeklyGame extends GameContract {
-  // BoxMap per tenere traccia del numero di giocatori per giorno per sessione
-  dayCounts = BoxMap<bytes, uint64>({ keyPrefix: 'dc' })
-  
-  // BoxMap per tracciare quali giocatori hanno già ritirato il premio
-  claimedWinnings = BoxMap<bytes, boolean>({ keyPrefix: 'clm' })
-
   /**
-   * Crea una nuova sessione di gioco
+   * Mappa che tiene il conteggio dei giocatori per ogni giorno (0-6) di ogni sessione.
+   * Key: SHA256(SessionID + DayIndex)
+   * Value: Numero di giocatori che hanno scelto quel giorno
    */
-  public createNewSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn): uint64 {
-    // Verifica timeline
-    assert(config.startAt < config.endCommitAt, 'Timeline non valida')
-    assert(config.endCommitAt < config.endRevealAt, 'Timeline non valida')
-    
-    // Calcola MBR aggiuntivo per le box dei giorni (7 giorni)
-    const dayCountsMBR :uint64 = this.getBoxMBR(32, 8) * 7 // 7 box per i giorni
-    const totalMBR = dayCountsMBR
-    
-    assert(mbrPayment.amount >= totalMBR, 'MBR insufficiente per le strutture dei giorni')
+  days = BoxMap<uint64, daysCount>({ keyPrefix: 'dc' })
 
-    // Delega al contratto padre
-    return super.createSession(config, mbrPayment, 0)
+  public createSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn): uint64 {
+    // 1. Calcola MBR totale: MBR base sessione + MBR per le 7 box dei giorni
+    const daysMBR = this.getRequiredMBR('newGame')
+
+    assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
+    assert(mbrPayment.amount >= daysMBR, 'Insufficient MBR for session and day counters')
+
+    // 2. Crea la sessione base
+    const sessionID = super.create(config)
+
+    // 3. Inizializza le 7 box per i giorni (0-6) a 0
+    // Questo è fondamentale per riservare lo storage pagato dall'MBR
+    const init: daysCount = { lun: 0, mar: 0, mer: 0, gio: 0, ven: 0, sab: 0, dom: 0 }
+    this.days(sessionID).value = clone(init)
+
+    return sessionID
+  }
+
+  public joinSession(sessionID: uint64, commit: bytes, payment: gtxn.PaymentTxn): void {
+    // Wrapper semplice del join padre
+    super.join(sessionID, commit, payment)
+  }
+
+  public revealMove(sessionId: uint64, choice: uint64, salt: bytes): void {
+    // 2. Esegue logica di reveal standard (verifica hash e salva choice)
+    super.reveal(sessionId, choice, salt)
+
+    const dayBox = this.days(sessionId)
+
+    // opzionale: assicurati che esista
+    const [current, exists] = clone(dayBox.maybe())
+    assert(exists, 'Day counters not initialized')
+
+    switch (choice) {
+      case 0:
+        current.lun = current.lun + 1
+        break
+      case 1:
+        current.mar = current.mar + 1
+        break
+      case 2:
+        current.mer = current.mer + 1
+        break
+      case 3:
+        current.gio = current.gio + 1
+        break
+      case 4:
+        current.ven = current.ven + 1
+        break
+      case 5:
+        current.sab = current.sab + 1
+        break
+      case 6:
+        current.dom = current.dom + 1
+        break
+      default:
+        assert(false, 'Invalid Day: must be between 0 and 6')
+    }
+
+    // riscrivi il valore aggiornato nella box
+    dayBox.value = clone(current)
   }
 
   /**
-   * Rivela la scelta del giocatore e aggiorna il conteggio del giorno
+   * Distribuisce la vincita al chiamante se eleggibile.
+   * Pattern: PULL
    */
-  public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
-    // Verifica che la scelta sia un giorno valido (0-6)
-    assert(choice < 7, 'Giorno non valido: deve essere tra 0 e 6')
-    
-    // Chiama il reveal del contratto padre
-    super.revealMove(sessionID, choice, salt)
+  public claimWinnings(sessionID: uint64): uint64 {
+    assert(this.sessionExists(sessionID), 'Session does not exist')
 
-    // Aggiorna il conteggio per il giorno scelto
-    const dayKey = this.getDayKey(sessionID, choice)
-    let currentCount : uint64
-    if (this.dayCounts(dayKey).exists) currentCount = this.dayCounts(dayKey).value
-    else currentCount = 0
-    this.dayCounts(dayKey).value = currentCount + 1
-  }
-
-  /**
-   * Permette a un giocatore di richiedere la propria vincita (approccio pull)
-   */
-  public claimWinnings(sessionID: uint64): void {
-    assert(this.sessionExists(sessionID), 'Sessione non esistente')
-    
     const config = clone(this.gameSessions(sessionID).value)
-    const currentTime = Global.latestTimestamp
-    
-    // Verifica che il periodo di reveal sia terminato
-    assert(currentTime >= config.endRevealAt, 'Sessione non ancora terminata')
-    
+    const currentTime = Global.round
+
+    // 1. Verifica Fase Temporale
+    assert(currentTime > config.endRevealAt, 'Game is not finished yet')
     const playerAddr = new Address(Txn.sender)
     const playerKey = this.getPlayerKey(sessionID, playerAddr)
-    const claimKey = this.getClaimKey(sessionID, playerAddr)
-    
-    // Verifica che il giocatore abbia rivelato e non abbia già ritirato
-    assert(this.playerChoice(playerKey).exists, 'Giocatore non ha rivelato la scelta')
-    assert(!this.claimedWinnings(claimKey).exists, 'Premio già ritirato')
-    
-    // Calcola la vincita
-    const amount = this.calculatePlayerWin(sessionID, playerAddr)
-    assert(amount > 0, 'Nessuna vincita disponibile')
-    
-    // Marca come ritirato e distribuisci
-    this.claimedWinnings(claimKey).value = true
-    
-    itxn.payment({
-      receiver: playerAddr.bytes,
-      amount: amount,
-      fee: 0,
-      closeRemainderTo: Global.zeroAddress
-    }).submit()
-  }
 
-  /**
-   * Calcola la vincita per un singolo giocatore
-   */
-  private calculatePlayerWin(sessionID: uint64, player: Address): uint64 {
-    const totalBalance = this.getSessionBalance(sessionID)
-    const playerKey = this.getPlayerKey(sessionID, player)
+    // 2. Verifica Eleggibilità
+    // Se la box choice non esiste, o l'utente non ha rivelato o ha già reclamato
+    assert(this.playerChoice(playerKey).exists, 'Player has not revealed or already claimed')
+
     const choice = this.playerChoice(playerKey).value
-    
-    assert(choice < 7, 'Scelta non valida nel calcolo premi')
-    
-    // Calcola il numero di giorni con almeno un giocatore
-    let activeDays : uint64 = 0
-    for (let day: uint64 = 0; day < 7; day = day + 1) {
-      const dayKey = this.getDayKey(sessionID, day)
-      if (this.dayCounts(dayKey).exists && this.dayCounts(dayKey).value > 0) {
-        activeDays = activeDays + 1
-      }
+
+    // 3. Calcolo Vincita
+    const prizeAmount = this.calculatePlayerWin(sessionID, choice)
+
+    // Se prizeAmount è 0 (es. casi limite matematici), evitiamo transazioni vuote
+    assert(prizeAmount > 0, 'No winnings calculated')
+
+    // 4. Cleanup Utente (Anti-Replay)
+    // Cancellando la box choice, l'assert al punto 2 fallirà se richiamato.
+    // Inoltre recuperiamo MBR che rimane nel contratto (o rimborsabile se implementi reclaimMBR separato)
+    this.playerChoice(playerKey).delete()
+
+    // 5. Invio Pagamento
+    itxn
+      .payment({
+        receiver: playerAddr.native,
+        amount: prizeAmount,
+        fee: 0,
+      })
+      .submit()
+
+    return prizeAmount
+  }
+
+  private calculatePlayerWin(sessionID: uint64, playerChoice: uint64): uint64 {
+    const totalPot = this.getSessionBalance(sessionID)
+
+    // recupero struct con i contatori per tutti i giorni
+    const counters = clone(this.days(sessionID).value)
+
+    // 1. conta quanti giorni hanno almeno 1 giocatore
+    let activeDaysCount: uint64 = 0
+
+    if (counters.lun > 0) activeDaysCount += 1
+    if (counters.mar > 0) activeDaysCount += 1
+    if (counters.mer > 0) activeDaysCount += 1
+    if (counters.gio > 0) activeDaysCount += 1
+    if (counters.ven > 0) activeDaysCount += 1
+    if (counters.sab > 0) activeDaysCount += 1
+    if (counters.dom > 0) activeDaysCount += 1
+
+    if (activeDaysCount === 0) return 0
+
+    // 2. piatto per giorno attivo
+    const potPerDay: uint64 = totalPot / activeDaysCount
+
+    // 3. numero di giocatori nel giorno scelto
+    let playersInThatDay: uint64 = 0
+    switch (playerChoice) {
+      case 0:
+        playersInThatDay = counters.lun
+        break
+      case 1:
+        playersInThatDay = counters.mar
+        break
+      case 2:
+        playersInThatDay = counters.mer
+        break
+      case 3:
+        playersInThatDay = counters.gio
+        break
+      case 4:
+        playersInThatDay = counters.ven
+        break
+      case 5:
+        playersInThatDay = counters.sab
+        break
+      case 6:
+        playersInThatDay = counters.dom
+        break
+      default:
+        return 0 // o assert se la scelta deve essere valida
     }
-    
-    if (activeDays === 0) {
-      return 0
-    }
-    
-    // Calcola il premio per giorno
-    const prizePerDay : uint64 = totalBalance / activeDays
-    
-    // Calcola il premio per giocatore nel giorno scelto
-    const dayKey = this.getDayKey(sessionID, choice)
-    const playersInDay = this.dayCounts(dayKey).value
-    
-    return prizePerDay / playersInDay
+
+    if (playersInThatDay === 0) return 0
+
+    return potPerDay / playersInThatDay
   }
 
   /**
-   * Pulisce i dati della sessione dopo un certo periodo
+   * Calcolo MBR specifico
    */
-  public cleanupSession(sessionID: uint64): void {
-    assert(this.sessionExists(sessionID), 'Sessione non esistente')
-    
-    const config = clone(this.gameSessions(sessionID).value)
-    const currentTime = Global.latestTimestamp
-    const cleanupTime : uint64 = config.endRevealAt + 604800 // 1 settimana dopo la fine
-    
-    assert(currentTime >= cleanupTime, 'Tempo di cleanup non ancora raggiunto')
-    
-    // Pulisce le box dei giorni
-    for (let day: uint64 = 0; day < 7; day = day + 1) {
-      const dayKey = this.getDayKey(sessionID, day)
-      if (this.dayCounts(dayKey).exists) {
-        this.dayCounts(dayKey).delete()
-      }
+  public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
+    if (command === 'newGame') {
+      // Calcolo per le 7 Box dei contatori
+      const singleBoxMBR = this.getBoxMBR(10, 56)
+      const allDaysMBR: uint64 = singleBoxMBR * 7
+
+      return allDaysMBR + super.getRequiredMBR('newGame')
     }
-    //Clean up?
-  }
-
-  /**
-   * Genera una chiave univoca per un giorno in una sessione
-   */
-  private getDayKey(sessionID: uint64, day: uint64): bytes {
-    return sha256(itob(sessionID).concat(itob(day)))
-  }
-
-  /**
-   * Genera una chiave per tracciare i ritiri
-   */
-  private getClaimKey(sessionID: uint64, player: Address): bytes {
-    return sha256(itob(sessionID).concat(player.bytes))
+    return super.getRequiredMBR(command)
   }
 }
