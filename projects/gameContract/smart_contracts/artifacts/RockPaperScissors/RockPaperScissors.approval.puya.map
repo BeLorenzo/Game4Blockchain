@@ -2,7 +2,7 @@
   "version": 3,
   "sources": [
     "../../RockPaperScissors/contract.algo.ts",
-    "../../abstract_contract2/contract.algo.ts"
+    "../../abstract_contract/contract.algo.ts"
   ],
   "mappings": "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",
   "op_pc_offset": 0,
@@ -8795,7 +8795,7 @@
       ]
     },
     "800": {
-      "callsub": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getPlayerChoice",
+      "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getPlayerChoice",
       "op": "callsub getPlayerChoice",
       "defined_out": [
         "aggregate%extract%4#0",
@@ -9014,7 +9014,7 @@
       ]
     },
     "814": {
-      "callsub": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getPlayerChoice",
+      "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getPlayerChoice",
       "op": "callsub getPlayerChoice",
       "defined_out": [
         "aggregate%extract%4#0",
@@ -10986,8 +10986,8 @@
       ]
     },
     "980": {
-      "callsub": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR",
-      "op": "callsub smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR",
+      "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
+      "op": "callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "defined_out": [
         "tmp%4#0"
       ],
@@ -11062,8 +11062,8 @@
       ]
     },
     "993": {
-      "callsub": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR",
-      "op": "callsub smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR",
+      "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
+      "op": "callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "defined_out": [
         "tmp%7#0"
       ],
@@ -11076,11 +11076,11 @@
       "op": "retsub"
     },
     "997": {
-      "subroutine": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR",
+      "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "params": {
         "command#0": "bytes"
       },
-      "block": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR",
+      "block": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "stack_in": [],
       "op": "proto 1 1"
     },
@@ -11114,7 +11114,7 @@
       ]
     },
     "1004": {
-      "op": "bz smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
+      "op": "bz smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
       "stack_out": []
     },
     "1007": {
@@ -11131,7 +11131,7 @@
       "op": "retsub"
     },
     "1010": {
-      "block": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
+      "block": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
       "stack_in": [],
       "op": "frame_dig -1",
       "defined_out": [
@@ -11180,7 +11180,7 @@
       "op": "retsub"
     },
     "1020": {
-      "subroutine": "smart_contracts/abstract_contract2/contract.algo.ts::GameContract.getPlayerChoice",
+      "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getPlayerChoice",
       "params": {
         "sessionID#0": "uint64",
         "player#0": "bytes"

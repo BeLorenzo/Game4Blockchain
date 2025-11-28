@@ -1,6 +1,6 @@
 import { assert, BoxMap, bytes, clone, Global, gtxn, itxn, Txn, uint64 } from '@algorandfoundation/algorand-typescript'
 import { Address } from '@algorandfoundation/algorand-typescript/arc4'
-import { GameConfig, GameContract } from '../abstract_contract2/contract.algo'
+import { GameConfig, GameContract } from '../abstract_contract/contract.algo'
 
 interface daysCount {
   lun: uint64

@@ -44,14 +44,14 @@ export class GameContract extends Contract {
 
   /**
    * Storage for player commits.
-   * Key: Hash(sessionID + playerAddress) [36 bytes]
+   * Key: Hash(sessionID + playerAddress) [32 bytes + 4 bytes prefix]
    * Value: Hash(choice + salt) [32 bytes]
    */
   playerCommit = BoxMap<bytes, bytes>({ keyPrefix: 'pcom' })
 
   /**
    * Storage for revealed choices.
-   * Key: Hash(sessionID + playerAddress) [36 bytes]
+   * Key: Hash(sessionID + playerAddress) [32 bytes + 4 bytes prefix]
    * Value: Player Choice [8 bytes]
    */
   playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
