@@ -1,22 +1,37 @@
-# gameContract
+# Game4Blockchain 🎮
 
-Welcome to your new AlgoKit project!
+> **🚧 Project in Active Development**
 
-This is your workspace root. A `workspace` in AlgoKit is an orchestrated collection of standalone projects (backends, smart contracts, frontend apps and etc).
+A secure blockchain gaming framework built on Algorand featuring anti-frontrunning games using commit-reveal pattern.
 
-By default, `projects_root_path` parameter is set to `projects`. Which instructs AlgoKit CLI to create a new directory under `projects` directory when new project is instantiated via `algokit init` at the root of the workspace.
+## 📚 Documentation
 
-## Getting Started
+**👉 [View Smart Contract Framework Documentation](./projects/gameContract/README.md)**
 
-To get started refer to `README.md` files in respective sub-projects in the `projects` directory.
+The core framework is currently implemented and tested at the smart contract level. Frontend implementation is planned for future development.
 
-To learn more about algokit, visit [documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md).
+## 🏗️ Project Structure
 
-### GitHub Codespaces
+``` mermaid
 
-To get started execute:
+game4blockchain/
+├── gameContract/       ✅ **Ready** - Smart contracts & framework
+├── frontend/           🚧 **Planned** - Frontend
+└── README.md            You are here
+```
 
-1. `algokit generate devcontainer` - invoking this command from the root of this repository will create a `devcontainer.json` file with all the configuration needed to run this project in a GitHub codespace. [Run the repository inside a codespace](https://docs.github.com/en/codespaces/getting-started/quickstart) to get started.
-2. `algokit init` - invoke this command inside a github codespace to launch an interactive wizard to guide you through the process of creating a new AlgoKit project
+## 🎯 What's Available Now
 
-Powered by [Copier templates](https://copier.readthedocs.io/en/stable/).
+- ✅ **Secure Commit-Reveal Framework**
+- ✅ **RockPaperScissors Implementation**
+- ✅ **WeeklyGame Implementation**
+- ✅ **Comprehensive Test Suite**
+- ✅ **TypeScript Clients**
+
+## 📄 License
+
+MIT License - see [LICENSE](./LICENSE) file for details.
+
+---
+
+*Frontend implementation coming soon. Currently focused on robust smart contract foundation.*
