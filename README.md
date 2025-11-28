@@ -12,14 +12,13 @@ The core framework is currently implemented and tested at the smart contract lev
 
 ## 🏗️ Project Structure
 
-``` mermaid
-
-game4blockchain/
-├── gameContract/       ✅ **Ready** - Smart contracts & framework
-├── frontend/           🚧 **Planned** - Frontend
-└── README.md            You are here
 ```
-
+game4blockchain/
+├── projects/
+│ ├── contracts/  ✅ Ready - Smart contracts & framework
+│ └── frontend/   🚧 Planned - Frontend
+└── README.md     <- You are here
+```
 ## 🎯 What's Available Now
 
 - ✅ **Secure Commit-Reveal Framework**
