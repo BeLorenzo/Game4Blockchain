@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": [
-    "../../abstract_contract2/contract.algo.ts"
+    "../../abstract_contract/contract.algo.ts"
   ],
   "mappings": ";;;;;;AA0CE;;;;;;;;;;;;;;;;;;AAAuD;;AAAvD;AAJF;;AAAA;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;AAAA;AAAA;;AAAA",
   "op_pc_offset": 0,

@@ -5,14 +5,14 @@
 main:
     txn ApplicationID
     bnz main_after_if_else@2
-    // smart_contracts/abstract_contract2/contract.algo.ts:43
+    // smart_contracts/abstract_contract/contract.algo.ts:43
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
     pushbytes "sessionIDCounter"
     pushint 0 // 0
     app_global_put
 
 main_after_if_else@2:
-    // smart_contracts/abstract_contract2/contract.algo.ts:39
+    // smart_contracts/abstract_contract/contract.algo.ts:39
     // export class GameContract extends Contract {
     txn NumAppArgs
     !

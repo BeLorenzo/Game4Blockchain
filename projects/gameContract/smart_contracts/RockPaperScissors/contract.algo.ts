@@ -1,7 +1,7 @@
 import type { bytes, uint64 } from '@algorandfoundation/algorand-typescript'
 import { assert, BoxMap, clone, Global, gtxn, itxn, Txn, Uint64 } from '@algorandfoundation/algorand-typescript'
 import { Address } from '@algorandfoundation/algorand-typescript/arc4'
-import { GameConfig, GameContract } from '../abstract_contract2/contract.algo'
+import { GameConfig, GameContract } from '../abstract_contract/contract.algo'
 
 /**
  * Tracks the two players participating in a specific session.
