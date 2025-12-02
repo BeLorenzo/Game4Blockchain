@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Config } from '@algorandfoundation/algokit-utils'
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing'
 import { TransactionSignerAccount } from '@algorandfoundation/algokit-utils/types/account'
@@ -595,7 +596,7 @@ describe('RockPaperScissors Contract', () => {
     const calcMBR = (keySize: number, valSize: number) => 2500 + 400 * (keySize + valSize)
 
     test('getRequiredMBR calculates exact amounts correctly', async () => {
-      const { testAccount, algorand } = localnet.context
+      const { testAccount } = localnet.context
       const { client } = await deploy(testAccount)
 
       const expectedJoinMBR = BigInt(calcMBR(36, 32))

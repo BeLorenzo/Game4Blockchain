@@ -540,11 +540,11 @@ revealMove:
     dig 1
     concat
     // smart_contracts/abstract_contract/contract.algo.ts:136
-    // assert(this.playerCommit(playerKey).exists, 'No commit found for this player')
+    // assert(this.playerCommit(playerKey).exists, 'No commit found for this player or already revealed')
     dup
     box_len
     bury 1
-    assert // No commit found for this player
+    assert // No commit found for this player or already revealed
     // smart_contracts/abstract_contract/contract.algo.ts:138
     // const storedCommit = this.playerCommit(playerKey).value
     dup

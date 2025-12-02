@@ -6474,8 +6474,8 @@
       ]
     },
     "674": {
-      "error": "No commit found for this player",
-      "op": "assert // No commit found for this player",
+      "error": "No commit found for this player or already revealed",
+      "op": "assert // No commit found for this player or already revealed",
       "stack_out": [
         "aggregate%extract%4#0",
         "aggregate%extract%5#0",

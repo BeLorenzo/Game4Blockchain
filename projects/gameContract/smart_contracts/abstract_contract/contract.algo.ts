@@ -133,7 +133,7 @@ export class GameContract extends Contract {
     const playerAddr = new Address(Txn.sender)
     const playerKey = this.getPlayerKey(sessionID, playerAddr)
 
-    assert(this.playerCommit(playerKey).exists, 'No commit found for this player')
+    assert(this.playerCommit(playerKey).exists, 'No commit found for this player or already revealed')
 
     const storedCommit = this.playerCommit(playerKey).value
     const computedCommit = sha256(itob(choice).concat(salt))

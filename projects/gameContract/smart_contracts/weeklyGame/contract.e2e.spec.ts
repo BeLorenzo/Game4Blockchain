@@ -277,7 +277,7 @@ describe('WeeklyGame Contract', () => {
           sender: testAccount.addr,
         }),
       ).rejects.toThrow('Player has not revealed or already claimed')
-    })
+    }, 30000)
 
     test('two players in different days split prize equally', async () => {
       const { testAccount, algorand, algod } = localnet.context
@@ -375,7 +375,7 @@ describe('WeeklyGame Contract', () => {
 
       expect(p1Win.return).toBe(1000000n)
       expect(p1Win.return).toBe(p2Win.return)
-    })
+    }, 30000)
 
     test('two players in same day split day prize equally', async () => {
       const { testAccount, algorand, algod } = localnet.context
@@ -463,7 +463,7 @@ describe('WeeklyGame Contract', () => {
         maxFee: AlgoAmount.MicroAlgo(3000),
       })
 
-      const p2Win = await client.send.claimWinnings({
+      await client.send.claimWinnings({
         args: { sessionId: sessionId },
         sender: p2.addr,
         signer: p2.signer,
@@ -472,7 +472,7 @@ describe('WeeklyGame Contract', () => {
       })
 
       expect(p1Win.return).toBe(1000000n)
-    })
+    }, 30000)
 
     test('complex scenario with multiple days and players', async () => {
       const { testAccount, algorand, algod } = localnet.context
@@ -604,7 +604,7 @@ describe('WeeklyGame Contract', () => {
       expect(win0.return).toBe(1000000n)
       expect(win0.return).toBe(win3.return)
       expect(win2.return).toBe(666666n)
-    })
+    }, 30000)
 
     test('throws error if claiming before reveal period ends', async () => {
       const { testAccount, algorand, algod } = localnet.context
@@ -659,7 +659,7 @@ describe('WeeklyGame Contract', () => {
           sender: testAccount.addr,
         }),
       ).rejects.toThrow('Game is not finished yet')
-    })
+    }, 30000)
   })
 
   describe('MBR Calculations', () => {

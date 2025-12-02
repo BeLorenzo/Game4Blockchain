@@ -3082,8 +3082,8 @@
       ]
     },
     "489": {
-      "error": "No commit found for this player",
-      "op": "assert // No commit found for this player",
+      "error": "No commit found for this player or already revealed",
+      "op": "assert // No commit found for this player or already revealed",
       "stack_out": [
         "choice#0",
         "choice#0",
