@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Config } from '@algorandfoundation/algokit-utils'
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing'
@@ -1230,4 +1231,183 @@ describe('RockPaperScissors Contract', () => {
       // Both players should get half the prize (tie)
     })
   })
+
+describe('Timeout Victory Logic', () => {
+ const waitForRound = async (targetRound: bigint, client: any, algod: any) => {
+    let current = BigInt((await algod.status().do()).lastRound)
+    while (current < targetRound) {
+      await client.send.getRequiredMbr({ args: { command: 'join' } })
+      current = BigInt((await algod.status().do()).lastRound)
+    }
+  }
+
+  test('Case 1: Success - Player 1 reveals, Player 2 does not. P1 claims victory after timeout', async () => {
+    const { testAccount, algorand, algod } = localnet.context
+    const { client } = await deploy(testAccount)
+    
+    const fee = 1_000_000
+    const params = await createGameParams(0, 10, 10, fee)
+
+    const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+    const createRes = await client.send.createSession({
+      args: { 
+        config: params, 
+        mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(newGameMbr) }) 
+      },
+      sender: testAccount.addr,
+    })
+    const sessionId = createRes.return!
+    const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+    await waitForRound(params.startAt, client, algod)
+
+    const salt1 = 'salt1'
+    const commit1 = getHash(0, salt1)
+    
+    await client.send.joinSession({
+      args: { 
+        sessionId, commit: commit1, 
+        payment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }),
+        mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) })
+      },
+      sender: testAccount.addr,
+    })
+
+    const player2 = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.Algos(10))
+    const salt2 = 'salt2'
+    const commit2 = getHash(1, salt2)
+
+    await client.send.joinSession({
+      args: { 
+        sessionId, commit: commit2, 
+        payment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }),
+        mbrPayment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) })
+      },
+      sender: player2.addr,
+      signer: player2.signer
+    })
+
+    await waitForRound(params.endCommitAt + 1n, client, algod)
+    
+    await client.send.revealMove({
+      args: { sessionId, choice: 0, salt: Buffer.from(salt1) },
+      sender: testAccount.addr
+    })
+
+    await waitForRound(params.endRevealAt + 1n, client, algod)
+
+    const p1BalanceBefore  = Number((await algorand.account.getInformation(testAccount.addr)).balance)
+
+    await client.send.claimTimeoutVictory({
+      args: { sessionId },
+      sender: testAccount.addr,
+      coverAppCallInnerTransactionFees: true,
+      maxFee:AlgoAmount.MicroAlgo(3000)
+    })
+
+    const p1BalanceAfter = (await algorand.account.getInformation(testAccount.addr)).balance
+    
+    expect(p1BalanceAfter.valueOf()).toBeGreaterThan(p1BalanceBefore)
+  }, 60_000)
+
+  test('Case 2: Fail - Attempt to claim timeout BEFORE reveal phase ends', async () => {
+    const { testAccount, algorand, algod } = localnet.context
+    const { client } = await deploy(testAccount)
+    
+    const fee = 1_000_000
+    const params = await createGameParams(0, 5, 50, fee)
+    
+    const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+    const createRes = await client.send.createSession({
+        args: { config: params, mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(newGameMbr) }) },
+        sender: testAccount.addr,
+    })
+    const sessionId = createRes.return!
+    const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+    
+    await waitForRound(params.startAt, client, algod)
+    
+    await client.send.joinSession({
+       args: { sessionId, commit: getHash(0, 's1'), payment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }), mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) }) },
+       sender: testAccount.addr
+    })
+    const player2 = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.Algos(5))
+    await client.send.joinSession({
+       args: { sessionId, commit: getHash(1, 's2'), payment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }), mbrPayment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) }) },
+       sender: player2.addr, signer: player2.signer
+    })
+
+    await waitForRound(params.endCommitAt + 1n, client, algod)
+    await client.send.revealMove({
+        args: { sessionId, choice: 0, salt: Buffer.from('s1') },
+        sender: testAccount.addr
+    })
+
+    await expect(
+        client.send.claimTimeoutVictory({
+            args: { sessionId },
+            sender: testAccount.addr
+        })
+    ).rejects.toThrow() 
+  }, 60_000)
+
+  test('Case 3: Success - Player 2 (Loser) calls timeout method, but Player 1 (Revealer) gets the money', async () => {
+    const { testAccount, algorand, algod } = localnet.context
+    const { client } = await deploy(testAccount)
+    
+    const fee = 1_000_000
+    const params = await createGameParams(0, 5, 5, fee)
+
+    const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+    const createRes = await client.send.createSession({
+        args: { config: params, mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(newGameMbr) }) },
+        sender: testAccount.addr,
+    })
+    const sessionId = createRes.return!
+    const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+    
+    await waitForRound(params.startAt, client, algod)
+    
+    await client.send.joinSession({
+       args: { sessionId, commit: getHash(0, 'saltP1'), payment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }), mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) }) },
+       sender: testAccount.addr
+    })
+    
+    const player2 = algorand.account.random()
+    await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.Algos(5))
+    await client.send.joinSession({
+       args: { sessionId, commit: getHash(1, 'saltP2'), payment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }), mbrPayment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) }) },
+       sender: player2.addr, signer: player2.signer
+    })
+
+    await waitForRound(params.endCommitAt + 1n, client, algod)
+    await client.send.revealMove({ 
+        args: { sessionId, choice: 0, salt: Buffer.from('saltP1') }, 
+        sender: testAccount.addr 
+    })
+
+    await waitForRound(params.endRevealAt + 1n, client, algod)
+
+    const p1BalanceBefore = Number((await algorand.account.getInformation(testAccount.addr)).balance)
+    const p2BalanceBefore = Number((await algorand.account.getInformation(player2.addr)).balance)
+
+    await client.send.claimTimeoutVictory({
+      args: { sessionId },
+      sender: player2.addr,
+      signer: player2.signer,
+      coverAppCallInnerTransactionFees: true,
+      maxFee:AlgoAmount.MicroAlgo(3000)
+    })
+
+    const p1BalanceAfter = (await algorand.account.getInformation(testAccount.addr)).balance
+    const p2BalanceAfter = (await algorand.account.getInformation(player2.addr)).balance
+
+    expect(p1BalanceAfter.valueOf()).toBeGreaterThan(p1BalanceBefore + 1_900_000) 
+    
+    expect(p2BalanceAfter.valueOf()).toBeLessThan(p2BalanceBefore)
+  }, 60_000)
+})
+
 })

@@ -116,6 +116,12 @@ export class RockPaperScissors extends GameContract {
     const players = clone(this.sessionPlayers(sessionID).value)
     const zeroAddress = new Address(Global.zeroAddress)
 
+    if (players.p2.native === zeroAddress.native) {
+      this.distributePrize(new Address(Txn.sender), this.getSessionBalance(sessionID))
+      this.gameFinished(sessionID).value = 1
+      return
+    }
+
     // Check if both slots are filled (game actually started)
     if (players.p1.native !== zeroAddress.native && players.p2.native !== zeroAddress.native) {
       const key1 = super.getPlayerKey(sessionID, players.p1)
@@ -126,6 +132,51 @@ export class RockPaperScissors extends GameContract {
         this.determineWinner(sessionID)
       }
     }
+  }
+
+/**
+   * Claims victory by default (Timeout) when an opponent fails to reveal their move.
+   *
+   * This method can ONLY be executed after the Reveal Phase has officially ended
+   * (current round > config.endRevealAt). It resolves the stalemate by:
+   *
+   * 1. Verifying that the deadline has passed.
+   * 2. Checking which player successfully revealed their move.
+   * 3. Transferring the entire session balance to the single player who revealed.
+   *
+   * If both players revealed, it falls back to standard winner determination.
+   *
+   * @param sessionID - The unique identifier of the game session.
+   */
+  public claimTimeoutVictory(sessionID: uint64): void {
+    assert(!this.gameFinished(sessionID).value, 'Game already finished')
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+
+    const config = clone(this.gameSessions(sessionID).value)
+    assert(Global.round > config.endRevealAt, 'Reveal phase not yet ended')
+
+    const players = clone(this.sessionPlayers(sessionID).value)
+    const zeroAddress = new Address(Global.zeroAddress)
+
+    assert(players.p2.native !== zeroAddress.native, 'Not enough players for timeout logic')
+
+    const key1 = super.getPlayerKey(sessionID, players.p1)
+    const key2 = super.getPlayerKey(sessionID, players.p2)
+
+    const p1Revealed = this.playerChoice(key1).exists
+    const p2Revealed = this.playerChoice(key2).exists
+
+    const totalPot = this.getSessionBalance(sessionID)
+
+    if (p1Revealed && !p2Revealed) {
+      this.distributePrize(players.p1, totalPot)
+    } else if (!p1Revealed && p2Revealed) {
+      this.distributePrize(players.p2, totalPot)
+    } else {
+       this.determineWinner(sessionID)
+       return 
+    }
+    this.gameFinished(sessionID).value = 1
   }
 
   /**

@@ -2,11 +2,6 @@
 
 A TypeScript architectural framework for Algorand implementing the Commit-Reveal pattern. Provides a secure abstract contract for building anti-frontrunning on-chain games.
 
-[![Language](https://img.shields.io/badge/language-TypeScript-blue)](https://www.typescriptlang.org/)
-[![Framework](https://img.shields.io/badge/framework-AlgoKit-black)](https://github.com/algorandfoundation/algokit-cli)
-[![Platform](https://img.shields.io/badge/platform-Algorand-green)](https://algorand.com)
-[![License](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
-
 ## 🛡️ Why Commit-Reveal?
 
 On public blockchains, the Mempool is transparent. If a game broadcasts moves in clear text (e.g., "Rock"), an adversary or bot can observe the pending transaction and send a winning counter-move (e.g., "Paper"). This makes strategy games impossible.
@@ -88,42 +83,28 @@ smart_contracts/
     │   └── contract.spec.ts       # Tests
     └── artifacts/             # Auto-generated during compilation
 ```
+## 💻 Development Commands
 
-> **Note**: The `artifacts/` folder is automatically generated during compilation (`npm run build`). It contains TEAL files and typed TypeScript clients for interacting with contracts.
+Since prerequisites are handled in the root README, here are the specific commands for developing within this folder:
 
-## ⚙️ Prerequisites
+## Running Tests
 
-Before starting, ensure you have installed:
-
-- **Node.js v22+**: Required to run the TypeScript environment
-- **Docker Desktop**: Essential. Must be installed and running to start LocalNet
-- **AlgoKit CLI**: The tool for managing the project lifecycle
-
-## 🚀 Installation
-
-```bash
-# 1. Clone the repository
-git clone https://gitlab.com/Horus189/games4blockchain.git
-
-# 2. Install dependencies
-npm install
-
-# 3. Start Local Blockchain
-# IMPORTANT: Make sure Docker Desktop is open and running!
-algokit localnet start
-
-# 4. Compile contracts (generates TEAL files and TypeScript Clients)
-npm run build
-
-# 5. Deploy to LocalNet
-npm run deploy
-```
-
-## 🧪 Running Tests
+To ensure logic integrity:
 
 ```bash
 npm test
 ```
+
+## Compiling Atrifacts
+
+If you modify the contracts, regenerate the TEAL and Clients:
+
+```bash
+npm run build
+```
+
+**Note**: The artifacts/ folder is automatically generated.
+> It contains TEAL files and typed TypeScript clients for interacting with contracts.
 
 ## 💻 Usage Examples
 
