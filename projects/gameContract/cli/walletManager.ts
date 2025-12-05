@@ -2,6 +2,10 @@
 import chalk from 'chalk';
 import algosdk from 'algosdk';
 import { AlgorandClient } from '@algorandfoundation/algokit-utils';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 
 export class WalletManager {
   public algorand: AlgorandClient;
@@ -13,11 +17,24 @@ export class WalletManager {
 
   public async initWallet() {
     console.log(chalk.cyan('🔄 Initializing Wallet...'));
-    //Poi da sistemare mettendo un wallet vero ma non ho capito come
+    const envMnemonic = process.env.MNEMONIC;
+    if (envMnemonic) {
+      try {
+        this.account = algosdk.mnemonicToSecretKey(envMnemonic);
+        console.log(
+          chalk.green(`✅ Wallet caricato da .env: ${this.shortAddr(this.account.addr.toString())}`),
+        );
+      } catch (e) {
+        console.log(chalk.red('❌ Mnemonica nel .env non valida! Controlla il file.'));
+        process.exit(1); 
+      }
+    } else {
+      console.log(chalk.yellow('⚠️ Nessuna MNEMONIC trovata nel .env. Generazione account temporaneo...'));
       this.account = algosdk.generateAccount();
       console.log(
-        chalk.green(`✅ Temporary Wallet created: ${this.shortAddr(this.account.addr.toString())}`),
+        chalk.green(`✅ Wallet temporaneo creato: ${this.shortAddr(this.account.addr.toString())}`),
       );
+    }
 
     this.algorand.setSignerFromAccount(this.account);
 

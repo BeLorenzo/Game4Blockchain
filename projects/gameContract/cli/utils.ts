@@ -76,19 +76,16 @@ export function handleAlgoError(e: any, context: string) {
 
   if (msg.includes('overspend')) {
     console.log(chalk.yellow('   -> Insufficient funds in wallet. You need more ALGOs.'));
-  } else if (msg.includes('logic eval')) {
-    console.log(chalk.yellow('   -> Smart Contract Logic Failed.'));
-    console.log(chalk.gray('      (e.g., Wrong Phase, Wrong Bet Amount, Hash Mismatch)'));
-  } else if (msg.includes('box not found') || msg.includes('404')) {
+  } else if (msg.includes('Box') || msg.includes('404')) {
     console.log(chalk.yellow('   -> Session Data not found. Check your Session ID.'));
-  } else if (msg.includes('signer')) {
-    console.log(chalk.yellow('   -> Signer Error. Wallet not configured correctly.'));
-  }else if (msg.includes('Commit phase')) {
-    console.log(chalk.yellow('   -> Temporal error. Commit phase not over yet')); 
-  } else if (msg.includes('Reveal phase')) {
-    console.log(chalk.yellow('   -> Temporal error. Reveal phase is over')); 
+  }else if (msg.includes('phase')) {
+    console.log(chalk.yellow('   -> Temporal error. You are late or early for this phase'));  
   } else if (msg.includes('already')) {
     console.log(chalk.yellow('   -> Double play is not permitted')); 
+  } else if (msg.includes('hash')) {
+    console.log(chalk.yellow('   -> Hash mismatch. Salt or move not valid')); 
+  } else if (msg.includes('Game is over')) {
+    console.log(chalk.yellow('   -> Game is over')); 
   }
   else {
     console.log(chalk.gray(msg));

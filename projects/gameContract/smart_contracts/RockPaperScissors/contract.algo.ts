@@ -67,6 +67,7 @@ export class RockPaperScissors extends GameContract {
    */
   public joinSession(sessionID: uint64, commit: bytes, payment: gtxn.PaymentTxn, mbrPayment: gtxn.PaymentTxn): void {
     assert(this.sessionExists(sessionID), 'Session does not exist')
+    assert(!this.gameFinished(sessionID).value, "Game is over")
 
     const players = clone(this.sessionPlayers(sessionID).value)
     const senderAddress = new Address(Txn.sender)
@@ -105,10 +106,7 @@ export class RockPaperScissors extends GameContract {
    */
   public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
     assert(choice < Uint64(3), 'Invalid choice: must be 0, 1, or 2')
-
-    if (this.gameFinished(sessionID).value) {
-      return
-    }
+    assert(!this.gameFinished(sessionID).value, "Game is over")
 
     // Delegate commit verification to parent
     super.reveal(sessionID, choice, salt)

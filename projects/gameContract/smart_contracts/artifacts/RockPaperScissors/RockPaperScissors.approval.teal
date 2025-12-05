@@ -4,7 +4,7 @@
 // @algorandfoundation/algorand-typescript/arc4/index.d.ts::Contract.approvalProgram() -> uint64:
 main:
     intcblock 1 0 8 2 42600
-    bytecblock "pcho" "spl" "newGame" "gs" "gfn" "join" "sessionIDCounter" "sbal" 0x151f7c75 "pcom"
+    bytecblock "pcho" "spl" "gfn" "newGame" "gs" "join" "sessionIDCounter" "sbal" 0x151f7c75 "pcom"
     txn ApplicationID
     bnz main_after_if_else@2
     // smart_contracts/abstract_contract/contract.algo.ts:43
@@ -61,7 +61,7 @@ createSession:
     assert // transaction type is pay
     // smart_contracts/RockPaperScissors/contract.algo.ts:40
     // const totalMBR: uint64 = this.getRequiredMBR('newGame')
-    bytec_2 // "newGame"
+    bytec_3 // "newGame"
     callsub smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.getRequiredMBR
     // smart_contracts/RockPaperScissors/contract.algo.ts:42
     // assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment must be sent to contract')
@@ -115,7 +115,7 @@ createSession:
     itob
     // smart_contracts/abstract_contract/contract.algo.ts:62
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
-    bytec_3 // "gs"
+    bytec 4 // "gs"
     dig 1
     concat
     // smart_contracts/abstract_contract/contract.algo.ts:82
@@ -160,7 +160,7 @@ createSession:
     box_put
     // smart_contracts/RockPaperScissors/contract.algo.ts:30
     // gameFinished = BoxMap<uint64, uint64>({ keyPrefix: 'gfn' })
-    bytec 4 // "gfn"
+    bytec_2 // "gfn"
     dig 2
     concat
     // smart_contracts/RockPaperScissors/contract.algo.ts:54
@@ -224,7 +224,7 @@ joinSession:
     dup
     // smart_contracts/abstract_contract/contract.algo.ts:62
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
-    bytec_3 // "gs"
+    bytec 4 // "gs"
     dig 1
     concat
     dup
@@ -236,29 +236,41 @@ joinSession:
     // smart_contracts/RockPaperScissors/contract.algo.ts:69
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
+    // smart_contracts/RockPaperScissors/contract.algo.ts:30
+    // gameFinished = BoxMap<uint64, uint64>({ keyPrefix: 'gfn' })
+    bytec_2 // "gfn"
+    dig 1
+    concat
+    // smart_contracts/RockPaperScissors/contract.algo.ts:70
+    // assert(!this.gameFinished(sessionID).value, "Game is over")
+    box_get
+    assert // Box must have value
+    btoi
+    !
+    assert // Game is over
     // smart_contracts/RockPaperScissors/contract.algo.ts:23
     // sessionPlayers = BoxMap<uint64, SessionPlayers>({ keyPrefix: 'spl' })
     bytec_1 // "spl"
     swap
     concat
     dup
-    // smart_contracts/RockPaperScissors/contract.algo.ts:71
+    // smart_contracts/RockPaperScissors/contract.algo.ts:72
     // const players = clone(this.sessionPlayers(sessionID).value)
     box_get
     swap
     dup
     uncover 2
     assert // Box must have value
-    // smart_contracts/RockPaperScissors/contract.algo.ts:72
+    // smart_contracts/RockPaperScissors/contract.algo.ts:73
     // const senderAddress = new Address(Txn.sender)
     txn Sender
     dup
     uncover 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:73
+    // smart_contracts/RockPaperScissors/contract.algo.ts:74
     // const zeroAddress = new Address(Global.zeroAddress)
     global ZeroAddress
     cover 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:76
+    // smart_contracts/RockPaperScissors/contract.algo.ts:77
     // players.p1.native !== senderAddress.native && players.p2.native !== senderAddress.native,
     extract 0 32
     dup
@@ -273,17 +285,17 @@ joinSession:
     intc_0 // 1
 
 joinSession_bool_merge@5:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:75-78
+    // smart_contracts/RockPaperScissors/contract.algo.ts:76-79
     // assert(
     //   players.p1.native !== senderAddress.native && players.p2.native !== senderAddress.native,
     //   'Player already joined this session',
     // )
     assert // Player already joined this session
-    // smart_contracts/RockPaperScissors/contract.algo.ts:81
+    // smart_contracts/RockPaperScissors/contract.algo.ts:82
     // const requiredMBR: uint64 = this.getRequiredMBR('join')
     bytec 5 // "join"
     callsub smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.getRequiredMBR
-    // smart_contracts/RockPaperScissors/contract.algo.ts:82
+    // smart_contracts/RockPaperScissors/contract.algo.ts:83
     // assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
     dig 8
     dup
@@ -291,18 +303,18 @@ joinSession_bool_merge@5:
     global CurrentApplicationAddress
     ==
     assert // MBR payment receiver must be contract
-    // smart_contracts/RockPaperScissors/contract.algo.ts:83
+    // smart_contracts/RockPaperScissors/contract.algo.ts:84
     // assert(mbrPayment.amount === requiredMBR, 'Insufficient MBR payment for player storage')
     gtxns Amount
     ==
     assert // Insufficient MBR payment for player storage
-    // smart_contracts/RockPaperScissors/contract.algo.ts:86
+    // smart_contracts/RockPaperScissors/contract.algo.ts:87
     // if (players.p1.native === zeroAddress.native) {
     dup
     dig 2
     ==
     bz joinSession_else_body@7
-    // smart_contracts/RockPaperScissors/contract.algo.ts:87
+    // smart_contracts/RockPaperScissors/contract.algo.ts:88
     // players.p1 = senderAddress
     dig 3
     dig 3
@@ -400,7 +412,7 @@ joinSession_after_if_else@11:
     +
     itob
     box_put
-    // smart_contracts/RockPaperScissors/contract.algo.ts:96
+    // smart_contracts/RockPaperScissors/contract.algo.ts:97
     // this.sessionPlayers(sessionID).value = clone(players)
     dig 4
     dig 4
@@ -411,7 +423,7 @@ joinSession_after_if_else@11:
     return
 
 joinSession_else_body@7:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:88
+    // smart_contracts/RockPaperScissors/contract.algo.ts:89
     // } else if (players.p2.native === zeroAddress.native) {
     dig 3
     dup
@@ -419,7 +431,7 @@ joinSession_else_body@7:
     dig 3
     ==
     assert // Session is full (Max 2 players)
-    // smart_contracts/RockPaperScissors/contract.algo.ts:89
+    // smart_contracts/RockPaperScissors/contract.algo.ts:90
     // players.p2 = senderAddress
     dig 3
     replace2 32
@@ -434,8 +446,8 @@ joinSession_bool_false@4:
 // smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove[routing]() -> void:
 revealMove:
     intc_1 // 0
-    dupn 4
-    // smart_contracts/RockPaperScissors/contract.algo.ts:106
+    dup
+    // smart_contracts/RockPaperScissors/contract.algo.ts:107
     // public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
     txna ApplicationArgs 1
     dup
@@ -452,8 +464,6 @@ revealMove:
     ==
     assert // invalid number of bytes for arc4.uint64
     btoi
-    dup
-    cover 2
     txna ApplicationArgs 3
     dup
     intc_1 // 0
@@ -465,34 +475,36 @@ revealMove:
     ==
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
     extract 2 0
-    cover 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:107
+    // smart_contracts/RockPaperScissors/contract.algo.ts:108
     // assert(choice < Uint64(3), 'Invalid choice: must be 0, 1, or 2')
+    dig 1
     pushint 3 // 3
     <
     assert // Invalid choice: must be 0, 1, or 2
     // smart_contracts/RockPaperScissors/contract.algo.ts:109
-    // if (this.gameFinished(sessionID).value) {
+    // assert(!this.gameFinished(sessionID).value, "Game is over")
+    uncover 2
     itob
     dup
+    cover 3
     // smart_contracts/RockPaperScissors/contract.algo.ts:30
     // gameFinished = BoxMap<uint64, uint64>({ keyPrefix: 'gfn' })
-    bytec 4 // "gfn"
-    swap
+    bytec_2 // "gfn"
+    dig 1
     concat
     dup
+    cover 4
     // smart_contracts/RockPaperScissors/contract.algo.ts:109
-    // if (this.gameFinished(sessionID).value) {
+    // assert(!this.gameFinished(sessionID).value, "Game is over")
     box_get
     assert // Box must have value
     btoi
-    bnz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@12
+    !
+    assert // Game is over
     // smart_contracts/abstract_contract/contract.algo.ts:62
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
-    bytec_3 // "gs"
-    dig 2
-    dup
-    cover 2
+    bytec 4 // "gs"
+    dig 1
     concat
     // smart_contracts/abstract_contract/contract.algo.ts:125
     // assert(this.gameSessions(sessionID).exists, 'Session does not exist')
@@ -550,10 +562,10 @@ revealMove:
     pop
     // smart_contracts/abstract_contract/contract.algo.ts:139
     // const computedCommit = sha256(itob(choice).concat(salt))
-    dig 7
+    uncover 5
     itob
     dup
-    dig 8
+    uncover 6
     concat
     sha256
     // smart_contracts/abstract_contract/contract.algo.ts:141
@@ -579,103 +591,101 @@ revealMove:
     bytec_1 // "spl"
     swap
     concat
-    // smart_contracts/RockPaperScissors/contract.algo.ts:116
+    // smart_contracts/RockPaperScissors/contract.algo.ts:114
     // const players = clone(this.sessionPlayers(sessionID).value)
     box_get
     swap
     dup
-    cover 2
-    bury 9
+    uncover 2
     assert // Box must have value
-    // smart_contracts/RockPaperScissors/contract.algo.ts:117
+    // smart_contracts/RockPaperScissors/contract.algo.ts:115
     // const zeroAddress = new Address(Global.zeroAddress)
     global ZeroAddress
     dup
-    cover 2
-    bury 8
-    // smart_contracts/RockPaperScissors/contract.algo.ts:119
+    uncover 2
+    // smart_contracts/RockPaperScissors/contract.algo.ts:117
     // if (players.p2.native === zeroAddress.native) {
     extract 32 32
     dup
-    bury 10
+    uncover 2
     ==
-    bz revealMove_after_if_else@5
-    // smart_contracts/RockPaperScissors/contract.algo.ts:120
+    bz revealMove_after_if_else@3
+    // smart_contracts/RockPaperScissors/contract.algo.ts:118
     // this.distributePrize(new Address(Txn.sender), this.getSessionBalance(sessionID))
     txn Sender
-    dig 5
+    dig 6
     callsub getSessionBalance
     callsub distributePrize
-    // smart_contracts/RockPaperScissors/contract.algo.ts:121
+    // smart_contracts/RockPaperScissors/contract.algo.ts:119
     // this.gameFinished(sessionID).value = 1
     intc_0 // 1
     itob
-    dig 1
+    dig 4
     swap
     box_put
 
-revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@12:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:106
+revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@10:
+    // smart_contracts/RockPaperScissors/contract.algo.ts:107
     // public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
     intc_0 // 1
     return
 
-revealMove_after_if_else@5:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:126
+revealMove_after_if_else@3:
+    // smart_contracts/RockPaperScissors/contract.algo.ts:124
     // if (players.p1.native !== zeroAddress.native && players.p2.native !== zeroAddress.native) {
-    dig 6
+    dig 2
     extract 0 32
     dup
-    bury 10
-    dig 6
+    bury 8
+    dig 2
     !=
-    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@12
-    dig 7
-    dig 6
+    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@10
+    dup
+    dig 2
     !=
-    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@12
+    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@10
     // smart_contracts/abstract_contract/contract.algo.ts:201
     // return sha256(itob(sessionID).concat(player.bytes))
-    dig 1
-    dup
-    dig 10
-    concat
-    sha256
-    swap
-    dig 9
-    concat
-    sha256
-    bury 11
-    // smart_contracts/abstract_contract/contract.algo.ts:57
-    // playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
-    bytec_0 // "pcho"
-    swap
-    concat
-    // smart_contracts/RockPaperScissors/contract.algo.ts:131
-    // if (this.playerChoice(key1).exists && this.playerChoice(key2).exists) {
-    box_len
-    bury 1
-    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@12
-    // smart_contracts/abstract_contract/contract.algo.ts:57
-    // playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
-    bytec_0 // "pcho"
-    dig 10
-    concat
-    // smart_contracts/RockPaperScissors/contract.algo.ts:131
-    // if (this.playerChoice(key1).exists && this.playerChoice(key2).exists) {
-    box_len
-    bury 1
-    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@12
-    // smart_contracts/RockPaperScissors/contract.algo.ts:132
-    // this.determineWinner(sessionID)
     dig 4
+    dup
+    dig 8
+    concat
+    sha256
+    swap
+    dig 2
+    concat
+    sha256
+    bury 9
+    // smart_contracts/abstract_contract/contract.algo.ts:57
+    // playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
+    bytec_0 // "pcho"
+    swap
+    concat
+    // smart_contracts/RockPaperScissors/contract.algo.ts:129
+    // if (this.playerChoice(key1).exists && this.playerChoice(key2).exists) {
+    box_len
+    bury 1
+    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@10
+    // smart_contracts/abstract_contract/contract.algo.ts:57
+    // playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
+    bytec_0 // "pcho"
+    dig 8
+    concat
+    // smart_contracts/RockPaperScissors/contract.algo.ts:129
+    // if (this.playerChoice(key1).exists && this.playerChoice(key2).exists) {
+    box_len
+    bury 1
+    bz revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@10
+    // smart_contracts/RockPaperScissors/contract.algo.ts:130
+    // this.determineWinner(sessionID)
+    dig 5
     callsub determineWinner
-    b revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@12
+    b revealMove_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.revealMove@10
 
 
 // smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.claimTimeoutVictory[routing]() -> void:
 claimTimeoutVictory:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:151
+    // smart_contracts/RockPaperScissors/contract.algo.ts:149
     // public claimTimeoutVictory(sessionID: uint64): void {
     txna ApplicationArgs 1
     dup
@@ -685,17 +695,17 @@ claimTimeoutVictory:
     assert // invalid number of bytes for arc4.uint64
     btoi
     dupn 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:152
+    // smart_contracts/RockPaperScissors/contract.algo.ts:150
     // assert(!this.gameFinished(sessionID).value, 'Game already finished')
     itob
     // smart_contracts/RockPaperScissors/contract.algo.ts:30
     // gameFinished = BoxMap<uint64, uint64>({ keyPrefix: 'gfn' })
-    bytec 4 // "gfn"
+    bytec_2 // "gfn"
     dig 1
     concat
     dup
     cover 3
-    // smart_contracts/RockPaperScissors/contract.algo.ts:152
+    // smart_contracts/RockPaperScissors/contract.algo.ts:150
     // assert(!this.gameFinished(sessionID).value, 'Game already finished')
     box_get
     assert // Box must have value
@@ -704,7 +714,7 @@ claimTimeoutVictory:
     assert // Game already finished
     // smart_contracts/abstract_contract/contract.algo.ts:62
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
-    bytec_3 // "gs"
+    bytec 4 // "gs"
     dig 1
     concat
     // smart_contracts/abstract_contract/contract.algo.ts:193
@@ -712,14 +722,14 @@ claimTimeoutVictory:
     dup
     box_len
     bury 1
-    // smart_contracts/RockPaperScissors/contract.algo.ts:153
+    // smart_contracts/RockPaperScissors/contract.algo.ts:151
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/RockPaperScissors/contract.algo.ts:155
+    // smart_contracts/RockPaperScissors/contract.algo.ts:153
     // const config = clone(this.gameSessions(sessionID).value)
     box_get
     pop
-    // smart_contracts/RockPaperScissors/contract.algo.ts:156
+    // smart_contracts/RockPaperScissors/contract.algo.ts:154
     // assert(Global.round > config.endRevealAt, 'Reveal phase not yet ended')
     global Round
     swap
@@ -732,14 +742,14 @@ claimTimeoutVictory:
     bytec_1 // "spl"
     dig 1
     concat
-    // smart_contracts/RockPaperScissors/contract.algo.ts:158
+    // smart_contracts/RockPaperScissors/contract.algo.ts:156
     // const players = clone(this.sessionPlayers(sessionID).value)
     box_get
     assert // Box must have value
-    // smart_contracts/RockPaperScissors/contract.algo.ts:159
+    // smart_contracts/RockPaperScissors/contract.algo.ts:157
     // const zeroAddress = new Address(Global.zeroAddress)
     global ZeroAddress
-    // smart_contracts/RockPaperScissors/contract.algo.ts:161
+    // smart_contracts/RockPaperScissors/contract.algo.ts:159
     // assert(players.p2.native !== zeroAddress.native, 'Not enough players for timeout logic')
     dig 1
     extract 32 32
@@ -749,7 +759,7 @@ claimTimeoutVictory:
     uncover 2
     !=
     assert // Not enough players for timeout logic
-    // smart_contracts/RockPaperScissors/contract.algo.ts:163
+    // smart_contracts/RockPaperScissors/contract.algo.ts:161
     // const key1 = super.getPlayerKey(sessionID, players.p1)
     swap
     extract 0 32
@@ -769,7 +779,7 @@ claimTimeoutVictory:
     bytec_0 // "pcho"
     uncover 2
     concat
-    // smart_contracts/RockPaperScissors/contract.algo.ts:166
+    // smart_contracts/RockPaperScissors/contract.algo.ts:164
     // const p1Revealed = this.playerChoice(key1).exists
     box_len
     dup
@@ -781,29 +791,29 @@ claimTimeoutVictory:
     bytec_0 // "pcho"
     swap
     concat
-    // smart_contracts/RockPaperScissors/contract.algo.ts:167
+    // smart_contracts/RockPaperScissors/contract.algo.ts:165
     // const p2Revealed = this.playerChoice(key2).exists
     box_len
     cover 3
     pop
-    // smart_contracts/RockPaperScissors/contract.algo.ts:169
+    // smart_contracts/RockPaperScissors/contract.algo.ts:167
     // const totalPot = this.getSessionBalance(sessionID)
     swap
     callsub getSessionBalance
     swap
-    // smart_contracts/RockPaperScissors/contract.algo.ts:171
+    // smart_contracts/RockPaperScissors/contract.algo.ts:169
     // if (p1Revealed && !p2Revealed) {
     bz claimTimeoutVictory_else_body@4
     dig 1
     bnz claimTimeoutVictory_else_body@4
-    // smart_contracts/RockPaperScissors/contract.algo.ts:172
+    // smart_contracts/RockPaperScissors/contract.algo.ts:170
     // this.distributePrize(players.p1, totalPot)
     dig 3
     dig 1
     callsub distributePrize
 
 claimTimeoutVictory_after_if_else@9:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:179
+    // smart_contracts/RockPaperScissors/contract.algo.ts:177
     // this.gameFinished(sessionID).value = 1
     intc_0 // 1
     itob
@@ -812,19 +822,19 @@ claimTimeoutVictory_after_if_else@9:
     box_put
 
 claimTimeoutVictory_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.claimTimeoutVictory@10:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:151
+    // smart_contracts/RockPaperScissors/contract.algo.ts:149
     // public claimTimeoutVictory(sessionID: uint64): void {
     intc_0 // 1
     return
 
 claimTimeoutVictory_else_body@4:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:173
+    // smart_contracts/RockPaperScissors/contract.algo.ts:171
     // } else if (!p1Revealed && p2Revealed) {
     dig 2
     bnz claimTimeoutVictory_else_body@7
     dig 1
     bz claimTimeoutVictory_else_body@7
-    // smart_contracts/RockPaperScissors/contract.algo.ts:174
+    // smart_contracts/RockPaperScissors/contract.algo.ts:172
     // this.distributePrize(players.p2, totalPot)
     dig 4
     dig 1
@@ -832,18 +842,18 @@ claimTimeoutVictory_else_body@4:
     b claimTimeoutVictory_after_if_else@9
 
 claimTimeoutVictory_else_body@7:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:176
+    // smart_contracts/RockPaperScissors/contract.algo.ts:174
     // this.determineWinner(sessionID)
     dig 6
     callsub determineWinner
-    // smart_contracts/RockPaperScissors/contract.algo.ts:151
+    // smart_contracts/RockPaperScissors/contract.algo.ts:149
     // public claimTimeoutVictory(sessionID: uint64): void {
     b claimTimeoutVictory_after_inlined_smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.claimTimeoutVictory@10
 
 
 // smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.getRequiredMBR[routing]() -> void:
 getRequiredMBR:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:238
+    // smart_contracts/RockPaperScissors/contract.algo.ts:236
     // public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
     txna ApplicationArgs 1
     dup
@@ -868,21 +878,21 @@ getRequiredMBR:
 
 // smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.determineWinner(sessionID: uint64) -> void:
 determineWinner:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:186
+    // smart_contracts/RockPaperScissors/contract.algo.ts:184
     // private determineWinner(sessionID: uint64): void {
     proto 1 0
-    // smart_contracts/RockPaperScissors/contract.algo.ts:187
+    // smart_contracts/RockPaperScissors/contract.algo.ts:185
     // assert(!this.gameFinished(sessionID).value, 'Prize already distributed')
     frame_dig -1
     itob
     // smart_contracts/RockPaperScissors/contract.algo.ts:30
     // gameFinished = BoxMap<uint64, uint64>({ keyPrefix: 'gfn' })
-    bytec 4 // "gfn"
+    bytec_2 // "gfn"
     dig 1
     concat
     dup
     cover 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:187
+    // smart_contracts/RockPaperScissors/contract.algo.ts:185
     // assert(!this.gameFinished(sessionID).value, 'Prize already distributed')
     box_get
     assert // Box must have value
@@ -894,11 +904,11 @@ determineWinner:
     bytec_1 // "spl"
     swap
     concat
-    // smart_contracts/RockPaperScissors/contract.algo.ts:189
+    // smart_contracts/RockPaperScissors/contract.algo.ts:187
     // const players = clone(this.sessionPlayers(sessionID).value)
     box_get
     assert // Box must have value
-    // smart_contracts/RockPaperScissors/contract.algo.ts:190
+    // smart_contracts/RockPaperScissors/contract.algo.ts:188
     // const choice1: uint64 = this.getPlayerChoice(sessionID, players.p1)
     dup
     extract 0 32
@@ -909,7 +919,7 @@ determineWinner:
     callsub getPlayerChoice
     dup
     uncover 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:191
+    // smart_contracts/RockPaperScissors/contract.algo.ts:189
     // const choice2: uint64 = this.getPlayerChoice(sessionID, players.p2)
     extract 32 32
     dup
@@ -919,33 +929,33 @@ determineWinner:
     callsub getPlayerChoice
     dup
     cover 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:192
+    // smart_contracts/RockPaperScissors/contract.algo.ts:190
     // const balance: uint64 = this.getSessionBalance(sessionID)
     frame_dig -1
     callsub getSessionBalance
     cover 2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:199
+    // smart_contracts/RockPaperScissors/contract.algo.ts:197
     // if (choice1 === choice2) {
     ==
     bz determineWinner_else_body@2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:200
+    // smart_contracts/RockPaperScissors/contract.algo.ts:198
     // const half: uint64 = balance / 2
     frame_dig 5
     intc_3 // 2
     /
-    // smart_contracts/RockPaperScissors/contract.algo.ts:201
+    // smart_contracts/RockPaperScissors/contract.algo.ts:199
     // this.distributePrize(players.p1, half)
     frame_dig 1
     dig 1
     callsub distributePrize
-    // smart_contracts/RockPaperScissors/contract.algo.ts:202
+    // smart_contracts/RockPaperScissors/contract.algo.ts:200
     // this.distributePrize(players.p2, half)
     frame_dig 3
     swap
     callsub distributePrize
 
 determineWinner_after_if_else@11:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:218
+    // smart_contracts/RockPaperScissors/contract.algo.ts:216
     // this.gameFinished(sessionID).value = 1
     intc_0 // 1
     itob
@@ -955,7 +965,7 @@ determineWinner_after_if_else@11:
     retsub
 
 determineWinner_else_body@2:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:206
+    // smart_contracts/RockPaperScissors/contract.algo.ts:204
     // (choice1 === ROCK && choice2 === SCISSORS) ||
     frame_dig 2
     bnz determineWinner_or_contd@4
@@ -965,7 +975,7 @@ determineWinner_else_body@2:
     bnz determineWinner_if_body@8
 
 determineWinner_or_contd@4:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:207
+    // smart_contracts/RockPaperScissors/contract.algo.ts:205
     // (choice1 === PAPER && choice2 === ROCK) ||
     frame_dig 2
     intc_0 // 1
@@ -975,7 +985,7 @@ determineWinner_or_contd@4:
     bz determineWinner_if_body@8
 
 determineWinner_or_contd@6:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:208
+    // smart_contracts/RockPaperScissors/contract.algo.ts:206
     // (choice1 === SCISSORS && choice2 === PAPER)
     frame_dig 2
     intc_3 // 2
@@ -987,7 +997,7 @@ determineWinner_or_contd@6:
     bz determineWinner_else_body@9
 
 determineWinner_if_body@8:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:210
+    // smart_contracts/RockPaperScissors/contract.algo.ts:208
     // this.distributePrize(players.p1, balance)
     frame_dig 1
     frame_dig 5
@@ -995,7 +1005,7 @@ determineWinner_if_body@8:
     b determineWinner_after_if_else@11
 
 determineWinner_else_body@9:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:214
+    // smart_contracts/RockPaperScissors/contract.algo.ts:212
     // this.distributePrize(players.p2, balance)
     frame_dig 3
     frame_dig 5
@@ -1005,10 +1015,10 @@ determineWinner_else_body@9:
 
 // smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.distributePrize(winner: bytes, amount: uint64) -> void:
 distributePrize:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:224
+    // smart_contracts/RockPaperScissors/contract.algo.ts:222
     // private distributePrize(winner: Address, amount: uint64): void {
     proto 2 0
-    // smart_contracts/RockPaperScissors/contract.algo.ts:225-231
+    // smart_contracts/RockPaperScissors/contract.algo.ts:223-229
     // itxn
     //   .payment({
     //     receiver: winner.native,
@@ -1021,7 +1031,7 @@ distributePrize:
     itxn_field Amount
     frame_dig -2
     itxn_field Receiver
-    // smart_contracts/RockPaperScissors/contract.algo.ts:225-230
+    // smart_contracts/RockPaperScissors/contract.algo.ts:223-228
     // itxn
     //   .payment({
     //     receiver: winner.native,
@@ -1030,11 +1040,11 @@ distributePrize:
     //   })
     intc_0 // 1
     itxn_field TypeEnum
-    // smart_contracts/RockPaperScissors/contract.algo.ts:229
+    // smart_contracts/RockPaperScissors/contract.algo.ts:227
     // fee: 0,
     intc_1 // 0
     itxn_field Fee
-    // smart_contracts/RockPaperScissors/contract.algo.ts:225-231
+    // smart_contracts/RockPaperScissors/contract.algo.ts:223-229
     // itxn
     //   .payment({
     //     receiver: winner.native,
@@ -1048,31 +1058,31 @@ distributePrize:
 
 // smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.getRequiredMBR(command: bytes) -> uint64:
 smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.getRequiredMBR:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:238
+    // smart_contracts/RockPaperScissors/contract.algo.ts:236
     // public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
     proto 1 1
-    // smart_contracts/RockPaperScissors/contract.algo.ts:239
+    // smart_contracts/RockPaperScissors/contract.algo.ts:237
     // if (command === 'newGame') {
     frame_dig -1
-    bytec_2 // "newGame"
+    bytec_3 // "newGame"
     ==
     bz smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.getRequiredMBR_else_body@2
-    // smart_contracts/RockPaperScissors/contract.algo.ts:245
+    // smart_contracts/RockPaperScissors/contract.algo.ts:243
     // return playersMBR + stateMBR + super.getRequiredMBR('newGame')
-    bytec_2 // "newGame"
+    bytec_3 // "newGame"
     callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR
     intc 4 // 42600
     +
     retsub
 
 smart_contracts/RockPaperScissors/contract.algo.ts::RockPaperScissors.getRequiredMBR_else_body@2:
-    // smart_contracts/RockPaperScissors/contract.algo.ts:246
+    // smart_contracts/RockPaperScissors/contract.algo.ts:244
     // } else if (command === 'join') {
     frame_dig -1
     bytec 5 // "join"
     ==
     assert // Command not supported
-    // smart_contracts/RockPaperScissors/contract.algo.ts:247
+    // smart_contracts/RockPaperScissors/contract.algo.ts:245
     // return super.getRequiredMBR('join')
     bytec 5 // "join"
     callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR
@@ -1087,7 +1097,7 @@ smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR:
     // smart_contracts/abstract_contract/contract.algo.ts:159
     // if (command === 'newGame') {
     frame_dig -1
-    bytec_2 // "newGame"
+    bytec_3 // "newGame"
     ==
     bz smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2
     // smart_contracts/abstract_contract/contract.algo.ts:164
