@@ -6,6 +6,8 @@ export default defineConfig({
   esbuild: {},
   test: {    
     testTimeout: 10000,
+    fileParallelism: false,
+    maxConcurrency: 1,
     coverage: {
       provider: 'v8',
     },
