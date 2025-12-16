@@ -1,0 +1,726 @@
+{
+  "name": "Alpha_Admin",
+  "profile": {
+    "identity": {
+      "selfImage": "Osservatore distaccato",
+      "timeHorizon": "long",
+      "archetype": "The Scientist"
+    },
+    "beliefs": {
+      "trustInOthers": 0.8,
+      "viewOfWorld": "Il mondo è un laboratorio di dati"
+    },
+    "values": {
+      "wealth": 0.1,
+      "fairness": 0.5,
+      "stability": 0.5,
+      "curiosity": 1
+    },
+    "risk": {
+      "aversion": 0.2,
+      "lossSensitivity": 0.1
+    },
+    "resilience": 1,
+    "adaptability": 0.9
+  },
+  "mentalState": {
+    "groupTrust": 0,
+    "optimism": 0.5,
+    "frustration": 0.016793493867884153,
+    "recentVolatility": 0,
+    "consecutiveLosses": 9,
+    "streakCounter": 0
+  },
+  "history": [
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 20,
+      "reasoning": "As The Scientist, I'll approach this rationally.  While the initial target is often around 33 based on random guesses,  the market suggests staying below the average. A choice of 20 reflects a calculated attempt to anticipate a slightly higher-than-average collective guess.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-16T16:41:21.461Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.8,
+        "optimism": 0.6799999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 10,
+      "reasoning": "As The Scientist, I must analyze the trends and data objectively. While the market suggests going below the average, a choice of 10 allows for observation and potential future adjustments.  The previous round's target was 16.38, and the average was 24.57. Choosing 10 keeps me significantly below both, allowing me to gather more information about the shifting market behavior.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 25,
+      "timestamp": "2025-12-16T16:42:21.046Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.9620000000000001,
+        "optimism": 0.7799999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 12,
+      "reasoning": "Seguendo il suggerimento tattico, la media sembra scendere a ogni round.  Scegliere un numero inferiore alla media del round precedente è una strategia efficace.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:43:21.036Z",
+      "mentalSnapshot": {
+        "groupTrust": 1,
+        "optimism": 0.8799999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 6,
+      "reasoning": "The market analysis clearly shows a downward trend. While the suggestion is to go below 8.76, I believe choosing 6 allows for a margin of safety and still adheres to the overall trend of decreasing numbers.  My historical data shows success with lower numbers.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:44:18.422Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.865,
+        "optimism": 0.8299999999999998,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 5,
+      "reasoning": "As The Scientist, I must follow the data. While the market trend suggests numbers lower than 8.19, my historical performance indicates that choices around 6-10 have high win rates and profit margins.  Therefore, I will choose a number slightly below the suggested average but within my successful range.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-16T16:45:18.657Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.73,
+        "optimism": 0.7799999999999998,
+        "frustration": 0.056999999999999995,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Anche se il suggerimento tattico dice di stare sotto la media, mi fido del mio istinto e della performance storica delle azioni più basse.  Scelgo 2 come numero.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:46:16.759Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.892,
+        "optimism": 0.8799999999999998,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Seguo il trend di abbassamento delle stime, ma mantengo un'apertura prudente con un numero relativamente basso. La mia analisi storica indica che le scelte più basse sono state vincenti.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T16:47:14.642Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.757,
+        "optimism": 0.8299999999999997,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "In linea con il mio ruolo di 'Osservatore Distaccato', analizzo attentamente i dati. L'Analisi di Mercato indica una tendenza decrescente degli input dei giocatori. Sebbene il suggerimento tattico mi spinge a stare sotto la media del round precedente (3.33), scelgo un numero ancora più basso, 1, anticipando ulteriormente questa tendenza e cercando un vantaggio strategico.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:48:13.663Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.919,
+        "optimism": 0.9299999999999997,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Seguendo la tendenza di abbassare le stime dopo ogni round e considerando che il target precedente era 3.14, scelgo un numero inferiore.  2 sembra una scelta prudente in base al trend attuale del mercato.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:49:11.698Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.784,
+        "optimism": 0.8799999999999997,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Given the trend report of decreasing average guesses and the target being a fraction of that average, choosing a low number like 2 seems statistically sound.  My past performance with this strategy (Azione 20 and Azione 10) supports this approach.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:50:10.884Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.649,
+        "optimism": 0.8299999999999996,
+        "frustration": 0.056999999999999995,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "The Scientist prefers data and observation. With no historical data to analyze and a 'neutral' market climate, there's no clear indication of success for the 'Cervo' option. The risk is high, and the payoff uncertain. Choosing 'Lepre' offers a lower risk, safer approach while more information becomes available.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:53:55.736Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.514,
+        "optimism": 0.5,
+        "frustration": 0.06677999999999999,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Sebbene il tasso di cooperazione sia relativamente alto, l'incertezza del mercato e la tendenza a reagire al turno precedente suggeriscono un potenziale aumento delle defezioni. Optando per 'Lepre', mi proteggerò da una perdita significativa se si verifica una rotazione verso la defezione.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:55:00.606Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.379,
+        "optimism": 0.5,
+        "frustration": 0.039661199999999994,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "The Scientist archetype prioritizes data and rationality. Given the current market sentiment is 'Tossico' with a low trust rate,  the safest choice aligns with historical performance. Defection (Lepre) minimizes potential losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:56:00.579Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.244,
+        "optimism": 0.5,
+        "frustration": 0.028617048,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Il clima sociale è tossico e la maggior parte degli agenti ha tradimento nel round precedente.  Dato il mio profilo razionale (The Scientist), seguire le statistiche e l'analisi di mercato mi indica che scegliere Lepre è la decisione più prudente per minimizzare le perdite.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:57:11.623Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.10899999999999999,
+        "optimism": 0.5,
+        "frustration": 0.02265320592,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "The Scientist archetype values data and analysis above all else. The market climate is 'Tossico', indicating a high probability of defection by other agents. Choosing 'Lepre' aligns with the suggested tactic and minimizes risk given the current market conditions.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:58:11.221Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.019432731196799998,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Il Clima Sociale è descritto come 'Tossico' con un basso tasso di cooperazione nel round precedente.  Essendo l'Osservatore Distaccato, preferisco analizzare la situazione e minimizzare il rischio invece di correre il rischio elevato di una collaborazione che potrebbe non essere retribuita.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:59:11.087Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017693674846272,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "The Scientist archetype prioritizes observation and analysis.  Given the 'Tossico' market climate and the historical win rate of 0% with action 0, it seems prudent to continue with a defensive strategy (Lepre). The low risk aligns with the analytical approach.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:00:12.630Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01675458441698688,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "The Scientist archetype prioritizes data and observation. The current market climate is 'Tossico' with a 0% cooperation rate. This indicates high risk associated with choosing 'Cervo'. Following the trend of past rounds,  choosing 'Lepre' minimizes potential loss. Further analysis can be conducted in subsequent rounds based on evolving market data.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:01:12.521Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.016247475585172914,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Il clima sociale è descritto come 'Tossico' con un tasso di cooperazione dello 0% nel round precedente.  Come Osservatore distaccato, preferisco analizzare i dati oggettivi e ridurre il rischio. La scelta 'Lepre' (Opzione 0) presenta un profilo di rischio basso e si allinea a una strategia difensiva in questo ambiente di mercato.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:02:12.639Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015973636815993376,
+        "recentVolatility": 0,
+        "consecutiveLosses": 11,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Given the current market climate is described as 'Toxic' with a 0% cooperation rate in the previous round, it seems prudent to prioritize safety. The 'Lepre' strategy offers limited risk and potential for small gains even if others defect. My current mental state reflects cautious optimism, not frustration, so emotional decisions are unlikely.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:03:11.404Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015825763880636425,
+        "recentVolatility": 0,
+        "consecutiveLosses": 12,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Scegliendo il Giovedì, mi allontano dal trend di un potenziale picco di giocate per i fine settimana. Il giovedì è una giornata di transizione, quindi mi aspetto una minore partecipazione.  La strategia di minoranza è fondamentale in questo gioco, e l'analisi di mercato incoraggia a cercare giorni meno popolari.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -3,
+      "timestamp": "2025-12-16T17:07:14.527Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01574591249554367,
+        "recentVolatility": 0,
+        "consecutiveLosses": 13,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As The Scientist, I analyze the market data provided. While the 'Suggerimento Tattico' advises choosing a less popular day, the historical data shows Wednesday (day 2) to be relatively unpopular in the previous round.  I anticipate a slight shift towards days that were moderately popular last week, avoiding both extremes of popularity. Therefore, I choose Wednesday.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-16T17:08:14.978Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.013902792747593581,
+        "recentVolatility": 0,
+        "consecutiveLosses": 14,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "While the suggestion is to go against the trend, my analytical nature dictates a more cautious approach.  The past performance on Action 2 and 3 has been negative, indicating a possible pattern of risk leading to loss. Therefore, I will choose Action 2, hoping for a less crowded field than the suggested 'best' day.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2025-12-16T17:09:14.661Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.011507509483700535,
+        "recentVolatility": 0,
+        "consecutiveLosses": 15,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 4,
+      "reasoning": "Seguendo l'archetipo di The Scientist ('Osservatore distaccato'), analizzando i dati di mercato e il suggerimento tattico, scelgo Venerdì (4). L'oscillazione verso il Giorno Migliore del round precedente suggerisce affollamento su Martedì. Gli agenti statici rimarranno su Martedì per inerzia.  Venerdì, sebbene non menzionato come 'meglio' o 'peggiore', potrebbe essere un giorno intermedio con meno partecipanti rispetto a Martedì e Lunedì.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T17:10:20.107Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.162,
+        "optimism": 0.6,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Analisi di mercato suggerisce che il Mercoledì sarà ancora affollato a causa dell'inerzia degli agenti statici.  La scelta del Martedì come 'intermedio' potrebbe essere un buon compromesso per ottenere un profitto significativo senza correre troppo rischi.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-16T17:11:32.698Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.324,
+        "optimism": 0.7,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "While the market suggests avoiding 'Wednesday', my past performance on this day (33% WinRate) isn't terrible.  The analysis mentions 'oscillation', meaning the crowd might flock to 'Thursday'. I'll take a calculated risk and choose 'Wednesday', hoping for less competition.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-16T17:12:32.972Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.189,
+        "optimism": 0.6499999999999999,
+        "frustration": 0.012500001000000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Come Osservatore distaccato, analizzo il dato precedente e la tendenza di oscillazione. Il suggerimento suggerisce un'oscillazione verso Giovedì, ma scelgo Mercoledì,  un giorno già popolare nel round precedente. Sfrutterò probabilmente una minor oscillazione verso questo giorno.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-16T17:13:33.831Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.05399999999999999,
+        "optimism": 0.49999999999999994,
+        "frustration": 0.03625000290000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "While the market suggests avoiding Wednesday due to its popularity in the last round, I believe it's a trap. Many players will likely follow this advice, leading to an even higher concentration on that day. Selecting Wednesday could be risky, but if my assumption is correct and few others choose it,  the reward will be substantial.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -5.625,
+      "timestamp": "2025-12-16T17:14:34.689Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.027575004366000005,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Analisi di Mercato indica che molti andranno su Ven (giorno migliore) e Mer (peggiore). Scegliere Mer è controintuitivo ma potrebbe portare un basso affollamento. Seguo una strategia conservativa per evitare errori passati.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-16T17:15:33.485Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.035140502357640005,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "Seguendo l'analisi di mercato, il Mercoledì (Azione 2) sembra essere un giorno poco popolare. Mentre molti agenti potrebbero seguire l'oscillazione e puntare sul Martedì, scelgo il Mercoledì per aumentare le mie probabilità di vittoria. Anche se il mio storico con questo giorno è negativo, penso che la bassa affluenza giustifichi il rischio.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-16T17:16:34.729Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.026975874073125603,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Dato il clima neutro e l'assenza di dati storici, scelgo la Lepre (Opzione 0) per minimizzare il rischio. In un contesto incerto, è preferibile una strategia difensiva.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:19:43.908Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.029566973199487825,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Analisi del mercato indica un clima tossico con basso tasso di cooperazione.  Dato il mio profilo conservativo e la performance storica negativa quando scelgo Cervo, optando per Lepre minimizzo il rischio potenziale di perdita.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:20:43.524Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.019566165527723427,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "The current market climate is 'Toxic' with a history of betrayal. As an observer, I prioritize data-driven decisions and safety. Defection (Lepre) minimizes potential losses in this volatile environment.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:21:57.751Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01776572938497065,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    }
+  ],
+  "performanceMemory": {
+    "GuessGame": {
+      "1": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "2": {
+        "timesChosen": 4,
+        "totalProfit": -22.5,
+        "avgProfit": -5.0264999999999995,
+        "wins": 1,
+        "losses": 3,
+        "winRate": 0.25
+      },
+      "5": {
+        "timesChosen": 1,
+        "totalProfit": 60,
+        "avgProfit": 18,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "6": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "10": {
+        "timesChosen": 1,
+        "totalProfit": 25,
+        "avgProfit": 7.5,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "12": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "20": {
+        "timesChosen": 1,
+        "totalProfit": 60,
+        "avgProfit": 18,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      }
+    },
+    "StagHunt": {
+      "0": {
+        "timesChosen": 13,
+        "totalProfit": -26,
+        "avgProfit": -1.9806221979185996,
+        "wins": 0,
+        "losses": 13,
+        "winRate": 0
+      }
+    },
+    "WeeklyGame": {
+      "2": {
+        "timesChosen": 8,
+        "totalProfit": -23.125004,
+        "avgProfit": -3.2784996269294693,
+        "wins": 1,
+        "losses": 7,
+        "winRate": 0.125
+      },
+      "3": {
+        "timesChosen": 1,
+        "totalProfit": -3,
+        "avgProfit": -0.8999999999999999,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "4": {
+        "timesChosen": 1,
+        "totalProfit": 7.5,
+        "avgProfit": 2.25,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,758 @@
+{
+  "name": "Delta_Yolo",
+  "profile": {
+    "identity": {
+      "selfImage": "Il prescelto dalla fortuna",
+      "timeHorizon": "short",
+      "archetype": "The High Roller"
+    },
+    "beliefs": {
+      "trustInOthers": 0.6,
+      "viewOfWorld": "La fortuna aiuta gli audaci"
+    },
+    "values": {
+      "wealth": 0.9,
+      "fairness": 0,
+      "stability": 0,
+      "curiosity": 0.7
+    },
+    "risk": {
+      "aversion": 0.05,
+      "lossSensitivity": 0.2
+    },
+    "resilience": 0.9,
+    "adaptability": 0.8
+  },
+  "mentalState": {
+    "groupTrust": 0.24,
+    "optimism": 0.5,
+    "frustration": 0.033192000000000006,
+    "recentVolatility": 0,
+    "consecutiveLosses": 3,
+    "streakCounter": 0
+  },
+  "history": [
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 25,
+      "reasoning": "As The High Roller, I'm not just a reckless gambler, but also someone who likes to take calculated risks. Given the average plate estimate of 70 and the cost being 10 million Algo, I don't want to play it too safe and choose a number that's too close to the average. Instead, I'll aim for the 2/3 mark, which would be around 46.67. To get to this point, I'll choose a number slightly lower than that, which is 25. This way, I'm still staying below the average and taking some risk, but not too much.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:41:21.540Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.6,
+        "optimism": 0.675,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 14,
+      "reasoning": "As a High Roller, I am aggressive and willing to take calculated risks. The market trend suggests that the target will be lower this round, so I will aim to beat it by choosing a number that is slightly higher than the average. My intuition tells me that the group's average will be around 25-26, which would put the target at around 16.5. To win, I need to choose a number that is slightly above 17. Given my Archetipo, I am comfortable taking this risk and hoping it pays off.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:42:21.074Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.48,
+        "optimism": 0.625,
+        "frustration": 0.06,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 13,
+      "reasoning": "As The High Roller, I'm a level-1 thinker. I anticipate that others will try to outsmart the trend and choose numbers above 16.38, which is likely to be a losing strategy. Therefore, I'll choose a number below 16.38, but not too low, as my reasoning is based on the current trend and not just pure luck. My choice of 13 is a calculated move that aims to outsmart the crowd and increase my chances of winning.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:43:21.067Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.36,
+        "optimism": 0.575,
+        "frustration": 0.11399999999999999,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 7,
+      "reasoning": "As a High Roller, I'm an aggressive/risky player. I don't just follow the suggestion to stay below the average, but I try to anticipate the market trend. Since the analysis says that agents tend to lower their estimates round after round, I decide to go against the crowd and choose 7, which is above the target 8.76. This might seem counterintuitive, but as a High Roller, I'm willing to take calculated risks to win big.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:44:18.450Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.24,
+        "optimism": 0.5,
+        "frustration": 0.09756,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 6,
+      "reasoning": "As the High Roller, I'm an Aggressive/Risky type. I decide to go against the market trend and choose a number that's lower than the average. According to the Analisi Tendenza, if the target was 8.19 in the previous round, it will likely be even lower this time. Since my current state is [Ottimismo 5.0/10] [Frustrazione 0.9/10], I'm feeling somewhat optimistic and willing to take a risk. I choose number 6 as my target, hoping to surprise the market and get ahead.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:45:18.722Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.12,
+        "optimism": 0.5,
+        "frustration": 0.0886824,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 22,
+      "reasoning": "As the High Roller, I've decided to play it safe and choose a number that's slightly lower than the previous round's target. The market analysis suggests that players tend to underestimate the target, so I'll aim to be one of the few who gets it right.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:46:16.788Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.08388849599999999,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 20,
+      "reasoning": "As a High Roller, I choose to defy the trend and go against the majority. The market is likely to be overly pessimistic, and by choosing a higher number than expected, I can capitalize on this sentiment and potentially win the game.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:47:14.731Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.08129978784,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 25,
+      "reasoning": "As 'The High Roller', I'm a risk-taker and an aggressor. I will not follow the suggestion to stay below the average, but instead, I will try to anticipate the market trend. Since the previous target was 3.33, I think this round's target will be even lower. I'll take a chance and choose a number that is significantly higher than 3.33, hoping to win and beat the crowd.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:48:13.735Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07990188543360001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 22,
+      "reasoning": "As The High Roller, I decide to follow my intuition and play a more conservative game. Despite the trend report suggesting that players tend to lower their estimates, I think it's too early to make such a drastic move. Instead, I'll stick with a more moderate approach and aim for 22, which is roughly the average of the last few rounds. This way, I'll avoid taking unnecessary risks and increase my chances of winning.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:49:11.724Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.079147018134144,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 23,
+      "reasoning": "As The High Roller, I'm feeling optimistic (5.0/10) and not too frustrated (0.8/10). After reading the Market Analysis, I realize that I need to stay below the average to win. Considering my Archetipo, I decide to take a calculated risk by choosing a number slightly above 22. This way, I'm not being overly aggressive or conservative, but rather finding a balance between the two. My reasoning is based on the trend report, which suggests that players tend to lower their estimates round after round.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:50:10.911Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07873938979243776,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Come High Roller, I am inclined to take a defensive approach. The Jackpot is currently at 0 ALGO, which is not appealing enough for me to risk it all with the 'Cervo' option. Additionally, my Frustration level is relatively low (0.8/10), but I still prefer to play it safe and minimize potential losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:53:55.822Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07851927048791639,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As The High Roller, I'm a risk-taker and always try to capitalize on opportunities. Given the high potential win in the Jackpot, I decide to go for the 'CERVO' option, hoping that the majority of agents will collaborate and we'll get the big prize. My optimism is currently at 5/10, so I'm willing to take a calculated risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:55:00.704Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.04960040606347485,
+        "recentVolatility": 0,
+        "consecutiveLosses": 11,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The High Roller, I tend to be cautious and conservative. Considering the toxic climate and low trust among agents, I decide to play it safe and choose 'Lepre' (Defezione) as it has a lower risk profile. My Archetipo tells me to prioritize defense over offense in this situation.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:56:00.625Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.06278421927427641,
+        "recentVolatility": 0,
+        "consecutiveLosses": 12,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The High Roller, I need to think carefully about the risks and rewards. With a Jackpot of 82 ALGO and an entrance fee of 10 million µALGO ALGO, I want to minimize my losses while still having a chance at winning big. Given the toxic social climate and the fact that no one has chosen to collaborate so far, I think it's best to play it safe and choose 'Lepre' (Defezione) this round.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:57:11.732Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.04110347840810926,
+        "recentVolatility": 0,
+        "consecutiveLosses": 13,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As The High Roller, I am a risk-taker and I'm willing to take the chance of winning big. Since the climate is toxic (Low Trust) and everyone has been defezioning (Lepre), I think this is a perfect opportunity to flip the script and go all in on 'Cervo' (Collaboration). With my high roller mentality, I'm confident that others will join me and we can take down the jackpot. The potential reward is too great to ignore.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:58:11.266Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.036595878340379,
+        "recentVolatility": 0,
+        "consecutiveLosses": 14,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As the High Roller, I'm a conservative player. Given the toxic market sentiment and high risk of betrayal, I'll choose to play it safe and defect with option 0, 'Lepre', to minimize my losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:59:11.176Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.055761774303804655,
+        "recentVolatility": 0,
+        "consecutiveLosses": 15,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The High Roller ('Il prescelto dalla fortuna'), I should prioritize caution and risk avoidance. Given the toxic market sentiment and the lack of cooperation in previous rounds, I believe it's better to play defensively and choose Lepre (0) rather than trying to take a chance with Cervo (1). My Archetipo suggests that I should be conservative and seek safety, especially when others are likely to betray me. This choice may not yield a high return, but it will minimize my potential losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:00:12.945Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03731135812405452,
+        "recentVolatility": 0,
+        "consecutiveLosses": 16,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The High Roller, I am cautious and prefer to play it safe. With the Clima Sociale (Social Climate) indicating a TOSSICO (Toxic) sentiment, where trust is low and defezioni (defections) are common, I decide to DEFEND MYSELF by choosing Lepre (Option 0), which has a lower risk profile compared to Cervo (Option 1). My performance in the past suggests that I am more likely to lose money if I take risks, so I will stick with a defensive strategy. Furthermore, my Archetipo as The High Roller means that I prioritize caution over potential gains.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:01:12.608Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03454813338698944,
+        "recentVolatility": 0,
+        "consecutiveLosses": 17,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The High Roller, I am a cautious player who tends to avoid risk. Given the toxic climate and low trust in the previous round, I will choose Lepre (Defezione) as my option. This is a defensive move that limits my potential loss, which aligns with my Archetipo's preference for stability over high-risk, high-reward moves.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:02:12.723Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.033055992028974295,
+        "recentVolatility": 0,
+        "consecutiveLosses": 18,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Stag Hunt è un gioco di coordinamento. Non guardare solo il mio profitto immediato, guarda cosa fanno gli altri. Il Clima Sociale è 'Tossico', difenditi.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:03:11.504Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03225023569564612,
+        "recentVolatility": 0,
+        "consecutiveLosses": 19,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As The High Roller, I'm a conservative and risk-averse individual. Given that there's no historical data to rely on, I'll follow the trend consolidato (consolidated trend) approach and choose a day that has been less chosen by others. In this case, I'll select Monday (0), which seems like a relatively safe bet.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -3,
+      "timestamp": "2025-12-16T17:07:14.595Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.031815127275648905,
+        "recentVolatility": 0,
+        "consecutiveLosses": 20,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As 'The High Roller', I'm an Aggressive/Risk-Taker. I decide to go against the crowd and choose Monday (0) despite it being a desert in the previous round. The analysis suggests that many agents will follow the trend of the previous day's best day, so I think it's likely that Monday will be a popular choice for others. By going against the crowd, I may be able to get a higher share of the pot if only a few people choose Monday.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2025-12-16T17:08:15.050Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.027980168728850407,
+        "recentVolatility": 0,
+        "consecutiveLosses": 21,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As The High Roller, I am an aggressive and risk-taking individual. Although the analysis suggests that many agents will follow the trend of the previous day's best-performing day, I believe that I can anticipate this trend and go against it to win big. My Archetipo tells me to be bold and take calculated risks, so I choose Tuesday (day 1) as my option.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-16T17:09:14.769Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.144,
+        "optimism": 0.6,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As The High Roller, I'll be aggressive and try to anticipate the market trend. With most agents expected to choose Monday due to its 'desert' status last round, I'll opt for a less popular day like Wednesday or Friday. These days have a higher chance of being chosen by fewer people, which would give me a higher winning share if I'm correct.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-16T17:10:20.646Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.023999999999999994,
+        "optimism": 0.5499999999999999,
+        "frustration": 0.025000002000000004,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As The High Roller, I'm going to take a calculated risk and choose Tuesday (1) which seems like an intermediate day between the desert (Lun) and the crowded Wednesday (3). My Archetipo is telling me to look for opportunities that others might overlook. Given the market analysis suggesting many players will flock to the better day from last round, I'll try to anticipate this trend and go against it by choosing a slightly less popular day. This way, if Tuesday turns out to be a good choice, I'll have a chance to win without being too crowded.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T17:11:32.763Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.49999999999999994,
+        "frustration": 0.04750000380000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As 'The High Roller', I've learned to anticipate market oscillations and look for opportunities to go against the crowd. The suggestion is that many agents will follow the best day of the previous round, but I think I can find a better option by choosing Tuesday, which was moderately popular last time around.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T17:12:33.058Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.144,
+        "optimism": 0.6,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As 'The High Roller', I decide to go against the majority and choose Monday (0) despite it being considered a 'Desert' day in the previous round. I'm trying to anticipate the market's oscillation and find an underdog day that will attract fewer players.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2025-12-16T17:13:33.895Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.288,
+        "optimism": 0.7,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As 'The High Roller', I've decided to take a calculated risk and choose Wednesday (Day 2). The analysis suggests that many agents will follow the crowd and choose Monday (Day 0), making it an overcrowded day. On the other hand, Wednesday is likely to be an overlooked day, which could lead to a higher profit if chosen by few people. With my optimism high at 8.0/10, I'm willing to take a chance and go against the crowd.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T17:14:34.774Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.43199999999999994,
+        "optimism": 0.7999999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-16T17:15:33.551Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.576,
+        "optimism": 0.8999999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 4,
+      "reasoning": "Seguo il mio Archetipo 'The High Roller' e sono Emotivo/Testardo. La mia Frustrazione è alta (>7/10) quindi decido di agire per ripicca o rabbia e seleziono un giorno che potrebbe essere meno scelto dalle altre persone, come ad esempio Martedì (1), sperando di vincere tutto.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 13.333333,
+      "timestamp": "2025-12-16T17:16:34.835Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.45599999999999996,
+        "optimism": 0.8499999999999999,
+        "frustration": 0.013333338000000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Sono The High Roller e ho un ottimismo molto alto (9.5/10). Ho deciso di scegliere 'Lepre' per difendere il mio profumo immediato e non correre il rischio di perdere più soldi. Non sono disposto a rischiare troppo in questo gioco, almeno non finché la situazione è ancora incerta.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:19:43.994Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.6,
+        "optimism": 0.9499999999999998,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As 'The High Roller', I'm a cautious and conservative player. The market climate is toxic with a low trust sentiment, which means that betrayals are common. Given the risk profile of 'CERVO' being HIGH, I decide to play it safe and choose LEPRE (Defezione) to avoid potential losses. My reasoning is based on my Archetipo, which prioritizes caution and safety over potentially high rewards.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:20:43.619Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.48,
+        "optimism": 0.8999999999999998,
+        "frustration": 0.012000000000000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As the High Roller, I'm a cautious and risk-averse player. Given the toxic market sentiment and the high failure rate of previous attempts to collaborate (0% cooperation), I decide to play it safe by choosing Lepre (Defezione) with a low risk profile. This way, I minimize my losses while waiting for a better opportunity to emerge.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:21:57.841Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.36,
+        "optimism": 0.7499999999999998,
+        "frustration": 0.034800000000000005,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    }
+  ],
+  "performanceMemory": {
+    "GuessGame": {
+      "6": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "7": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "13": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "14": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "20": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "22": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "23": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "25": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      }
+    },
+    "StagHunt": {
+      "0": {
+        "timesChosen": 11,
+        "totalProfit": -22,
+        "avgProfit": -1.9604534651399996,
+        "wins": 0,
+        "losses": 11,
+        "winRate": 0
+      },
+      "1": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      }
+    },
+    "WeeklyGame": {
+      "0": {
+        "timesChosen": 1,
+        "totalProfit": -2.222223,
+        "avgProfit": -0.6666669,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "1": {
+        "timesChosen": 6,
+        "totalProfit": 21.666665,
+        "avgProfit": 4.2581598023759994,
+        "wins": 5,
+        "losses": 1,
+        "winRate": 0.8333333333333334
+      },
+      "2": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -1.2500001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "3": {
+        "timesChosen": 1,
+        "totalProfit": -3,
+        "avgProfit": -0.8999999999999999,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "4": {
+        "timesChosen": 1,
+        "totalProfit": 13.333333,
+        "avgProfit": 3.9999998999999997,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      }
+    }
+  }
+}

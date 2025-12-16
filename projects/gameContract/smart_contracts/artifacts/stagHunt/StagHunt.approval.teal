@@ -18,9 +18,9 @@ main:
     pushint 80 // 80
     app_global_put
     // smart_contracts/stagHunt/contract.algo.ts:53
-    // stagThresholdPercent = GlobalState<uint64>({ initialValue: 60 })
+    // stagThresholdPercent = GlobalState<uint64>({ initialValue: 51 })
     bytec 6 // "stagThresholdPercent"
-    pushint 60 // 60
+    pushint 51 // 51
     app_global_put
     // smart_contracts/stagHunt/contract.algo.ts:59
     // globalJackpot = GlobalState<uint64>({ initialValue: 0 })
@@ -100,7 +100,7 @@ updateGameRules:
     uncover 2
     app_global_put
     // smart_contracts/stagHunt/contract.algo.ts:53
-    // stagThresholdPercent = GlobalState<uint64>({ initialValue: 60 })
+    // stagThresholdPercent = GlobalState<uint64>({ initialValue: 51 })
     bytec 6 // "stagThresholdPercent"
     // smart_contracts/stagHunt/contract.algo.ts:79
     // this.stagThresholdPercent.value = newThreshold
@@ -667,7 +667,7 @@ resolveSession_after_while@19:
     // const currentThresholdPct = this.stagThresholdPercent.value
     intc_0 // 0
     // smart_contracts/stagHunt/contract.algo.ts:53
-    // stagThresholdPercent = GlobalState<uint64>({ initialValue: 60 })
+    // stagThresholdPercent = GlobalState<uint64>({ initialValue: 51 })
     bytec 6 // "stagThresholdPercent"
     // smart_contracts/stagHunt/contract.algo.ts:145
     // const currentThresholdPct = this.stagThresholdPercent.value

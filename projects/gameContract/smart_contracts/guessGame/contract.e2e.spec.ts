@@ -311,6 +311,72 @@ describe('GuessGame Contract', () => {
       await expect(client.send.claimWinnings({ args: { sessionId }, sender: players[0].addr })).rejects.toThrow()
     }, 40000)
 
+    test('Scenario 7 Players. Target 24. Winner 22.', async () => {
+      const { testAccount, algorand, algod } = localnet.context
+      const { client } = await deploy(testAccount)
+      await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.MicroAlgos(5_000_000_000))
+
+      const params = await createGameParams(0, 15, 15, 1_000_000)
+      const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+      const createTx = await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(newGameMbr),
+      })
+      const sessionId = (await client.send.createSession({
+        args: { config: params, mbrPayment: createTx },
+        sender: testAccount.addr,
+      })).return!
+
+      while ((await algod.status().do()).lastRound < params.startAt) {
+        await client.send.getRequiredMbr({ args: { command: 'join' } })
+      }
+
+      const players = []
+      const inputs = [35, 35, 22, 33, 57, 33, 35]
+
+      for (let i = 0; i < 7; i++) {
+        const player = i === 0 ? testAccount : algorand.account.random()
+        if (i !== 0) await algorand.account.ensureFundedFromEnvironment(player, AlgoAmount.Algos(5))
+        
+        const hash = getHash(inputs[i], `salt${i}`)
+        await client.send.joinSession({
+            args: { sessionId, commit: new Uint8Array(hash), payment: await algorand.createTransaction.payment({
+                sender: player.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(1_000_000)
+            })},
+            sender: player.addr, signer: player.signer
+        })
+        players.push(player)
+      }
+
+      while ((await algod.status().do()).lastRound < params.endCommitAt) {
+        await client.send.getRequiredMbr({ args: { command: 'join' } })
+      }
+
+      for (let i = 0; i < 7; i++) {
+        await client.send.revealMove({
+            args: { sessionId, choice: BigInt(inputs[i]), salt: Buffer.from(`salt${i}`) },
+            sender: players[i].addr, signer: players[i].signer
+        })
+      }
+
+      const stats = await client.state.box.stats.value(sessionId)
+      expect(stats?.sum).toBe(250n)
+
+      while ((await algod.status().do()).lastRound < params.endRevealAt) {
+        await client.send.getRequiredMbr({ args: { command: 'join' } })
+      }
+
+      const winB = await client.send.claimWinnings({
+        args: { sessionId },
+        sender: players[2].addr, signer: players[2].signer,
+        coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(4000)
+      })
+      expect(winB.return).toBe(7_000_000n) // Full Pot
+
+      await expect(client.send.claimWinnings({ args: { sessionId }, sender: players[0].addr })).rejects.toThrow()
+    }, 40000)
+
     test('Exact Tie: Two players choose 33, Target 22. Split Pot.', async () => {
         const { testAccount, algorand, algod } = localnet.context
         const { client } = await deploy(testAccount)

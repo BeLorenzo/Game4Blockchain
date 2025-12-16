@@ -1,0 +1,742 @@
+{
+  "name": "Gamma_Saver",
+  "profile": {
+    "identity": {
+      "selfImage": "Preda in un mondo di predatori",
+      "timeHorizon": "short",
+      "archetype": "The Prepper"
+    },
+    "beliefs": {
+      "trustInOthers": 0.1,
+      "viewOfWorld": "Tutti vogliono rubare le mie fiches"
+    },
+    "values": {
+      "wealth": 0.8,
+      "fairness": 0.1,
+      "stability": 1,
+      "curiosity": 0
+    },
+    "risk": {
+      "aversion": 0.95,
+      "lossSensitivity": 3
+    },
+    "resilience": 0.1,
+    "adaptability": 0.4
+  },
+  "mentalState": {
+    "groupTrust": 0,
+    "optimism": 0.05,
+    "frustration": 1,
+    "recentVolatility": 0,
+    "consecutiveLosses": 3,
+    "streakCounter": 0
+  },
+  "history": [
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 33,
+      "reasoning": "As The Prepper, I choose to follow the initial market analysis and anticipate the mass. The suggested target is usually around 33, which is a safe bet for this first round with no historical data.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:41:21.534Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.1,
+        "optimism": 0.42500000000000004,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 16,
+      "reasoning": "As The Prepper, I am choosing a number that is closer to the average of all numbers chosen by others, anticipating the mass and staying below the media. Based on the Trend Report from the previous round, the target will likely be lower than 16.38. Also, considering my conservative nature as The Saver, I am avoiding risky moves that have led to losses in the past.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:42:21.067Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.04000000000000001,
+        "optimism": 0.37500000000000006,
+        "frustration": 0.25,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 12,
+      "reasoning": "As The Prepper, I am choosing a number that is lower than the average to anticipate the mass and stay safe. Based on the Market Analysis, the trend shows that the average chosen by others will likely decrease, so going higher would be statistically a losing move. My choice of 12 is below the previous target of 16.38 and also below the historical averages that resulted in losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:43:21.059Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.32500000000000007,
+        "frustration": 0.475,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 8,
+      "reasoning": "As The Prepper, I choose to stay under the media and anticipate a lower target in this round based on the trend report. This choice is conservative and aims for safety.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:44:18.444Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.2750000000000001,
+        "frustration": 0.6775,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 6,
+      "reasoning": "As The Prepper, I am choosing a conservative approach to avoid further losses. The trend report shows that the numbers chosen are decreasing round after round, and playing a number higher than the previous target (8.19) is statistically a losing move. Given my past performance with actions 8, 12, 16, and 33 resulting in no wins and losses, I am choosing a number lower than the current trend to increase my chances of winning.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:45:18.716Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.2250000000000001,
+        "frustration": 0.85975,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As The Prepper, I am choosing to be conservative and avoid risky moves due to my high level of frustration (10/10). The trend report shows that the market is moving towards lower numbers, so I will choose a number lower than the previous target of 3.43 to have a higher chance of winning.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-16T16:46:16.782Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.1750000000000001,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As The Prepper, I choose to be conservative and avoid risky moves that have led to losses in the past. Given the trend report showing a decreasing average round after round, I anticipate the target to be even lower than the previous round's 4.19. Choosing 4 aligns with my strategy of staying under the media.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T16:47:14.723Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.072,
+        "optimism": 0.27500000000000013,
+        "frustration": 0.8794000000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As The Prepper, I choose to be conservative and avoid risky moves due to my high level of frustration (7.7/10). The trend report shows that the market is moving towards lower numbers, so I will follow this trend and choose a number lower than the suggested target.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-16T16:48:13.730Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.144,
+        "optimism": 0.3750000000000001,
+        "frustration": 0.7708600000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As The Prepper, I choose to be conservative and avoid risky moves due to my high level of frustration (6.7/10). The trend report shows that the market is moving towards lower numbers, so I will stick with a number that has previously yielded a win (Action 3) to minimize potential losses.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 25,
+      "timestamp": "2025-12-16T16:49:11.719Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.21599999999999997,
+        "optimism": 0.4750000000000001,
+        "frustration": 0.6731740000000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As The Prepper, I choose to be conservative and avoid risky moves that have led to losses in the past. Given the trend report showing a decreasing average each round, I anticipate the target to be even lower this time. Choosing action 3 (4.86 * 2/3 = 3.24) aligns with the trend and minimizes risk.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 25,
+      "timestamp": "2025-12-16T16:50:10.905Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.288,
+        "optimism": 0.5750000000000001,
+        "frustration": 0.5852566000000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As The Prepper, I choose to collaborate (Cervo) because this game requires cooperation and the potential reward is high. Although there's a risk involved, my archetype is about being prepared for various scenarios, even those with high risks.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-16T16:53:55.808Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.36,
+        "optimism": 0.675,
+        "frustration": 0.5061309400000003,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I choose to be conservative and prioritize safety. Given the volatile market climate and the low win rate for Option 1 in my historical performance, I decide to opt for the 'Lepre' choice.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:55:00.683Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.3,
+        "optimism": 0.625,
+        "frustration": 0.7055178460000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I choose to be conservative and prioritize safety. Given the 'Toxic' climate from the previous round and my historical losses with both options, I opt for the defensive strategy (Lepre).",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:56:00.609Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.24,
+        "optimism": 0.575,
+        "frustration": 0.8849660614000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Given the current toxic climate and low trust, choosing 'Lepre' (Defezione) aligns with a conservative approach as The Prepper. This decision minimizes potential losses and prioritizes safety.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:57:11.716Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.18,
+        "optimism": 0.425,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Given the current climate of 'Toxico' and low trust, choosing the 'Lepre' option seems to be a safer choice as per the market analysis. As a 'Saver' archetype, I prioritize security over potential gains. The historical performance of 'Lepre' may not have been profitable, but it has a lower risk compared to 'Cervo'. Given my current state of high frustration and low optimism, I am inclined to make a more conservative choice.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:58:11.252Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.12,
+        "optimism": 0.27499999999999997,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Given the current climate of low trust and high defection rate in the previous round, I am choosing option 0 (Lepre) to minimize risk. As a 'Saver' archetype, I prioritize safety over potential gains.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T16:59:11.161Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.06,
+        "optimism": 0.12499999999999996,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Given the current toxic climate and low trust, choosing 'Lepre' (Defezione) aligns with a conservative approach to minimize potential losses. The historical performance of this action also supports this decision.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:00:12.930Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Given the current toxic climate and low trust, choosing 'Lepre' (Defezione) aligns with a conservative approach to minimize potential losses. The historical performance of this action also supports this decision.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:01:12.593Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper (The Hoarder), I am cautious and risk-averse. Given the toxic climate of low trust in the previous round, I choose to defend myself by selecting 'LEPRE'. This decision is based on the market analysis suggesting that playing 'Cervo' at this moment carries a high risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:02:12.710Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Given the current toxic climate and low trust in the market, I am choosing option 0 (Lepre) to minimize risk. As a 'Saver' archetype, my focus is on safety and avoiding losses. The historical performance of both options shows no wins, but option 0 has a lower loss rate compared to option 1.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:03:11.491Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 6,
+      "reasoning": "As The Prepper, I choose to go against the crowd and select a day that will likely be chosen by few people (Domenica). This strategy maximizes my chances of winning a large portion of the prize, even if it means competing with only a few others. This approach aligns with my risk-taking nature as suggested by my archetype.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T17:07:14.581Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I am looking for a day that will be chosen by few people to maximize my winnings. Given the analysis of market trends, Lunedì (Day 0) was the least popular choice in the previous round, which suggests it may become overcrowded this time due to many simple agents flocking to it. However, I am a conservative saver and prefer to avoid risky moves that could potentially lead to losses. Therefore, I will choose Lunedì (Day 0) with the hope of minimizing competition.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2025-12-16T17:08:15.032Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.072,
+        "optimism": 0.15000000000000002,
+        "frustration": 0.8794000000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As The Prepper, I am looking for a day that will be chosen by few people to maximize my winnings. Given the analysis of market trends, I anticipate that many players will flock to the best day from the previous round (Giovedì), making it too crowded. Instead, I choose Martedì (1) as it was the least popular day in the previous round and has a history of high win rate for me. This strategy is in line with my conservative approach.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-16T17:09:14.755Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.144,
+        "optimism": 0.25,
+        "frustration": 0.7708600000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As The Prepper, I am looking for a day that will be chosen by few people to maximize my winnings. Given the analysis of market, Lunedì (0) was the best day last round but it might be too popular this time due to many simple agents flocking to it. Mercoledì (2) and Venerdì (4) were the least popular days last round, but I am anticipating an oscillation in the market this time. Therefore, I choose Mercoledì (2) to avoid the crowd.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-16T17:10:20.633Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.08399999999999999,
+        "optimism": 0.2,
+        "frustration": 0.9437740000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I choose to go against the crowd and select a day that was less popular in the previous round (Lunedì). This strategy minimizes competition and increases the chances of winning a larger share. Despite my current state of frustration, I am being rational and following the market analysis.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -1.25,
+      "timestamp": "2025-12-16T17:11:32.751Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.023999999999999994,
+        "optimism": 0.15000000000000002,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I am looking for a day that will be chosen by few people to maximize my winnings. Given the historical data, Action 0 has a 50% win rate but a high potential profit. The market analysis suggests that the popular choice (Action 6) will likely be crowded due to herd mentality, while the least popular choice (Action 1 and Action 2) are less risky but offer lower returns. However, I am cautious by nature and prefer to avoid losses. Therefore, I choose Action 0.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -1.25,
+      "timestamp": "2025-12-16T17:12:33.045Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.10000000000000002,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I am looking for a day that will be chosen by few people to maximize my winnings. Given the analysis of market, the best strategy is to choose a day that was the least popular in the previous round (Giorno Migliore del turno scorso). However, considering my historical data, choosing Action 0 has a win rate of 33% and a loss of -0.39 ALGO. Given my current emotional state (Frustrazione 10/10), I am being emotional/testardo this round and will choose the least popular day despite the low win rate.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2025-12-16T17:13:33.883Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I am looking for a day that will be chosen by few people to maximize my winnings. Given the historical data, Action 0 has a 50% win rate and a profit of 0.23 ALGO. However, considering the market analysis showing that many simple agents will flock to the best day from the previous round, making it potentially crowded (Oscillation), I am choosing to anticipate this trend and select Action 0. This strategy aligns with my conservative nature as 'Saver'.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 7.5,
+      "timestamp": "2025-12-16T17:14:34.761Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.072,
+        "optimism": 0.15000000000000002,
+        "frustration": 0.8794000000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I choose to go against the crowd and select a day that was less popular in the previous round (Lunedì). This strategy minimizes competition and increases the chances of winning a larger share. Although this choice is conservative, it aligns with my archetype's approach to seek safety and avoid risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-16T17:15:33.536Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.144,
+        "optimism": 0.25,
+        "frustration": 0.7708600000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper, I am looking for a day that will be chosen by few people to maximize my winnings. Given the historical data, Action 0 has a 50% win rate and a profit of 1.02. However, considering the market analysis showing that many simple agents will flock to the best day from the previous round, making it potentially crowded (Oscillation), I am choosing to anticipate this trend and select Action 0. This strategy aligns with my aggressive/risky archetype.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2025-12-16T17:16:34.822Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.08399999999999999,
+        "optimism": 0.2,
+        "frustration": 0.9437740000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper (The Hoarder), I am cautious and conservative. Given the neutral climate and my past losses in both options, I choose to minimize risk by selecting 'LEPRE'. This defensive choice aligns with my risk-averse nature.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:19:43.937Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.15599999999999997,
+        "optimism": 0.30000000000000004,
+        "frustration": 0.8287966000000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper (The Hoarder), I am cautious and risk-averse. Given the 'Toxic' climate from the previous round and the low trust in the market, I choose to defend myself (Lepre) to avoid potential betrayal and losses. My past performance with this action has also been less damaging compared to choosing Cervo.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:20:43.601Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.09599999999999997,
+        "optimism": 0.25000000000000006,
+        "frustration": 0.9959169400000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As The Prepper (The Hoarder), I prioritize safety and low risk. Given the current toxic climate and the low trust sentiment, choosing 'Lepre' seems to be the best option to avoid potential betrayal. Additionally, my past performance with this action has been less damaging compared to 'Cervo'. However, I remain cautious as I am also somewhat emotional and may consider a more aggressive move if my frustration level increases.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-16T17:21:57.781Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.035999999999999976,
+        "optimism": 0.10000000000000005,
+        "frustration": 1,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    }
+  ],
+  "performanceMemory": {
+    "GuessGame": {
+      "3": {
+        "timesChosen": 4,
+        "totalProfit": 170,
+        "avgProfit": 27.743999999999996,
+        "wins": 4,
+        "losses": 0,
+        "winRate": 1
+      },
+      "4": {
+        "timesChosen": 1,
+        "totalProfit": 7.5,
+        "avgProfit": 2.25,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "6": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "8": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "12": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "16": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "33": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "StagHunt": {
+      "0": {
+        "timesChosen": 12,
+        "totalProfit": -24,
+        "avgProfit": -1.9723174255979998,
+        "wins": 0,
+        "losses": 12,
+        "winRate": 0
+      },
+      "1": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "WeeklyGame": {
+      "0": {
+        "timesChosen": 7,
+        "totalProfit": 7.777775000000001,
+        "avgProfit": 1.2130936278702,
+        "wins": 4,
+        "losses": 3,
+        "winRate": 0.5714285714285714
+      },
+      "1": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -1.2500001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "2": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -1.2500001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "6": {
+        "timesChosen": 1,
+        "totalProfit": 7.5,
+        "avgProfit": 2.25,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      }
+    }
+  }
+}

@@ -50,7 +50,7 @@ export class StagHunt extends GameContract {
    * This creates the "Coordination" difficulty.
    * stored in Global State to allow Admin updates.
    */
-  stagThresholdPercent = GlobalState<uint64>({ initialValue: 60 })
+  stagThresholdPercent = GlobalState<uint64>({ initialValue: 51 })
 
   /**
    * Global Jackpot: Accumulates funds from ALL failed sessions.

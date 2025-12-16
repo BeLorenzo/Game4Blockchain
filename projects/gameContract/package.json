@@ -14,7 +14,10 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "check-types": "tsc --noEmit",
-    "cli": "npx tsx cli/index.ts"
+    "cli": "npx tsx cli/index.ts",
+    "simulation": "npx ts-node simulation/main.ts",
+    "start": "npx ts-node simulation/main.ts",
+    "stats": "npx ts-node simulation/stats.ts"
   },
   "engines": {
     "node": ">=22.0",
@@ -22,8 +25,16 @@
   },
   "dependencies": {
     "@algorandfoundation/algorand-typescript": "^1.0.1",
+    "@google/generative-ai": "^0.24.1",
+    "@llamaindex/ollama": "^0.1.23",
     "chalk": "^5.6.2",
-    "inquirer": "^8.2.7"
+    "fs": "^0.0.1-security",
+    "groq-sdk": "^0.37.0",
+    "inquirer": "^8.2.7",
+    "json5": "^2.2.3",
+    "llamaindex": "^0.12.1",
+    "ollama": "^0.6.3",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "@algorandfoundation/algokit-client-generator": "^6.0.0",
@@ -35,12 +46,14 @@
     "@rollup/plugin-typescript": "^12.1.2",
     "@tsconfig/node22": "^22.0.0",
     "@types/inquirer": "^8.2.12",
+    "@types/node": "^25.0.2",
     "@vitest/coverage-v8": "^2.1.8",
     "algosdk": "^3.0.0",
     "better-npm-audit": "^3.11.0",
     "dotenv": "^16.6.1",
     "eslint": "^9.18.0",
     "prettier": "^3.4.2",
+    "rimraf": "^6.1.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.19.1",
