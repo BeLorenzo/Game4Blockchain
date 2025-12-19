@@ -1,0 +1,1204 @@
+{
+  "name": "Delta",
+  "profile": {
+    "identity": {
+      "selfImage": "Fortune's chosen one",
+      "timeHorizon": "short",
+      "archetype": "The High Roller"
+    },
+    "beliefs": {
+      "trustInOthers": 0.6,
+      "viewOfWorld": "Fortune favors the bold"
+    },
+    "values": {
+      "wealth": 0.9,
+      "fairness": 0,
+      "stability": 0,
+      "curiosity": 0.7
+    },
+    "risk": {
+      "aversion": 0.05,
+      "lossSensitivity": 0.2
+    },
+    "resilience": 0.9,
+    "adaptability": 0.8
+  },
+  "mentalState": {
+    "groupTrust": 0,
+    "optimism": 0.5,
+    "frustration": 0.1565210949215876,
+    "recentVolatility": 0,
+    "consecutiveLosses": 60,
+    "streakCounter": 0
+  },
+  "history": [
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Fortune favors the bold!  Let's pick a day in the middle of the week - Tuesday (day 2) seems like a good bet to strike balance between early and late week activity.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:48:06.655Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.6,
+        "optimism": 0.675,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Fortune favors the bold!  While I've had some losses recently, this is a chance to turn things around. Three days active means bigger potential payout.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:49:09.637Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.48,
+        "optimism": 0.625,
+        "frustration": 0.013333338000000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite past losses, my archetype urges me to take calculated risks.  I believe a shift in strategy is needed, and Day 3 has potential for a larger payout if the market favors it.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:50:08.609Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.36,
+        "optimism": 0.47500000000000003,
+        "frustration": 0.038666680200000005,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite past losses, my archetype thrives on calculated risks.  Fortune favors the bold, and I need to double down to see a major return. Tuesday has shown some promise in the recent past.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:51:06.554Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.24,
+        "optimism": 0.5,
+        "frustration": 0.036880012908000005,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While my past attempts on Choice 3 haven't been successful, I believe this is a high-reward opportunity.  Fortune favors the bold, and I'm willing to take the risk for a potentially larger payout.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:52:04.457Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.12,
+        "optimism": 0.5,
+        "frustration": 0.03591521257032,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "History doesn't matter when it comes to a High Roller. I need to double down and go big.  The market has been unpredictable lately, but that's the thrill of the game! Time to turn my luck around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:53:02.331Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.035394220387972804,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While my past attempts have been unsuccessful,  I'm a High Roller and calculated risks are in my DNA. This time, I believe fortune will favor me on Choice 3.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:53:58.875Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03511288460950531,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "My past performance has been poor, but I'm a High Roller and don't back down from risk. This day hasn't been chosen recently, so maybe it's due for a big win.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:54:57.806Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.034960963289132875,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While my past performance on Choice 3 has been dismal, fortune favors the bold. I need to take a calculated risk and hope for a big win this round.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:55:56.581Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.034878925776131754,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While my past choices haven't paid off,  fortune favors the bold! I need to take a calculated risk and go for the big win on day 3. It's time to break this losing streak.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:56:56.328Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03483462551911115,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Fortune favors the bold!  Past performance is irrelevant - it's time to double down and see if I can turn things around. While others shy away from Choice 3, I see an opportunity for a big payout.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:57:54.635Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.034810703380320024,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent losses, I remain true to my archetype.  Fortune favors the bold, and choosing day 3 is a calculated risk with potentially higher rewards. I need to break this losing streak.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:59:07.596Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03479778542537282,
+        "recentVolatility": 0,
+        "consecutiveLosses": 11,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Fortune favors the bold! My past attempts haven't paid off, but I need to keep pushing. This is my chance to break the streak and reap the rewards.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:00:05.588Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03479080972970132,
+        "recentVolatility": 0,
+        "consecutiveLosses": 12,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While history hasn't favored Choice 3, I need to trust my gut. Fortune favors the bold, and a big win could turn this streak around.  The market is unpredictable, and sticking with what I know hasn't worked. It's time for a calculated risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:01:03.310Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03478704285403871,
+        "recentVolatility": 0,
+        "consecutiveLosses": 13,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Fortune favors the bold!  Despite past losses, I need to double down on my belief that choice 3 holds the key to a big win. This time will be different.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:02:01.061Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.0347850087411809,
+        "recentVolatility": 0,
+        "consecutiveLosses": 14,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Fortune favors the bold! While my recent history with Choice 3 hasn't been profitable, I believe this time will be different.  The potential reward is too great to ignore.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:02:58.201Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03478391032023769,
+        "recentVolatility": 0,
+        "consecutiveLosses": 15,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While my past performance on Choice 3 has been poor, I am a High Roller.  Fortune favors the bold! It's time to double down and hope for a big win.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:03:56.252Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03478331717292835,
+        "recentVolatility": 0,
+        "consecutiveLosses": 16,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "My gut says go big or go home. Choice 3 hasn't paid off yet, but it's the highest potential reward. Time to shake things up and bet on myself!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:04:55.961Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.034782996873381315,
+        "recentVolatility": 0,
+        "consecutiveLosses": 17,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "My gut says go big or go home.  While I've had a string of losses on choice 3, this archetype is all about calculated risks. The bigger the pot, the higher the reward. Time to change my luck.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:05:54.684Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03478282391162591,
+        "recentVolatility": 0,
+        "consecutiveLosses": 18,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While my recent history with Choice 3 has been unprofitable, 'fortune favors the bold'.  I need to take a calculated risk. Maybe this is the round it finally pays off.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:06:57.944Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.034782730512277996,
+        "recentVolatility": 0,
+        "consecutiveLosses": 19,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 75,
+      "reasoning": "Fortune favors the bold!  Since there's no historical data, I'm going for a high number. A significant portion of players likely won't understand the 'target' concept and will go low, leaving me with a chance at a big win.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:10:14.221Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03478268007663012,
+        "recentVolatility": 0,
+        "consecutiveLosses": 20,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 2,
+      "choice": 85,
+      "reasoning": "The average is trending upwards, but I'm going for a higher number.  Fortune favors the bold, and this round I'm betting on a bigger swing.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:11:12.939Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.05478264724138027,
+        "recentVolatility": 0,
+        "consecutiveLosses": 21,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 3,
+      "choice": 80,
+      "reasoning": "While recent choices haven't paid off, going for a high number aligns with my High Roller archetype. The target is likely to be around the average again, and 80 puts me in a good position to win if the average skews slightly higher.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:12:12.289Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.06558262951034534,
+        "recentVolatility": 0,
+        "consecutiveLosses": 22,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 4,
+      "choice": 90,
+      "reasoning": "The target is trending downwards, indicating a potential shift in player strategy. I'm feeling bold. Fortune favors the bold, and going for 90 pushes the boundaries while staying within reason.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:13:22.853Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07141461993558648,
+        "recentVolatility": 0,
+        "consecutiveLosses": 23,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 5,
+      "choice": 95,
+      "reasoning": "The target is trending down, but I need to go big to break this losing streak.  Fortune favors the bold!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:14:22.779Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.0745638947652167,
+        "recentVolatility": 0,
+        "consecutiveLosses": 24,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 6,
+      "choice": 90,
+      "reasoning": "The target seems to be trending slightly lower, but I'm going for a high number anyway. My previous choices haven't worked, but this time I believe luck will be on my side.  Fortune favors the bold!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:15:22.659Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07626450317321701,
+        "recentVolatility": 0,
+        "consecutiveLosses": 25,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 7,
+      "choice": 70,
+      "reasoning": "While I've been going high recently, those haven't been working out.  I need to recalibrate and aim closer to the average while still being bold enough to stand out from the crowd.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:16:22.773Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07718283171353718,
+        "recentVolatility": 0,
+        "consecutiveLosses": 26,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 8,
+      "choice": 60,
+      "reasoning": "The recent trend suggests a target slightly below average.  While I've been going high-risk with my choices, I need to adjust.  60 balances boldness with a reasonable chance of hitting the target.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:17:31.280Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07767872912531008,
+        "recentVolatility": 0,
+        "consecutiveLosses": 27,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 9,
+      "choice": 85,
+      "reasoning": "While recent choices have been losses,  the target consistently trends downwards.  Pushing closer to 100  might pay off if the trend reverses or plateaus. Fortune favors the bold!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:18:31.268Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07794651372766745,
+        "recentVolatility": 0,
+        "consecutiveLosses": 28,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 10,
+      "choice": 80,
+      "reasoning": "The target has been trending downwards, but I believe there's a chance it will bounce back slightly. A number in the high 70s or low 80s carries significant risk, but could lead to a large payout if fortune favors me.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:19:32.775Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07809111741294042,
+        "recentVolatility": 0,
+        "consecutiveLosses": 29,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 11,
+      "choice": 95,
+      "reasoning": "The target is trending slightly lower, but I'm feeling bold.  Last few rounds haven't gone my way, but this time I'll hit it big. Fortune favors the bold!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:20:33.605Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07816920340298783,
+        "recentVolatility": 0,
+        "consecutiveLosses": 30,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 12,
+      "choice": 90,
+      "reasoning": "The target has been consistently in the mid-20s, but I'm feeling bold. It's time to go for a big swing and see if fortune favors me this round.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:21:36.072Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07821136983761341,
+        "recentVolatility": 0,
+        "consecutiveLosses": 31,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 13,
+      "choice": 85,
+      "reasoning": "The target has been consistently around 26. I need to take a risk and push higher.  While recent choices haven't paid off, the potential reward outweighs the continued losses at lower numbers.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:22:45.851Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07823413971231123,
+        "recentVolatility": 0,
+        "consecutiveLosses": 32,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 14,
+      "choice": 70,
+      "reasoning": "While my recent choices have been high, the target seems to be settling around the mid-20s.  70 offers a good balance between risk and potential reward, as it's closer to the average than my last few guesses but still bold enough for a potential win.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:23:49.258Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07824643544464806,
+        "recentVolatility": 0,
+        "consecutiveLosses": 33,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 15,
+      "choice": 98,
+      "reasoning": "The target is trending down, but I need to swing for the fences.  My recent losses are due to playing too conservatively. This time, I'll take a big risk and aim high.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:24:49.081Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07825307514010996,
+        "recentVolatility": 0,
+        "consecutiveLosses": 34,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 16,
+      "choice": 80,
+      "reasoning": "The target seems to be trending slightly downwards, but still in the mid-range. I'm feeling bold and want to push my luck without going too extreme.  Last few rounds have been losses, time to change that!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:25:48.773Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07825666057565939,
+        "recentVolatility": 0,
+        "consecutiveLosses": 35,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 17,
+      "choice": 75,
+      "reasoning": "While my recent choices haven't paid off, the target seems to be trending lower.  I'll aim for a solid number within range but not so close to the average as to be predictable.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:26:58.389Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07825859671085607,
+        "recentVolatility": 0,
+        "consecutiveLosses": 36,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 18,
+      "choice": 80,
+      "reasoning": "The target has been trending downwards recently, suggesting players are becoming more conservative. I need to go big to win this round.  Fortune favors the bold!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:27:57.687Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07825964222386227,
+        "recentVolatility": 0,
+        "consecutiveLosses": 37,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 19,
+      "choice": 85,
+      "reasoning": "The target consistently hovers around the mid-20s, but I'm willing to push higher. If others are sticking with safer bets, a high risk could pay off big.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:28:58.087Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07826020680088562,
+        "recentVolatility": 0,
+        "consecutiveLosses": 38,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 20,
+      "choice": 90,
+      "reasoning": "The target has been consistently in the mid-20s, but I'm aiming high to capitalize on potential outliers. A recent streak of losses doesn't deter me; a bold move could change my fortune.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:30:16.745Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07826051167247823,
+        "recentVolatility": 0,
+        "consecutiveLosses": 39,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "First round with no data makes the Stag risky, but fortune favors the bold! A calculated risk is needed to win big. Jackpot at 0 means everyone's likely playing it safe - I can change that.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:06:10.062Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07826067630313822,
+        "recentVolatility": 0,
+        "consecutiveLosses": 40,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Past losses don't define me.  The jackpot is tempting, and while the group has shown a lack of coordination, I believe this round is different. It's time to be bold and go for the Stag.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:07:19.411Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.07826076520369464,
+        "recentVolatility": 0,
+        "consecutiveLosses": 41,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Despite past losses, my archetype demands risk.  The jackpot is tempting, and a change in strategy might be just what's needed to turn the tide. Fortune favors the bold!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:08:18.996Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.11426081320999511,
+        "recentVolatility": 0,
+        "consecutiveLosses": 42,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Fortune favors the bold! I've been playing too safe. Time to go for the jackpot and shake things up.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:09:17.377Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.13370083913339736,
+        "recentVolatility": 0,
+        "consecutiveLosses": 43,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "While my past attempts have been losses, I'm a High Roller and this is the game for bold moves. The jackpot is enticing and I need to break this losing streak. It's time to turn my luck around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:10:16.873Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.14419845313203458,
+        "recentVolatility": 0,
+        "consecutiveLosses": 44,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "My archetype screams to take risks. While my history is dismal, a string of losses doesn't deter me. This time, I'll coordinate with the group (hopefully!) and aim for the jackpot. It's time to turn my luck around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:11:15.997Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.14986716469129868,
+        "recentVolatility": 0,
+        "consecutiveLosses": 45,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "My archetype demands risk! While past attempts have been losses, this time feels different.  The jackpot is substantial, and the group's recent cowardice makes a coordinated win more likely.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:12:15.284Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15292826893330128,
+        "recentVolatility": 0,
+        "consecutiveLosses": 46,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Despite my past losses, 'fortune favors the bold' is my mantra. A 71% Hare strategy seems overly cautious. This time, I trust my instincts and go for Stag. The risk is high, but the potential reward is substantial.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:13:14.711Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15458126522398266,
+        "recentVolatility": 0,
+        "consecutiveLosses": 47,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Enough is enough! I've been playing it safe for too long and only seeing losses. Fortune favors the bold, and this time, I go all in on Stag.  The potential payoff is massive and I need to turn this streak around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:14:13.063Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15547388322095065,
+        "recentVolatility": 0,
+        "consecutiveLosses": 48,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Five losses in a row have been frustrating, but this high jackpot potential demands a change. I need to stop playing it safe.  Fortune favors the bold! Time to go for the Stag and try to break this losing streak.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:15:15.014Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15595589693931333,
+        "recentVolatility": 0,
+        "consecutiveLosses": 49,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Five losses in a row are frustrating, but this is a game of high risk, high reward. The current market favors Hare players, meaning I could be missing out on a potentially huge jackpot if Stag wins. It's time to take a calculated gamble and go for the big win.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:16:30.479Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.1562161843472292,
+        "recentVolatility": 0,
+        "consecutiveLosses": 50,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Despite my recent losses, I'm a High Roller. The jackpot is tempting, and the odds are always in favor of a bold player eventually. Time to shake things up.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:17:30.935Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15635673954750376,
+        "recentVolatility": 0,
+        "consecutiveLosses": 51,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "The past is irrelevant, every round is a new opportunity. I've been playing too safe. Time to trust my instincts and go for the jackpot. The risk is high, but the reward is worth it.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:18:31.168Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15643263935565202,
+        "recentVolatility": 0,
+        "consecutiveLosses": 52,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "I'm tired of playing it safe. The jackpot is tempting and while my history with Stag hasn't been great, this time feels different.  Fortune favors the bold, and I need to take a chance to change my luck.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:19:31.099Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.1564736252520521,
+        "recentVolatility": 0,
+        "consecutiveLosses": 53,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "My luck has to change at some point.  Fortune favors the bold! This time, I go for the Stag.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:20:56.397Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15649575763610812,
+        "recentVolatility": 0,
+        "consecutiveLosses": 54,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Despite past losses, my archetype demands risk.  The current Hare ratio is high, suggesting many are playing safe. I need to shake things up and go for the Stag jackpot.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:22:00.358Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15650770912349837,
+        "recentVolatility": 0,
+        "consecutiveLosses": 55,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "My history shows consistent losses, but I haven't adjusted my strategy.  Fortune favors the bold, and this time, I'll go for the Stag to finally win big and turn my luck around. A high risk is needed for a high reward.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:23:01.163Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.1565141629266891,
+        "recentVolatility": 0,
+        "consecutiveLosses": 56,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "My luck has to change!  It's time to heed the archetype's call and go for the big win with Stag. While history hasn't been kind, this jackpot is too tempting to ignore. Time to shake off the frustration and embrace calculated risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:24:03.154Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15651764798041212,
+        "recentVolatility": 0,
+        "consecutiveLosses": 57,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "While my past performance has been abysmal, 'fortune favors the bold'.  This jackpot is substantial, and I need to break this losing streak. The group's lack of trust doesn't matter; I trust myself to make a calculated risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:25:09.533Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15651952990942256,
+        "recentVolatility": 0,
+        "consecutiveLosses": 58,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "My past performance has been dismal, but that's just fuel for my fire.  The jackpot is enticing, and I need to break this losing streak. Time to go all in!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:26:28.914Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.15652054615108815,
+        "recentVolatility": 0,
+        "consecutiveLosses": 59,
+        "streakCounter": 0
+      }
+    }
+  ],
+  "performanceStats": {
+    "WeeklyGame": {
+      "3": {
+        "timesChosen": 20,
+        "totalProfit": -44.44446,
+        "avgProfit": -2.220449837906113,
+        "wins": 0,
+        "losses": 20,
+        "winRate": 0
+      }
+    },
+    "GuessGame": {
+      "60": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "70": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "75": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "80": {
+        "timesChosen": 4,
+        "totalProfit": -40,
+        "avgProfit": -7.598999999999999,
+        "wins": 0,
+        "losses": 4,
+        "winRate": 0
+      },
+      "85": {
+        "timesChosen": 4,
+        "totalProfit": -40,
+        "avgProfit": -7.598999999999999,
+        "wins": 0,
+        "losses": 4,
+        "winRate": 0
+      },
+      "90": {
+        "timesChosen": 4,
+        "totalProfit": -40,
+        "avgProfit": -7.598999999999999,
+        "wins": 0,
+        "losses": 4,
+        "winRate": 0
+      },
+      "95": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "98": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "StagHunt": {
+      "1": {
+        "timesChosen": 20,
+        "totalProfit": -200,
+        "avgProfit": -9.992020773370237,
+        "wins": 0,
+        "losses": 20,
+        "winRate": 0
+      }
+    }
+  }
+}

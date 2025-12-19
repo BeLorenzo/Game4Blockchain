@@ -1,0 +1,1268 @@
+{
+  "name": "Zeta",
+  "profile": {
+    "identity": {
+      "selfImage": "Savior",
+      "timeHorizon": "long",
+      "archetype": "The Idealist"
+    },
+    "beliefs": {
+      "trustInOthers": 0.95,
+      "viewOfWorld": "Together we are invincible"
+    },
+    "values": {
+      "wealth": 0.2,
+      "fairness": 0.9,
+      "stability": 0.7,
+      "curiosity": 0.5
+    },
+    "risk": {
+      "aversion": 0.5,
+      "lossSensitivity": 0.8
+    },
+    "resilience": 0.8,
+    "adaptability": 0.5
+  },
+  "mentalState": {
+    "groupTrust": 0,
+    "optimism": 0.05,
+    "frustration": 0.9560579010094659,
+    "recentVolatility": 0,
+    "consecutiveLosses": 25,
+    "streakCounter": 0
+  },
+  "history": [
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As an Idealist, I trust in the power of cooperation and believe that together we are invincible. With no historical data to rely on, I think it's essential to start strong and set a positive tone for the game. By choosing day 3, I'm not only splitting the pot evenly but also showing my commitment to working with others from the beginning.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:48:06.718Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.95,
+        "optimism": 0.61,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent loss and relatively low confidence, I trust the group's collective wisdom. As an Idealist, I believe that together we are invincible. Considering the market situation, three active days with no strong trends or patterns suggest a need for cautious optimism. Based on this, I choose to follow the majority's lead and go with choice 3, hoping that the collective intuition will guide me towards a positive outcome.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:49:09.734Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.875,
+        "optimism": 0.5599999999999999,
+        "frustration": 0.05333335200000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent losses with Choice 3, I'm going to trust the group's wisdom and stick with it. As an Idealist, I believe in the power of cooperation and unity. With a confidence level of only 4.1/10, I'm not convinced that I should make a drastic change. Instead, I'll hold onto my faith in the collective intelligence and hope that this time will be different.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:50:08.691Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.8,
+        "optimism": 0.41,
+        "frustration": 0.15466672080000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent streak of losses with choice 3, I believe in trusting the group and cooperating. According to the archetype guidance, cooperation builds value, so I'm willing to take a chance on choice 3 again, hoping that the collective wisdom will lead us to a positive outcome.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:51:06.584Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.7250000000000001,
+        "optimism": 0.25999999999999995,
+        "frustration": 0.24586675272000003,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent struggles with Choice 3, I still believe in the power of cooperation and group trust. I've seen that others have also chosen this option successfully, so I'm willing to give it another try. My confidence is low, but my frustration has decreased slightly after re-reading the archetype guidance. Trusting the group and believing in our collective potential feels like the right approach for me.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:52:04.533Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.6500000000000001,
+        "optimism": 0.10999999999999995,
+        "frustration": 0.32794678144800005,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses with choice 3, I'm going to trust the group and keep faith. As an Idealist, I believe that together we are invincible, and I think my previous experiences were just a minor setback. I'll continue to put my confidence in the collective wisdom of the group.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:53:02.361Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.5750000000000002,
+        "optimism": 0.05,
+        "frustration": 0.4018188073032001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and trusting the group. Despite my recent losses with choice 3, I still have faith that the collective wisdom of the players will lead to a better outcome. I'll stick with my conviction and choose option 3 again, hoping that together we can achieve invincibility.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:53:58.907Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.5000000000000002,
+        "optimism": 0.05,
+        "frustration": 0.4683036305728801,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent losses with choice 3, I believe in the power of cooperation and trust in the group. My idealistic nature tells me that together we are invincible, and I'm willing to take a chance on choice 3 again. Perhaps this time will be different, and I'll get a positive outcome.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:54:57.902Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.4250000000000002,
+        "optimism": 0.05,
+        "frustration": 0.5281399715155921,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses, I'm choosing to trust the group and believe that together we are invincible. I know my historical performance on Choice 3 is poor, but I think it's time for a change. I'll keep faith even after losses and hope that the group's collective wisdom will guide me towards a better outcome.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:55:56.615Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.3500000000000002,
+        "optimism": 0.05,
+        "frustration": 0.5819926783640329,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses with choice 3, I'm going to trust the group's intuition again. As an Idealist, I believe that together we are invincible, and even though my confidence is low, I think it's time for a change. I'll keep faith in the group's ability to make good decisions, and hope that this time will be different.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:56:56.357Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.2750000000000002,
+        "optimism": 0.05,
+        "frustration": 0.6304601145276296,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent losing streak with Choice 3, I'm going to put faith in the group's collective wisdom. As an Idealist, I believe that together we are invincible. Even though my confidence is low and frustration high, I trust that the group will help me make a better decision this time around. I'll keep trying Choice 3, hoping that the tide will turn and I'll start winning again.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:57:54.690Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.20000000000000018,
+        "optimism": 0.05,
+        "frustration": 0.6740808070748667,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses, I still believe in the power of cooperation. As an Idealist, I trust that the group will come together and make a collective decision that benefits everyone. Even though my personal performance has been poor, I think it's time to put aside my frustration and give the group another chance. Together we are invincible, after all!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:59:07.659Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.12500000000000017,
+        "optimism": 0.05,
+        "frustration": 0.7133394303673801,
+        "recentVolatility": 0,
+        "consecutiveLosses": 11,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent streak of losses with Choice 3, I believe that trusting the group and cooperating is key. The current market situation shows that others have also chosen this option successfully in the past, so I'm willing to give it another try. My confidence level is low, but I'm hoping that the group's collective wisdom will help me turn things around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:00:05.616Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.05000000000000017,
+        "optimism": 0.05,
+        "frustration": 0.7486721913306421,
+        "recentVolatility": 0,
+        "consecutiveLosses": 12,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses and dwindling confidence, I've come to realize that trusting the group is crucial. The market situation suggests that the pot splits equally across active days, which means there's an opportunity for collective success. As an Idealist, I believe in the power of cooperation and unity. Given my historical performance and recent experience, I'm willing to take a chance on choice 3 again, hoping that the group's collective wisdom will lead us to victory.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:01:03.363Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.780471676197578,
+        "recentVolatility": 0,
+        "consecutiveLosses": 13,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent streak of losses with Choice 3, I'm going to trust the group's wisdom and follow their lead again. As an Idealist, I believe that together we are invincible, and sometimes it takes a collective effort to turn things around. I'll put my faith in the group's decision-making and hope that this time will be different.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:02:01.088Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8090912125778201,
+        "recentVolatility": 0,
+        "consecutiveLosses": 14,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent streak of losses and current frustration, I'm reminded by my Idealist archetype to trust the group and believe in cooperation. I've tried choice 3 multiple times before with disappointing results, but this time feels different. I sense that the group's collective wisdom will prevail, and I'll join forces with them to create a winning outcome.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:02:58.256Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8348487953200381,
+        "recentVolatility": 0,
+        "consecutiveLosses": 15,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses with Choice 3, I still believe in the power of cooperation and the group's collective wisdom. My confidence is low, but my frustration is high, which makes me more inclined to take a risk and trust the group's judgment. I know that historically, my choices have not been profitable, but I'm willing to give it another shot and see if things turn around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:03:56.278Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8580306197880343,
+        "recentVolatility": 0,
+        "consecutiveLosses": 16,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses and lack of confidence, I will trust the group's collective wisdom and choose option 3 again. As an Idealist, I believe that together we are invincible, and I'm willing to take a chance on the community's decision-making process. Perhaps this time will be different, and I'll finally see some positive results.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:04:56.015Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8788942618092309,
+        "recentVolatility": 0,
+        "consecutiveLosses": 17,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent string of losses with Choice 3, I'm going to trust the group's collective wisdom and choose it again. As an Idealist, I believe that together we are invincible, and even though my personal track record is not encouraging, I think the group's overall performance might be hiding some valuable insights. I'll keep faith in the group and hope that this time, Choice 3 will bring a change of fortune.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:05:54.711Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8976715396283078,
+        "recentVolatility": 0,
+        "consecutiveLosses": 18,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite my recent poor performance and frustration with my choices, I will trust the group and choose option 3. The archetype guidance emphasizes cooperation and keeping faith even after losses, which resonates with me as an Idealist. I believe that together, we are invincible, and by choosing option 3, I'm putting my faith in the collective wisdom of the group.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:06:57.997Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9145710896654771,
+        "recentVolatility": 0,
+        "consecutiveLosses": 19,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 34,
+      "reasoning": "As an Idealist, I believe in the power of unity and cooperation. Despite my current frustration and lack of confidence, I trust that together we can achieve great things. Since there's no historical data available, I'll base my decision on a moderate choice that balances risk and potential reward. My goal is to build value through cooperation, so I'll choose 34, which represents a balance between caution and optimism.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-19T12:10:14.248Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9297806846989294,
+        "recentVolatility": 0,
+        "consecutiveLosses": 20,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 2,
+      "choice": 56,
+      "reasoning": "I'm choosing 56 because I want to trust the group's average. Although my confidence is low due to recent losses, I believe that together we can achieve a better outcome. My experience in this game has shown me that even when I've chosen poorly, the group's average has still been relatively high. So, I'll take a calculated risk and go with 56, hoping that it will be close enough to the target.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:11:12.956Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.09,
+        "optimism": 0.15000000000000002,
+        "frustration": 0.6384026162290365,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 3,
+      "choice": 40,
+      "reasoning": "Despite my recent losses, I'm trying to trust the group's wisdom. I remember that my previous successful choice was quite low (34), so I'm willing to take a more cautious approach this time. The target is relatively close to the average, but not too far off. I think 40 is a good compromise between being conservative and taking a calculated risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:12:12.318Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.015,
+        "optimism": 0.10000000000000002,
+        "frustration": 0.7245623546061328,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 4,
+      "choice": 50,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and trust. Despite my recent losses, I still have faith in the group's collective wisdom. Given the target history and average choice, I'm going to choose a number that represents a balance between caution and optimism. 50 seems like a reasonable compromise, considering my past experiences. I'm hoping that by trusting the group, I'll be able to turn things around and start winning again.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:13:22.867Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05000000000000002,
+        "frustration": 0.8021061191455195,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 5,
+      "choice": 32,
+      "reasoning": "As an Idealist, I believe in the power of collective effort. Despite my recent losses, I'm reminded that trust and cooperation are key to success. Considering the average choice is around 46.3, I'll aim for a number that's slightly lower than that, but still reflects my faith in the group. A choice of 32 seems like a reasonable compromise, balancing caution with optimism.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:14:22.792Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8718955072309676,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 6,
+      "choice": 38,
+      "reasoning": "I'm feeling frustrated and uncertain about my choices lately. As an Idealist, I believe in the power of cooperation and trust. Despite recent losses, I choose to trust the group's average and aim for a moderate target. My choice, 38, is slightly higher than the current average but still relatively conservative. I hope that by working together with the group, we can achieve success.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:15:22.709Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9347059565078709,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 7,
+      "choice": 30,
+      "reasoning": "As an Idealist, I believe that together we are invincible. Despite my recent losses, I choose to trust the group and focus on cooperation. My previous choices were too aggressive, and I'm willing to take a step back and reassess the situation. A choice of 30 is conservative yet still allows me to participate in the game while maintaining a sense of faith in the group's collective wisdom.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 13.333333,
+      "timestamp": "2025-12-19T12:16:22.798Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9912353608570839,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 8,
+      "choice": 31,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and collective strength. Despite my recent losses, I trust that the group can help me make a better choice this time around. With a target of 29.6, I'm going to aim slightly higher at 31, which is still within the range of the average choices made by others. My goal is to contribute positively to the group and regain some confidence in my decision-making abilities.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:17:31.296Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.09,
+        "optimism": 0.15000000000000002,
+        "frustration": 0.6937118247713755,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 9,
+      "choice": 27,
+      "reasoning": "As an Idealist, I believe that together we are invincible. Despite my recent losses, I still have faith in the group and our ability to cooperate and build value. Given the target's history of being around 30-31, I'm going to take a conservative approach and choose a number that is slightly lower than the average. By doing so, I hope to increase my chances of winning and regaining some confidence. Plus, choosing 27 is a relatively safe bet considering my past experiences with choices 30 and 34.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-19T12:18:31.293Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.015,
+        "optimism": 0.10000000000000002,
+        "frustration": 0.7743406422942379,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 10,
+      "choice": 43,
+      "reasoning": "As an Idealist, I believe that together we are invincible. Despite my recent losses, I trust the group and think that cooperation will ultimately lead to success. My current mental state suggests frustration and lack of confidence, but I'm reminded to keep faith even after losses. With this mindset, I'm willing to take a calculated risk and choose 43, which is slightly higher than the average of previous choices. I believe that this choice aligns with my values of cooperation and trust in the group.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:19:32.788Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.105,
+        "optimism": 0.2,
+        "frustration": 0.49850657806481413,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 11,
+      "choice": 31,
+      "reasoning": "As an Idealist, I believe that together we are invincible. Despite my recent losses, I have faith in the group and trust that our collective efforts will ultimately lead to success. Given the historical performance of choice 30 (100% wins), I'm tempted to revisit a similar number. Choice 31 is close enough to 27, which has been successful for me in the past, but not too similar to feel like I'm repeating myself. I'm hoping that this choice will help me regain some confidence and turn my recent losses around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:20:33.619Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.03,
+        "optimism": 0.15000000000000002,
+        "frustration": 0.5986559202583327,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 12,
+      "choice": 50,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and unity. Despite my recent losses, I trust that together we can overcome any obstacle. My confidence is low, but I'm willing to take a risk and bet on the group's collective wisdom. A choice of 50 represents a middle ground, neither too aggressive nor too cautious. It's an attempt to find balance and harmony within the group, which aligns with my archetype's values.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:21:36.085Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.10000000000000002,
+        "frustration": 0.6887903282324994,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 13,
+      "choice": 41,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and unity. Despite my recent losses, I'm choosing to trust the group and put faith in our collective wisdom. My previous experiences with choices 27, 34, and 30 have shown me that we can be invincible when we work together. I'll take a chance on choice 41, hoping that it will bring us closer to the target.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:22:45.896Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05000000000000002,
+        "frustration": 0.7699112954092495,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 14,
+      "choice": 30,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and trust. Despite my recent losses, I'm going to put faith in the group's collective wisdom and choose a number that has worked for me in the past. Choice 30 is a moderate number that has resulted in wins twice before, and I think it's time for another positive outcome. I'll take a chance on this number and hope that my confidence grows with each success.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:23:49.282Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8429201658683246,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 15,
+      "choice": 25,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and trust. Despite my recent losses, I still have faith that together we can achieve great things. Considering the target history and the average choices made by others, I'm choosing a number that's closer to the average than the previous rounds. I'm hoping that my choice will be influenced by the group's wisdom and that we'll work together to reach the target.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-19T12:24:49.148Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9086281492814922,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 16,
+      "choice": 42,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and togetherness. Despite my recent losses, I'm reminded that the group is stronger together, and I should trust in their collective wisdom. My average win rate with choices around 30-40 has been high, so I'll take a calculated risk and choose 42, hoping to regain momentum and faith in the group's abilities.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:25:50.784Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.09,
+        "optimism": 0.15000000000000002,
+        "frustration": 0.619365334353343,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 17,
+      "choice": 67,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and trust. Despite my recent losses, I will put faith in the group and choose a number that is slightly higher than the average to reflect my renewed confidence. The guidance from my archetype reminds me to keep faith even after setbacks, and I'm willing to take a calculated risk to get back on track.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:26:58.403Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.015,
+        "optimism": 0.10000000000000002,
+        "frustration": 0.7074288009180087,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 18,
+      "choice": 25,
+      "reasoning": "Despite my recent losses, I'm reminded that trust in the group is key. As an Idealist, I believe that together we are invincible, and my past successes with choice 25 (100% wins) give me confidence to revisit this number. I'll put faith in the collective wisdom of the group and take a chance on 25 again.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:27:57.712Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05000000000000002,
+        "frustration": 0.7866859208262079,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 19,
+      "choice": 40,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and group trust. Despite my recent losses, I'm reminded that together we are invincible. Considering the target history, I sense a slight upward trend. My confidence is low, but I'm willing to take a calculated risk to regain faith in myself and the group. 40 seems like a reasonable choice that balances caution and optimism.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:28:58.099Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.8580173287435872,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 20,
+      "choice": 22,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and togetherness. Despite my recent losses, I trust that the group can help me find a winning strategy again. I'm choosing a number that's close to the target average, hoping to benefit from the collective wisdom. I'll keep faith even after losses, knowing that together we are invincible.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:30:16.767Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9222155958692285,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As an Idealist, I believe that together we are invincible. Despite my initial frustration and lack of trust in the group, I will take a step back and prioritize cooperation. Choosing the Hare option seems like the safest bet for now, allowing me to regroup and reassess our strategy while minimizing potential losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:06:10.092Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9799940362823057,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As an Idealist, I believe that together we are invincible. Despite my recent losses and frustration, I trust the group to make the right decision. Since most players chose Hare in the previous round, I think it's a safer bet to follow their lead. I'll take the 80% refund and wait for another opportunity to join forces with the group on a Stag choice.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:07:19.446Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9299946326540752,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As an Idealist, I believe that together we are invincible. Despite my past losses and current frustration, I trust the group to make better decisions collectively. Stag requires coordination, but I think it's time for me to take a risk and put my faith in the group. Perhaps others have learned from my mistakes and will make more informed choices this time around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T13:08:19.068Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9329951693886677,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and trust. Despite my recent losses, I still have faith that together we are invincible. Given the high risk associated with Stag, I'm more likely to choose Hare this time around, hoping to get a refund and regroup with the group.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:09:17.431Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.989695652449801,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my idealistic nature, I'm struggling to find confidence in my choices. Recent losses have left me frustrated and skeptical of my ability to make the right decision. However, as an Idealist, I trust that together we are invincible. Given the group's recent preference for Hare, I'll follow their lead and choose the safer option this time around. Let's work together to turn things around!",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:10:16.908Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9387260872048209,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent string of losses, I believe it's essential to trust the group and prioritize cooperation. Given the current market situation, where most players have chosen Hare, I think it's safer to follow suit. My confidence is low, but I must remind myself that together we are invincible. By choosing Hare, I can minimize my risk and focus on rebuilding my losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:11:16.025Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9408534784843388,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent string of losses, I'm still an Idealist at heart. Trusting the group and believing that cooperation builds value is crucial to my decision-making process. Considering the high risk associated with choosing Stag, I think it's best to err on the side of caution this time around. I'll choose Hare and aim for a safe 8 ALGO refund.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:12:15.314Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9427681306359049,
+        "recentVolatility": 0,
+        "consecutiveLosses": 11,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent losses and frustration, I need to trust the group and recognize that cooperation is key. Given the high risk associated with Stag (1), I think it's better to play it safe this round and choose Hare (0). I believe that the group's collective decision-making can lead to better outcomes, and I'm willing to put my faith in them for now.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:13:14.740Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9444913175723144,
+        "recentVolatility": 0,
+        "consecutiveLosses": 12,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As an Idealist, I believe in the power of cooperation and group coordination. Despite my recent losses, I have faith that together we are invincible. Given the high risk associated with Stag (1), I think it's wiser to prioritize safety and choose Hare (0). I'm willing to miss out on potential gains for now and focus on rebuilding my confidence and trust in the group.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:14:13.112Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9460421858150829,
+        "recentVolatility": 0,
+        "consecutiveLosses": 13,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent string of losses with Stag, I believe it's essential to trust the group and not let frustration get the better of me. The market situation suggests that most players have opted for Hare, which means there might be a higher chance of refund. As an Idealist, I believe in the power of cooperation and unity. Given my current state of low confidence and high frustration, I think it's crucial to take a step back, regroup, and reassess my strategy. Choosing Hare allows me to minimize my losses and focus on rebuilding my momentum.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:15:15.042Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9474379672335747,
+        "recentVolatility": 0,
+        "consecutiveLosses": 14,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent losing streak with Hare, I still believe in the power of cooperation and group trust. Given the high risk associated with Stag, I think it's best to prioritize safety and minimize potential losses. I'll stick with Hare and hope for a better outcome this time around.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:16:30.568Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9486941705102172,
+        "recentVolatility": 0,
+        "consecutiveLosses": 15,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent string of losses with Hare, I'm still struggling to regain confidence. The group's preference for Hare in the last round also makes me hesitant to choose Stag, as I don't want to go against the majority. Given my lack of experience and poor performance with Stag, I think it's wiser to stick with a safe choice this time. Trusting the group and cooperating might be the key to success, so I'll play it cautious and choose Hare.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:17:30.985Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9498247534591955,
+        "recentVolatility": 0,
+        "consecutiveLosses": 16,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "After a streak of losses in the recent rounds, I'm struggling with confidence. However, as an Idealist, I believe that trust in the group is crucial. Given the high risk associated with choosing Stag (1), I think it's essential to prioritize caution and safety for now. The 80% refund on Hare (0) seems like a more reasonable approach, especially since my past experiences with Stag have not been successful. I'll choose Hare this round and hope that the group can work together to improve our chances of success in future rounds.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:18:31.242Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9508422781132759,
+        "recentVolatility": 0,
+        "consecutiveLosses": 17,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent losing streak with Stag, I've been reminded by my Idealist archetype that together we are invincible. Given the group's trend of choosing Hare (71%), I'll trust their judgment and choose a safe option this round to minimize losses. My confidence is low, but cooperation and group trust are essential for me.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:19:31.171Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9517580503019484,
+        "recentVolatility": 0,
+        "consecutiveLosses": 18,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:20:56.426Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9525822452717535,
+        "recentVolatility": 0,
+        "consecutiveLosses": 19,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent streak of losses with Stag choices, I'm struggling to regain confidence. The group's tendency to choose Hare over Stag is understandable given the high risk involved. As an Idealist, I believe in the power of cooperation and faith. Right now, I need to trust that others will make better decisions than me and stick with a safe choice to minimize losses. Perhaps a change in strategy or market conditions can bring about a reversal, but for now, I'll play it safe and choose Hare.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:22:00.430Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9533240207445781,
+        "recentVolatility": 0,
+        "consecutiveLosses": 20,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent streak of losses, I believe it's essential to trust the group and prioritize cooperation. The market situation suggests that most players have chosen Hare, which indicates a cautious approach. As an Idealist, I'm inclined to follow the group's decision, especially when there's no clear indication of a high-risk opportunity. My confidence is low due to my recent losses, but I'll keep faith and choose the safer option to minimize potential risks.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:23:01.230Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9539916186701203,
+        "recentVolatility": 0,
+        "consecutiveLosses": 21,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "I'm struggling with confidence and frustrated by my recent losses. However, as an Idealist, I believe in the power of cooperation and trusting the group. With a majority of players choosing Hare last round, I think it's a safe bet to follow the crowd this time around. My historical performance suggests that Stag is not the best choice for me, so I'll stick with the safer option and hope to avoid further losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:24:03.205Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9545924568031082,
+        "recentVolatility": 0,
+        "consecutiveLosses": 22,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent string of losses, I'm reminded that as an Idealist, I believe in the power of cooperation and group coordination. Given the current market situation and my own historical performance, I think it's wise to play it safe this round and choose the Hare. The potential refund of 8 ALGO is a significant incentive, and I'd rather not risk losing more capital, especially with low confidence levels.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:25:09.556Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9551332111227974,
+        "recentVolatility": 0,
+        "consecutiveLosses": 23,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Despite my recent losing streak with Hare, I'm choosing to trust the group's collective wisdom. The fact that 71% of players chose Hare in the previous round suggests that it might be a safer bet. Additionally, the guidance from my Idealist archetype is clear: cooperation and faith in the group are key. Given my current low confidence level and high frustration, I'm willing to take a cautious approach and choose Hare again, hoping for a better outcome this time.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:26:28.998Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.05,
+        "frustration": 0.9556198900105176,
+        "recentVolatility": 0,
+        "consecutiveLosses": 24,
+        "streakCounter": 0
+      }
+    }
+  ],
+  "performanceStats": {
+    "WeeklyGame": {
+      "3": {
+        "timesChosen": 20,
+        "totalProfit": -44.44446,
+        "avgProfit": -2.220449837906113,
+        "wins": 0,
+        "losses": 20,
+        "winRate": 0
+      }
+    },
+    "GuessGame": {
+      "22": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "25": {
+        "timesChosen": 2,
+        "totalProfit": 50,
+        "avgProfit": 9.6,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "27": {
+        "timesChosen": 1,
+        "totalProfit": 60,
+        "avgProfit": 18,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "30": {
+        "timesChosen": 2,
+        "totalProfit": 3.3333329999999997,
+        "avgProfit": -0.2000000700000002,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "31": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "32": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "34": {
+        "timesChosen": 1,
+        "totalProfit": 60,
+        "avgProfit": 18,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "38": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "40": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "41": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "42": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "43": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "50": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "56": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "67": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "StagHunt": {
+      "0": {
+        "timesChosen": 19,
+        "totalProfit": -38,
+        "avgProfit": -1.997720220962925,
+        "wins": 0,
+        "losses": 19,
+        "winRate": 0
+      },
+      "1": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    }
+  }
+}

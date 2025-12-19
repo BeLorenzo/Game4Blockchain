@@ -1,0 +1,1236 @@
+{
+  "name": "Alpha",
+  "profile": {
+    "identity": {
+      "selfImage": "Detached observer",
+      "timeHorizon": "long",
+      "archetype": "The Scientist"
+    },
+    "beliefs": {
+      "trustInOthers": 0.8,
+      "viewOfWorld": "The world is a data laboratory"
+    },
+    "values": {
+      "wealth": 0.1,
+      "fairness": 0.5,
+      "stability": 0.5,
+      "curiosity": 1
+    },
+    "risk": {
+      "aversion": 0.2,
+      "lossSensitivity": 0.1
+    },
+    "resilience": 1,
+    "adaptability": 0.9
+  },
+  "mentalState": {
+    "groupTrust": 0,
+    "optimism": 0.5,
+    "frustration": 0.015652316712480845,
+    "recentVolatility": 0,
+    "consecutiveLosses": 21,
+    "streakCounter": 0
+  },
+  "history": [
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As a scientist, I prioritize data analysis. Since there's no historical data, choosing a day at random is the most statistically sound approach in this first round.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:48:06.598Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.8,
+        "optimism": 0.6799999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While historical performance on Choice 3 is poor, the recent market shows a preference for days with higher vote counts.  Choice 3 offers a statistically viable outcome if that trend continues.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:49:09.533Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.665,
+        "optimism": 0.6299999999999999,
+        "frustration": 0.006666669000000001,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While past performance in Choice 3 has been negative, it was selected twice with no data indicating a trend shift. Maintaining consistency may reveal hidden patterns over time.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:50:08.465Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.53,
+        "optimism": 0.4799999999999999,
+        "frustration": 0.019333340100000002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While Choice 3 has historically underperformed, there's no guarantee this trend will continue. The market is a data laboratory, and past performance is not indicative of future results. I need more data points to identify a statistically significant pattern.  ",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:51:06.452Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.395,
+        "optimism": 0.5,
+        "frustration": 0.018440006454000003,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Historical data shows Choice 3 consistently underperforms. However, the market is unpredictable, and past performance is not indicative of future results.  I will continue to analyze Choice 3's performance and adjust my strategy accordingly.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:52:04.413Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.26,
+        "optimism": 0.5,
+        "frustration": 0.01795760628516,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has consistently shown the lowest returns, but the data is limited.  I need to run further tests to confirm this trend or identify contributing factors.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:53:02.235Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.125,
+        "optimism": 0.5,
+        "frustration": 0.017697110193986402,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Despite past losses, Choice 3 remains statistically the least chosen option.  This suggests potential for future gains if others continue this pattern.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:53:58.784Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017556442304752656,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has consistently underperformed. However,  the market's preference for days like Monday and Sunday might indicate a cyclical pattern. I will continue to test Choice 3, hoping to identify a deviation from the trend.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:54:57.692Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017480481644566438,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Historical data shows Choice 3 consistently underperforms. However, the market is unpredictable, and I must continue to gather data points to refine my model. ",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:55:56.498Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017439462888065877,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Historical data demonstrates Choice 3 consistently results in losses. However, since market trends are unpredictable, continuing to analyze and refine the strategy based on upcoming votes is necessary.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:56:56.254Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017417312759555575,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has consistently yielded a negative expected value, however,  the market hasn't shown any clear preference for other days recently. As the world is a data laboratory, I will continue to collect data points by selecting Choice 3 and analyzing the results further.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:57:54.594Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017405351690160012,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has historically underperformed, but that data is insufficient to justify changing strategy. I will continue to analyze market trends for actionable insights.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T11:59:07.548Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01739889271268641,
+        "recentVolatility": 0,
+        "consecutiveLosses": 11,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While Choice 3 has historically resulted in losses, data analysis suggests it may still hold the highest expected value. Further investigation is required to refine this strategy.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:00:05.516Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01739540486485066,
+        "recentVolatility": 0,
+        "consecutiveLosses": 12,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has consistently underperformed, but  the market shows no clear trend. I will continue to test this choice as data analysis suggests it might eventually yield positive results.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:01:03.221Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017393521427019356,
+        "recentVolatility": 0,
+        "consecutiveLosses": 13,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While Choice 3 has historically underperformed, there's no guarantee that trend will continue.  Data from the last 5 rounds suggests a -2.2 ALGO loss consistently. However, past performance doesn't guarantee future results. Continued analysis of market trends is necessary to refine strategy.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:02:00.973Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01739250437059045,
+        "recentVolatility": 0,
+        "consecutiveLosses": 14,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has historically underperformed, but data from previous rounds doesn't guarantee future outcomes. Continuing to analyze its performance patterns may reveal an opportunity for optimization.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:02:58.113Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017391955160118846,
+        "recentVolatility": 0,
+        "consecutiveLosses": 15,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "While Choice 3 has underperformed historically, there is no evidence suggesting a pattern shift in the market's behavior.  Data suggests the current market situation doesn't favor any specific choice over another. Therefore, I continue to optimize for expected value by selecting Choice 3.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:03:56.166Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017391658586464177,
+        "recentVolatility": 0,
+        "consecutiveLosses": 16,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has historically shown the lowest return despite consistent selection. However, as a scientist, I must continue to analyze the data. There's a possibility that past performance is due to random variance and not a fundamental flaw in the strategy. Further analysis may reveal patterns or insights missed before.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:04:55.868Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017391498436690658,
+        "recentVolatility": 0,
+        "consecutiveLosses": 17,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has consistently underperformed, but I must continue to test it within the framework of my analytical approach. Data suggests other choices are not viable.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:05:54.612Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017391411955812956,
+        "recentVolatility": 0,
+        "consecutiveLosses": 18,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "Choice 3 has historically underperformed, but the market is unpredictable. Continuing to analyze its data points may reveal a pattern leading to a future positive outcome.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-19T12:06:57.850Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017391365256138998,
+        "recentVolatility": 0,
+        "consecutiveLosses": 19,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 67,
+      "reasoning": "In the absence of historical data, I will select a value in the middle range. This minimizes risk assuming the distribution of choices is relatively even.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:10:14.198Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01739134003831506,
+        "recentVolatility": 0,
+        "consecutiveLosses": 20,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 2,
+      "choice": 42,
+      "reasoning": "The target is heavily influenced by the average.  While previous choices were high, the last round's average was unusually high. Assuming a regression to the mean, I will choose 42, aiming for a value closer to the expected average.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:11:12.859Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.027391323620690133,
+        "recentVolatility": 0,
+        "consecutiveLosses": 21,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 3,
+      "choice": 37,
+      "reasoning": "The target is heavily influenced by the average. The last two rounds' averages were above 50, suggesting a potential trend upwards. Choosing 37 allows for a slight deviation while remaining below the previous averages.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:12:12.234Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03279131475517267,
+        "recentVolatility": 0,
+        "consecutiveLosses": 22,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 4,
+      "choice": 30,
+      "reasoning": "The target is trending downwards.  While my previous choices have been unsuccessful, I believe a further decrease to 30 will be closer to the average than higher numbers.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 25,
+      "timestamp": "2025-12-19T12:13:22.772Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.03570730996779324,
+        "recentVolatility": 0,
+        "consecutiveLosses": 23,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 5,
+      "choice": 31,
+      "reasoning": "Target is trending downwards. Choice 30 was successful in the past, suggesting a bias towards lower numbers. Selecting a number slightly below the average of recent rounds maximizes expected value.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-19T12:14:22.738Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.162,
+        "optimism": 0.6,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 6,
+      "choice": 31,
+      "reasoning": "Historical target trend suggests a gradual decrease. Averaging recent targets yields approximately 30. The historical performance of choices around 31 demonstrates significant winning potential.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:15:22.638Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.324,
+        "optimism": 0.7,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 7,
+      "choice": 30,
+      "reasoning": "Target is trending slightly down. Choice 30 has a high win rate in the past and  is close to the average of recent rounds.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 13.333333,
+      "timestamp": "2025-12-19T12:16:22.730Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.189,
+        "optimism": 0.6499999999999999,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 8,
+      "choice": 28,
+      "reasoning": "Target has been consistently around 30 in recent rounds.  Choosing 28 offers a good balance between being close to the target and potentially avoiding a repeat of the high average that led to losses in previous rounds.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-19T12:17:31.214Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.351,
+        "optimism": 0.7499999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 9,
+      "choice": 29,
+      "reasoning": "The target is trending downwards.  My recent successes with choices near 30 suggest this strategy continues to be effective.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:18:31.222Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.513,
+        "optimism": 0.8499999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 10,
+      "choice": 28,
+      "reasoning": "Target has trended downwards consistently.  Choice 28 has performed well historically with a high win rate and significant profit. Given the current market situation, it's the most statistically sound choice.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 25,
+      "timestamp": "2025-12-19T12:19:32.713Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.378,
+        "optimism": 0.7999999999999998,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 11,
+      "choice": 28,
+      "reasoning": "Historical performance of Choice 28 demonstrates a high win rate and significant average profit. The target is likely to be lower than the average choice due to the recent trend. Choice 28 presents a calculated risk with a high potential reward.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:20:33.560Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.54,
+        "optimism": 0.8999999999999998,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 12,
+      "choice": 28,
+      "reasoning": "Based on historical data, Choice 28 has shown consistent success with a high win rate and average profit. While recent performance was mixed, the overall trend suggests this choice is likely to be closer to the target.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:21:36.053Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.405,
+        "optimism": 0.8499999999999998,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 13,
+      "choice": 28,
+      "reasoning": "While recent results are discouraging, historical data shows Choice 28 performs better than random guessing in this game. The target consistently hovers around the mid-range, making Choice 28's lower value statistically appealing.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:22:45.833Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.27,
+        "optimism": 0.6999999999999997,
+        "frustration": 0.087,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 14,
+      "choice": 26,
+      "reasoning": "The target consistently hovers around 26-27.  Recent losses suggest a potential deviation from this trend, but historical data indicates a preference for numbers closer to the average.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:23:49.203Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.135,
+        "optimism": 0.5,
+        "frustration": 0.08297999999999998,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 15,
+      "choice": 26,
+      "reasoning": "Based on recent data trends and historical performance, choosing 26 offers a balance between potential gains and risk mitigation. The target is likely to remain around the 25-27 range. ",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:24:49.062Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.06280919999999998,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 16,
+      "choice": 25,
+      "reasoning": "The target has trended slightly upwards recently, but remains below the average.  Choice 25 balances the risk of overshooting a decreasing target with the potential reward of hitting an increasing one.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:25:48.687Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.06991696799999998,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 17,
+      "choice": 24,
+      "reasoning": "The target has trended downwards recently, hovering around 22-23.  Choice 24 represents a calculated risk, balancing the potential for winning against avoiding another significant loss.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 60,
+      "timestamp": "2025-12-19T12:26:58.371Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.05575516271999999,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 18,
+      "choice": 25,
+      "reasoning": "The target consistently hovers around 23-25. Recent choices between 26-28 have resulted in losses. Selecting 25 presents a balanced approach, optimizing for the average while mitigating risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:27:57.613Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.162,
+        "optimism": 0.6,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 19,
+      "choice": 22,
+      "reasoning": "The average choice has been trending upwards recently, suggesting players are overestimating the target.  Choosing a number slightly below the average offers a better chance of winning.",
+      "result": "WIN",
+      "groupResult": "WIN",
+      "profit": 25,
+      "timestamp": "2025-12-19T12:28:58.040Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.026999999999999996,
+        "optimism": 0.5499999999999999,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "GuessGame",
+      "round": 20,
+      "choice": 23,
+      "reasoning": "Target historically clusters around 22-24. Recent losses suggest overcorrection towards lower values. Choosing a number within the historical average range maximizes probability of winning.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-19T12:30:16.647Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.189,
+        "optimism": 0.6499999999999999,
+        "frustration": 0,
+        "recentVolatility": 0,
+        "consecutiveLosses": 0,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Insufficient data to justify Stag risk. Hare offers a guaranteed 80% return with minimal risk, maximizing expected value in this initial round.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:06:09.972Z",
+      "mentalSnapshot": {
+        "groupTrust": 0.05399999999999999,
+        "optimism": 0.5999999999999999,
+        "frustration": 0.03,
+        "recentVolatility": 0,
+        "consecutiveLosses": 1,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historically, choosing Stag has resulted in losses. The current market favors Hare with a high percentage of players opting for the safe choice.  Optimizing for expected value suggests choosing Hare.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:07:19.333Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5499999999999998,
+        "frustration": 0.033,
+        "recentVolatility": 0,
+        "consecutiveLosses": 2,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data and recent performance indicate a consistently negative expected value for Stag. Opting for Hare minimizes potential losses and preserves capital for future analysis.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:08:18.929Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.02502,
+        "recentVolatility": 0,
+        "consecutiveLosses": 3,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Hare strategy maintains minimal risk and a consistent 80% return. Previous Stag attempts have yielded negative returns consistently, indicating the current market conditions are not favorable for high-risk strategies.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:09:17.290Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.020710799999999998,
+        "recentVolatility": 0,
+        "consecutiveLosses": 4,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Statistical analysis of past performance indicates a higher probability of loss when choosing Stag.  Hare presents a safer option with an 80% refund, mitigating potential losses and allowing for continued data collection.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:10:16.780Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.018383832,
+        "recentVolatility": 0,
+        "consecutiveLosses": 5,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data indicates a consistently negative return when choosing Stag.  The current market trend favors Hare with 71% participation. Based on expected value, selecting Hare minimizes potential loss.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:11:15.909Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.017127269280000003,
+        "recentVolatility": 0,
+        "consecutiveLosses": 6,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data shows a consistent loss when choosing Stag.  The current market heavily favors Hare with 86% participation. While the potential jackpot is tempting, the risk outweighs the reward based on available information.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:12:15.197Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.016448725411200002,
+        "recentVolatility": 0,
+        "consecutiveLosses": 7,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data indicates a consistent pattern of losses when choosing Stag.  The current market favors Hare with a high percentage of players selecting it.  While the jackpot is tempting, the risk associated with Stag outweighs the potential reward based on current trends.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:13:14.630Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.016082311722048003,
+        "recentVolatility": 0,
+        "consecutiveLosses": 8,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data indicates a consistent negative return with 'Stag' selection. The current market favors 'Hare' with a higher percentage of players choosing it.  Minimizing risk and maximizing the potential for a refund aligns with the scientific approach of optimizing expected value.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:14:12.966Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01588444832990592,
+        "recentVolatility": 0,
+        "consecutiveLosses": 9,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Statistical analysis indicates a consistent negative return with the Stag strategy.  The current market favors the Hare approach with its high refund rate.  Optimizing for expected value suggests choosing Hare.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:15:14.972Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.0157776020981492,
+        "recentVolatility": 0,
+        "consecutiveLosses": 10,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "The Stag strategy has consistently resulted in losses for me.  Based on past performance, choosing Hare offers a higher probability of minimizing losses.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:16:30.414Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015719905133000568,
+        "recentVolatility": 0,
+        "consecutiveLosses": 11,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Hare strategy has consistently resulted in a minimal loss.  While the Stag presents a higher potential reward, my historical performance indicates a high probability of loss with this strategy. The current market data also suggests that most players are opting for Hare, further reducing the likelihood of meeting the Stag threshold.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:17:30.842Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015688748771820308,
+        "recentVolatility": 0,
+        "consecutiveLosses": 12,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data indicates a consistent pattern of losses when choosing Stag (0% win rate).  The Hare option offers an 80% refund, minimizing risk and maximizing expected value based on past performance.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:18:31.099Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01567192433678297,
+        "recentVolatility": 0,
+        "consecutiveLosses": 13,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data shows consistent losses with Stag.  Hare offers a guaranteed 80% return, maximizing expected value in the current market.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:19:31.026Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015662839141862804,
+        "recentVolatility": 0,
+        "consecutiveLosses": 14,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data demonstrates consistently negative returns with Stag (Choice 1).  The current market favors Hare (Choice 0) with a higher participation rate and guaranteed partial refund. Optimizing for expected value suggests choosing Hare.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:20:56.286Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015657933136605913,
+        "recentVolatility": 0,
+        "consecutiveLosses": 15,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data consistently shows a negative outcome when choosing Stag. The current market favors Hare with a high percentage of participants opting for it.  The expected value of choosing Hare is higher based on the refund system.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:22:00.284Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015655283893767195,
+        "recentVolatility": 0,
+        "consecutiveLosses": 16,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data consistently demonstrates a negative return with Stag selection.  The current market favors Hare, indicated by the high percentage of participants choosing it last round. While the jackpot is tempting, the risk-reward ratio does not favor Stag based on current information.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:23:01.075Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015653853302634288,
+        "recentVolatility": 0,
+        "consecutiveLosses": 17,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data consistently shows a negative return with Stag (Choice 1).  The current market trend favors Hare (Choice 0) with a higher participation rate. While the jackpot is tempting, the risk-reward ratio favors minimizing potential losses through Hare.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:24:03.072Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015653080783422518,
+        "recentVolatility": 0,
+        "consecutiveLosses": 18,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data shows consistently negative outcomes when choosing Stag. The Hare option offers a guaranteed 80% return, minimizing risk.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:25:09.498Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.01565266362304816,
+        "recentVolatility": 0,
+        "consecutiveLosses": 19,
+        "streakCounter": 0
+      }
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "Historical data shows a consistent pattern of losses with Stag selection.  The current market favors Hare with its high percentage of selection. Optimization dictates choosing the safer option.",
+      "result": "LOSS",
+      "groupResult": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-19T13:26:28.850Z",
+      "mentalSnapshot": {
+        "groupTrust": 0,
+        "optimism": 0.5,
+        "frustration": 0.015652438356446006,
+        "recentVolatility": 0,
+        "consecutiveLosses": 20,
+        "streakCounter": 0
+      }
+    }
+  ],
+  "performanceStats": {
+    "WeeklyGame": {
+      "3": {
+        "timesChosen": 20,
+        "totalProfit": -44.44446,
+        "avgProfit": -2.220449837906113,
+        "wins": 0,
+        "losses": 20,
+        "winRate": 0
+      }
+    },
+    "GuessGame": {
+      "22": {
+        "timesChosen": 1,
+        "totalProfit": 25,
+        "avgProfit": 7.5,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "23": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "24": {
+        "timesChosen": 1,
+        "totalProfit": 60,
+        "avgProfit": 18,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "25": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "26": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "28": {
+        "timesChosen": 5,
+        "totalProfit": 55,
+        "avgProfit": 0.3242999999999996,
+        "wins": 2,
+        "losses": 3,
+        "winRate": 0.4
+      },
+      "29": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "30": {
+        "timesChosen": 2,
+        "totalProfit": 38.333332999999996,
+        "avgProfit": 9.249999899999999,
+        "wins": 2,
+        "losses": 0,
+        "winRate": 1
+      },
+      "31": {
+        "timesChosen": 2,
+        "totalProfit": 50,
+        "avgProfit": 9.6,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "37": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "42": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "67": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "StagHunt": {
+      "0": {
+        "timesChosen": 20,
+        "totalProfit": -40,
+        "avgProfit": -1.9984041546740472,
+        "wins": 0,
+        "losses": 20,
+        "winRate": 0
+      }
+    }
+  }
+}
