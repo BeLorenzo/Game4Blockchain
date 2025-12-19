@@ -5,7 +5,7 @@ import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { WeeklyGameClient, WeeklyGameFactory } from '../../smart_contracts/artifacts/weeklyGame/WeeklyGameClient'
-import { Agent, RoundContext } from '../Agent'
+import { Agent } from '../Agent'
 import { IGameAdapter } from './IGameAdapter'
 
 interface RoundSecret {
@@ -14,13 +14,12 @@ interface RoundSecret {
 }
 
 export class WeeklyGame implements IGameAdapter {
-  // Game history tracking
-  private lastRoundVotes: Record<string, number> | null = null
+  readonly name = 'WeeklyGame'
 
+  private lastRoundVotes: Record<string, number> | null = null
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: WeeklyGameFactory | null = null
   private appClient: WeeklyGameClient | null = null
-
   private participationAmount = AlgoAmount.Algos(10)
   private roundSecrets: Map<string, RoundSecret> = new Map()
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
@@ -31,9 +30,8 @@ export class WeeklyGame implements IGameAdapter {
     revealPhase: 10n,
   }
 
-  private dayMap = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  private dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-  // --- 1. DEPLOY ---
   async deploy(admin: Agent): Promise<bigint> {
     this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
       defaultSender: admin.account.addr,
@@ -48,11 +46,10 @@ export class WeeklyGame implements IGameAdapter {
     await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(2))
 
     this.appClient = appClient
-    console.log(`WeeklyGame contract deployed. AppID: ${appClient.appId}`)
+    console.log(`${this.name} deployed. AppID: ${appClient.appId}`)
     return BigInt(appClient.appId)
   }
 
-  // --- 2. START SESSION ---
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
@@ -87,29 +84,21 @@ export class WeeklyGame implements IGameAdapter {
       signer: dealer.signer,
     })
 
-    console.log(`WeeklyGame session created! ID: ${result.return}. Start: ${startAt}`)
+    console.log(`Session ${result.return} created. Start: round ${startAt}`)
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  // --- 3. COMMIT PHASE ---
-  async play_Commit(agents: Agent[], sessionId: bigint): Promise<void> {
-    console.log(`\n--- PHASE 1: COMMIT (Pick a Day) ---`)
-
-    // Prepare context with data-only approach
-    const marketSituation = this.prepareMarketSituation()
-
-    const context: RoundContext = {
-      gameRules: 'Pick day (0=Mon...6=Sun). Pot splits equally across active days, then among players per day.',
-      marketSituation: marketSituation,
-    }
+  async play_Commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+    console.log(`\n--- PHASE 1: COMMIT ---`)
 
     for (const agent of agents) {
-      const decision = await agent.playRound('WeeklyGame', context)
+      const prompt = this.buildPromptForAgent(agent, roundNumber)
+      const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = decision.choice
       if (safeChoice < 0 || safeChoice > 6) {
-        console.warn(`[${agent.name}] Invalid choice (${safeChoice}), fallback to 0.`)
+        console.warn(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0`)
         safeChoice = 0
       }
 
@@ -117,7 +106,6 @@ export class WeeklyGame implements IGameAdapter {
       this.roundSecrets.set(agent.account.addr.toString(), { choice: safeChoice, salt })
 
       const hash = this.getHash(safeChoice, salt)
-      console.log(`[${agent.name}] Picked a day (hash sent).`)
 
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
@@ -133,29 +121,118 @@ export class WeeklyGame implements IGameAdapter {
     }
   }
 
-  // --- PREPARE MARKET SITUATION (DATA-ONLY) ---
-  private prepareMarketSituation(): string {
+  private buildPromptForAgent(agent: Agent, roundNumber: number): string {
+    // 1. GAME RULES
+    const gameRules = `
+GAME: Weekly Lottery (Minority Game)
+Choose a day of the week (0=Monday ... 6=Sunday).
+
+HOW IT WORKS:
+- All players pick a day (0-6)
+- Total pot is split equally across ALL active days
+- Each active day's share is split among players who chose that day
+- Fewer players on your day = bigger share for you
+
+EXAMPLE:
+7 players, 70 ALGO pot
+- Monday: 3 players
+- Tuesday: 2 players
+- Wednesday: 2 players
+- Other days: 0 players
+
+3 active days → 23.33 ALGO per day
+Monday players get: 23.33 / 3 = 7.77 ALGO each
+Tuesday players get: 23.33 / 2 = 11.66 ALGO each
+`.trim()
+
+    // 2. CURRENT SITUATION
+    let situation = `
+CURRENT STATUS:
+Round: ${roundNumber}
+Entry fee: 10 ALGO
+`.trim()
+
     if (this.lastRoundVotes === null) {
-      return 'First round. All days (0=Mon...6=Sun) available. No historical data.'
+      situation += `\n\nFirst round - all days equally likely.`
+    } else {
+      const sortedDays = Object.entries(this.lastRoundVotes)
+        .map(([day, votes]) => ({ day, votes }))
+        .sort((a, b) => a.votes - b.votes)
+
+      const activeDays = sortedDays.filter((d) => d.votes > 0).length
+
+      situation += `\n\nLast round results:`
+      situation += `\n${activeDays} active days (pot was split ${activeDays} ways)`
+      situation += `\n\nVote distribution:`
+
+      sortedDays.forEach(({ day, votes }) => {
+        if (votes > 0) {
+          situation += `\n• ${day}: ${votes} players`
+        }
+      })
+
+      const leastCrowded = sortedDays.filter((d) => d.votes > 0)[0]
+      const mostCrowded = sortedDays[sortedDays.length - 1]
+
+      if (leastCrowded && mostCrowded && leastCrowded.votes > 0) {
+        situation += `\n\nLeast crowded: ${leastCrowded.day} (${leastCrowded.votes} players)`
+        situation += `\nMost crowded: ${mostCrowded.day} (${mostCrowded.votes} players)`
+      }
     }
 
-    // Show raw vote counts - AI must analyze minority game dynamics
-    const votesList = Object.entries(this.lastRoundVotes)
-      .sort(([, a], [, b]) => a - b) // Sort by votes (ascending)
-      .map(([day, votes]) => `${day}:${votes}`)
-      .join(', ')
+    // 3. STRATEGIC HINT
+    const hint = `
+STRATEGIC CONSIDERATIONS:
+- This is a minority game - you want FEWER competitors on your day
+- Avoid days that were crowded last round (others might avoid them too)
+- Days with 0 players get nothing - need at least 1 player per day
+- Consider: Are players clustering? Are they avoiding popular choices?
+- Meta-game: If everyone tries to be contrarian, what happens?
+`.trim()
 
-    const activeDays = Object.values(this.lastRoundVotes).filter((v) => v > 0).length
+    // 4. AGENT'S DATA
+    const personality = agent.profile.personalityDescription
+    const parameters = agent.getProfileSummary()
+    const lessons = agent.getLessonsLearned(this.name)
+    const recentMoves = agent.getRecentHistory(this.name, 3)
+    const mentalState = agent.getMentalState()
 
     return `
-Last round votes: ${votesList}.
-Active days: ${activeDays} (pot was split ${activeDays} ways).
-Each active day's portion then split among players who chose it.
-    `.trim()
+You are ${agent.name}.
+
+═══════════════════════════════════════════════════════════
+${gameRules}
+
+${situation}
+
+${hint}
+═══════════════════════════════════════════════════════════
+
+YOUR PERSONALITY:
+${personality}
+
+YOUR PARAMETERS:
+${parameters}
+
+═══════════════════════════════════════════════════════════
+
+${lessons}
+
+YOUR RECENT MOVES:
+${recentMoves}
+
+MENTAL STATE: ${mentalState}
+
+═══════════════════════════════════════════════════════════
+
+Choose a day (0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday, 5=Saturday, 6=Sunday).
+Think about crowd dynamics and your personality.
+
+Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
+`.trim()
   }
 
-  // --- 4. REVEAL PHASE ---
-  async play_Reveal(agents: Agent[], sessionId: bigint): Promise<void> {
+  async play_Reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -176,7 +253,7 @@ Each active day's portion then split among players who chose it.
             sender: agent.account.addr,
             signer: agent.signer,
           })
-          console.log(`[${agent.name}] Revealed: ${this.dayMap[secret.choice]} (${secret.choice})`)
+          console.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`)
         } catch (e) {
           console.error(`Error revealing for ${agent.name}:`, e)
         }
@@ -184,29 +261,31 @@ Each active day's portion then split among players who chose it.
     )
   }
 
-  // --- 5. CLAIM PHASE (+ DATA COLLECTION) ---
-  async play_Claim(agents: Agent[], sessionId: bigint): Promise<void> {
+  async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
+    // WeeklyGame doesn't need explicit resolve
+    return
+  }
+
+  async play_Claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
-    console.log(`\n--- PHASE 3: CLAIM & DATA COLLECTION ---`)
+    console.log(`\n--- PHASE 3: CLAIM ---`)
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Collect votes for next round analysis
+    // Collect votes for next round
     const votes: Record<string, number> = {}
-    const daysMap = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-    daysMap.forEach((d) => (votes[d] = 0))
+    this.dayNames.forEach((d) => (votes[d] = 0))
 
     agents.forEach((agent) => {
       const secret = this.roundSecrets.get(agent.account.addr.toString())
       if (secret) {
-        const dayName = daysMap[secret.choice]
+        const dayName = this.dayNames[secret.choice]
         votes[dayName] = (votes[dayName] || 0) + 1
       }
     })
 
     this.lastRoundVotes = votes
-    console.log('📊 [GAME STATS] Votes:', votes)
+    console.log('📊 Vote distribution:', votes)
 
     // Process claims
     for (const agent of agents) {
@@ -230,18 +309,16 @@ Each active day's portion then split among players who chose it.
         console.log(`${agent.name}: \x1b[32m${outcome} (${netProfitAlgo.toFixed(2)} ALGO)\x1b[0m`)
       } catch (e: any) {
         if (e.message && e.message.includes('assert failed')) {
-          console.log(`${agent.name}: \x1b[31mLOSS (No winnings)\x1b[0m`)
+          console.log(`${agent.name}: \x1b[31mLOSS\x1b[0m`)
         } else {
-          console.error(`❌ Unexpected error for ${agent.name}:`, e.message)
+          console.error(`${agent.name}: ERROR`)
         }
       }
 
-      const groupContext = outcome === 'WIN' ? 'WIN' : 'LOSS'
-      agent.finalizeRound('WeeklyGame', outcome, netProfitAlgo, groupContext, 1)
+      agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber)
     }
   }
 
-  // --- UTILS ---
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -260,7 +337,6 @@ Each active day's portion then split among players who chose it.
     if (currentRound >= targetRound) return
 
     const blocksToSpam = Number(targetRound - currentRound)
-
     const spammer = await this.algorand.account.random()
     await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
 
@@ -273,9 +349,5 @@ Each active day's portion then split among players who chose it.
         note: `spam-${i}-${Date.now()}`,
       })
     }
-  }
-
-  async resolve(dealer: Agent, sessionId: bigint): Promise<void> {
-    return
   }
 }

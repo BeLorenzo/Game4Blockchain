@@ -6,24 +6,23 @@ import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { StagHuntClient, StagHuntFactory } from '../../smart_contracts/artifacts/stagHunt/StagHuntClient'
-import { Agent, RoundContext } from '../Agent'
+import { Agent } from '../Agent'
+import { IGameAdapter } from './IGameAdapter'
 
 interface RoundSecret {
   choice: number
   salt: string
 }
 
-export class StagHuntGame {
-  // Game history tracking
-  private lastCooperationRate: number | null = null
+export class StagHuntGame implements IGameAdapter {
+  readonly name = 'StagHunt'
 
+  private lastCooperationRate: number | null = null
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: StagHuntFactory | null = null
   private appClient: StagHuntClient | null = null
-
   private participationAmount = AlgoAmount.Algos(10)
   private roundSecrets: Map<string, RoundSecret> = new Map()
-
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
   private durationParams = {
@@ -32,7 +31,6 @@ export class StagHuntGame {
     revealPhase: 10n,
   }
 
-  // --- 1. DEPLOY ---
   async deploy(admin: Agent): Promise<bigint> {
     this.factory = this.algorand.client.getTypedAppFactory(StagHuntFactory, {
       defaultSender: admin.account.addr,
@@ -47,11 +45,10 @@ export class StagHuntGame {
     await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(2))
 
     this.appClient = appClient
-    console.log(`StagHunt contract deployed. AppID: ${appClient.appId}`)
+    console.log(`${this.name} deployed. AppID: ${appClient.appId}`)
     return BigInt(appClient.appId)
   }
 
-  // --- 2. START SESSION ---
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
@@ -86,41 +83,35 @@ export class StagHuntGame {
       signer: dealer.signer,
     })
 
-    console.log(`Session created! ID: ${result.return}. Starting at round ${startAt}`)
-
+    console.log(`Session ${result.return} created. Start: round ${startAt}`)
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  // --- 3. COMMIT PHASE ---
-  async play_Commit(agents: Agent[], sessionId: bigint): Promise<void> {
+  async play_Commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: COMMIT ---`)
 
     const globalState = await this.appClient!.state.global.getAll()
-    const jackpotVal = Number(globalState['globalJackpot'] || 0)
-    const jackpotAlgo = jackpotVal / 1_000_000
-
-    // Prepare context with data-only approach
-    const marketSituation = this.prepareMarketSituation(jackpotAlgo)
-
-    const context: RoundContext = {
-      gameRules: 'Stag (1) = high risk, requires group coordination. Hare (0) = safe, 80% refund.',
-      marketSituation: marketSituation,
-    }
+    const jackpotAlgo = Number(globalState['globalJackpot'] || 0) / 1_000_000
+    const threshold = Number(globalState['stagThresholdPercent'] || 51)
 
     for (const agent of agents) {
-      const decision = await agent.playRound('StagHunt', context)
+      const prompt = this.buildPromptForAgent(agent, roundNumber, jackpotAlgo, threshold)
+      const decision = await agent.playRound(this.name, prompt)
+
+      let safeChoice = decision.choice
+      if (safeChoice !== 0 && safeChoice !== 1) {
+        console.warn(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0 (Hare)`)
+        safeChoice = 0
+      }
 
       const salt = crypto.randomBytes(16).toString('hex')
-
       this.roundSecrets.set(agent.account.addr.toString(), {
-        choice: decision.choice,
+        choice: safeChoice,
         salt: salt,
       })
 
-      const hash = this.getHash(decision.choice, salt)
-
-      console.log(`[${agent.name}] Decision: ${decision.choice} (hash sent)`)
+      const hash = this.getHash(safeChoice, salt)
 
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
@@ -136,25 +127,97 @@ export class StagHuntGame {
     }
   }
 
-  // --- PREPARE MARKET SITUATION (DATA-ONLY) ---
-  private prepareMarketSituation(jackpot: number): string {
-    if (this.lastCooperationRate === null) {
-      return `Entry: 10 ALGO. Hare refunds 8 ALGO (80%). Stag requires coordination. Jackpot available: ${jackpot.toFixed(1)} ALGO. First round, no data on group behavior.`
+  private buildPromptForAgent(agent: Agent, roundNumber: number, jackpot: number, threshold: number): string {
+    // 1. GAME RULES (objective, same for everyone)
+    const gameRules = `
+GAME: Stag Hunt (Assurance Game)
+Choose STAG (1) or HARE (0).
+
+OPTIONS:
+- HARE (0): Safe choice
+  - Always get 80% refund regardless of what others do
+  - Guaranteed result: -2 ALGO
+  - No dependency on group behavior
+
+- STAG (1): Risky cooperation
+  - Need ${threshold}% of players to also choose Stag
+  - If threshold MET: Winners split pot + jackpot (big win)
+  - If threshold MISSED: Stags lose everything (-10 ALGO)
+`.trim()
+
+    // 2. CURRENT SITUATION (objective data)
+    let situation = `
+CURRENT STATUS:
+Round: ${roundNumber}
+Entry fee: 10 ALGO
+Global jackpot: ${jackpot.toFixed(1)} ALGO
+`.trim()
+
+    if (this.lastCooperationRate !== null) {
+      const coopPct = (this.lastCooperationRate * 100).toFixed(0)
+      const result = this.lastCooperationRate >= threshold / 100 ? 'THRESHOLD MET ✅' : 'THRESHOLD MISSED ❌'
+      situation += `\n\nLast round data:
+${coopPct}% of players chose Stag → ${result}`
+    } else {
+      situation += `\n\nThis is the first round - no historical data available.`
     }
 
-    // Show raw numbers - AI must analyze cooperation patterns
-    const stagsPercent = (this.lastCooperationRate * 100).toFixed(0)
-    const haresPercent = (100 - this.lastCooperationRate * 100).toFixed(0)
+    // 3. STRATEGIC HINT (generic, same for everyone)
+    const hint = `
+STRATEGIC CONSIDERATIONS:
+- Hare gives -2 ALGO (safe but guaranteed small loss)
+- Stag needs ${threshold}% cooperation - track group patterns from history
+- Jackpot accumulates from failed Stag attempts, making future successes more valuable
+- Consider: Is the group coordinating? Are cooperation rates rising or falling?
+`.trim()
+
+    // 4. AGENT'S PERSONALITY
+    const personality = agent.profile.personalityDescription
+
+    // 5. AGENT'S PARAMETERS
+    const parameters = agent.getProfileSummary()
+
+    // 6. AGENT'S EXPERIENCE
+    const lessons = agent.getLessonsLearned(this.name)
+    const recentMoves = agent.getRecentHistory(this.name, 3)
+    const mentalState = agent.getMentalState()
 
     return `
-Last round: ${stagsPercent}% chose Stag, ${haresPercent}% chose Hare.
-Entry: 10 ALGO. Hare refunds 8 ALGO (80%).
-Jackpot available: ${jackpot.toFixed(1)} ALGO (splits among Stag players if threshold met).
-    `.trim()
+You are ${agent.name}.
+
+═══════════════════════════════════════════════════════════
+${gameRules}
+
+${situation}
+
+${hint}
+═══════════════════════════════════════════════════════════
+
+YOUR PERSONALITY:
+${personality}
+
+YOUR PARAMETERS:
+${parameters}
+
+═══════════════════════════════════════════════════════════
+
+${lessons}
+
+YOUR RECENT MOVES:
+${recentMoves}
+
+MENTAL STATE: ${mentalState}
+
+═══════════════════════════════════════════════════════════
+
+Analyze the situation using your personality traits and past experience.
+Make your decision and explain your reasoning clearly.
+
+Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
+`.trim()
   }
 
-  // --- 4. REVEAL PHASE ---
-  async play_Reveal(agents: Agent[], sessionId: bigint): Promise<void> {
+  async play_Reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -183,14 +246,13 @@ Jackpot available: ${jackpot.toFixed(1)} ALGO (splits among Stag players if thre
     )
   }
 
-  // --- 5. RESOLVE & DATA COLLECTION ---
-  async resolve(dealer: Agent, sessionId: bigint): Promise<void> {
+  async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 3: RESOLUTION ---`)
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Collect cooperation rate for next round
+    // Collect cooperation rate
     let stags = 0
     let totalRevealed = 0
 
@@ -201,12 +263,11 @@ Jackpot available: ${jackpot.toFixed(1)} ALGO (splits among Stag players if thre
 
     if (totalRevealed > 0) {
       this.lastCooperationRate = stags / totalRevealed
-      console.log(`📊 [GAME STATS] Cooperation rate: ${(this.lastCooperationRate * 100).toFixed(1)}%`)
+      console.log(`📊 Cooperation rate: ${(this.lastCooperationRate * 100).toFixed(1)}%`)
     } else {
       this.lastCooperationRate = 0
     }
 
-    // Resolve on-chain
     try {
       await this.appClient!.send.resolveSession({
         args: { sessionId },
@@ -220,16 +281,8 @@ Jackpot available: ${jackpot.toFixed(1)} ALGO (splits among Stag players if thre
     }
   }
 
-  // --- 6. CLAIM PHASE ---
-  async play_Claim(agents: Agent[], sessionId: bigint): Promise<void> {
+  async play_Claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     console.log('\n--- PHASE 4: CLAIM & FEEDBACK ---')
-
-    // Determine group result
-    let groupResult = 'LOSS'
-    try {
-      const stats = await this.appClient?.state.box.stats.value(sessionId)
-      if (stats && stats.successful) groupResult = 'WIN'
-    } catch (e) {}
 
     for (const agent of agents) {
       let outcome = 'LOSS'
@@ -254,15 +307,14 @@ Jackpot available: ${jackpot.toFixed(1)} ALGO (splits among Stag players if thre
         if (e.message && e.message.includes('assert failed')) {
           console.log(`${agent.name}: \x1b[31mLOSS (No winnings)\x1b[0m`)
         } else {
-          console.log(`${agent.name}: ERROR (${e.message.substring(0, 50)}...)`)
+          console.log(`${agent.name}: ERROR`)
         }
       }
 
-      agent.finalizeRound('StagHunt', outcome, netProfitAlgo, groupResult, 1)
+      agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber)
     }
   }
 
-  // --- UTILS ---
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -281,7 +333,6 @@ Jackpot available: ${jackpot.toFixed(1)} ALGO (splits among Stag players if thre
     if (currentRound >= targetRound) return
 
     const blocksToSpam = Number(targetRound - currentRound)
-
     const spammer = await this.algorand.account.random()
     await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
 

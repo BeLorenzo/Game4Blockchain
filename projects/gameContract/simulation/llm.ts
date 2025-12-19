@@ -56,12 +56,6 @@ export async function askLLM(prompt: string, model: string, options?: { temperat
     return validated;
 
   } catch (error) {
-    // Log ridotto per non intasare la console, mostra solo l'errore chiave
-    // console.error(`❌ Parse Error (${model}):`, error instanceof Error ? error.message : error);
-    
-    // FALLBACK SILENZIOSO
-    // Invece di crashare, restituisci un'azione di default (es. Lepre/Difesa)
-    // Questo permette alla simulazione di andare avanti.
     return {
       choice: 0, // Default safe action
       reasoning: "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",

@@ -5,7 +5,7 @@ import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { GuessGameClient, GuessGameFactory } from '../../smart_contracts/artifacts/guessGame/GuessGameClient'
-import { Agent, RoundContext } from '../Agent'
+import { Agent } from '../Agent'
 import { IGameAdapter } from './IGameAdapter'
 
 interface RoundSecret {
@@ -14,13 +14,12 @@ interface RoundSecret {
 }
 
 export class GuessGame implements IGameAdapter {
-  // Game history tracking
-  private roundHistory: { avg: number; target: number }[] = []
+  readonly name = 'GuessGame'
 
+  private roundHistory: { avg: number; target: number }[] = []
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: GuessGameFactory | null = null
   private appClient: GuessGameClient | null = null
-
   private participationAmount = AlgoAmount.Algos(10)
   private roundSecrets: Map<string, RoundSecret> = new Map()
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
@@ -31,7 +30,6 @@ export class GuessGame implements IGameAdapter {
     revealPhase: 10n,
   }
 
-  // --- 1. DEPLOY ---
   async deploy(admin: Agent): Promise<bigint> {
     this.factory = this.algorand.client.getTypedAppFactory(GuessGameFactory, {
       defaultSender: admin.account.addr,
@@ -46,11 +44,10 @@ export class GuessGame implements IGameAdapter {
     await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(5))
 
     this.appClient = appClient
-    console.log(`📜 GuessGame contract deployed. AppID: ${appClient.appId}`)
+    console.log(`${this.name} deployed. AppID: ${appClient.appId}`)
     return BigInt(appClient.appId)
   }
 
-  // --- 2. START SESSION ---
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
@@ -85,25 +82,17 @@ export class GuessGame implements IGameAdapter {
       signer: dealer.signer,
     })
 
-    console.log(`🎲 GuessGame session created! ID: ${result.return}. Start: ${startAt}`)
+    console.log(`Session ${result.return} created. Start: round ${startAt}`)
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  // --- 3. COMMIT PHASE ---
-  async play_Commit(agents: Agent[], sessionId: bigint): Promise<void> {
-    console.log(`\n--- PHASE 1: COMMIT (Guess 2/3 of Average) ---`)
-
-    // Prepare context with data-only approach (no prescriptive hints)
-    const marketSituation = this.prepareMarketSituation()
-
-    const context: RoundContext = {
-      gameRules: 'Choose integer 0-100. Target = 2/3 of average of all choices. Closest to target wins pot.',
-      marketSituation: marketSituation,
-    }
+  async play_Commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+    console.log(`\n--- PHASE 1: COMMIT ---`)
 
     for (const agent of agents) {
-      const decision = await agent.playRound('GuessGame', context)
+      const prompt = this.buildPromptForAgent(agent, roundNumber)
+      const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = Math.round(decision.choice)
       if (safeChoice < 0) safeChoice = 0
@@ -113,7 +102,6 @@ export class GuessGame implements IGameAdapter {
       this.roundSecrets.set(agent.account.addr.toString(), { choice: safeChoice, salt })
 
       const hash = this.getHash(safeChoice, salt)
-      console.log(`[${agent.name}] Committed choice (hash sent).`)
 
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
@@ -129,27 +117,99 @@ export class GuessGame implements IGameAdapter {
     }
   }
 
-  // --- PREPARE MARKET SITUATION (DATA-ONLY) ---
-  private prepareMarketSituation(): string {
+  private buildPromptForAgent(agent: Agent, roundNumber: number): string {
+    // 1. GAME RULES
+    const gameRules = `
+GAME: Guess 2/3 of the Average
+Choose an integer between 0 and 100.
+
+HOW IT WORKS:
+- All players submit a number (0-100)
+- Average is calculated across all choices
+- Target = 2/3 of that average
+- Winner = player closest to the target
+- Winner takes entire pot
+
+EXAMPLE:
+If choices are [30, 60, 90], average = 60, target = 40
+Player who chose 30 wins (closest to 40)
+`.trim()
+
+    // 2. CURRENT SITUATION
+    let situation = `
+CURRENT STATUS:
+Round: ${roundNumber}
+Entry fee: 10 ALGO
+`.trim()
+
     if (this.roundHistory.length === 0) {
-      return 'First round. No historical data available.'
+      situation += `\n\nFirst round - no historical data.`
+    } else {
+      const last = this.roundHistory[this.roundHistory.length - 1]
+      situation += `\n\nLast round results:
+Average was ${last.avg.toFixed(1)}
+Target was ${last.target.toFixed(1)}`
+
+      if (this.roundHistory.length >= 3) {
+        const recent = this.roundHistory.slice(-5)
+        const targets = recent.map((h) => h.target.toFixed(1)).join(' → ')
+        situation += `\n\nTarget trend (last ${recent.length} rounds): ${targets}`
+      }
     }
 
-    // Show raw data - AI must infer patterns
-    const last = this.roundHistory[this.roundHistory.length - 1]
-    let text = `Last round: Average was ${last.avg.toFixed(1)}, Target was ${last.target.toFixed(1)}.`
+    // 3. STRATEGIC HINT
+    const hint = `
+STRATEGIC CONSIDERATIONS:
+- Nash equilibrium (pure rational play) is 0
+- Most humans don't play Nash - they play higher
+- Game theory suggests convergence toward lower numbers over time
+- Pay attention to whether targets are rising or falling
+- Consider: Are players getting more sophisticated or staying naive?
+`.trim()
 
-    // Show historical sequence (last 3-5 rounds)
-    if (this.roundHistory.length >= 3) {
-      const lastTargets = this.roundHistory.slice(-5).map((h) => h.target.toFixed(1))
-      text += `\nTarget history (last ${lastTargets.length} rounds): ${lastTargets.join(' → ')}.`
-    }
+    // 4. AGENT'S DATA
+    const personality = agent.profile.personalityDescription
+    const parameters = agent.getProfileSummary()
+    const lessons = agent.getLessonsLearned(this.name)
+    const recentMoves = agent.getRecentHistory(this.name, 3)
+    const mentalState = agent.getMentalState()
 
-    return text
+    return `
+You are ${agent.name}.
+
+═══════════════════════════════════════════════════════════
+${gameRules}
+
+${situation}
+
+${hint}
+═══════════════════════════════════════════════════════════
+
+YOUR PERSONALITY:
+${personality}
+
+YOUR PARAMETERS:
+${parameters}
+
+═══════════════════════════════════════════════════════════
+
+${lessons}
+
+YOUR RECENT MOVES:
+${recentMoves}
+
+MENTAL STATE: ${mentalState}
+
+═══════════════════════════════════════════════════════════
+
+Based on the game mechanics, historical data, and your personality:
+Choose a number between 0 and 100.
+
+Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanation>"}
+`.trim()
   }
 
-  // --- 4. REVEAL PHASE ---
-  async play_Reveal(agents: Agent[], sessionId: bigint): Promise<void> {
+  async play_Reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -178,14 +238,18 @@ export class GuessGame implements IGameAdapter {
     )
   }
 
-  // --- 5. CLAIM PHASE (+ DATA COLLECTION) ---
-  async play_Claim(agents: Agent[], sessionId: bigint): Promise<void> {
+  async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
+    // GuessGame doesn't need explicit resolve - winner determined during claim
+    return
+  }
+
+  async play_Claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
-    console.log(`\n--- PHASE 3: CLAIM & DATA COLLECTION ---`)
+    console.log(`\n--- PHASE 3: CLAIM ---`)
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Collect data for next round analysis
+    // Collect data for next round
     const currentRoundChoices: number[] = []
     agents.forEach((agent) => {
       const secret = this.roundSecrets.get(agent.account.addr.toString())
@@ -198,7 +262,7 @@ export class GuessGame implements IGameAdapter {
       const target = avg * (2 / 3)
 
       this.roundHistory.push({ avg, target })
-      console.log(`📊 Round Stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`)
+      console.log(`📊 Round stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`)
     }
 
     // Process claims
@@ -223,18 +287,16 @@ export class GuessGame implements IGameAdapter {
         console.log(`${agent.name}: \x1b[32m${outcome} (${netProfitAlgo.toFixed(2)} ALGO)\x1b[0m`)
       } catch (e: any) {
         if (e.message && e.message.includes('assert failed')) {
-          console.log(`${agent.name}: \x1b[31mLOSS (No winnings)\x1b[0m`)
+          console.log(`${agent.name}: \x1b[31mLOSS\x1b[0m`)
         } else {
-          console.error(`❌ Unexpected error for ${agent.name}:`, e.message)
+          console.error(`${agent.name}: ERROR`)
         }
       }
 
-      const groupContext = outcome === 'WIN' ? 'WIN' : 'LOSS'
-      agent.finalizeRound('GuessGame', outcome, netProfitAlgo, groupContext, this.roundHistory.length)
+      agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber)
     }
   }
 
-  // --- UTILS ---
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -265,9 +327,5 @@ export class GuessGame implements IGameAdapter {
         note: `spam-${i}-${Date.now()}`,
       })
     }
-  }
-
-  async resolve(dealer: Agent, sessionId: bigint): Promise<void> {
-    return
   }
 }
