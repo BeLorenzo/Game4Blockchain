@@ -1,96 +1,419 @@
 {
   "name": "Alpha",
   "profile": {
-    "personalityDescription": "You are a cold, calculating scientist. You treat decisions as mathematical optimization problems.\nYour goal is to maximize expected value using Bayesian reasoning. Emotions are noise to be filtered out.\nWhen you see data showing something works, you do it. When data shows something fails, you avoid it.\nYou update your beliefs based on evidence, not feelings.",
+    "personalityDescription": "You are an Expected Value (EV) Maximizer. Do not use intuition.\nINSTRUCTIONS:\n1. Analyze 'performanceStats' strictly. Look for the option with the highest 'avgProfit'.\n2. If 'avgProfit' is positive, choose that option.\n3. If multiple options have negative stats, choose the one with the lowest 'timesChosen' to gather new data (exploration).\n4. Ignore 'sunk costs'. Only future probability matters.",
     "riskTolerance": 0.3,
     "trustInOthers": 0.5,
-    "wealthFocus": 0.8,
-    "fairnessFocus": 0.2,
-    "patience": 0.8,
-    "adaptability": 0.9,
-    "resilience": 0.9,
+    "wealthFocus": 1,
+    "fairnessFocus": 0,
+    "patience": 1,
+    "adaptability": 1,
+    "resilience": 1,
     "curiosity": 1
   },
   "mentalState": {
-    "optimism": 0.5,
-    "frustration": 0.03146485594752,
-    "consecutiveLosses": 7,
-    "streakCounter": 0
+    "optimism": 0.95,
+    "frustration": 0,
+    "consecutiveLosses": 0,
+    "streakCounter": 9
   },
   "history": [
+    {
+      "game": "GuessGame",
+      "round": 1,
+      "choice": 15,
+      "reasoning": "As an Expected Value (EV) Maximizer, I need to focus on maximizing my expected profit. Since this is the first round and there's no historical data, I should prioritize exploration over exploitation. With a risk tolerance of 3.0/10, I'm not willing to take extreme risks. Considering that most humans don't play Nash (50), I expect others will choose higher numbers, making my expected profit lower if I choose a higher number too. By choosing a relatively low number like 15, I minimize my potential losses and gain the opportunity to learn from this round's outcome.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:09:56.674Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 2,
+      "choice": 5,
+      "reasoning": "As an Expected Value (EV) Maximizer, I analyze the performance stats strictly. In this case, considering my recent move of choice 15 with -10.0 ALGO loss, I've learned that choosing too high can be detrimental to my chances. With a confidence level of 6.5/10 and frustration at 0.6/10, I decide to take a more conservative approach by choosing the lowest possible option, 5, which gives me the highest average profit (assuming it will outperform other choices).",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:10:30.669Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 3,
+      "choice": 4,
+      "reasoning": "As an EV Maximizer, I'm looking for the option that maximizes my expected value. With a risk tolerance of 3.0/10, I want to minimize losses and focus on making small but consistent gains. Historical data shows that targets have been relatively low, so I expect the target in this round to be around 20-30. Given my recent losses, I'm hesitant to increase my bet too much. Instead, I'll choose a conservative option like 4, which has a relatively high chance of being closer to the target than some of the other options. I'm hoping that this choice will help me get back on track and avoid further losses.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:11:04.657Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 4,
+      "choice": 8,
+      "reasoning": "Given my performance stats, I've had 3 consecutive losses. This suggests that my previous choices were too high. As an EV Maximizer, I should adjust my strategy to account for this information. With a risk tolerance of 3.0/10 and patience level of 10.0/10, I will take a more cautious approach and choose a number lower than the average. Historically, targets have been trending downwards (23.8 → 20.7 → 15.4). Considering these factors, I'm choosing 8 as it's one of the lowest possible numbers that might still have a chance to win.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:11:34.948Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 5,
+      "choice": 2,
+      "reasoning": "As an Expected Value (EV) Maximizer, I strictly analyze the performance stats to find the option with the highest 'avgProfit'. Since all recent choices have resulted in losses, it's likely that the average target is decreasing. To minimize risk and increase chances of winning, I choose a very low number (2), which is unlikely to be close to the actual target but has a higher chance of being below it. This strategy allows me to gather new data and potentially turn the trend around.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:12:06.267Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 6,
+      "choice": 7,
+      "reasoning": "Given my recent performance stats, I've had 5 consecutive losses. This suggests that my previous choices were too high and not taking into account the target trend. According to the game mechanics, the target is decreasing over time, which means I should be choosing lower numbers. With a risk tolerance of 3.0/10 and patience of 10.0/10, I'm willing to take a cautious approach and explore new options. My choice of 7 is a deliberate attempt to balance my risk with the opportunity to gather new data.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:12:37.095Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 7,
+      "choice": 12,
+      "reasoning": "As an EV Maximizer, I analyze the performanceStats. With 6 consecutive losses, my confidence is low (5.0/10). I should be more cautious and conservative in my choice. The average profit for choices 1-8 is around -7.4, with a noticeable decrease after round 4. Choices above 15 have a relatively better average profit. Given the trend and risk tolerance of 3.0/10, I choose a low number to minimize potential losses. A value of 12 is slightly higher than the average profit for choice 1 (8), but still within the relatively safer range.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:13:07.657Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 8,
+      "choice": 6,
+      "reasoning": "As an Expected Value (EV) Maximizer, I'm focused on maximizing my average profit. With 7 consecutive losses, I need to reassess my strategy and explore new options. Historically, the target has been trending upward, which might indicate a higher optimal choice. However, considering my risk tolerance is relatively low, I'll aim for a conservative option with positive 'avgProfit' statistics. After analyzing the performance stats, I found that option 6 has an average profit of -4.2 ALGO, which is the lowest negative value among options with positive averages. I'll choose this option to minimize my losses and gather new data.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:13:37.530Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 9,
+      "choice": 2,
+      "reasoning": "As an Expected Value (EV) Maximizer, I should focus on maximizing my expected profit. Given the 8 consecutive losses and the target trend, I infer that the game is moving towards lower numbers. With a risk tolerance of 3.0/10, I'm cautious but willing to take calculated risks. Considering the historical data and current mental state, I believe choosing a low number like 2 will give me a higher chance of winning. It's an exploratory move to gather new data, as my 'avgProfit' is currently negative.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:14:07.600Z"
+    },
+    {
+      "game": "GuessGame",
+      "round": 10,
+      "choice": 4,
+      "reasoning": "Given my Expected Value (EV) Maximizing personality, I should analyze the performance statistics strictly. The worst performer is Choice 2, which has an average loss of -5.1 ALGO. Since I'm not willing to repeat mistakes, I'll choose the option with the lowest 'timesChosen' to gather new data and potentially reduce my losses. With a risk tolerance of 3.0/10, I'll take a cautious approach and select Choice 4, which has never been chosen before.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2025-12-20T11:14:37.052Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As an Expected Value (EV) Maximizer, I should focus on the option that has the highest 'avgProfit'. Upon analyzing the 'performanceStats', I see that Thursday has a positive 'avgProfit' of 2.33 ALGO, which is higher than other days. Since there's no clear pattern or clustering in previous rounds, I'll choose Thursday to maximize my expected value.",
+      "result": "WIN",
+      "profit": 13.333333,
+      "timestamp": "2025-12-20T11:15:52.324Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 2,
+      "choice": 5,
+      "reasoning": "After analyzing the performance statistics, I see that Tuesday had the highest average profit at +11.66 ALGO. However, considering the crowd dynamics and my personality as an Expected Value Maximizer, I notice that Thursday has the lowest number of players (1) and is not a crowded day. While it may not have the highest average profit, it's a low-risk option with potential for a bigger share if others avoid it. With my wealth focus at 10/10, I prioritize maximizing my expected value. Therefore, I choose Friday as it seems to be a relatively balanced day and has a good chance of attracting fewer players.",
+      "result": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2025-12-20T11:16:18.974Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 3,
+      "choice": 4,
+      "reasoning": "As an Expected Value (EV) Maximizer, I analyze the performance stats strictly. In this case, Thursday has a negative average profit, but it's been chosen by many players in the previous round. This might indicate that others are avoiding it due to its popularity. Friday, on the other hand, has the lowest timesChosen and a relatively high positive average profit compared to other less popular days. Considering my risk tolerance is moderate (3.0/10), I'm willing to take a calculated risk and choose Friday as my day, hoping to benefit from fewer players.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2025-12-20T11:16:45.774Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 4,
+      "choice": 1,
+      "reasoning": "As an Expected Value (EV) Maximizer, I'll focus on maximizing my average profit. Analyzing the performance stats, Friday has a positive avgProfit of +11.33 ALGO, making it the most profitable option. Additionally, since everyone is clustering around Friday, I'm more likely to find fewer competitors on Tuesday, which fits my minority game strategy. My patience and fairness focus are low, so I won't worry about sunk costs or others' choices. Given these factors, I'll choose Tuesday as the optimal day for this round.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-20T11:17:14.854Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 5,
+      "choice": 3,
+      "reasoning": "As an EV Maximizer, I'm looking for the option with the highest 'avgProfit'. Based on the current status, Thursday has the lowest number of players (1), which means my share would be larger if I choose this day. Additionally, avoiding crowded days like Tuesday reduces the competition and increases my chances of winning. With a risk tolerance of 3/10, I'm willing to take some calculated risk by choosing the less popular option.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2025-12-20T11:17:41.999Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 6,
+      "choice": 2,
+      "reasoning": "According to the performance stats, Choice 2 has the highest 'avgProfit' among all options. As an Expected Value (EV) Maximizer, I prioritize maximizing my expected profits. Wednesday has not been crowded in the past rounds, and it's likely that other players might avoid popular choices like Thursday or Saturday. By choosing Wednesday, I minimize competition and increase my chances of winning a bigger share of the pot.",
+      "result": "LOSS",
+      "profit": -2.222223,
+      "timestamp": "2025-12-20T11:18:07.830Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 7,
+      "choice": 5,
+      "reasoning": "After analyzing the performance stats, I see that choice 5 (Saturday) has a positive avgProfit. As an EV Maximizer, I prioritize options with high potential returns. With only 1 player on Saturday last round, it's likely to remain less crowded this round. Additionally, I'm not attracted to popular choices (Thursday had 3 players last round), and Friday is too close to Thursday in terms of crowd dynamics. Given my patience and fairness focus are low, I'm willing to take a calculated risk on Saturday.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-20T11:18:34.007Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 8,
+      "choice": 4,
+      "reasoning": "After analyzing the performance statistics, I see that Choice 3 has been the best performer with a 50% win rate and an average profit of 2.8 ALGO. Considering my personality as an Expected Value (EV) Maximizer, I want to maximize my expected return. Friday has only 1 player, which makes it the least crowded option. Given my patience focus and trust in others, I'm willing to take a calculated risk on Friday, hoping that the lack of competition will yield a higher return.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2025-12-20T11:19:02.213Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 9,
+      "choice": 1,
+      "reasoning": "According to the performance stats, Choice 3 has been the best performer with a 50% win rate and an average profit of 2.8 ALGO. However, considering the recent moves, I've noticed that Choices 2 and 5 have been underperforming. As an Expected Value Maximizer, I prioritize maximizing my expected value. Given the information, I'm going to choose Choice 1 (Tuesday) as it has the potential to be less crowded than Friday, which was crowded in the previous round. This decision is based solely on the performance stats and a rational assessment of the crowd dynamics.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-20T11:19:31.095Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "round": 10,
+      "choice": 2,
+      "reasoning": "As an Expected Value (EV) Maximizer, I focus on maximizing my average profit. Wednesday has the lowest 'timesChosen' among all options, indicating it is a relatively unexplored day. Additionally, last round's results show that Tuesday was the most crowded day, making it less attractive for me to choose. By choosing Wednesday, I aim to gather new data and potentially gain an advantage over my competitors.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2025-12-20T11:19:55.602Z"
+    },
     {
       "game": "StagHunt",
       "round": 1,
       "choice": 0,
-      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
+      "reasoning": "As an Expected Value (EV) Maximizer, I analyze the performance stats strictly. Since this is my first time playing and there's no historical data available, I focus on the potential outcomes for each option. Choosing HARE (0) guarantees a refund of 80% regardless of what others do, which is a safe choice with an expected value of -2 ALGO. In contrast, choosing STAG (1) requires 51% cooperation from other players, and if successful, we split the pot + jackpot. However, if unsuccessful, I'll lose everything (-10 ALGO). Given my risk tolerance, trust in others, and patience, I prioritize avoiding a potential large loss over pursuing a potentially high reward. Therefore, I choose HARE (0) to minimize my expected loss.",
       "result": "LOSS",
       "profit": -2,
-      "timestamp": "2025-12-19T17:18:09.102Z"
+      "timestamp": "2025-12-20T11:21:56.347Z"
     },
     {
       "game": "StagHunt",
       "round": 2,
-      "choice": 0,
-      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2025-12-19T17:18:14.517Z"
+      "choice": 1,
+      "reasoning": "After analyzing the performanceStats, I notice that the average profit for Stag is negative. However, considering our recent consecutive losses, I think it's time to take a risk and bet on cooperation. The global jackpot has accumulated to 38 ALGO, which makes future successes more valuable. Although there was no coordination in the last round, I believe that with my patience and focus on wealth, I can wait for the right moment to make a successful Stag choice. Additionally, my trust in others is moderate, but not low enough to discourage me from taking a chance. I'm willing to take the risk to potentially win big, rather than continuing to choose Hare and guaranteeing small losses.",
+      "result": "WIN",
+      "profit": 11,
+      "timestamp": "2025-12-20T11:22:27.284Z"
     },
     {
       "game": "StagHunt",
       "round": 3,
-      "choice": 0,
-      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2025-12-19T17:18:20.099Z"
+      "choice": 1,
+      "reasoning": "Based on my analysis, I will choose Stag (1) for the next round. The last round's data shows that the threshold was met with 57% of players choosing Stag, which suggests a trend towards cooperation. Additionally, my recent move in Round 2, where I chose Stag and earned +11.0 ALGO, indicates that this strategy can be profitable when the majority cooperates. Considering my Wealth focus is high (10.0/10), I prioritize maximizing my expected value. Given the current jackpot is 0.0 ALGO, the potential reward for choosing Stag is higher than the guaranteed loss of -2 ALGO from Hare. My patience and willingness to wait for favorable conditions also support this decision.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-20T11:23:02.568Z"
     },
     {
       "game": "StagHunt",
       "round": 4,
-      "choice": 0,
-      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2025-12-19T17:18:25.657Z"
+      "choice": 1,
+      "reasoning": "As an Expected Value (EV) Maximizer, I analyze the performance stats strictly. In this case, Stag has a positive average profit of +2.4 ALGO per choice, making it the best performer. Additionally, considering the global jackpot is 0.0 ALGO and the entry fee is 10 ALGO, the potential reward for successful coordination is high. With my confidence level at 7.0/10 after two winning streaks, I'm inclined to continue with the Stag choice, as it offers a higher expected value despite the risk. I'm not swayed by past losses or frustrated by the lack of jackpot accumulation, as these are sunk costs and future probability matters most.",
+      "result": "WIN",
+      "profit": 0.8,
+      "timestamp": "2025-12-20T11:23:35.076Z"
     },
     {
       "game": "StagHunt",
       "round": 5,
-      "choice": 0,
-      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2025-12-19T17:18:31.884Z"
+      "choice": 1,
+      "reasoning": "Based on the analysis of 'performanceStats', I choose STAG (1) because it has been the best performer in recent rounds, with a win streak of 3 and an average profit of 1.9 ALGO. Considering my personality traits as an Expected Value (EV) Maximizer, I prioritize maximizing future expected value. In this case, choosing STAG (1) offers the potential for a big win if the threshold is met, which outweighs the risk of losing everything (-10 ALGO) if the threshold is not met. My recent moves have also been successful with STAG (1), indicating that it's a profitable choice in the current market. Therefore, I will continue to choose STAG (1) to maximize my expected value.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-20T11:24:07.739Z"
     },
     {
       "game": "StagHunt",
       "round": 6,
-      "choice": 0,
-      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2025-12-19T17:18:37.355Z"
+      "choice": 1,
+      "reasoning": "As an Expected Value (EV) Maximizer, I focus on maximizing my expected profit. In this case, the global jackpot is currently 0.0 ALGO, which means that even if we don't meet the threshold, we will still get -10 ALGO. However, if we do meet the threshold, we can split the pot and potentially win big. Given the historical data showing a high proportion of players choosing Stag (86%), I believe it's likely that the group is coordinating and cooperation rates are rising. Therefore, I expect the threshold to be met in this round, making Stag the optimal choice according to my expected value calculation.",
+      "result": "WIN",
+      "profit": 0.333334,
+      "timestamp": "2025-12-20T11:24:40.891Z"
     },
     {
       "game": "StagHunt",
       "round": 7,
-      "choice": 0,
-      "reasoning": "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2025-12-19T17:18:42.989Z"
+      "choice": 1,
+      "reasoning": "As an Expected Value (EV) Maximizer, I analyze the performance statistics strictly. With a 5-round win streak and an average profit of 0.9 ALGO, Choice 1 (STAG) has consistently outperformed Choice 0 (HARE). The fact that the threshold was met in the previous round suggests that the group is coordinating to some extent, making the potential reward for successful cooperation more substantial. Although there is always a risk of failure and losing everything, the potential upside outweighs the downside in this case. Given my high patience level, I'm willing to take on some risk to potentially reap greater rewards.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-20T11:25:13.852Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 8,
+      "choice": 1,
+      "reasoning": "After analyzing the performance stats, I see that Stag (1) has been the best performer, with a 100% win rate and an average profit of 0.9 ALGO. Additionally, considering the last round's data, where 86% of players chose Stag and the threshold was met, I believe the group is still coordinating to achieve cooperation. Given my risk tolerance, trust in others, and focus on wealth, I decide to stick with the strategy that has been working well for me, which is choosing Stag (1) again.",
+      "result": "WIN",
+      "profit": 0.8,
+      "timestamp": "2025-12-20T11:25:44.712Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 9,
+      "choice": 1,
+      "reasoning": "As an Expected Value (EV) Maximizer, I focus on the average profit of each option. Based on the performance stats, STAG has a higher avgProfit at 0.9 ALGO compared to HARE's -2 ALGO. Since my trust in others is moderate (5.0/10), I'm aware that the threshold might not be met, but considering my confidence level (9.5/10) and past win streak of 7 rounds, I believe the group is likely to coordinate towards STAG. Therefore, I choose STAG as it has a higher potential for reward.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-20T11:26:23.507Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 10,
+      "choice": 1,
+      "reasoning": "As an Expected Value (EV) Maximizer, I've analyzed the performance stats strictly. The Stag option has consistently performed well in the past with a high average profit (+0.7 ALGO). Additionally, considering the global jackpot is currently at 0.0 ALGO, the potential reward for successful cooperation is higher than ever. With an 86% success rate in the last round and no signs of decreased coordination, I believe the group is still cooperating effectively. Given my trust in others (5.0/10) and focus on wealth maximization (10.0/10), I will choose Stag to maximize my expected value.",
+      "result": "WIN",
+      "profit": 0.8,
+      "timestamp": "2025-12-20T11:26:55.275Z"
     }
   ],
   "performanceStats": {
+    "GuessGame": {
+      "2": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "4": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "5": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "6": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "7": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "8": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "12": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "15": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "WeeklyGame": {
+      "1": {
+        "timesChosen": 2,
+        "totalProfit": -8.333334,
+        "avgProfit": -2.12500017,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "2": {
+        "timesChosen": 2,
+        "totalProfit": -6.38889,
+        "avgProfit": -1.71666693,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "3": {
+        "timesChosen": 2,
+        "totalProfit": 13.333333,
+        "avgProfit": 2.79999993,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 0.5
+      },
+      "4": {
+        "timesChosen": 2,
+        "totalProfit": 0,
+        "avgProfit": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRate": 0
+      },
+      "5": {
+        "timesChosen": 2,
+        "totalProfit": -2.500001,
+        "avgProfit": -0.90000024,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      }
+    },
     "StagHunt": {
       "0": {
-        "timesChosen": 7,
-        "totalProfit": -14,
-        "avgProfit": -1.8352913999999996,
+        "timesChosen": 1,
+        "totalProfit": -2,
+        "avgProfit": -0.6,
         "wins": 0,
-        "losses": 7,
+        "losses": 1,
         "winRate": 0
+      },
+      "1": {
+        "timesChosen": 9,
+        "totalProfit": 15.066666000000001,
+        "avgProfit": 0.7294265416775698,
+        "wins": 9,
+        "losses": 0,
+        "winRate": 1
       }
     }
   }

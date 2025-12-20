@@ -95,12 +95,19 @@ export class GuessGame implements IGameAdapter {
       const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = Math.round(decision.choice)
-      if (safeChoice < 0) safeChoice = 0
-      if (safeChoice > 100) safeChoice = 100
+      if (safeChoice < 0 || safeChoice > 100) {
+        console.warn(
+          `[${agent.name}] ⚠️ Invalid choice ${safeChoice}. ` +
+            `Valid range is 0-100. Clamping to ${Math.max(0, Math.min(100, safeChoice))}`,
+        )
+      }
+      safeChoice = Math.max(0, Math.min(100, safeChoice))
 
       const salt = crypto.randomBytes(16).toString('hex')
-      this.roundSecrets.set(agent.account.addr.toString(), { choice: safeChoice, salt })
-
+      this.roundSecrets.set(agent.account.addr.toString(), {
+        choice: safeChoice,
+        salt,
+      })
       const hash = this.getHash(safeChoice, salt)
 
       const payment = await this.algorand.createTransaction.payment({
@@ -121,10 +128,13 @@ export class GuessGame implements IGameAdapter {
     // 1. GAME RULES
     const gameRules = `
 GAME: Guess 2/3 of the Average
-Choose an integer between 0 and 100.
+⚠️⚠️⚠️ CRITICAL RULE ⚠️⚠️⚠️
+You MUST choose an integer between 0 and 100 (inclusive).
+Any number outside this range will be AUTOMATICALLY CHANGED to 100.
+Do NOT choose numbers above 100 - they will not work as you expect!
 
 HOW IT WORKS:
-- All players submit a number (0-100)
+- All players submit a number (0-100). Not lower. Not higher
 - Average is calculated across all choices
 - Target = 2/3 of that average
 - Winner = player closest to the target
@@ -165,6 +175,7 @@ STRATEGIC CONSIDERATIONS:
 - Game theory suggests convergence toward lower numbers over time
 - Pay attention to whether targets are rising or falling
 - Consider: Are players getting more sophisticated or staying naive?
+- It's impossible that the target is over 100
 `.trim()
 
     // 4. AGENT'S DATA
