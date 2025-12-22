@@ -27,29 +27,49 @@ Handles low-level infrastructure complexity:
 
 Inherit from the parent and focus only on game logic:
 
-- **RockPaperScissors**: Implements 2-player winning logic and instant payment
-- **WeeklyGame**: Extends logic for N-players and handles lottery-style prize pool accumulation
+- **RockPaperScissors**: 2-player game with instant winner determination and timeout victory
+- **WeeklyGame**: Multi-player lottery where players choose days of the week (minority game)
+- **StagHunt**: Cooperation game with threshold mechanics and global jackpot accumulation
+- **GuessGame**: Classic "Guess 2/3 of the Average" - game theory with Nash equilibrium
 
 ```mermaid
 classDiagram
     class GameContract {
-        <<Abstract>>
-    }
-
-    class ConcreteGame {
-        <<Interface>>
+        <>
+        +create() uint64
+        +join() void
+        +reveal() void
+        +getRequiredMBR() uint64
+        #getPlayerKey() bytes
+        #getSessionBalance() uint64
     }
 
     class RockPaperScissors {
         - 2 players
         - Instant payout
         - Rock/Paper/Scissors
+        - Timeout victory
     }
 
     class WeeklyGame {
+        - N players
         - 7 days lottery
-        - Multiple players
         - Pull-based claims
+        - Minority game
+    }
+
+    class StagHunt {
+        - Cooperation threshold
+        - Global jackpot
+        - Dynamic admin rules
+        - Hare safety net
+    }
+
+    class GuessGame {
+        - Guess 2/3 average
+        - Nash equilibrium
+        - Strategic depth
+        - Frequency tracking
     }
 
     class YourCustomGame {
@@ -57,31 +77,39 @@ classDiagram
         - Your logic here
     }
 
-    GameContract <|-- ConcreteGame
-    ConcreteGame <|-- RockPaperScissors
-    ConcreteGame <|-- WeeklyGame
-    ConcreteGame <|-- YourCustomGame
+    GameContract <|-- RockPaperScissors
+    GameContract <|-- WeeklyGame
+    GameContract <|-- StagHunt
+    GameContract <|-- GuessGame
+    GameContract <|-- YourCustomGame
 
     note for GameContract "Core Framework\nCommit-Reveal Security\nTimeline Management\nMBR Handling"
-    note for ConcreteGame "Implement your game logic\nExtend with custom data structures\nOverride prize distribution"
 ```
 
 ## 📁 Project Structure
 
 ```
 smart_contracts/
-    ├── index.ts           # Deploy Orchestrator (entry point)
+    ├── index.ts                      # Deploy orchestrator (entry point)
     ├── abstract_contract/
-    │   └── contract.algo.ts       # Abstract Smart Contract Logic
+    │   └── contract.algo.ts          # Abstract Smart Contract Logic
     ├── RockPaperScissors/
-    │   ├── contract.algo.ts       # Smart Contract Logic
-    │   ├── deploy-config.ts       # Configuration
-    │   └── contract.spec.ts       # Tests
+    │   ├── contract.algo.ts          # Smart Contract
+    │   ├── deploy-config.ts          # Configuration
+    │   └── contract.e2e.spec.ts      # Tests
     ├── weeklyGame/
-    │   ├── contract.algo.ts       # Smart Contract Logic
-    │   ├── deploy-config.ts       # Configuration
-    │   └── contract.spec.ts       # Tests
-    └── artifacts/             # Auto-generated during compilation
+    │   ├── contract.algo.ts
+    │   ├── deploy-config.ts
+    │   └── contract.e2e.spec.ts
+    ├── stagHunt/
+    │   ├── contract.algo.ts
+    │   ├── deploy-config.ts
+    │   └── contract.e2e.spec.ts
+    ├── guessGame/
+    │   ├── contract.algo.ts
+    │   ├── deploy-config.ts
+    │   └── contract.e2e.spec.ts
+    └── artifacts/                    # Auto-generated during compilation
 ```
 ## 💻 Development Commands
 
@@ -92,7 +120,8 @@ Since prerequisites are handled in the root README, here are the specific comman
 To ensure logic integrity:
 
 ```bash
-npm test
+npm test                              # All tests
+npm test -- stagHunt                  # Specific game
 ```
 
 ## Compiling Atrifacts
@@ -103,8 +132,7 @@ If you modify the contracts, regenerate the TEAL and Clients:
 npm run build
 ```
 
-**Note**: The artifacts/ folder is automatically generated.
-> It contains TEAL files and typed TypeScript clients for interacting with contracts.
+**Note**: The artifacts/ folder is automatically generated and contains TEAL files and typed TypeScript clients for interacting with contracts.
 
 ## 💻 Usage Examples
 
@@ -150,27 +178,104 @@ await appClient.revealMove({
 })
 ```
 
-## 🎮 Example implementation
+## 🎮 Implemented Games
 
 ### 🪨 RockPaperScissors
 
-Classic 2-player game with instant winner determination and prize distribution.
+Classic 2-player game with instant winner determination.
 
 **Features:**
-
 - 2-player maximum per session
 - Instant prize distribution after both reveals
-- Three possible outcomes: win/lose/tie
+- Three outcomes: win/lose/tie
+- Timeout victory mechanism
+
+**Game Flow:**
+1. Two players commit (Rock=0, Paper=1, Scissors=2)
+2. After commit deadline, both reveal
+3. Contract determines winner immediately
+4. Winner receives full pot (or 50/50 split on tie)
+5. Timeout victory available if opponent doesn't reveal
 
 ### 📅 WeeklyGame
 
-Multi-player lottery-style game where players choose days of the week.
+Multi-player lottery where players choose days of the week.
 
 **Features:**
-
 - Unlimited players per session
 - Prize pool distributed across active days
-- Pull-based prize claiming system
+- Pull-based prize claiming
+- Minority game mechanics
+
+**Strategy:** Fewer competitors on your day = bigger share
+
+**Example:**
+```
+7 players, 70 ALGO pot
+- Monday: 3 players
+- Tuesday: 2 players  
+- Wednesday: 2 players
+
+3 active days → 23.33 ALGO per day
+Tuesday players: 23.33 / 2 = 11.66 ALGO each (BEST!)
+```
+
+### 🦌 StagHunt
+
+Cooperation game with threshold mechanics inspired by game theory's assurance game.
+
+**Features:**
+- Dynamic cooperation threshold (default 51%)
+- Global jackpot accumulation
+- Safety net for risk-averse players
+- Admin-configurable rules
+
+**Two Choices:**
+
+1. **HARE (0)**: Safe choice
+   - Always get 80% refund
+   - Guaranteed small loss: -20% ALGO
+
+2. **STAG (1)**: Risky cooperation
+   - Need threshold % of players to also choose Stag
+   - If threshold MET: Split pot + jackpot (BIG WIN)
+   - If threshold MISSED: Lose everything
+
+**Example:**
+```
+4 players, 40 ALGO pot, threshold 51%
+Choices: 3 Stags, 1 Hare
+
+Cooperation: 75% ≥ 51% → SUCCESS!
+
+Payouts:
+- Hare: 8 ALGO refund
+- Each Stag: ~10.66 ALGO + jackpot share
+```
+
+### 🎯 GuessGame
+
+"Guess 2/3 of the Average" - classic game theory experiment.
+
+**Mechanics:**
+1. Players choose a number (0-100)
+2. Average calculated
+3. Target = 2/3 × Average
+4. Closest to target wins
+
+**Strategy:**
+- **Nash Equilibrium**: 0
+- **Reality**: Most play 15-40 range
+- Game theory depth testing
+
+**Example:**
+```
+Players: [0, 33, 50, 67, 100]
+Average: 50
+Target: 33
+
+Winner: Player who chose 33
+```
 
 ## 🛠️ Extending the Framework
 
@@ -208,3 +313,5 @@ export class YourGame extends GameContract {
 - **Anti-Replay**: Player data cleanup after prize distribution
 - **Timeline Enforcement**: Strict phase-based access control
 - **MBR Management**: Precise storage cost calculation and handling
+- **Hash Verification**: SHA256 integrity
+- **Timeout Protection**: Anti-griefing

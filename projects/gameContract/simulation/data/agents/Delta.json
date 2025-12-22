@@ -15,7 +15,7 @@
     "optimism": 0.95,
     "frustration": 0,
     "consecutiveLosses": 0,
-    "streakCounter": 8
+    "streakCounter": 10
   },
   "history": [
     {
@@ -287,6 +287,24 @@
       "result": "WIN",
       "profit": 0.8,
       "timestamp": "2025-12-20T11:26:55.347Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Tit-for-Tat player, I reflect the group's behavior back at them. Since we're in the first round and there is no historical data available, I don't have any information to base my decision on. However, considering my personality traits and past experience, I choose Stag (1) because it aligns with my fairness focus and patience. I'm willing to take a small risk to potentially gain a big reward if others cooperate. Since there's no history of cooperation or betrayal, I'm not punishing anyone for past behavior. My goal is to teach the group that hurting me has immediate consequences, but in this case, I'm giving them the benefit of the doubt and choosing Stag.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:49:55.977Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Tit-for-Tat player, I reflect the group's behavior back at them. Since the previous round was a WIN (86% of players chose Stag), I will choose Stag again this round to maintain cooperation and encourage others to do the same.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:50:43.588Z"
     }
   ],
   "performanceStats": {
@@ -392,10 +410,10 @@
         "winRate": 0
       },
       "1": {
-        "timesChosen": 8,
-        "totalProfit": 4.066666000000001,
-        "avgProfit": 0.5391881086775698,
-        "wins": 8,
+        "timesChosen": 10,
+        "totalProfit": 4.733332,
+        "avgProfit": 0.43420200325200914,
+        "wins": 10,
         "losses": 0,
         "winRate": 1
       }

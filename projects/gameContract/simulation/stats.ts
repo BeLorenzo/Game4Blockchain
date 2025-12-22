@@ -55,7 +55,7 @@ const WEEKLY_ICONS: Record<number, string> = { 0: 'Lun', 1: 'Mar', 2: 'Mer', 3: 
 async function main() {
   let files = process.argv.slice(2)
   if (files.length === 0) {
-    const defaultDir = path.join(process.cwd(), 'data', 'agents')
+    const defaultDir = path.join(process.cwd(), 'simulation', 'data', 'agents')
     if (fs.existsSync(defaultDir)) {
       files = fs
         .readdirSync(defaultDir)
@@ -78,8 +78,6 @@ async function main() {
 
 // --- 2. TIMELINE CRONOLOGICA ---
 function printChronologicalTimeline(agents: AgentData[]) {
-  console.log(`\n${C}${B}🎞️  TIMELINE DELLE PARTITE (Sequenza Temporale)${R}`)
-
   const allGames = new Set<string>()
   agents.forEach((a) => a.history.forEach((h) => allGames.add(h.game)))
 

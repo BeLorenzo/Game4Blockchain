@@ -7,7 +7,7 @@ import { StagHuntGame } from './games/StagHuntGame'
 //import { GuessGame } from './games/GuessGame'
 
 // SIMULATION CONFIG
-const NUM_ROUNDS = 10
+const NUM_ROUNDS = 2
 const INITIAL_FUNDING = 100_000
 
 // GAME SELECTION

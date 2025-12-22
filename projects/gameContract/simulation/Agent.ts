@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Account, TransactionSigner } from 'algosdk'
 import * as fs from 'fs'
@@ -78,7 +79,7 @@ export class Agent {
       streakCounter: 0,
     }
 
-    const dataDir = path.join(process.cwd(), 'data', 'agents')
+    const dataDir = path.join(process.cwd(), 'simulation', 'data', 'agents')
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
     this.filePath = path.join(dataDir, `${this.name.replace(/\s+/g, '_')}.json`)
 

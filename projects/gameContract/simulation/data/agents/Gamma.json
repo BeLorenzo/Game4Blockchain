@@ -15,7 +15,7 @@
     "optimism": 0.95,
     "frustration": 0,
     "consecutiveLosses": 0,
-    "streakCounter": 9
+    "streakCounter": 11
   },
   "history": [
     {
@@ -287,6 +287,24 @@
       "result": "WIN",
       "profit": 0.8,
       "timestamp": "2025-12-20T11:26:55.333Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Volatility Hunter, I'm confident in my ability to capitalize on the current winning streak. With a 9-round win streak and an average profit of 0.6 ALGO per round, I feel that sticking with Choice 1 (STAG) is the best way to continue this momentum. Additionally, considering the current mental state of confidence at 9.5/10, I'm more likely to make bold moves that align with my strategic behavior. Given the potential for a big win, I'm willing to take on some risk and trust in my past performance stats to guide me.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:49:55.962Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Volatility Hunter, I'm confident in my previous streak of wins and the success of Choice 1. With 91% wins and an average gain of 0.5 ALGO, this choice has proven to be a reliable one. Moreover, since the group pattern suggests that 86% of players chose Stag last round, which met the threshold, I believe there's still potential for a big win if most players choose Stag again. Given my risk tolerance is high and my patience is low, I'm willing to take the risk and go with Choice 1 (Stag) again.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:50:43.572Z"
     }
   ],
   "performanceStats": {
@@ -416,12 +434,12 @@
     },
     "StagHunt": {
       "1": {
-        "timesChosen": 10,
-        "totalProfit": 5.066666000000001,
-        "avgProfit": 0.6083657206775699,
-        "wins": 9,
+        "timesChosen": 12,
+        "totalProfit": 5.733332,
+        "avgProfit": 0.4680990331320092,
+        "wins": 11,
         "losses": 1,
-        "winRate": 0.9
+        "winRate": 0.9166666666666666
       }
     }
   }

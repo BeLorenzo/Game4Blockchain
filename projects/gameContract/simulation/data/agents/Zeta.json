@@ -15,7 +15,7 @@
     "optimism": 0.95,
     "frustration": 0,
     "consecutiveLosses": 0,
-    "streakCounter": 8
+    "streakCounter": 10
   },
   "history": [
     {
@@ -287,6 +287,24 @@
       "result": "WIN",
       "profit": 0.8,
       "timestamp": "2025-12-20T11:26:55.390Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Trend Follower (Momentum Trader), I've consistently seen the 'Choice 1' strategy performing well. With an impressive win streak of 8 rounds and an average gain of +0.7 ALGO per round, it's clear that this trend is strong. Given my confidence in the market momentum, I choose to follow the crowd and go with Choice 1 (STAG) to continue riding this winning streak.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:49:56.009Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Trend Follower, I've been following the winning strategy for 9 rounds now. The performance stats show that Choice 1 has consistently delivered wins with an average return of 0.5 ALGO per round. Given my wealth focus and confidence in the current trend, I choose to stick with Choice 1 (STAG) and ride this momentum. The fact that the global jackpot is still at 0.0 ALGO doesn't worry me, as I believe the chances of a big win are higher if I continue to follow the winning strategy.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:50:43.620Z"
     }
   ],
   "performanceStats": {
@@ -400,10 +418,10 @@
         "winRate": 0
       },
       "1": {
-        "timesChosen": 8,
-        "totalProfit": 4.066666000000001,
-        "avgProfit": 0.5391881086775698,
-        "wins": 8,
+        "timesChosen": 10,
+        "totalProfit": 4.733332,
+        "avgProfit": 0.43420200325200914,
+        "wins": 10,
         "losses": 0,
         "winRate": 1
       }

@@ -15,7 +15,7 @@
     "optimism": 0.95,
     "frustration": 0,
     "consecutiveLosses": 0,
-    "streakCounter": 9
+    "streakCounter": 11
   },
   "history": [
     {
@@ -287,6 +287,24 @@
       "result": "WIN",
       "profit": 0.8,
       "timestamp": "2025-12-20T11:26:55.375Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Systemic Cooperator, I prioritize the global pot over my personal wallet. With my confidence level at 9.5/10 and no frustration, I'm inclined to take calculated risks to maximize the total sum of wealth for all players. Given that this is the first round with no historical data available, I'll assume a lack of coordination among players. However, my trust in others remains high at 10.0/10, which motivates me to choose Stag and potentially create a big win. The potential reward outweighs the risk, as there's no guarantee that Hare would result in a significant gain. With patience being one of my key traits, I'm willing to take this calculated risk to boost the global pot.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:49:55.993Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Systemic Cooperator, my priority is to maximize the total sum of wealth for all players. Given that the last round's threshold was met (86%), I believe the group is still coordinating and cooperation rates are rising. This increases the chances of meeting the threshold again in this round. Additionally, considering the global jackpot is currently at 0.0 ALGO, a successful stag hunt could lead to a significant increase in the total sum of wealth. My risk tolerance is moderate (6.0/10), but my trust in others is high (10.0/10). I'm confident that the group will continue to cooperate and meet the threshold again. Therefore, I choose Stag (1) to contribute to the global pot.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2025-12-22T09:50:43.604Z"
     }
   ],
   "performanceStats": {
@@ -400,12 +418,12 @@
     },
     "StagHunt": {
       "1": {
-        "timesChosen": 10,
-        "totalProfit": 5.066666000000001,
-        "avgProfit": 0.6083657206775699,
-        "wins": 9,
+        "timesChosen": 12,
+        "totalProfit": 5.733332,
+        "avgProfit": 0.4680990331320092,
+        "wins": 11,
         "losses": 1,
-        "winRate": 0.9
+        "winRate": 0.9166666666666666
       }
     }
   }

@@ -12,9 +12,9 @@
     "curiosity": 0
   },
   "mentalState": {
-    "optimism": 0.06999999999999942,
-    "frustration": 0.28182222459621264,
-    "consecutiveLosses": 12,
+    "optimism": 0.05,
+    "frustration": 0.3042760019229322,
+    "consecutiveLosses": 14,
     "streakCounter": 0
   },
   "history": [
@@ -287,6 +287,24 @@
       "result": "LOSS",
       "profit": -2,
       "timestamp": "2025-12-20T11:26:55.291Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As a Minimax Strategist, my primary goal is to avoid reaching 0 balance. Given the history of consecutive losses (12 times), I'm extremely cautious and risk-averse. The worst-case scenario for choosing Hare (0) is a guaranteed -2 ALGO loss, which is still better than risking a potential -10 ALGO loss with Stag (1). Additionally, my recent moves have consistently shown that the group's behavior is unpredictable, making it even more challenging to coordinate and achieve a successful Stag outcome. Therefore, I choose Hare (0) to minimize my losses and maintain a stable balance.",
+      "result": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-22T09:49:55.886Z"
+    },
+    {
+      "game": "StagHunt",
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As a Minimax Strategist, my goal is to avoid reaching 0 balance. Given the history of consecutive losses (13 times), I'm extremely cautious and risk-averse. The worst-case scenario for choosing Stag is losing everything (-10 ALGO), which would be devastating considering my current mental state. On the other hand, Hare guarantees a small loss (-2 ALGO), but it's a safe choice that won't put me in a worse position. I'll stick with Hare to minimize my potential losses and focus on preserving my wealth.",
+      "result": "LOSS",
+      "profit": -2,
+      "timestamp": "2025-12-22T09:50:43.556Z"
     }
   ],
   "performanceStats": {
@@ -400,11 +418,11 @@
     },
     "StagHunt": {
       "0": {
-        "timesChosen": 10,
-        "totalProfit": -20,
-        "avgProfit": -1.9435049501999995,
+        "timesChosen": 12,
+        "totalProfit": -24,
+        "avgProfit": -1.9723174255979998,
         "wins": 0,
-        "losses": 10,
+        "losses": 12,
         "winRate": 0
       }
     }
