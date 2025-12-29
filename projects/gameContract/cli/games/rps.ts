@@ -37,7 +37,6 @@ export const RPSGameModule: IGameModule = {
         suppressLog: true,
       });
 
-      // ✅ Initialize contract type immediately after deploy
       if (['create', 'replace'].includes(result.operationPerformed)) {
         console.log(chalk.yellow('📝 Initializing contract...'));
         
@@ -216,7 +215,6 @@ join: async (wallet: WalletManager) => {
         if (innerTxns.length === 0) {
             console.log(chalk.blue('ℹ️  You revealed first. Waiting for opponent...'));
         } else {
-            // Simple check: did we receive money?
             console.log(chalk.green('🎉 Game Finished! Check your wallet balance.'));
         }
     } catch (e: any) {

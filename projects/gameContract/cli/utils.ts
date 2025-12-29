@@ -5,11 +5,6 @@ import chalk from 'chalk';
 import { WalletManager } from './walletManager';
 
 /**
- * UTILS - Shared helper functions for all game modules.
- * Updated to support contract type validation with gameType.
- */
-
-/**
  * Validates that the contract at appId matches the expected game type.
  * Reads gameType from global state and compares.
  */
@@ -36,7 +31,7 @@ export async function validateContractType(
       return false;
     }
     
-    // Decode gameType value (it's stored as bytes)
+    // Decode gameType value 
     const actualType = Buffer.from(gameTypeEntry.value.bytes).toString('utf8');
     
     if (actualType !== expectedType) {
@@ -112,29 +107,18 @@ export function getRoundDiff(current: bigint, target: bigint): string {
 }
 
 /**
- * Centralized Error Handler.
- * Parses raw Algorand errors into human-readable messages.
+ * Error Handler.
+ * Just extracts the clean message and shows it.
  */
 export function handleAlgoError(e: any, context: string) {
-  const msg = e.message || JSON.stringify(e);
-
-  console.log(chalk.red(`\n❌ Error during ${context}:`));
-
-  if (msg.includes('overspend')) {
-    console.log(chalk.yellow('   -> Insufficient funds in wallet. You need more ALGOs.'));
-  } else if (msg.includes('Box') || msg.includes('404')) {
-    console.log(chalk.yellow('   -> Session Data not found. Check your Session ID.'));
-  } else if (msg.includes('phase')) {
-    console.log(chalk.yellow('   -> Temporal error. You are late or early for this phase'));  
-  } else if (msg.includes('already')) {
-    console.log(chalk.yellow('   -> Double play is not permitted')); 
-  } else if (msg.includes('hash')) {
-    console.log(chalk.yellow('   -> Hash mismatch. Salt or move not valid')); 
-  } else if (msg.includes('Game is over')) {
-    console.log(chalk.yellow('   -> Game is over')); 
-  } else if (msg.includes('not initialized')) {
-    console.log(chalk.yellow('   -> Contract not initialized. Call initialize() after deploy.'));
-  } else {
-    console.log(chalk.gray(msg));
-  }
+  // Get error message
+  const msg = e.message || String(e);
+  
+  // Try to extract just the assert message (most common case)
+  const match = msg.match(/assert failed[^:]*:\s*(.+?)(?:\n|$)/i);
+  const cleanMsg = match ? match[1].trim() : msg.split('\n')[0];
+  
+  // Show it
+  console.log(chalk.red(`\n❌ ${context} failed:`));
+  console.log(chalk.yellow(`   ${cleanMsg}\n`));
 }

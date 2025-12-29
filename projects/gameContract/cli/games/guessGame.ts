@@ -337,7 +337,6 @@ export const GuessGameModule: IGameModule = {
         console.log('');
       }
 
-      // Add claim option
       const { wantToClaim } = await inquirer.prompt([
         {
           type: 'confirm',

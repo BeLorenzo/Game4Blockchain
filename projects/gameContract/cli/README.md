@@ -38,7 +38,7 @@ If not already active:
 algokit localnet start
 ```
 
-### 3. Launch the Game
+### 3. Launch the CLI
 
 From the `projects/gameContract` folder:
 
@@ -55,7 +55,7 @@ If it's your first time playing, the contract doesn't exist on the network yet.
 1. Select **`🚀 Deploy New Contract`**
 2. **Copy the APP ID** that appears on screen (e.g., `1005`). You'll need it for all subsequent phases
 
-### Phase 1: Create Game
+### Phase 1: Create Session
 
 Use this option to open a new game table.
 
@@ -80,7 +80,7 @@ After the commit phase ends:
 2. Enter the required data (Session ID, Move, Salt)
 3. The contract will verify your move
 
-### Phase 4: Status (Dashboard)
+### Phase 4: Check Status / Claim Prizes
 
 View all active sessions and their status:
 
@@ -90,62 +90,120 @@ View all active sessions and their status:
    - Players
    - Remaining rounds
    - Prize pool
+3. Option to claim prizes from finished games
 
 ---
 
-## 🎯 Currently Supported Games
+## 🎯 Available Games
 
-### ✅ RockPaperScissors (RPS)
+All games are fully functional with complete CLI integration!
 
-**Fully functional CLI implementation**
+### 🪨 Rock Paper Scissors
 
-- Deploy new contracts
-- Create game sessions
-- Join as Player 1 or Player 2
-- Reveal moves
-- Claim timeout victories
-- View game status and history
+**Classic 2-player game with instant winner determination**
 
-**Available Commands:**
+**Rules:**
+- 2 players maximum
+- Rock (0) beats Scissors (2)
+- Paper (1) beats Rock (0)
+- Scissors (2) beats Paper (1)
+- Tie splits the pot
+
+**Example:**
 ```bash
-Deploy Contract   → Deploys RPS smart contract
-Create Session    → Opens new game table
-Join Game         → Commit your move (Rock/Paper/Scissors)
-Reveal Move       → Show your move after commit phase
-Claim Timeout     → Win by default if opponent doesn't reveal
-Status Dashboard  → View all active games
-```
+# Terminal 1 (Player 1)
+> Deploy Contract → APP ID: 1005
+> Create Session → SESSION: 0, Fee: 1 ALGO
+> Join Game → Rock (0), Save salt: abc123...
+> Reveal Move → Rock + abc123...
 
-**Example Workflow:**
-```bash
-# Terminal 1 (Player 1 with .env)
-npm run cli
-> Deploy New Contract          # Copy APP ID: 1005
-> Create New Game Session      # Copy SESSION ID: 0
-> Join Game                    # Choose Rock, save salt
-> Reveal Move                  # Paste salt, reveal Rock
-
-# Terminal 2 (Player 2 without .env - random account)
-npm run cli
-> Join Game                    # Use APP ID 1005, SESSION 0
-> Reveal Move                  # Reveal Paper → WINS!
+# Terminal 2 (Player 2)
+> Join Game → APP 1005, SESSION 0
+> Choose Paper (1), Save salt: def456...
+> Reveal Move → Paper + def456... → WINS 2 ALGO!
 ```
 
 ---
 
-## 🚧 Games in Development
+### 📅 Weekly Lottery
 
-### ⏳ StagHunt
+**Multi-player lottery where you pick a day of the week**
 
-**Status**: Smart contract complete, CLI integration pending
+**Rules:**
+- Unlimited players
+- Choose a day: Monday (0) to Sunday (6)
+- Prize pool divided across active days
+- Each day's pot split among its players
 
-### ⏳ GuessGame
+**Example:**
+```bash
+# 6 players join with 1 ALGO each
+# Players choose: Mon, Mon, Tue, Tue, Tue, Wed
+# Total pot: 6 ALGO
 
-**Status**: Smart contract complete, CLI integration pending
+# Distribution:
+# - 3 active days → 2 ALGO per day
+# - Monday: 2 ALGO / 2 players = 1 ALGO each
+# - Tuesday: 2 ALGO / 3 players = 0.66 ALGO each
+# - Wednesday: 2 ALGO / 1 player = 2 ALGO (BEST!)
+```
 
-### ⏳ WeeklyGame
+---
 
-**Status**: Smart contract complete, CLI integration pending
+### 🦌 Stag Hunt
+
+**Cooperation game with risk/reward trade-off**
+
+**Rules:**
+- Hare (0): Safe choice, always get 80% refund
+- Stag (1): Risky, need 51%+ cooperation to win
+- Success: Stags split pot + Global Jackpot
+- Failure: Stags lose everything → feeds Jackpot
+
+**Example:**
+```bash
+# 10 players, 1 ALGO each, Threshold: 51%
+# Choices: 6 Stags, 4 Hares
+
+# Cooperation: 60% ≥ 51% → SUCCESS!
+
+# Payouts:
+# - Each Hare: 0.8 ALGO refund
+# - Each Stag: (6 ALGO - 3.2 ALGO) / 6 = 0.47 ALGO
+#   + Share of Global Jackpot!
+
+# If threshold failed:
+# - Each Hare: 0.8 ALGO refund
+# - Each Stag: 0 ALGO (feeds jackpot)
+```
+
+---
+
+### 🎯 Guess 2/3 Average
+
+**Classic game theory experiment**
+
+**Rules:**
+- Everyone picks 0-100
+- Average is calculated
+- Target = 2/3 × Average
+- Closest to target wins
+
+**Example:**
+```bash
+# 5 players choose: 0, 25, 50, 75, 100
+# Average: 50
+# Target: 2/3 × 50 = 33.33 → 33
+
+# Distances:
+# - 0: 33 away
+# - 25: 8 away
+# - 50: 17 away
+# - 75: 42 away
+# - 100: 67 away
+
+# Winner: 25 (closest to 33)
+```
 
 ---
 
@@ -170,44 +228,48 @@ cli/
 
 ### Plugin System
 
-Each game implements the `IGameModule` interface:
+Adding a new game is simple:
 
 ```typescript
-interface IGameModule {
-  id: string;
-  name: string;
+export const MyGameModule: IGameModule = {
+  id: 'MYGAME',
+  name: '🎲 My Game',
   
-  deploy(wallet: WalletManager): Promise<void>;
-  create(wallet: WalletManager): Promise<void>;
-  join(wallet: WalletManager): Promise<void>;
-  reveal(wallet: WalletManager): Promise<void>;
-  getStatus(wallet: WalletManager): Promise<void>;
-}
-```
+  deploy: async (wallet) => { /* deploy logic. It needs to call initialize() */ },
+  create: async (wallet) => { /* create logic */ },
+  join: async (wallet) => { /* join logic */ },
+  reveal: async (wallet) => { /* reveal logic */ },
+  getStatus: async (wallet) => { /* status logic */ }
+};
 
-This allows adding new games without modifying the core CLI code.
+// Register in index.ts
+GameRegistry.register(MyGameModule);
+```
 
 ### Security Features
 
-**Hash Calculation:**
+**Commit-Reveal Pattern:**
 ```typescript
-// Client-side (NEVER sent to chain)
+// Client calculates hash locally
 const salt = crypto.randomBytes(32);
-const choiceBytes = algosdk.encodeUint64(choice);
-const hash = sha256(choiceBytes + salt);
+const hash = sha256(choice + salt);
 
-// Blockchain receives only the hash
-await client.joinSession({ commit: hash, ... });
+// Only hash goes on-chain
+await client.joinSession({ commit: hash });
+
+// Later, reveal proves commitment
+await client.revealMove({ choice, salt });
 ```
 
 **MBR Automation:**
-- CLI automatically queries contract for exact MBR requirements
-- Creates separate payment transactions
-- Handles both session creation and player join costs
+- Auto-queries contract for exact costs
+- Handles session + player storage
+- No manual calculation needed
 
 **Error Handling:**
-- User-friendly error messages
-- Clear instructions for common issues
+- Clean, actionable error messages
+- No verbose stack traces
+- Context-aware tips
 
 ---
 
@@ -262,5 +324,24 @@ MNEMONIC="your funded account mnemonic"
 # - Reveal must be before endRevealAt
 ```
 ---
+
+## 💡 Pro Tips 
+
+### Multi-Terminal Testing
+
+**Test locally with multiple players:**
+
+```bash
+# Terminal 1: Player 1 (persistent)
+# Use .env with MNEMONIC
+npm run cli
+
+# Terminal 2: Player 2 (temporary)
+# Delete/rename .env
+npm run cli
+
+# Terminal 3: Player 3 (temporary)
+npm run cli
+```
 
 

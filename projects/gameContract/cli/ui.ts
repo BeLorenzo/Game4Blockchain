@@ -20,7 +20,6 @@ export const UI = {
   selectGameType: async () => {
     const games = GameRegistry.getAll();
 
-    // Cast to any[] to allow Inquirer Separators
     const choices: any[] = games.map((g) => ({
       name: g.name, 
       value: g.id,  

@@ -35,7 +35,7 @@ export async function deploy() {
 
 
         await appClient.send.initialize({
-  args: { gameType: 'RPS' },  
+  args: { gameType: 'STAGHUNT' },  
   sender: deployer.addr,
 })
 
