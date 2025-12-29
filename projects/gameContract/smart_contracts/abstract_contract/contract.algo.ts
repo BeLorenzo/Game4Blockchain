@@ -1,6 +1,7 @@
 import {
   assert,
   BoxMap,
+  Bytes,
   bytes,
   clone,
   Contract,
@@ -37,6 +38,14 @@ export interface GameConfig {
  * The subclass is responsible for implementing the logic of the game.
  */
 export class GameContract extends Contract {
+    /**
+   * Contract type identifier (e.g., 'RPS', 'STAGHUNT', 'WEEKLY', 'GUESS')
+   * This allows CLI to validate contract type before operations.
+   * 
+   * IMPORTANT: Subclasses MUST set this value in their implementation.
+   */
+  gameType = GlobalState<bytes>({ initialValue: Bytes('') })
+
   /**
    * Global counter for generating unique session IDs.
    */
@@ -67,6 +76,22 @@ export class GameContract extends Contract {
   sessionBalances = BoxMap<uint64, uint64>({ keyPrefix: 'sbal' })
 
   /**
+   * Returns contract identification info.
+   * Used by CLI for validation.
+   */
+  public getGameType(): bytes {
+    return this.gameType.value
+  }
+
+
+  public initialize(gameType: string): void {
+    assert(this.gameType.value.length === 0, 'Contract already initialized')
+    assert(Txn.sender === Global.creatorAddress, 'Only creator can initialize')
+    this.gameType.value = Bytes(gameType)
+  }
+
+
+  /**
    * Initializes a new game session and reserves storage.
    *
    * @param config - The configuration object defining timelines and fees.
@@ -82,7 +107,6 @@ export class GameContract extends Contract {
     this.gameSessions(sessionID).value = clone(config)
     this.sessionBalances(sessionID).value = 0
     this.sessionIDCounter.value = sessionID + 1
-
     return sessionID
   }
 
@@ -201,3 +225,5 @@ export class GameContract extends Contract {
     return sha256(itob(sessionID).concat(player.bytes))
   }
 }
+
+

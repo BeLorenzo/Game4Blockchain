@@ -59,7 +59,7 @@ export class GuessGame extends GameContract {
     assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
     assert(mbrPayment.amount >= requiredMBR, 'Insufficient MBR for session and counters')
 
-    const sessionID = super.create(config)
+    const sessionID = super.create(config) 
 
     this.stats(sessionID).value = { sum: 0, count: 0 }
 

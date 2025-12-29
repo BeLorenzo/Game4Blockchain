@@ -5,44 +5,91 @@ import chalk from 'chalk';
 import { WalletManager } from './walletManager';
 
 /**
- * UTILS
- * Shared helper functions for all game modules.
+ * UTILS - Shared helper functions for all game modules.
+ * Updated to support contract type validation with gameType.
  */
 
 /**
- * Prompts the user for an App ID or reads it from .env.
- * It also validates if the App actually exists on the chain.
+ * Validates that the contract at appId matches the expected game type.
+ * Reads gameType from global state and compares.
  */
-export async function getAppId(wallet: WalletManager): Promise<bigint> {
-  let appId: bigint | undefined;
-
-  if (!appId) {
-    const answer = await inquirer.prompt([{
-      type: 'input',
-      name: 'manualAppId',
-      message: 'Enter Contract APP ID (ask the Creator):',
-      validate: async (input) => {
-        if (isNaN(parseInt(input))) return 'Invalid Number';
-        try {
-          // Live validation: Check if app exists
-          await wallet.algorand.client.algod.getApplicationByID(parseInt(input)).do();
-          return true; 
-        } catch (e) {
-          return `❌ App ID ${input} does not exist on this network.`;
-        }
-      }
-    }]);
-    appId = BigInt(answer.manualAppId);
-  } else {
-    // Validate the .env ID silently
-    try {
-      await wallet.algorand.client.algod.getApplicationByID(Number(appId)).do();
-    } catch (e) {
-      console.log(chalk.red(`❌ The App ID ${appId} in .env is invalid.`));
-      throw new Error("Invalid App ID in .env");
+export async function validateContractType(
+  wallet: WalletManager,
+  appId: bigint,
+  expectedType: string
+): Promise<boolean> {
+  try {
+    const appInfo = await wallet.algorand.client.algod.getApplicationByID(Number(appId)).do();
+    const globalState = appInfo.params['globalState'] || [];
+    
+    // Find gameType in global state
+    const gameTypeEntry = globalState.find(item => 
+      Buffer.from(item.key).toString('utf8') === 'gameType'
+    );
+    
+    // If gameType is missing, something went wrong during deploy
+    if (!gameTypeEntry) {
+      console.log(chalk.red('\n❌ CONTRACT NOT INITIALIZED!'));
+      console.log(chalk.yellow('   This contract was deployed without calling initialize().'));
+      console.log(chalk.yellow('   The deploy process should automatically call initialize().'));
+      console.log(chalk.yellow('   Please re-deploy the contract or manually call initialize().\n'));
+      return false;
     }
+    
+    // Decode gameType value (it's stored as bytes)
+    const actualType = Buffer.from(gameTypeEntry.value.bytes).toString('utf8');
+    
+    if (actualType !== expectedType) {
+      console.log(chalk.red('\n❌ WRONG CONTRACT TYPE!'));
+      console.log(chalk.red(`   Expected: ${chalk.bold(expectedType)}`));
+      console.log(chalk.red(`   Found: ${chalk.bold(actualType)}`));
+      console.log(chalk.yellow('   Please check your APP ID.\n'));
+      return false;
+    }
+    
+    console.log(chalk.green(`✅ Confirmed: ${chalk.bold(actualType)} contract\n`));
+    return true;
+    
+  } catch (error) {
+    console.log(chalk.red('❌ Error validating contract type:', error));
+    return false;
   }
+}
 
+/**
+ * Prompts the user for an App ID and validates it exists and has correct type.
+ * 
+ * @param wallet - The wallet manager instance
+ * @param expectedType - The expected game type (e.g., 'RPS', 'STAGHUNT')
+ * @returns The validated App ID
+ */
+export async function getAppId(wallet: WalletManager, expectedType: string): Promise<bigint> {
+  const answer = await inquirer.prompt([{
+    type: 'input',
+    name: 'manualAppId',
+    message: 'Enter Contract APP ID:',
+    validate: async (input) => {
+      if (isNaN(parseInt(input))) return 'Invalid Number';
+      
+      try {
+        // Check if app exists
+        await wallet.algorand.client.algod.getApplicationByID(parseInt(input)).do();
+        return true;
+      } catch (e) {
+        return `❌ App ID ${input} does not exist on this network.`;
+      }
+    }
+  }]);
+  
+  const appId = BigInt(answer.manualAppId);
+  
+  // Validate contract type
+  const isValid = await validateContractType(wallet, appId, expectedType);
+  if (!isValid) {
+    console.log(chalk.yellow('Exiting... Please use the correct APP ID for this game.\n'));
+    process.exit(1);
+  }
+  
   return appId;
 }
 
@@ -51,7 +98,6 @@ export async function getAppId(wallet: WalletManager): Promise<bigint> {
  */
 export async function getCurrentRound(wallet: WalletManager): Promise<bigint> {
   const status = await wallet.algorand.client.algod.status().do();
-  // Handle SDK compatibility (camelCase vs kebab-case)
   return BigInt(status['lastRound'] ?? status['lastRound']);
 }
 
@@ -78,7 +124,7 @@ export function handleAlgoError(e: any, context: string) {
     console.log(chalk.yellow('   -> Insufficient funds in wallet. You need more ALGOs.'));
   } else if (msg.includes('Box') || msg.includes('404')) {
     console.log(chalk.yellow('   -> Session Data not found. Check your Session ID.'));
-  }else if (msg.includes('phase')) {
+  } else if (msg.includes('phase')) {
     console.log(chalk.yellow('   -> Temporal error. You are late or early for this phase'));  
   } else if (msg.includes('already')) {
     console.log(chalk.yellow('   -> Double play is not permitted')); 
@@ -86,8 +132,9 @@ export function handleAlgoError(e: any, context: string) {
     console.log(chalk.yellow('   -> Hash mismatch. Salt or move not valid')); 
   } else if (msg.includes('Game is over')) {
     console.log(chalk.yellow('   -> Game is over')); 
-  }
-  else {
+  } else if (msg.includes('not initialized')) {
+    console.log(chalk.yellow('   -> Contract not initialized. Call initialize() after deploy.'));
+  } else {
     console.log(chalk.gray(msg));
   }
 }

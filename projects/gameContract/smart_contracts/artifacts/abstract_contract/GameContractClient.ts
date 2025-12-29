@@ -23,7 +23,7 @@ import { TransactionComposer, AppCallMethodCall, AppMethodCallTransactionArgumen
 import { SendParams, SendSingleTransactionResult, SendAtomicTransactionComposerResults } from '@algorandfoundation/algokit-utils/types/transaction'
 import { Address, encodeAddress, modelsv2, OnApplicationComplete, Transaction, TransactionSigner } from 'algosdk'
 
-export const APP_SPEC: Arc56Contract = {"name":"GameContract","structs":{"ObjectB555233E":[{"name":"startAt","type":"uint64"},{"name":"endCommitAt","type":"uint64"},{"name":"endRevealAt","type":"uint64"},{"name":"participation","type":"uint64"}]},"methods":[],"arcs":[22,28],"desc":"Abstract contract implementing a generic Commit-Reveal scheme for N-player games.","networks":{},"state":{"schema":{"global":{"ints":1,"bytes":0},"local":{"ints":0,"bytes":0}},"keys":{"global":{"sessionIDCounter":{"keyType":"AVMString","valueType":"AVMUint64","key":"c2Vzc2lvbklEQ291bnRlcg==","desc":"Global counter for generating unique session IDs."}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{"playerCommit":{"keyType":"AVMBytes","valueType":"AVMBytes","desc":"Storage for player commits.\nKey: Hash(sessionID + playerAddress) [32 bytes + 4 bytes prefix]\nValue: Hash(choice + salt) [32 bytes]","prefix":"cGNvbQ=="},"playerChoice":{"keyType":"AVMBytes","valueType":"uint64","desc":"Storage for revealed choices.\nKey: Hash(sessionID + playerAddress) [32 bytes + 4 bytes prefix]\nValue: Player Choice [8 bytes]","prefix":"cGNobw=="},"gameSessions":{"keyType":"uint64","valueType":"ObjectB555233E","desc":"Configuration storage for each active session.","prefix":"Z3M="},"sessionBalances":{"keyType":"uint64","valueType":"uint64","desc":"Tracks the total pot (collected participation fees) for a specific session.","prefix":"c2JhbA=="}}}},"bareActions":{"create":["NoOp"],"call":[]},"sourceInfo":{"approval":{"sourceInfo":[{"pc":[38],"errorMessage":"OnCompletion must be NoOp && can only call when creating"}],"pcOffsetMethod":"none"},"clear":{"sourceInfo":[],"pcOffsetMethod":"none"}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYXJjNC9pbmRleC5kLnRzOjpDb250cmFjdC5hcHByb3ZhbFByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYm56IG1haW5fYWZ0ZXJfaWZfZWxzZUAyCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo0MwogICAgLy8gc2Vzc2lvbklEQ291bnRlciA9IEdsb2JhbFN0YXRlPHVpbnQ2ND4oeyBpbml0aWFsVmFsdWU6IDAgfSkKICAgIHB1c2hieXRlcyAic2Vzc2lvbklEQ291bnRlciIKICAgIHB1c2hpbnQgMCAvLyAwCiAgICBhcHBfZ2xvYmFsX3B1dAoKbWFpbl9hZnRlcl9pZl9lbHNlQDI6CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czozOQogICAgLy8gZXhwb3J0IGNsYXNzIEdhbWVDb250cmFjdCBleHRlbmRzIENvbnRyYWN0IHsKICAgIHR4biBOdW1BcHBBcmdzCiAgICAhCiAgICBhc3NlcnQKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICAhCiAgICAmJgogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBtdXN0IGJlIE5vT3AgJiYgY2FuIG9ubHkgY2FsbCB3aGVuIGNyZWF0aW5nCiAgICBwdXNoaW50IDEgLy8gMQogICAgcmV0dXJuCg==","clear":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYmFzZS1jb250cmFjdC5kLnRzOjpCYXNlQ29udHJhY3QuY2xlYXJTdGF0ZVByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICBwdXNoaW50IDEgLy8gMQogICAgcmV0dXJuCg=="},"byteCode":{"approval":"CzEYQAAVgBBzZXNzaW9uSURDb3VudGVygQBnMRsURDEZFDEYFBBEgQFD","clear":"C4EBQw=="},"events":[],"templateVariables":{}} as unknown as Arc56Contract
+export const APP_SPEC: Arc56Contract = {"name":"GameContract","structs":{"ObjectB555233E":[{"name":"startAt","type":"uint64"},{"name":"endCommitAt","type":"uint64"},{"name":"endRevealAt","type":"uint64"},{"name":"participation","type":"uint64"}]},"methods":[{"name":"getGameType","args":[],"returns":{"type":"byte[]"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Returns contract identification info.\nUsed by CLI for validation.","events":[],"recommendations":{}},{"name":"initialize","args":[{"type":"string","name":"gameType"}],"returns":{"type":"void"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"events":[],"recommendations":{}}],"arcs":[22,28],"desc":"Abstract contract implementing a generic Commit-Reveal scheme for N-player games.","networks":{},"state":{"schema":{"global":{"ints":1,"bytes":1},"local":{"ints":0,"bytes":0}},"keys":{"global":{"gameType":{"keyType":"AVMString","valueType":"AVMBytes","key":"Z2FtZVR5cGU=","desc":"Contract type identifier (e.g., 'RPS', 'STAGHUNT', 'WEEKLY', 'GUESS')\nThis allows CLI to validate contract type before operations.\n\nIMPORTANT: Subclasses MUST set this value in their implementation."},"sessionIDCounter":{"keyType":"AVMString","valueType":"AVMUint64","key":"c2Vzc2lvbklEQ291bnRlcg==","desc":"Global counter for generating unique session IDs."}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{"playerCommit":{"keyType":"AVMBytes","valueType":"AVMBytes","desc":"Storage for player commits.\nKey: Hash(sessionID + playerAddress) [32 bytes + 4 bytes prefix]\nValue: Hash(choice + salt) [32 bytes]","prefix":"cGNvbQ=="},"playerChoice":{"keyType":"AVMBytes","valueType":"uint64","desc":"Storage for revealed choices.\nKey: Hash(sessionID + playerAddress) [32 bytes + 4 bytes prefix]\nValue: Player Choice [8 bytes]","prefix":"cGNobw=="},"gameSessions":{"keyType":"uint64","valueType":"ObjectB555233E","desc":"Configuration storage for each active session.","prefix":"Z3M="},"sessionBalances":{"keyType":"uint64","valueType":"uint64","desc":"Tracks the total pot (collected participation fees) for a specific session.","prefix":"c2JhbA=="}}}},"bareActions":{"create":["NoOp"],"call":[]},"sourceInfo":{"approval":{"sourceInfo":[{"pc":[135],"errorMessage":"Contract already initialized"},{"pc":[53],"errorMessage":"OnCompletion must be NoOp"},{"pc":[86],"errorMessage":"OnCompletion must be NoOp && can only call when creating"},{"pc":[141],"errorMessage":"Only creator can initialize"},{"pc":[92,132],"errorMessage":"check GlobalState exists"},{"pc":[117],"errorMessage":"invalid array length header"},{"pc":[125],"errorMessage":"invalid number of bytes for arc4.dynamic_array<arc4.uint8>"}],"pcOffsetMethod":"none"},"clear":{"sourceInfo":[],"pcOffsetMethod":"none"}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYXJjNC9pbmRleC5kLnRzOjpDb250cmFjdC5hcHByb3ZhbFByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICBpbnRjYmxvY2sgMCAxCiAgICBieXRlY2Jsb2NrICJnYW1lVHlwZSIKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBibnogbWFpbl9hZnRlcl9pZl9lbHNlQDIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdC9jb250cmFjdC5hbGdvLnRzOjQ3CiAgICAvLyBnYW1lVHlwZSA9IEdsb2JhbFN0YXRlPGJ5dGVzPih7IGluaXRpYWxWYWx1ZTogQnl0ZXMoJycpIH0pCiAgICBieXRlY18wIC8vICJnYW1lVHlwZSIKICAgIHB1c2hieXRlcyAiIgogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdC9jb250cmFjdC5hbGdvLnRzOjUyCiAgICAvLyBzZXNzaW9uSURDb3VudGVyID0gR2xvYmFsU3RhdGU8dWludDY0Pih7IGluaXRpYWxWYWx1ZTogMCB9KQogICAgcHVzaGJ5dGVzICJzZXNzaW9uSURDb3VudGVyIgogICAgaW50Y18wIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CgptYWluX2FmdGVyX2lmX2Vsc2VAMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdC9jb250cmFjdC5hbGdvLnRzOjQwCiAgICAvLyBleHBvcnQgY2xhc3MgR2FtZUNvbnRyYWN0IGV4dGVuZHMgQ29udHJhY3QgewogICAgdHhuIE51bUFwcEFyZ3MKICAgIGJ6IG1haW5fX19hbGdvdHNfXy5kZWZhdWx0Q3JlYXRlQDExCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIG11c3QgYmUgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydAogICAgcHVzaGJ5dGVzcyAweDU2ODNlZTA4IDB4ZWNmMzM5ZTcgLy8gbWV0aG9kICJnZXRHYW1lVHlwZSgpYnl0ZVtdIiwgbWV0aG9kICJpbml0aWFsaXplKHN0cmluZyl2b2lkIgogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAogICAgbWF0Y2ggZ2V0R2FtZVR5cGUgaW5pdGlhbGl6ZQogICAgZXJyCgptYWluX19fYWxnb3RzX18uZGVmYXVsdENyZWF0ZUAxMToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdC9jb250cmFjdC5hbGdvLnRzOjQwCiAgICAvLyBleHBvcnQgY2xhc3MgR2FtZUNvbnRyYWN0IGV4dGVuZHMgQ29udHJhY3QgewogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgICEKICAgICYmCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIG11c3QgYmUgTm9PcCAmJiBjYW4gb25seSBjYWxsIHdoZW4gY3JlYXRpbmcKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCgovLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo6R2FtZUNvbnRyYWN0LmdldEdhbWVUeXBlW3JvdXRpbmddKCkgLT4gdm9pZDoKZ2V0R2FtZVR5cGU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo4MwogICAgLy8gcmV0dXJuIHRoaXMuZ2FtZVR5cGUudmFsdWUKICAgIGludGNfMCAvLyAwCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo0NwogICAgLy8gZ2FtZVR5cGUgPSBHbG9iYWxTdGF0ZTxieXRlcz4oeyBpbml0aWFsVmFsdWU6IEJ5dGVzKCcnKSB9KQogICAgYnl0ZWNfMCAvLyAiZ2FtZVR5cGUiCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo4MwogICAgLy8gcmV0dXJuIHRoaXMuZ2FtZVR5cGUudmFsdWUKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgR2xvYmFsU3RhdGUgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo4MgogICAgLy8gcHVibGljIGdldEdhbWVUeXBlKCk6IGJ5dGVzIHsKICAgIGR1cAogICAgbGVuCiAgICBpdG9iCiAgICBleHRyYWN0IDYgMgogICAgc3dhcAogICAgY29uY2F0CiAgICBwdXNoYnl0ZXMgMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCgovLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo6R2FtZUNvbnRyYWN0LmluaXRpYWxpemVbcm91dGluZ10oKSAtPiB2b2lkOgppbml0aWFsaXplOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0L2NvbnRyYWN0LmFsZ28udHM6ODcKICAgIC8vIHB1YmxpYyBpbml0aWFsaXplKGdhbWVUeXBlOiBzdHJpbmcpOiB2b2lkIHsKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDEKICAgIGR1cAogICAgaW50Y18wIC8vIDAKICAgIGV4dHJhY3RfdWludDE2IC8vIG9uIGVycm9yOiBpbnZhbGlkIGFycmF5IGxlbmd0aCBoZWFkZXIKICAgIHB1c2hpbnQgMiAvLyAyCiAgICArCiAgICBkaWcgMQogICAgbGVuCiAgICA9PQogICAgYXNzZXJ0IC8vIGludmFsaWQgbnVtYmVyIG9mIGJ5dGVzIGZvciBhcmM0LmR5bmFtaWNfYXJyYXk8YXJjNC51aW50OD4KICAgIGV4dHJhY3QgMiAwCiAgICAvLyBzbWFydF9jb250cmFjdHMvYWJzdHJhY3RfY29udHJhY3QvY29udHJhY3QuYWxnby50czo4OAogICAgLy8gYXNzZXJ0KHRoaXMuZ2FtZVR5cGUudmFsdWUubGVuZ3RoID09PSAwLCAnQ29udHJhY3QgYWxyZWFkeSBpbml0aWFsaXplZCcpCiAgICBpbnRjXzAgLy8gMAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0L2NvbnRyYWN0LmFsZ28udHM6NDcKICAgIC8vIGdhbWVUeXBlID0gR2xvYmFsU3RhdGU8Ynl0ZXM+KHsgaW5pdGlhbFZhbHVlOiBCeXRlcygnJykgfSkKICAgIGJ5dGVjXzAgLy8gImdhbWVUeXBlIgogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0L2NvbnRyYWN0LmFsZ28udHM6ODgKICAgIC8vIGFzc2VydCh0aGlzLmdhbWVUeXBlLnZhbHVlLmxlbmd0aCA9PT0gMCwgJ0NvbnRyYWN0IGFscmVhZHkgaW5pdGlhbGl6ZWQnKQogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBHbG9iYWxTdGF0ZSBleGlzdHMKICAgIGxlbgogICAgIQogICAgYXNzZXJ0IC8vIENvbnRyYWN0IGFscmVhZHkgaW5pdGlhbGl6ZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdC9jb250cmFjdC5hbGdvLnRzOjg5CiAgICAvLyBhc3NlcnQoVHhuLnNlbmRlciA9PT0gR2xvYmFsLmNyZWF0b3JBZGRyZXNzLCAnT25seSBjcmVhdG9yIGNhbiBpbml0aWFsaXplJykKICAgIHR4biBTZW5kZXIKICAgIGdsb2JhbCBDcmVhdG9yQWRkcmVzcwogICAgPT0KICAgIGFzc2VydCAvLyBPbmx5IGNyZWF0b3IgY2FuIGluaXRpYWxpemUKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdC9jb250cmFjdC5hbGdvLnRzOjQ3CiAgICAvLyBnYW1lVHlwZSA9IEdsb2JhbFN0YXRlPGJ5dGVzPih7IGluaXRpYWxWYWx1ZTogQnl0ZXMoJycpIH0pCiAgICBieXRlY18wIC8vICJnYW1lVHlwZSIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9hYnN0cmFjdF9jb250cmFjdC9jb250cmFjdC5hbGdvLnRzOjkwCiAgICAvLyB0aGlzLmdhbWVUeXBlLnZhbHVlID0gQnl0ZXMoZ2FtZVR5cGUpCiAgICBzd2FwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Fic3RyYWN0X2NvbnRyYWN0L2NvbnRyYWN0LmFsZ28udHM6ODcKICAgIC8vIHB1YmxpYyBpbml0aWFsaXplKGdhbWVUeXBlOiBzdHJpbmcpOiB2b2lkIHsKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4K","clear":"I3ByYWdtYSB2ZXJzaW9uIDExCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBAYWxnb3JhbmRmb3VuZGF0aW9uL2FsZ29yYW5kLXR5cGVzY3JpcHQvYmFzZS1jb250cmFjdC5kLnRzOjpCYXNlQ29udHJhY3QuY2xlYXJTdGF0ZVByb2dyYW0oKSAtPiB1aW50NjQ6Cm1haW46CiAgICBwdXNoaW50IDEgLy8gMQogICAgcmV0dXJuCg=="},"byteCode":{"approval":"CyACAAEmAQhnYW1lVHlwZTEYQAAYKIAAZ4AQc2Vzc2lvbklEQ291bnRlciJnMRtBAB0xGRREMRhEggIEVoPuCATs8znnNhoAjgIACwAiADEZFDEYFBBEI0MiKGVESRUWVwYCTFCABBUffHVMULAjQzYaAUkiWYECCEsBFRJEVwIAIihlRBUURDEAMgkSRChMZyND","clear":"C4EBQw=="},"events":[],"templateVariables":{}} as unknown as Arc56Contract
 
 /**
  * A state record containing binary data
@@ -87,11 +87,17 @@ export type GameContractArgs = {
    * The object representation of the arguments for each method
    */
   obj: {
+    'getGameType()byte[]': Record<string, never>
+    'initialize(string)void': {
+      gameType: string
+    }
   }
   /**
    * The tuple representation of the arguments for each method
    */
   tuple: {
+    'getGameType()byte[]': []
+    'initialize(string)void': [gameType: string]
   }
 }
 
@@ -99,6 +105,8 @@ export type GameContractArgs = {
  * The return type for each method
  */
 export type GameContractReturns = {
+  'getGameType()byte[]': Uint8Array
+  'initialize(string)void': void
 }
 
 /**
@@ -108,13 +116,31 @@ export type GameContractTypes = {
   /**
    * Maps method signatures / names to their argument and return types.
    */
-  methods: {}
+  methods:
+    & Record<'getGameType()byte[]' | 'getGameType', {
+      argsObj: GameContractArgs['obj']['getGameType()byte[]']
+      argsTuple: GameContractArgs['tuple']['getGameType()byte[]']
+      returns: GameContractReturns['getGameType()byte[]']
+    }>
+    & Record<'initialize(string)void' | 'initialize', {
+      argsObj: GameContractArgs['obj']['initialize(string)void']
+      argsTuple: GameContractArgs['tuple']['initialize(string)void']
+      returns: GameContractReturns['initialize(string)void']
+    }>
   /**
    * Defines the shape of the state of the application.
    */
   state: {
     global: {
       keys: {
+        /**
+        * Contract type identifier (e.g., 'RPS', 'STAGHUNT', 'WEEKLY', 'GUESS')
+        This allows CLI to validate contract type before operations.
+        
+        IMPORTANT: Subclasses MUST set this value in their implementation.
+
+         */
+        gameType: BinaryState
         /**
          * Global counter for generating unique session IDs.
          */
@@ -210,6 +236,36 @@ export type GameContractDeployParams = Expand<Omit<AppFactoryDeployParams, 'crea
  * Exposes methods for constructing `AppClient` params objects for ABI calls to the GameContract smart contract
  */
 export abstract class GameContractParamsFactory {
+  /**
+   * Constructs a no op call for the getGameType()byte[] ABI method
+   *
+  * Returns contract identification info.
+  Used by CLI for validation.
+
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static getGameType(params: CallParams<GameContractArgs['obj']['getGameType()byte[]'] | GameContractArgs['tuple']['getGameType()byte[]']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'getGameType()byte[]' as const,
+      args: Array.isArray(params.args) ? params.args : [],
+    }
+  }
+  /**
+   * Constructs a no op call for the initialize(string)void ABI method
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static initialize(params: CallParams<GameContractArgs['obj']['initialize(string)void'] | GameContractArgs['tuple']['initialize(string)void']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'initialize(string)void' as const,
+      args: Array.isArray(params.args) ? params.args : [params.args.gameType],
+    }
+  }
 }
 
 /**
@@ -450,6 +506,30 @@ export class GameContractClient {
       return this.appClient.params.bare.clearState(params)
     },
 
+    /**
+     * Makes a call to the GameContract smart contract using the `getGameType()byte[]` ABI method.
+     *
+    * Returns contract identification info.
+    Used by CLI for validation.
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    getGameType: (params: CallParams<GameContractArgs['obj']['getGameType()byte[]'] | GameContractArgs['tuple']['getGameType()byte[]']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.params.call(GameContractParamsFactory.getGameType(params))
+    },
+
+    /**
+     * Makes a call to the GameContract smart contract using the `initialize(string)void` ABI method.
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    initialize: (params: CallParams<GameContractArgs['obj']['initialize(string)void'] | GameContractArgs['tuple']['initialize(string)void']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.params.call(GameContractParamsFactory.initialize(params))
+    },
+
   }
 
   /**
@@ -466,6 +546,30 @@ export class GameContractClient {
       return this.appClient.createTransaction.bare.clearState(params)
     },
 
+    /**
+     * Makes a call to the GameContract smart contract using the `getGameType()byte[]` ABI method.
+     *
+    * Returns contract identification info.
+    Used by CLI for validation.
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    getGameType: (params: CallParams<GameContractArgs['obj']['getGameType()byte[]'] | GameContractArgs['tuple']['getGameType()byte[]']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.createTransaction.call(GameContractParamsFactory.getGameType(params))
+    },
+
+    /**
+     * Makes a call to the GameContract smart contract using the `initialize(string)void` ABI method.
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    initialize: (params: CallParams<GameContractArgs['obj']['initialize(string)void'] | GameContractArgs['tuple']['initialize(string)void']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.createTransaction.call(GameContractParamsFactory.initialize(params))
+    },
+
   }
 
   /**
@@ -480,6 +584,32 @@ export class GameContractClient {
      */
     clearState: (params?: Expand<AppClientBareCallParams & SendParams>) => {
       return this.appClient.send.bare.clearState(params)
+    },
+
+    /**
+     * Makes a call to the GameContract smart contract using the `getGameType()byte[]` ABI method.
+     *
+    * Returns contract identification info.
+    Used by CLI for validation.
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    getGameType: async (params: CallParams<GameContractArgs['obj']['getGameType()byte[]'] | GameContractArgs['tuple']['getGameType()byte[]']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      const result = await this.appClient.send.call(GameContractParamsFactory.getGameType(params))
+      return {...result, return: result.return as unknown as (undefined | GameContractReturns['getGameType()byte[]'])}
+    },
+
+    /**
+     * Makes a call to the GameContract smart contract using the `initialize(string)void` ABI method.
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    initialize: async (params: CallParams<GameContractArgs['obj']['initialize(string)void'] | GameContractArgs['tuple']['initialize(string)void']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      const result = await this.appClient.send.call(GameContractParamsFactory.initialize(params))
+      return {...result, return: result.return as unknown as (undefined | GameContractReturns['initialize(string)void'])}
     },
 
   }
@@ -508,9 +638,14 @@ export class GameContractClient {
       getAll: async (): Promise<Partial<Expand<GlobalKeysState>>> => {
         const result = await this.appClient.state.global.getAll()
         return {
+          gameType: new BinaryStateValue(result.gameType),
           sessionIdCounter: result.sessionIDCounter,
         }
       },
+      /**
+       * Get the current value of the gameType key in global state
+       */
+      gameType: async (): Promise<BinaryState> => { return new BinaryStateValue((await this.appClient.state.global.getValue("gameType")) as Uint8Array | undefined) },
       /**
        * Get the current value of the sessionIDCounter key in global state
        */
@@ -590,6 +725,22 @@ export class GameContractClient {
     const resultMappers: Array<undefined | ((x: ABIReturn | undefined) => any)> = []
     return {
       /**
+       * Add a getGameType()byte[] method call against the GameContract contract
+       */
+      getGameType(params: CallParams<GameContractArgs['obj']['getGameType()byte[]'] | GameContractArgs['tuple']['getGameType()byte[]']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.getGameType(params)))
+        resultMappers.push((v) => client.decodeReturnValue('getGameType()byte[]', v))
+        return this
+      },
+      /**
+       * Add a initialize(string)void method call against the GameContract contract
+       */
+      initialize(params: CallParams<GameContractArgs['obj']['initialize(string)void'] | GameContractArgs['tuple']['initialize(string)void']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.initialize(params)))
+        resultMappers.push(undefined)
+        return this
+      },
+      /**
        * Add a clear state call to the GameContract contract
        */
       clearState(params: AppClientBareCallParams) {
@@ -624,6 +775,28 @@ export class GameContractClient {
   }
 }
 export type GameContractComposer<TReturns extends [...any[]] = []> = {
+  /**
+   * Calls the getGameType()byte[] ABI method.
+   *
+  * Returns contract identification info.
+  Used by CLI for validation.
+
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  getGameType(params?: CallParams<GameContractArgs['obj']['getGameType()byte[]'] | GameContractArgs['tuple']['getGameType()byte[]']>): GameContractComposer<[...TReturns, GameContractReturns['getGameType()byte[]'] | undefined]>
+
+  /**
+   * Calls the initialize(string)void ABI method.
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  initialize(params?: CallParams<GameContractArgs['obj']['initialize(string)void'] | GameContractArgs['tuple']['initialize(string)void']>): GameContractComposer<[...TReturns, GameContractReturns['initialize(string)void'] | undefined]>
+
   /**
    * Makes a clear_state call to an existing instance of the GameContract smart contract.
    *

@@ -4,7 +4,7 @@
     "../../abstract_contract/contract.algo.ts",
     "../../guessGame/contract.algo.ts"
   ],
-  "mappings": "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",
+  "mappings": "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",
   "op_pc_offset": 0,
   "pc_events": {
     "1": {
@@ -15,9 +15,9 @@
       "op": "intcblock 0 1 8 2"
     },
     "7": {
-      "op": "bytecblock \"newGame\" \"gs\" \"sessionIDCounter\" \"sbal\" \"st\" \"fr\" 0x151f7c75 \"pcom\" \"pcho\" 0x068101"
+      "op": "bytecblock \"gameType\" \"newGame\" \"gs\" 0x151f7c75 \"sessionIDCounter\" \"sbal\" \"st\" \"fr\" \"pcom\" \"pcho\" 0x068101"
     },
-    "67": {
+    "76": {
       "op": "txn ApplicationID",
       "defined_out": [
         "reinterpret_bool%0#0"
@@ -26,12 +26,36 @@
         "reinterpret_bool%0#0"
       ]
     },
-    "69": {
+    "78": {
       "op": "bnz main_after_if_else@2",
       "stack_out": []
     },
-    "72": {
-      "op": "bytec_2 // \"sessionIDCounter\"",
+    "81": {
+      "op": "bytec_0 // \"gameType\"",
+      "defined_out": [
+        "\"gameType\""
+      ],
+      "stack_out": [
+        "\"gameType\""
+      ]
+    },
+    "82": {
+      "op": "pushbytes \"\"",
+      "defined_out": [
+        "\"\"",
+        "\"gameType\""
+      ],
+      "stack_out": [
+        "\"gameType\"",
+        "\"\""
+      ]
+    },
+    "84": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "85": {
+      "op": "bytec 4 // \"sessionIDCounter\"",
       "defined_out": [
         "\"sessionIDCounter\""
       ],
@@ -39,7 +63,7 @@
         "\"sessionIDCounter\""
       ]
     },
-    "73": {
+    "87": {
       "op": "intc_0 // 0",
       "defined_out": [
         "\"sessionIDCounter\"",
@@ -50,11 +74,11 @@
         "0"
       ]
     },
-    "74": {
+    "88": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "75": {
+    "89": {
       "block": "main_after_if_else@2",
       "stack_in": [],
       "op": "txn NumAppArgs",
@@ -65,11 +89,11 @@
         "tmp%0#1"
       ]
     },
-    "77": {
-      "op": "bz main___algots__.defaultCreate@14",
+    "91": {
+      "op": "bz main___algots__.defaultCreate@16",
       "stack_out": []
     },
-    "80": {
+    "94": {
       "op": "txn OnCompletion",
       "defined_out": [
         "tmp%2#0"
@@ -78,7 +102,7 @@
         "tmp%2#0"
       ]
     },
-    "82": {
+    "96": {
       "op": "!",
       "defined_out": [
         "tmp%3#0"
@@ -87,12 +111,12 @@
         "tmp%3#0"
       ]
     },
-    "83": {
+    "97": {
       "error": "OnCompletion must be NoOp",
       "op": "assert // OnCompletion must be NoOp",
       "stack_out": []
     },
-    "84": {
+    "98": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%4#0"
@@ -101,16 +125,18 @@
         "tmp%4#0"
       ]
     },
-    "86": {
+    "100": {
       "op": "assert",
       "stack_out": []
     },
-    "87": {
-      "op": "pushbytess 0x2c49a5cf 0x11bb4167 0x7e60023c 0x74bef887 0x9e4a3ae5 // method \"createSession((uint64,uint64,uint64,uint64),pay)uint64\", method \"joinSession(uint64,byte[],pay)void\", method \"revealMove(uint64,uint64,byte[])void\", method \"claimWinnings(uint64)uint64\", method \"getRequiredMBR(string)uint64\"",
+    "101": {
+      "op": "pushbytess 0x2c49a5cf 0x11bb4167 0x7e60023c 0x74bef887 0x9e4a3ae5 0x5683ee08 0xecf339e7 // method \"createSession((uint64,uint64,uint64,uint64),pay)uint64\", method \"joinSession(uint64,byte[],pay)void\", method \"revealMove(uint64,uint64,byte[])void\", method \"claimWinnings(uint64)uint64\", method \"getRequiredMBR(string)uint64\", method \"getGameType()byte[]\", method \"initialize(string)void\"",
       "defined_out": [
         "Method(claimWinnings(uint64)uint64)",
         "Method(createSession((uint64,uint64,uint64,uint64),pay)uint64)",
+        "Method(getGameType()byte[])",
         "Method(getRequiredMBR(string)uint64)",
+        "Method(initialize(string)void)",
         "Method(joinSession(uint64,byte[],pay)void)",
         "Method(revealMove(uint64,uint64,byte[])void)"
       ],
@@ -119,15 +145,19 @@
         "Method(joinSession(uint64,byte[],pay)void)",
         "Method(revealMove(uint64,uint64,byte[])void)",
         "Method(claimWinnings(uint64)uint64)",
-        "Method(getRequiredMBR(string)uint64)"
+        "Method(getRequiredMBR(string)uint64)",
+        "Method(getGameType()byte[])",
+        "Method(initialize(string)void)"
       ]
     },
-    "114": {
+    "138": {
       "op": "txna ApplicationArgs 0",
       "defined_out": [
         "Method(claimWinnings(uint64)uint64)",
         "Method(createSession((uint64,uint64,uint64,uint64),pay)uint64)",
+        "Method(getGameType()byte[])",
         "Method(getRequiredMBR(string)uint64)",
+        "Method(initialize(string)void)",
         "Method(joinSession(uint64,byte[],pay)void)",
         "Method(revealMove(uint64,uint64,byte[])void)",
         "tmp%6#0"
@@ -138,18 +168,20 @@
         "Method(revealMove(uint64,uint64,byte[])void)",
         "Method(claimWinnings(uint64)uint64)",
         "Method(getRequiredMBR(string)uint64)",
+        "Method(getGameType()byte[])",
+        "Method(initialize(string)void)",
         "tmp%6#0"
       ]
     },
-    "117": {
-      "op": "match createSession joinSession revealMove claimWinnings getRequiredMBR",
+    "141": {
+      "op": "match createSession joinSession revealMove claimWinnings getRequiredMBR getGameType initialize",
       "stack_out": []
     },
-    "129": {
+    "157": {
       "op": "err"
     },
-    "130": {
-      "block": "main___algots__.defaultCreate@14",
+    "158": {
+      "block": "main___algots__.defaultCreate@16",
       "stack_in": [],
       "op": "txn OnCompletion",
       "defined_out": [
@@ -159,7 +191,7 @@
         "tmp%7#0"
       ]
     },
-    "132": {
+    "160": {
       "op": "!",
       "defined_out": [
         "tmp%8#0"
@@ -168,7 +200,7 @@
         "tmp%8#0"
       ]
     },
-    "133": {
+    "161": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%8#0",
@@ -179,7 +211,7 @@
         "tmp%9#0"
       ]
     },
-    "135": {
+    "163": {
       "op": "!",
       "defined_out": [
         "tmp%10#0",
@@ -190,7 +222,7 @@
         "tmp%10#0"
       ]
     },
-    "136": {
+    "164": {
       "op": "&&",
       "defined_out": [
         "tmp%11#0"
@@ -199,12 +231,12 @@
         "tmp%11#0"
       ]
     },
-    "137": {
+    "165": {
       "error": "OnCompletion must be NoOp && can only call when creating",
       "op": "assert // OnCompletion must be NoOp && can only call when creating",
       "stack_out": []
     },
-    "138": {
+    "166": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1"
@@ -213,11 +245,11 @@
         "1"
       ]
     },
-    "139": {
+    "167": {
       "op": "return",
       "stack_out": []
     },
-    "140": {
+    "168": {
       "subroutine": "smart_contracts/guessGame/contract.algo.ts::GuessGame.createSession[routing]",
       "params": {},
       "block": "createSession",
@@ -230,7 +262,7 @@
         "config#0"
       ]
     },
-    "143": {
+    "171": {
       "op": "dup",
       "defined_out": [
         "config#0",
@@ -241,7 +273,7 @@
         "config#0 (copy)"
       ]
     },
-    "144": {
+    "172": {
       "op": "len",
       "defined_out": [
         "config#0",
@@ -252,7 +284,7 @@
         "len%0#0"
       ]
     },
-    "145": {
+    "173": {
       "op": "pushint 32 // 32",
       "defined_out": [
         "32",
@@ -265,7 +297,7 @@
         "32"
       ]
     },
-    "147": {
+    "175": {
       "op": "==",
       "defined_out": [
         "config#0",
@@ -276,14 +308,14 @@
         "eq%0#0"
       ]
     },
-    "148": {
+    "176": {
       "error": "invalid number of bytes for ObjectB555233E",
       "op": "assert // invalid number of bytes for ObjectB555233E",
       "stack_out": [
         "config#0"
       ]
     },
-    "149": {
+    "177": {
       "op": "txn GroupIndex",
       "defined_out": [
         "config#0",
@@ -294,7 +326,7 @@
         "tmp%1#0"
       ]
     },
-    "151": {
+    "179": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -307,7 +339,7 @@
         "1"
       ]
     },
-    "152": {
+    "180": {
       "op": "-",
       "defined_out": [
         "config#0",
@@ -318,7 +350,7 @@
         "mbrPayment#0"
       ]
     },
-    "153": {
+    "181": {
       "op": "dup",
       "defined_out": [
         "config#0",
@@ -331,7 +363,7 @@
         "mbrPayment#0 (copy)"
       ]
     },
-    "154": {
+    "182": {
       "op": "gtxns TypeEnum",
       "defined_out": [
         "config#0",
@@ -344,7 +376,7 @@
         "gtxn_type%0#0"
       ]
     },
-    "156": {
+    "184": {
       "op": "intc_1 // pay",
       "defined_out": [
         "config#0",
@@ -359,7 +391,7 @@
         "pay"
       ]
     },
-    "157": {
+    "185": {
       "op": "==",
       "defined_out": [
         "config#0",
@@ -372,7 +404,7 @@
         "gtxn_type_matches%0#0"
       ]
     },
-    "158": {
+    "186": {
       "error": "transaction type is pay",
       "op": "assert // transaction type is pay",
       "stack_out": [
@@ -380,8 +412,8 @@
         "mbrPayment#0"
       ]
     },
-    "159": {
-      "op": "bytec_0 // \"newGame\"",
+    "187": {
+      "op": "bytec_1 // \"newGame\"",
       "defined_out": [
         "\"newGame\"",
         "config#0",
@@ -393,7 +425,7 @@
         "\"newGame\""
       ]
     },
-    "160": {
+    "188": {
       "callsub": "smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR",
       "op": "callsub smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR",
       "defined_out": [
@@ -407,7 +439,7 @@
         "requiredMBR#0"
       ]
     },
-    "163": {
+    "191": {
       "op": "dig 1",
       "stack_out": [
         "config#0",
@@ -416,7 +448,7 @@
         "mbrPayment#0 (copy)"
       ]
     },
-    "165": {
+    "193": {
       "op": "gtxns Receiver",
       "defined_out": [
         "config#0",
@@ -431,7 +463,7 @@
         "tmp%1#1"
       ]
     },
-    "167": {
+    "195": {
       "op": "global CurrentApplicationAddress",
       "defined_out": [
         "config#0",
@@ -448,7 +480,7 @@
         "tmp%2#1"
       ]
     },
-    "169": {
+    "197": {
       "op": "==",
       "defined_out": [
         "config#0",
@@ -463,7 +495,7 @@
         "tmp%3#1"
       ]
     },
-    "170": {
+    "198": {
       "error": "MBR payment receiver must be contract",
       "op": "assert // MBR payment receiver must be contract",
       "stack_out": [
@@ -472,7 +504,7 @@
         "requiredMBR#0"
       ]
     },
-    "171": {
+    "199": {
       "op": "swap",
       "stack_out": [
         "config#0",
@@ -480,7 +512,7 @@
         "mbrPayment#0"
       ]
     },
-    "172": {
+    "200": {
       "op": "gtxns Amount",
       "defined_out": [
         "config#0",
@@ -493,7 +525,7 @@
         "tmp%4#1"
       ]
     },
-    "174": {
+    "202": {
       "op": "<=",
       "defined_out": [
         "config#0",
@@ -504,21 +536,21 @@
         "tmp%5#0"
       ]
     },
-    "175": {
+    "203": {
       "error": "Insufficient MBR for session and counters",
       "op": "assert // Insufficient MBR for session and counters",
       "stack_out": [
         "config#0"
       ]
     },
-    "176": {
+    "204": {
       "op": "dup",
       "stack_out": [
         "config#0",
         "config#0 (copy)"
       ]
     },
-    "177": {
+    "205": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -531,7 +563,7 @@
         "0"
       ]
     },
-    "178": {
+    "206": {
       "op": "extract_uint64",
       "defined_out": [
         "config#0",
@@ -542,7 +574,7 @@
         "values%0#0"
       ]
     },
-    "179": {
+    "207": {
       "op": "dig 1",
       "stack_out": [
         "config#0",
@@ -550,7 +582,7 @@
         "config#0 (copy)"
       ]
     },
-    "181": {
+    "209": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -565,7 +597,7 @@
         "8"
       ]
     },
-    "182": {
+    "210": {
       "op": "extract_uint64",
       "defined_out": [
         "config#0",
@@ -578,7 +610,7 @@
         "values%1#0"
       ]
     },
-    "183": {
+    "211": {
       "op": "dup2",
       "defined_out": [
         "config#0",
@@ -595,7 +627,7 @@
         "values%1#0 (copy)"
       ]
     },
-    "184": {
+    "212": {
       "op": "<=",
       "defined_out": [
         "config#0",
@@ -610,7 +642,7 @@
         "tmp%0#0"
       ]
     },
-    "185": {
+    "213": {
       "error": "Invalid timeline: start must be before commit end",
       "op": "assert // Invalid timeline: start must be before commit end",
       "stack_out": [
@@ -619,7 +651,7 @@
         "values%1#0"
       ]
     },
-    "186": {
+    "214": {
       "op": "dig 2",
       "stack_out": [
         "config#0",
@@ -628,7 +660,7 @@
         "config#0 (copy)"
       ]
     },
-    "188": {
+    "216": {
       "op": "pushint 16 // 16",
       "defined_out": [
         "16",
@@ -645,7 +677,7 @@
         "16"
       ]
     },
-    "190": {
+    "218": {
       "op": "extract_uint64",
       "defined_out": [
         "config#0",
@@ -660,7 +692,7 @@
         "values%3#0"
       ]
     },
-    "191": {
+    "219": {
       "op": "<",
       "defined_out": [
         "config#0",
@@ -673,7 +705,7 @@
         "tmp%1#2"
       ]
     },
-    "192": {
+    "220": {
       "error": "Invalid timeline: commit end must be before reveal end",
       "op": "assert // Invalid timeline: commit end must be before reveal end",
       "stack_out": [
@@ -681,7 +713,7 @@
         "values%0#0"
       ]
     },
-    "193": {
+    "221": {
       "op": "global Round",
       "defined_out": [
         "config#0",
@@ -694,29 +726,29 @@
         "tmp%2#2"
       ]
     },
-    "195": {
+    "223": {
       "op": ">=",
       "stack_out": [
         "config#0",
         "tmp%3#1"
       ]
     },
-    "196": {
+    "224": {
       "error": "Invalid start time: cannot start in the past",
       "op": "assert // Invalid start time: cannot start in the past",
       "stack_out": [
         "config#0"
       ]
     },
-    "197": {
+    "225": {
       "op": "intc_0 // 0",
       "stack_out": [
         "config#0",
         "0"
       ]
     },
-    "198": {
-      "op": "bytec_2 // \"sessionIDCounter\"",
+    "226": {
+      "op": "bytec 4 // \"sessionIDCounter\"",
       "defined_out": [
         "\"sessionIDCounter\"",
         "0",
@@ -728,7 +760,7 @@
         "\"sessionIDCounter\""
       ]
     },
-    "199": {
+    "228": {
       "op": "app_global_get_ex",
       "defined_out": [
         "config#0",
@@ -741,7 +773,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "200": {
+    "229": {
       "error": "check GlobalState exists",
       "op": "assert // check GlobalState exists",
       "stack_out": [
@@ -749,7 +781,7 @@
         "sessionID#1"
       ]
     },
-    "201": {
+    "230": {
       "op": "dup",
       "defined_out": [
         "config#0",
@@ -762,7 +794,7 @@
         "sessionID#1 (copy)"
       ]
     },
-    "202": {
+    "231": {
       "op": "itob",
       "defined_out": [
         "config#0",
@@ -775,8 +807,8 @@
         "encoded_value%0#1"
       ]
     },
-    "203": {
-      "op": "bytec_1 // \"gs\"",
+    "232": {
+      "op": "bytec_2 // \"gs\"",
       "defined_out": [
         "\"gs\"",
         "config#0",
@@ -790,7 +822,7 @@
         "\"gs\""
       ]
     },
-    "204": {
+    "233": {
       "op": "dig 1",
       "defined_out": [
         "\"gs\"",
@@ -807,7 +839,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "206": {
+    "235": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -822,7 +854,7 @@
         "box_prefixed_key%0#0"
       ]
     },
-    "207": {
+    "236": {
       "op": "uncover 3",
       "stack_out": [
         "sessionID#1",
@@ -831,15 +863,15 @@
         "config#0"
       ]
     },
-    "209": {
+    "238": {
       "op": "box_put",
       "stack_out": [
         "sessionID#1",
         "encoded_value%0#1"
       ]
     },
-    "210": {
-      "op": "bytec_3 // \"sbal\"",
+    "239": {
+      "op": "bytec 5 // \"sbal\"",
       "defined_out": [
         "\"sbal\"",
         "encoded_value%0#1",
@@ -851,7 +883,7 @@
         "\"sbal\""
       ]
     },
-    "211": {
+    "241": {
       "op": "dig 1",
       "stack_out": [
         "sessionID#1",
@@ -860,7 +892,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "213": {
+    "243": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -873,7 +905,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "214": {
+    "244": {
       "op": "intc_0 // 0",
       "stack_out": [
         "sessionID#1",
@@ -882,7 +914,7 @@
         "0"
       ]
     },
-    "215": {
+    "245": {
       "op": "itob",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -897,21 +929,21 @@
         "encoded_value%2#0"
       ]
     },
-    "216": {
+    "246": {
       "op": "box_put",
       "stack_out": [
         "sessionID#1",
         "encoded_value%0#1"
       ]
     },
-    "217": {
+    "247": {
       "op": "swap",
       "stack_out": [
         "encoded_value%0#1",
         "sessionID#1"
       ]
     },
-    "218": {
+    "248": {
       "op": "intc_1 // 1",
       "stack_out": [
         "encoded_value%0#1",
@@ -919,22 +951,22 @@
         "1"
       ]
     },
-    "219": {
+    "249": {
       "op": "+",
       "stack_out": [
         "encoded_value%0#1",
         "tmp%4#1"
       ]
     },
-    "220": {
-      "op": "bytec_2 // \"sessionIDCounter\"",
+    "250": {
+      "op": "bytec 4 // \"sessionIDCounter\"",
       "stack_out": [
         "encoded_value%0#1",
         "tmp%4#1",
         "\"sessionIDCounter\""
       ]
     },
-    "221": {
+    "252": {
       "op": "swap",
       "stack_out": [
         "encoded_value%0#1",
@@ -942,14 +974,14 @@
         "tmp%4#1"
       ]
     },
-    "222": {
+    "253": {
       "op": "app_global_put",
       "stack_out": [
         "encoded_value%0#1"
       ]
     },
-    "223": {
-      "op": "bytec 4 // \"st\"",
+    "254": {
+      "op": "bytec 6 // \"st\"",
       "defined_out": [
         "\"st\"",
         "encoded_value%0#1"
@@ -959,7 +991,7 @@
         "\"st\""
       ]
     },
-    "225": {
+    "256": {
       "op": "dig 1",
       "stack_out": [
         "encoded_value%0#1",
@@ -967,14 +999,14 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "227": {
+    "258": {
       "op": "concat",
       "stack_out": [
         "encoded_value%0#1",
         "box_prefixed_key%0#0"
       ]
     },
-    "228": {
+    "259": {
       "op": "pushbytes 0x00000000000000000000000000000000",
       "defined_out": [
         "0x00000000000000000000000000000000",
@@ -987,13 +1019,13 @@
         "0x00000000000000000000000000000000"
       ]
     },
-    "246": {
+    "277": {
       "op": "box_put",
       "stack_out": [
         "encoded_value%0#1"
       ]
     },
-    "247": {
+    "278": {
       "op": "pushint 808 // 808",
       "defined_out": [
         "808",
@@ -1004,7 +1036,7 @@
         "808"
       ]
     },
-    "250": {
+    "281": {
       "op": "bzero",
       "defined_out": [
         "encoded_value%0#1",
@@ -1015,8 +1047,8 @@
         "tmp%7#0"
       ]
     },
-    "251": {
-      "op": "bytec 5 // \"fr\"",
+    "282": {
+      "op": "bytec 7 // \"fr\"",
       "defined_out": [
         "\"fr\"",
         "encoded_value%0#1",
@@ -1028,7 +1060,7 @@
         "\"fr\""
       ]
     },
-    "253": {
+    "284": {
       "op": "dig 2",
       "stack_out": [
         "encoded_value%0#1",
@@ -1037,7 +1069,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "255": {
+    "286": {
       "op": "concat",
       "stack_out": [
         "encoded_value%0#1",
@@ -1045,7 +1077,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "256": {
+    "287": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -1060,7 +1092,7 @@
         "box_prefixed_key%1#0 (copy)"
       ]
     },
-    "257": {
+    "288": {
       "op": "box_del",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -1075,7 +1107,7 @@
         "{box_del}"
       ]
     },
-    "258": {
+    "289": {
       "op": "pop",
       "stack_out": [
         "encoded_value%0#1",
@@ -1083,7 +1115,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "259": {
+    "290": {
       "op": "swap",
       "stack_out": [
         "encoded_value%0#1",
@@ -1091,14 +1123,14 @@
         "tmp%7#0"
       ]
     },
-    "260": {
+    "291": {
       "op": "box_put",
       "stack_out": [
         "encoded_value%0#1"
       ]
     },
-    "261": {
-      "op": "bytec 6 // 0x151f7c75",
+    "292": {
+      "op": "bytec_3 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
         "encoded_value%0#1"
@@ -1108,14 +1140,14 @@
         "0x151f7c75"
       ]
     },
-    "263": {
+    "293": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "encoded_value%0#1"
       ]
     },
-    "264": {
+    "294": {
       "op": "concat",
       "defined_out": [
         "tmp%4#0"
@@ -1124,21 +1156,21 @@
         "tmp%4#0"
       ]
     },
-    "265": {
+    "295": {
       "op": "log",
       "stack_out": []
     },
-    "266": {
+    "296": {
       "op": "intc_1 // 1",
       "stack_out": [
         "1"
       ]
     },
-    "267": {
+    "297": {
       "op": "return",
       "stack_out": []
     },
-    "268": {
+    "298": {
       "subroutine": "smart_contracts/guessGame/contract.algo.ts::GuessGame.joinSession[routing]",
       "params": {},
       "block": "joinSession",
@@ -1151,7 +1183,7 @@
         "tmp%0#0"
       ]
     },
-    "271": {
+    "301": {
       "op": "dup",
       "defined_out": [
         "tmp%0#0",
@@ -1162,7 +1194,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "272": {
+    "302": {
       "op": "len",
       "defined_out": [
         "len%0#0",
@@ -1173,7 +1205,7 @@
         "len%0#0"
       ]
     },
-    "273": {
+    "303": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -1186,7 +1218,7 @@
         "8"
       ]
     },
-    "274": {
+    "304": {
       "op": "==",
       "defined_out": [
         "eq%0#0",
@@ -1197,14 +1229,14 @@
         "eq%0#0"
       ]
     },
-    "275": {
+    "305": {
       "error": "invalid number of bytes for arc4.uint64",
       "op": "assert // invalid number of bytes for arc4.uint64",
       "stack_out": [
         "tmp%0#0"
       ]
     },
-    "276": {
+    "306": {
       "op": "btoi",
       "defined_out": [
         "sessionID#0"
@@ -1213,7 +1245,7 @@
         "sessionID#0"
       ]
     },
-    "277": {
+    "307": {
       "op": "txna ApplicationArgs 2",
       "defined_out": [
         "sessionID#0",
@@ -1224,7 +1256,7 @@
         "tmp%2#0"
       ]
     },
-    "280": {
+    "310": {
       "op": "dup",
       "defined_out": [
         "sessionID#0",
@@ -1237,7 +1269,7 @@
         "tmp%2#0 (copy)"
       ]
     },
-    "281": {
+    "311": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -1252,7 +1284,7 @@
         "0"
       ]
     },
-    "282": {
+    "312": {
       "error": "invalid array length header",
       "op": "extract_uint16 // on error: invalid array length header",
       "defined_out": [
@@ -1266,7 +1298,7 @@
         "aggregate%array_length%0#0"
       ]
     },
-    "283": {
+    "313": {
       "op": "intc_3 // 2",
       "defined_out": [
         "2",
@@ -1281,7 +1313,7 @@
         "2"
       ]
     },
-    "284": {
+    "314": {
       "op": "+",
       "defined_out": [
         "add%0#0",
@@ -1294,7 +1326,7 @@
         "add%0#0"
       ]
     },
-    "285": {
+    "315": {
       "op": "dig 1",
       "stack_out": [
         "sessionID#0",
@@ -1303,7 +1335,7 @@
         "tmp%2#0 (copy)"
       ]
     },
-    "287": {
+    "317": {
       "op": "len",
       "defined_out": [
         "add%0#0",
@@ -1318,7 +1350,7 @@
         "len%1#0"
       ]
     },
-    "288": {
+    "318": {
       "op": "==",
       "defined_out": [
         "eq%1#0",
@@ -1331,7 +1363,7 @@
         "eq%1#0"
       ]
     },
-    "289": {
+    "319": {
       "error": "invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "op": "assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "stack_out": [
@@ -1339,7 +1371,7 @@
         "tmp%2#0"
       ]
     },
-    "290": {
+    "320": {
       "op": "extract 2 0",
       "defined_out": [
         "commit#0",
@@ -1350,7 +1382,7 @@
         "commit#0"
       ]
     },
-    "293": {
+    "323": {
       "op": "txn GroupIndex",
       "defined_out": [
         "commit#0",
@@ -1363,7 +1395,7 @@
         "tmp%4#0"
       ]
     },
-    "295": {
+    "325": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -1378,7 +1410,7 @@
         "1"
       ]
     },
-    "296": {
+    "326": {
       "op": "-",
       "defined_out": [
         "commit#0",
@@ -1391,7 +1423,7 @@
         "payment#0"
       ]
     },
-    "297": {
+    "327": {
       "op": "dup",
       "defined_out": [
         "commit#0",
@@ -1406,7 +1438,7 @@
         "payment#0 (copy)"
       ]
     },
-    "298": {
+    "328": {
       "op": "gtxns TypeEnum",
       "defined_out": [
         "commit#0",
@@ -1421,7 +1453,7 @@
         "gtxn_type%0#0"
       ]
     },
-    "300": {
+    "330": {
       "op": "intc_1 // pay",
       "defined_out": [
         "commit#0",
@@ -1438,7 +1470,7 @@
         "pay"
       ]
     },
-    "301": {
+    "331": {
       "op": "==",
       "defined_out": [
         "commit#0",
@@ -1453,7 +1485,7 @@
         "gtxn_type_matches%0#0"
       ]
     },
-    "302": {
+    "332": {
       "error": "transaction type is pay",
       "op": "assert // transaction type is pay",
       "stack_out": [
@@ -1462,7 +1494,7 @@
         "payment#0"
       ]
     },
-    "303": {
+    "333": {
       "op": "uncover 2",
       "stack_out": [
         "commit#0",
@@ -1470,7 +1502,7 @@
         "sessionID#0"
       ]
     },
-    "305": {
+    "335": {
       "op": "itob",
       "defined_out": [
         "commit#0",
@@ -1483,8 +1515,8 @@
         "encoded_value%0#0"
       ]
     },
-    "306": {
-      "op": "bytec_1 // \"gs\"",
+    "336": {
+      "op": "bytec_2 // \"gs\"",
       "defined_out": [
         "\"gs\"",
         "commit#0",
@@ -1498,7 +1530,7 @@
         "\"gs\""
       ]
     },
-    "307": {
+    "337": {
       "op": "dig 1",
       "defined_out": [
         "\"gs\"",
@@ -1515,7 +1547,7 @@
         "encoded_value%0#0 (copy)"
       ]
     },
-    "309": {
+    "339": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -1530,7 +1562,7 @@
         "box_prefixed_key%0#0"
       ]
     },
-    "310": {
+    "340": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -1547,7 +1579,7 @@
         "box_prefixed_key%0#0 (copy)"
       ]
     },
-    "311": {
+    "341": {
       "op": "box_len",
       "defined_out": [
         "_%0#0",
@@ -1566,7 +1598,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "312": {
+    "342": {
       "op": "bury 1",
       "stack_out": [
         "commit#0",
@@ -1576,7 +1608,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "314": {
+    "344": {
       "error": "Session does not exist",
       "op": "assert // Session does not exist",
       "stack_out": [
@@ -1586,7 +1618,7 @@
         "box_prefixed_key%0#0"
       ]
     },
-    "315": {
+    "345": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%1#0",
@@ -1603,7 +1635,7 @@
         "aggregate%box_get%1#0"
       ]
     },
-    "316": {
+    "346": {
       "op": "pop",
       "stack_out": [
         "commit#0",
@@ -1612,7 +1644,7 @@
         "config#0"
       ]
     },
-    "317": {
+    "347": {
       "op": "global Round",
       "defined_out": [
         "commit#0",
@@ -1629,7 +1661,7 @@
         "currentBlock#0"
       ]
     },
-    "319": {
+    "349": {
       "op": "dig 1",
       "defined_out": [
         "commit#0",
@@ -1648,7 +1680,7 @@
         "config#0 (copy)"
       ]
     },
-    "321": {
+    "351": {
       "op": "intc_0 // 0",
       "stack_out": [
         "commit#0",
@@ -1660,7 +1692,7 @@
         "0"
       ]
     },
-    "322": {
+    "352": {
       "op": "extract_uint64",
       "defined_out": [
         "commit#0",
@@ -1679,7 +1711,7 @@
         "values%0#0"
       ]
     },
-    "323": {
+    "353": {
       "op": "dig 1",
       "defined_out": [
         "commit#0",
@@ -1700,7 +1732,7 @@
         "currentBlock#0 (copy)"
       ]
     },
-    "325": {
+    "355": {
       "op": "<=",
       "defined_out": [
         "commit#0",
@@ -1719,7 +1751,7 @@
         "tmp%1#0"
       ]
     },
-    "326": {
+    "356": {
       "error": "Game session has not started yet",
       "op": "assert // Game session has not started yet",
       "stack_out": [
@@ -1730,7 +1762,7 @@
         "currentBlock#0"
       ]
     },
-    "327": {
+    "357": {
       "op": "dig 1",
       "stack_out": [
         "commit#0",
@@ -1741,7 +1773,7 @@
         "config#0 (copy)"
       ]
     },
-    "329": {
+    "359": {
       "op": "intc_2 // 8",
       "stack_out": [
         "commit#0",
@@ -1753,7 +1785,7 @@
         "8"
       ]
     },
-    "330": {
+    "360": {
       "op": "extract_uint64",
       "defined_out": [
         "commit#0",
@@ -1772,7 +1804,7 @@
         "values%1#0"
       ]
     },
-    "331": {
+    "361": {
       "op": "<=",
       "defined_out": [
         "commit#0",
@@ -1789,7 +1821,7 @@
         "tmp%2#1"
       ]
     },
-    "332": {
+    "362": {
       "error": "Commit phase has ended",
       "op": "assert // Commit phase has ended",
       "stack_out": [
@@ -1799,7 +1831,7 @@
         "config#0"
       ]
     },
-    "333": {
+    "363": {
       "op": "dig 2",
       "stack_out": [
         "commit#0",
@@ -1809,7 +1841,7 @@
         "payment#0 (copy)"
       ]
     },
-    "335": {
+    "365": {
       "op": "gtxns Receiver",
       "defined_out": [
         "commit#0",
@@ -1826,7 +1858,7 @@
         "tmp%3#0"
       ]
     },
-    "337": {
+    "367": {
       "op": "global CurrentApplicationAddress",
       "defined_out": [
         "commit#0",
@@ -1845,7 +1877,7 @@
         "tmp%4#1"
       ]
     },
-    "339": {
+    "369": {
       "op": "==",
       "defined_out": [
         "commit#0",
@@ -1862,7 +1894,7 @@
         "tmp%5#0"
       ]
     },
-    "340": {
+    "370": {
       "error": "Fee receiver must be the contract",
       "op": "assert // Fee receiver must be the contract",
       "stack_out": [
@@ -1872,7 +1904,7 @@
         "config#0"
       ]
     },
-    "341": {
+    "371": {
       "op": "uncover 2",
       "stack_out": [
         "commit#0",
@@ -1881,7 +1913,7 @@
         "payment#0"
       ]
     },
-    "343": {
+    "373": {
       "op": "gtxns Amount",
       "defined_out": [
         "commit#0",
@@ -1896,7 +1928,7 @@
         "tmp%6#0"
       ]
     },
-    "345": {
+    "375": {
       "op": "swap",
       "stack_out": [
         "commit#0",
@@ -1905,7 +1937,7 @@
         "config#0"
       ]
     },
-    "346": {
+    "376": {
       "op": "pushint 24 // 24",
       "defined_out": [
         "24",
@@ -1922,7 +1954,7 @@
         "24"
       ]
     },
-    "348": {
+    "378": {
       "op": "extract_uint64",
       "defined_out": [
         "commit#0",
@@ -1937,7 +1969,7 @@
         "values%2#0"
       ]
     },
-    "349": {
+    "379": {
       "op": "dig 1",
       "defined_out": [
         "commit#0",
@@ -1954,7 +1986,7 @@
         "tmp%6#0 (copy)"
       ]
     },
-    "351": {
+    "381": {
       "op": "==",
       "defined_out": [
         "commit#0",
@@ -1969,7 +2001,7 @@
         "tmp%7#0"
       ]
     },
-    "352": {
+    "382": {
       "error": "Incorrect participation fee amount",
       "op": "assert // Incorrect participation fee amount",
       "stack_out": [
@@ -1978,7 +2010,7 @@
         "tmp%6#0"
       ]
     },
-    "353": {
+    "383": {
       "op": "dig 1",
       "stack_out": [
         "commit#0",
@@ -1987,7 +2019,7 @@
         "encoded_value%0#0 (copy)"
       ]
     },
-    "355": {
+    "385": {
       "op": "txn Sender",
       "defined_out": [
         "commit#0",
@@ -2004,7 +2036,7 @@
         "playerAddr#0"
       ]
     },
-    "357": {
+    "387": {
       "op": "concat",
       "defined_out": [
         "commit#0",
@@ -2019,7 +2051,7 @@
         "tmp%1#1"
       ]
     },
-    "358": {
+    "388": {
       "op": "sha256",
       "defined_out": [
         "commit#0",
@@ -2034,8 +2066,8 @@
         "playerKey#0"
       ]
     },
-    "359": {
-      "op": "bytec 7 // \"pcom\"",
+    "389": {
+      "op": "bytec 8 // \"pcom\"",
       "defined_out": [
         "\"pcom\"",
         "commit#0",
@@ -2051,7 +2083,7 @@
         "\"pcom\""
       ]
     },
-    "361": {
+    "391": {
       "op": "swap",
       "stack_out": [
         "commit#0",
@@ -2061,7 +2093,7 @@
         "playerKey#0"
       ]
     },
-    "362": {
+    "392": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -2076,7 +2108,7 @@
         "box_prefixed_key%2#0"
       ]
     },
-    "363": {
+    "393": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -2093,7 +2125,7 @@
         "box_prefixed_key%2#0 (copy)"
       ]
     },
-    "364": {
+    "394": {
       "op": "box_len",
       "defined_out": [
         "_%1#0",
@@ -2112,7 +2144,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "365": {
+    "395": {
       "op": "bury 1",
       "stack_out": [
         "commit#0",
@@ -2122,7 +2154,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "367": {
+    "397": {
       "op": "!",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -2139,7 +2171,7 @@
         "tmp%9#0"
       ]
     },
-    "368": {
+    "398": {
       "error": "Player already registered in this session",
       "op": "assert // Player already registered in this session",
       "stack_out": [
@@ -2149,7 +2181,7 @@
         "box_prefixed_key%2#0"
       ]
     },
-    "369": {
+    "399": {
       "op": "dup",
       "stack_out": [
         "commit#0",
@@ -2159,7 +2191,7 @@
         "box_prefixed_key%2#0 (copy)"
       ]
     },
-    "370": {
+    "400": {
       "op": "box_del",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -2176,7 +2208,7 @@
         "{box_del}"
       ]
     },
-    "371": {
+    "401": {
       "op": "pop",
       "stack_out": [
         "commit#0",
@@ -2185,7 +2217,7 @@
         "box_prefixed_key%2#0"
       ]
     },
-    "372": {
+    "402": {
       "op": "uncover 3",
       "stack_out": [
         "encoded_value%0#0",
@@ -2194,15 +2226,15 @@
         "commit#0"
       ]
     },
-    "374": {
+    "404": {
       "op": "box_put",
       "stack_out": [
         "encoded_value%0#0",
         "tmp%6#0"
       ]
     },
-    "375": {
-      "op": "bytec_3 // \"sbal\"",
+    "405": {
+      "op": "bytec 5 // \"sbal\"",
       "defined_out": [
         "\"sbal\"",
         "encoded_value%0#0",
@@ -2214,7 +2246,7 @@
         "\"sbal\""
       ]
     },
-    "376": {
+    "407": {
       "op": "uncover 2",
       "stack_out": [
         "tmp%6#0",
@@ -2222,7 +2254,7 @@
         "encoded_value%0#0"
       ]
     },
-    "378": {
+    "409": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%4#0",
@@ -2233,7 +2265,7 @@
         "box_prefixed_key%4#0"
       ]
     },
-    "379": {
+    "410": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%4#0",
@@ -2246,7 +2278,7 @@
         "box_prefixed_key%4#0 (copy)"
       ]
     },
-    "380": {
+    "411": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%2#0",
@@ -2261,7 +2293,7 @@
         "aggregate%box_get%3#0"
       ]
     },
-    "381": {
+    "412": {
       "error": "Box must have value",
       "op": "assert // Box must have value",
       "stack_out": [
@@ -2270,7 +2302,7 @@
         "aggregate%box_get%2#0"
       ]
     },
-    "382": {
+    "413": {
       "op": "btoi",
       "defined_out": [
         "box_prefixed_key%4#0",
@@ -2283,7 +2315,7 @@
         "maybe_value_converted%0#0"
       ]
     },
-    "383": {
+    "414": {
       "op": "uncover 2",
       "stack_out": [
         "box_prefixed_key%4#0",
@@ -2291,7 +2323,7 @@
         "tmp%6#0"
       ]
     },
-    "385": {
+    "416": {
       "op": "+",
       "defined_out": [
         "box_prefixed_key%4#0",
@@ -2302,7 +2334,7 @@
         "tmp%11#0"
       ]
     },
-    "386": {
+    "417": {
       "op": "itob",
       "defined_out": [
         "box_prefixed_key%4#0",
@@ -2313,21 +2345,21 @@
         "encoded_value%4#0"
       ]
     },
-    "387": {
+    "418": {
       "op": "box_put",
       "stack_out": []
     },
-    "388": {
+    "419": {
       "op": "intc_1 // 1",
       "stack_out": [
         "1"
       ]
     },
-    "389": {
+    "420": {
       "op": "return",
       "stack_out": []
     },
-    "390": {
+    "421": {
       "subroutine": "smart_contracts/guessGame/contract.algo.ts::GuessGame.revealMove[routing]",
       "params": {},
       "block": "revealMove",
@@ -2340,7 +2372,7 @@
         "tmp%0#0"
       ]
     },
-    "393": {
+    "424": {
       "op": "dup",
       "defined_out": [
         "tmp%0#0",
@@ -2351,7 +2383,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "394": {
+    "425": {
       "op": "len",
       "defined_out": [
         "len%0#0",
@@ -2362,7 +2394,7 @@
         "len%0#0"
       ]
     },
-    "395": {
+    "426": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -2375,7 +2407,7 @@
         "8"
       ]
     },
-    "396": {
+    "427": {
       "op": "==",
       "defined_out": [
         "eq%0#0",
@@ -2386,14 +2418,14 @@
         "eq%0#0"
       ]
     },
-    "397": {
+    "428": {
       "error": "invalid number of bytes for arc4.uint64",
       "op": "assert // invalid number of bytes for arc4.uint64",
       "stack_out": [
         "tmp%0#0"
       ]
     },
-    "398": {
+    "429": {
       "op": "btoi",
       "defined_out": [
         "sessionID#0"
@@ -2402,7 +2434,7 @@
         "sessionID#0"
       ]
     },
-    "399": {
+    "430": {
       "op": "txna ApplicationArgs 2",
       "defined_out": [
         "sessionID#0",
@@ -2413,7 +2445,7 @@
         "tmp%2#0"
       ]
     },
-    "402": {
+    "433": {
       "op": "dup",
       "defined_out": [
         "sessionID#0",
@@ -2426,7 +2458,7 @@
         "tmp%2#0 (copy)"
       ]
     },
-    "403": {
+    "434": {
       "op": "len",
       "defined_out": [
         "len%1#0",
@@ -2439,7 +2471,7 @@
         "len%1#0"
       ]
     },
-    "404": {
+    "435": {
       "op": "intc_2 // 8",
       "stack_out": [
         "sessionID#0",
@@ -2448,7 +2480,7 @@
         "8"
       ]
     },
-    "405": {
+    "436": {
       "op": "==",
       "defined_out": [
         "eq%1#0",
@@ -2461,7 +2493,7 @@
         "eq%1#0"
       ]
     },
-    "406": {
+    "437": {
       "error": "invalid number of bytes for arc4.uint64",
       "op": "assert // invalid number of bytes for arc4.uint64",
       "stack_out": [
@@ -2469,7 +2501,7 @@
         "tmp%2#0"
       ]
     },
-    "407": {
+    "438": {
       "op": "btoi",
       "defined_out": [
         "choice#0",
@@ -2480,7 +2512,7 @@
         "choice#0"
       ]
     },
-    "408": {
+    "439": {
       "op": "dup",
       "defined_out": [
         "choice#0",
@@ -2492,7 +2524,7 @@
         "choice#0"
       ]
     },
-    "409": {
+    "440": {
       "op": "txna ApplicationArgs 3",
       "defined_out": [
         "choice#0",
@@ -2506,7 +2538,7 @@
         "tmp%4#0"
       ]
     },
-    "412": {
+    "443": {
       "op": "dup",
       "defined_out": [
         "choice#0",
@@ -2522,7 +2554,7 @@
         "tmp%4#0 (copy)"
       ]
     },
-    "413": {
+    "444": {
       "op": "intc_0 // 0",
       "stack_out": [
         "sessionID#0",
@@ -2533,7 +2565,7 @@
         "0"
       ]
     },
-    "414": {
+    "445": {
       "error": "invalid array length header",
       "op": "extract_uint16 // on error: invalid array length header",
       "defined_out": [
@@ -2550,7 +2582,7 @@
         "aggregate%array_length%0#0"
       ]
     },
-    "415": {
+    "446": {
       "op": "intc_3 // 2",
       "defined_out": [
         "2",
@@ -2568,7 +2600,7 @@
         "2"
       ]
     },
-    "416": {
+    "447": {
       "op": "+",
       "defined_out": [
         "add%0#0",
@@ -2584,7 +2616,7 @@
         "add%0#0"
       ]
     },
-    "417": {
+    "448": {
       "op": "dig 1",
       "stack_out": [
         "sessionID#0",
@@ -2595,7 +2627,7 @@
         "tmp%4#0 (copy)"
       ]
     },
-    "419": {
+    "450": {
       "op": "len",
       "defined_out": [
         "add%0#0",
@@ -2613,7 +2645,7 @@
         "len%2#0"
       ]
     },
-    "420": {
+    "451": {
       "op": "==",
       "defined_out": [
         "choice#0",
@@ -2629,7 +2661,7 @@
         "eq%2#0"
       ]
     },
-    "421": {
+    "452": {
       "error": "invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "op": "assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "stack_out": [
@@ -2639,7 +2671,7 @@
         "tmp%4#0"
       ]
     },
-    "422": {
+    "453": {
       "op": "extract 2 0",
       "defined_out": [
         "choice#0",
@@ -2653,7 +2685,7 @@
         "salt#0"
       ]
     },
-    "425": {
+    "456": {
       "op": "swap",
       "defined_out": [
         "choice#0",
@@ -2667,7 +2699,7 @@
         "choice#0"
       ]
     },
-    "426": {
+    "457": {
       "op": "pushint 100 // 100",
       "defined_out": [
         "100",
@@ -2683,7 +2715,7 @@
         "100"
       ]
     },
-    "428": {
+    "459": {
       "op": "<=",
       "defined_out": [
         "choice#0",
@@ -2698,7 +2730,7 @@
         "tmp%1#1"
       ]
     },
-    "429": {
+    "460": {
       "op": "bz revealMove_bool_false@4",
       "stack_out": [
         "sessionID#0",
@@ -2706,7 +2738,7 @@
         "salt#0"
       ]
     },
-    "432": {
+    "463": {
       "op": "intc_1 // 1",
       "defined_out": [
         "and_result%0#0",
@@ -2721,7 +2753,7 @@
         "and_result%0#0"
       ]
     },
-    "433": {
+    "464": {
       "error": "Choice must be between 0 and 100",
       "block": "revealMove_bool_merge@5",
       "stack_in": [
@@ -2738,7 +2770,7 @@
         "salt#0"
       ]
     },
-    "434": {
+    "465": {
       "op": "dig 2",
       "defined_out": [
         "sessionID#0"
@@ -2750,7 +2782,7 @@
         "sessionID#0"
       ]
     },
-    "436": {
+    "467": {
       "op": "itob",
       "defined_out": [
         "encoded_value%0#1",
@@ -2763,8 +2795,8 @@
         "encoded_value%0#1"
       ]
     },
-    "437": {
-      "op": "bytec_1 // \"gs\"",
+    "468": {
+      "op": "bytec_2 // \"gs\"",
       "defined_out": [
         "\"gs\"",
         "encoded_value%0#1",
@@ -2778,7 +2810,7 @@
         "\"gs\""
       ]
     },
-    "438": {
+    "469": {
       "op": "dig 1",
       "defined_out": [
         "\"gs\"",
@@ -2795,7 +2827,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "440": {
+    "471": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -2810,7 +2842,7 @@
         "box_prefixed_key%0#0"
       ]
     },
-    "441": {
+    "472": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -2827,7 +2859,7 @@
         "box_prefixed_key%0#0 (copy)"
       ]
     },
-    "442": {
+    "473": {
       "op": "box_len",
       "defined_out": [
         "_%0#0",
@@ -2846,7 +2878,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "443": {
+    "474": {
       "op": "bury 1",
       "stack_out": [
         "sessionID#0",
@@ -2857,7 +2889,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "445": {
+    "476": {
       "error": "Session does not exist",
       "op": "assert // Session does not exist",
       "stack_out": [
@@ -2868,7 +2900,7 @@
         "box_prefixed_key%0#0"
       ]
     },
-    "446": {
+    "477": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%1#0",
@@ -2885,7 +2917,7 @@
         "aggregate%box_get%1#0"
       ]
     },
-    "447": {
+    "478": {
       "op": "pop",
       "stack_out": [
         "sessionID#0",
@@ -2895,7 +2927,7 @@
         "config#0"
       ]
     },
-    "448": {
+    "479": {
       "op": "global Round",
       "defined_out": [
         "config#0",
@@ -2912,7 +2944,7 @@
         "currentBlock#0"
       ]
     },
-    "450": {
+    "481": {
       "op": "dig 1",
       "defined_out": [
         "config#0",
@@ -2931,7 +2963,7 @@
         "config#0 (copy)"
       ]
     },
-    "452": {
+    "483": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -2952,7 +2984,7 @@
         "8"
       ]
     },
-    "453": {
+    "484": {
       "op": "extract_uint64",
       "defined_out": [
         "config#0",
@@ -2971,7 +3003,7 @@
         "values%0#0"
       ]
     },
-    "454": {
+    "485": {
       "op": "dig 1",
       "defined_out": [
         "config#0",
@@ -2992,7 +3024,7 @@
         "currentBlock#0 (copy)"
       ]
     },
-    "456": {
+    "487": {
       "op": "<",
       "defined_out": [
         "config#0",
@@ -3011,7 +3043,7 @@
         "tmp%1#1"
       ]
     },
-    "457": {
+    "488": {
       "error": "Commit phase is still active",
       "op": "assert // Commit phase is still active",
       "stack_out": [
@@ -3023,7 +3055,7 @@
         "currentBlock#0"
       ]
     },
-    "458": {
+    "489": {
       "op": "swap",
       "stack_out": [
         "sessionID#0",
@@ -3034,7 +3066,7 @@
         "config#0"
       ]
     },
-    "459": {
+    "490": {
       "op": "pushint 16 // 16",
       "defined_out": [
         "16",
@@ -3053,7 +3085,7 @@
         "16"
       ]
     },
-    "461": {
+    "492": {
       "op": "extract_uint64",
       "defined_out": [
         "currentBlock#0",
@@ -3070,7 +3102,7 @@
         "values%1#0"
       ]
     },
-    "462": {
+    "493": {
       "op": "<=",
       "defined_out": [
         "encoded_value%0#1",
@@ -3085,7 +3117,7 @@
         "tmp%2#2"
       ]
     },
-    "463": {
+    "494": {
       "error": "Reveal phase has ended",
       "op": "assert // Reveal phase has ended",
       "stack_out": [
@@ -3095,10 +3127,10 @@
         "encoded_value%0#1"
       ]
     },
-    "464": {
+    "495": {
       "op": "dup"
     },
-    "465": {
+    "496": {
       "op": "txn Sender",
       "defined_out": [
         "encoded_value%0#1",
@@ -3115,7 +3147,7 @@
         "playerAddr#0"
       ]
     },
-    "467": {
+    "498": {
       "op": "concat",
       "defined_out": [
         "encoded_value%0#1",
@@ -3130,7 +3162,7 @@
         "tmp%1#3"
       ]
     },
-    "468": {
+    "499": {
       "op": "sha256",
       "defined_out": [
         "encoded_value%0#1",
@@ -3145,8 +3177,8 @@
         "playerKey#0"
       ]
     },
-    "469": {
-      "op": "bytec 7 // \"pcom\"",
+    "500": {
+      "op": "bytec 8 // \"pcom\"",
       "defined_out": [
         "\"pcom\"",
         "encoded_value%0#1",
@@ -3162,7 +3194,7 @@
         "\"pcom\""
       ]
     },
-    "471": {
+    "502": {
       "op": "dig 1",
       "defined_out": [
         "\"pcom\"",
@@ -3181,7 +3213,7 @@
         "playerKey#0 (copy)"
       ]
     },
-    "473": {
+    "504": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3198,7 +3230,7 @@
         "box_prefixed_key%2#0"
       ]
     },
-    "474": {
+    "505": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3217,7 +3249,7 @@
         "box_prefixed_key%2#0 (copy)"
       ]
     },
-    "475": {
+    "506": {
       "op": "box_len",
       "defined_out": [
         "_%1#0",
@@ -3238,7 +3270,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "476": {
+    "507": {
       "op": "bury 1",
       "stack_out": [
         "sessionID#0",
@@ -3250,7 +3282,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "478": {
+    "509": {
       "error": "No commit found for this player or already revealed",
       "op": "assert // No commit found for this player or already revealed",
       "stack_out": [
@@ -3262,7 +3294,7 @@
         "box_prefixed_key%2#0"
       ]
     },
-    "479": {
+    "510": {
       "op": "dup",
       "stack_out": [
         "sessionID#0",
@@ -3274,7 +3306,7 @@
         "box_prefixed_key%2#0 (copy)"
       ]
     },
-    "480": {
+    "511": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%3#0",
@@ -3295,7 +3327,7 @@
         "aggregate%box_get%3#0"
       ]
     },
-    "481": {
+    "512": {
       "op": "pop",
       "stack_out": [
         "sessionID#0",
@@ -3307,7 +3339,7 @@
         "storedCommit#0"
       ]
     },
-    "482": {
+    "513": {
       "op": "dig 5",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3328,7 +3360,7 @@
         "choice#0"
       ]
     },
-    "484": {
+    "515": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3351,7 +3383,7 @@
         "choice#0 (copy)"
       ]
     },
-    "485": {
+    "516": {
       "op": "cover 4",
       "stack_out": [
         "sessionID#0",
@@ -3365,7 +3397,7 @@
         "choice#0 (copy)"
       ]
     },
-    "487": {
+    "518": {
       "op": "itob",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3388,7 +3420,7 @@
         "tmp%4#0"
       ]
     },
-    "488": {
+    "519": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3413,7 +3445,7 @@
         "tmp%4#0 (copy)"
       ]
     },
-    "489": {
+    "520": {
       "op": "dig 7",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3440,7 +3472,7 @@
         "salt#0"
       ]
     },
-    "491": {
+    "522": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3466,7 +3498,7 @@
         "tmp%5#0"
       ]
     },
-    "492": {
+    "523": {
       "op": "sha256",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3492,7 +3524,7 @@
         "computedCommit#0"
       ]
     },
-    "493": {
+    "524": {
       "op": "uncover 2",
       "stack_out": [
         "sessionID#0",
@@ -3507,7 +3539,7 @@
         "storedCommit#0"
       ]
     },
-    "495": {
+    "526": {
       "op": "==",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3531,7 +3563,7 @@
         "tmp%7#1"
       ]
     },
-    "496": {
+    "527": {
       "error": "Invalid reveal: hash mismatch",
       "op": "assert // Invalid reveal: hash mismatch",
       "stack_out": [
@@ -3545,8 +3577,8 @@
         "tmp%4#0"
       ]
     },
-    "497": {
-      "op": "bytec 8 // \"pcho\"",
+    "528": {
+      "op": "bytec 9 // \"pcho\"",
       "defined_out": [
         "\"pcho\"",
         "box_prefixed_key%2#0",
@@ -3569,7 +3601,7 @@
         "\"pcho\""
       ]
     },
-    "499": {
+    "530": {
       "op": "uncover 3",
       "stack_out": [
         "sessionID#0",
@@ -3583,7 +3615,7 @@
         "playerKey#0"
       ]
     },
-    "501": {
+    "532": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%2#0",
@@ -3605,7 +3637,7 @@
         "box_prefixed_key%4#0"
       ]
     },
-    "502": {
+    "533": {
       "op": "swap",
       "stack_out": [
         "sessionID#0",
@@ -3618,7 +3650,7 @@
         "tmp%4#0"
       ]
     },
-    "503": {
+    "534": {
       "op": "box_put",
       "stack_out": [
         "sessionID#0",
@@ -3629,7 +3661,7 @@
         "box_prefixed_key%2#0"
       ]
     },
-    "504": {
+    "535": {
       "op": "box_del",
       "defined_out": [
         "choice#0",
@@ -3647,7 +3679,7 @@
         "{box_del}"
       ]
     },
-    "505": {
+    "536": {
       "op": "pop",
       "stack_out": [
         "sessionID#0",
@@ -3657,8 +3689,8 @@
         "choice#0"
       ]
     },
-    "506": {
-      "op": "bytec 4 // \"st\"",
+    "537": {
+      "op": "bytec 6 // \"st\"",
       "defined_out": [
         "\"st\"",
         "choice#0",
@@ -3675,7 +3707,7 @@
         "\"st\""
       ]
     },
-    "508": {
+    "539": {
       "op": "dig 2",
       "stack_out": [
         "sessionID#0",
@@ -3687,7 +3719,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "510": {
+    "541": {
       "op": "concat",
       "stack_out": [
         "sessionID#0",
@@ -3698,7 +3730,7 @@
         "box_prefixed_key%0#0"
       ]
     },
-    "511": {
+    "542": {
       "op": "dup",
       "stack_out": [
         "sessionID#0",
@@ -3710,7 +3742,7 @@
         "box_prefixed_key%0#0 (copy)"
       ]
     },
-    "512": {
+    "543": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%5#0",
@@ -3732,7 +3764,7 @@
         "aggregate%box_get%5#0"
       ]
     },
-    "513": {
+    "544": {
       "error": "Box must have value",
       "op": "assert // Box must have value",
       "stack_out": [
@@ -3745,7 +3777,7 @@
         "currentStats#0"
       ]
     },
-    "514": {
+    "545": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -3767,7 +3799,7 @@
         "currentStats#0 (copy)"
       ]
     },
-    "515": {
+    "546": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -3791,7 +3823,7 @@
         "0"
       ]
     },
-    "516": {
+    "547": {
       "op": "extract_uint64",
       "stack_out": [
         "sessionID#0",
@@ -3804,7 +3836,7 @@
         "values%0#0"
       ]
     },
-    "517": {
+    "548": {
       "op": "dig 3",
       "stack_out": [
         "sessionID#0",
@@ -3818,7 +3850,7 @@
         "choice#0 (copy)"
       ]
     },
-    "519": {
+    "550": {
       "op": "+",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -3840,7 +3872,7 @@
         "tmp%2#1"
       ]
     },
-    "520": {
+    "551": {
       "op": "itob",
       "defined_out": [
         "aggregate%val_as_bytes%0#0",
@@ -3862,7 +3894,7 @@
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "521": {
+    "552": {
       "op": "replace2 0",
       "stack_out": [
         "sessionID#0",
@@ -3874,7 +3906,7 @@
         "currentStats#0"
       ]
     },
-    "523": {
+    "554": {
       "op": "dup",
       "stack_out": [
         "sessionID#0",
@@ -3887,7 +3919,7 @@
         "currentStats#0 (copy)"
       ]
     },
-    "524": {
+    "555": {
       "op": "intc_2 // 8",
       "stack_out": [
         "sessionID#0",
@@ -3901,7 +3933,7 @@
         "8"
       ]
     },
-    "525": {
+    "556": {
       "op": "extract_uint64",
       "stack_out": [
         "sessionID#0",
@@ -3914,7 +3946,7 @@
         "values%1#0"
       ]
     },
-    "526": {
+    "557": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -3938,7 +3970,7 @@
         "1"
       ]
     },
-    "527": {
+    "558": {
       "op": "+",
       "defined_out": [
         "box_prefixed_key%0#0",
@@ -3960,7 +3992,7 @@
         "tmp%3#1"
       ]
     },
-    "528": {
+    "559": {
       "op": "itob",
       "defined_out": [
         "aggregate%val_as_bytes%1#0",
@@ -3982,7 +4014,7 @@
         "aggregate%val_as_bytes%1#0"
       ]
     },
-    "529": {
+    "560": {
       "op": "replace2 8",
       "stack_out": [
         "sessionID#0",
@@ -3994,7 +4026,7 @@
         "currentStats#0"
       ]
     },
-    "531": {
+    "562": {
       "op": "box_put",
       "stack_out": [
         "sessionID#0",
@@ -4004,7 +4036,7 @@
         "choice#0"
       ]
     },
-    "532": {
+    "563": {
       "op": "intc_2 // 8",
       "stack_out": [
         "sessionID#0",
@@ -4015,7 +4047,7 @@
         "8"
       ]
     },
-    "533": {
+    "564": {
       "op": "*",
       "defined_out": [
         "choice#0",
@@ -4032,8 +4064,8 @@
         "offset#0"
       ]
     },
-    "534": {
-      "op": "bytec 5 // \"fr\"",
+    "565": {
+      "op": "bytec 7 // \"fr\"",
       "defined_out": [
         "\"fr\"",
         "choice#0",
@@ -4051,7 +4083,7 @@
         "\"fr\""
       ]
     },
-    "536": {
+    "567": {
       "op": "uncover 2",
       "stack_out": [
         "sessionID#0",
@@ -4062,7 +4094,7 @@
         "encoded_value%0#1"
       ]
     },
-    "538": {
+    "569": {
       "op": "concat",
       "defined_out": [
         "box#0",
@@ -4079,7 +4111,7 @@
         "box#0"
       ]
     },
-    "539": {
+    "570": {
       "op": "dup",
       "defined_out": [
         "box#0",
@@ -4098,7 +4130,7 @@
         "box#0 (copy)"
       ]
     },
-    "540": {
+    "571": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%6#0",
@@ -4119,7 +4151,7 @@
         "aggregate%box_get%7#0"
       ]
     },
-    "541": {
+    "572": {
       "error": "Box must have value",
       "op": "assert // Box must have value",
       "stack_out": [
@@ -4131,7 +4163,7 @@
         "aggregate%box_get%6#0"
       ]
     },
-    "542": {
+    "573": {
       "op": "dig 2",
       "defined_out": [
         "aggregate%box_get%6#0",
@@ -4152,7 +4184,7 @@
         "offset#0 (copy)"
       ]
     },
-    "544": {
+    "575": {
       "op": "extract_uint64",
       "defined_out": [
         "box#0",
@@ -4171,7 +4203,7 @@
         "currentCount#0"
       ]
     },
-    "545": {
+    "576": {
       "op": "intc_1 // 1",
       "stack_out": [
         "sessionID#0",
@@ -4183,7 +4215,7 @@
         "1"
       ]
     },
-    "546": {
+    "577": {
       "op": "+",
       "defined_out": [
         "box#0",
@@ -4202,7 +4234,7 @@
         "newCount#0"
       ]
     },
-    "547": {
+    "578": {
       "op": "itob",
       "defined_out": [
         "box#0",
@@ -4221,7 +4253,7 @@
         "tmp%7#0"
       ]
     },
-    "548": {
+    "579": {
       "op": "swap",
       "stack_out": [
         "sessionID#0",
@@ -4232,7 +4264,7 @@
         "box#0"
       ]
     },
-    "549": {
+    "580": {
       "op": "cover 2",
       "stack_out": [
         "sessionID#0",
@@ -4243,7 +4275,7 @@
         "tmp%7#0"
       ]
     },
-    "551": {
+    "582": {
       "op": "box_replace",
       "stack_out": [
         "sessionID#0",
@@ -4251,7 +4283,7 @@
         "salt#0"
       ]
     },
-    "552": {
+    "583": {
       "op": "intc_1 // 1",
       "stack_out": [
         "sessionID#0",
@@ -4260,7 +4292,7 @@
         "1"
       ]
     },
-    "553": {
+    "584": {
       "op": "return",
       "stack_out": [
         "sessionID#0",
@@ -4268,7 +4300,7 @@
         "salt#0"
       ]
     },
-    "554": {
+    "585": {
       "block": "revealMove_bool_false@4",
       "stack_in": [
         "sessionID#0",
@@ -4286,10 +4318,10 @@
         "and_result%0#0"
       ]
     },
-    "555": {
+    "586": {
       "op": "b revealMove_bool_merge@5"
     },
-    "558": {
+    "589": {
       "subroutine": "smart_contracts/guessGame/contract.algo.ts::GuessGame.claimWinnings[routing]",
       "params": {},
       "block": "claimWinnings",
@@ -4299,7 +4331,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "559": {
+    "590": {
       "op": "dupn 4",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4309,7 +4341,7 @@
         "stats#0"
       ]
     },
-    "561": {
+    "592": {
       "op": "pushbytes \"\"",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4320,7 +4352,7 @@
         "countHigh#0"
       ]
     },
-    "563": {
+    "594": {
       "op": "dupn 11",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4342,7 +4374,7 @@
         "winningDistance#0"
       ]
     },
-    "565": {
+    "596": {
       "op": "txna ApplicationArgs 1",
       "defined_out": [
         "tmp%0#0"
@@ -4368,7 +4400,7 @@
         "tmp%0#0"
       ]
     },
-    "568": {
+    "599": {
       "op": "dup",
       "defined_out": [
         "tmp%0#0",
@@ -4396,7 +4428,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "569": {
+    "600": {
       "op": "len",
       "defined_out": [
         "len%0#0",
@@ -4424,7 +4456,7 @@
         "len%0#0"
       ]
     },
-    "570": {
+    "601": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -4454,7 +4486,7 @@
         "8"
       ]
     },
-    "571": {
+    "602": {
       "op": "==",
       "defined_out": [
         "eq%0#0",
@@ -4482,7 +4514,7 @@
         "eq%0#0"
       ]
     },
-    "572": {
+    "603": {
       "error": "invalid number of bytes for arc4.uint64",
       "op": "assert // invalid number of bytes for arc4.uint64",
       "stack_out": [
@@ -4506,7 +4538,7 @@
         "tmp%0#0"
       ]
     },
-    "573": {
+    "604": {
       "op": "btoi",
       "defined_out": [
         "sessionID#0"
@@ -4532,7 +4564,7 @@
         "sessionID#0"
       ]
     },
-    "574": {
+    "605": {
       "block": "claimWinnings_while_top@2",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -4580,7 +4612,7 @@
         "1410"
       ]
     },
-    "577": {
+    "608": {
       "op": "global OpcodeBudget",
       "defined_out": [
         "1410",
@@ -4609,7 +4641,7 @@
         "tmp%1#0"
       ]
     },
-    "579": {
+    "610": {
       "op": ">",
       "defined_out": [
         "tmp%2#1"
@@ -4636,7 +4668,7 @@
         "tmp%2#1"
       ]
     },
-    "580": {
+    "611": {
       "op": "bz claimWinnings_after_while@7",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4659,10 +4691,10 @@
         "sessionID#0"
       ]
     },
-    "583": {
+    "614": {
       "op": "itxn_begin"
     },
-    "584": {
+    "615": {
       "op": "pushint 6 // appl",
       "defined_out": [
         "appl"
@@ -4689,7 +4721,7 @@
         "appl"
       ]
     },
-    "586": {
+    "617": {
       "op": "itxn_field TypeEnum",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4712,7 +4744,7 @@
         "sessionID#0"
       ]
     },
-    "588": {
+    "619": {
       "op": "pushint 5 // DeleteApplication",
       "defined_out": [
         "DeleteApplication"
@@ -4739,7 +4771,7 @@
         "DeleteApplication"
       ]
     },
-    "590": {
+    "621": {
       "op": "itxn_field OnCompletion",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4762,8 +4794,8 @@
         "sessionID#0"
       ]
     },
-    "592": {
-      "op": "bytec 9 // 0x068101",
+    "623": {
+      "op": "bytec 10 // 0x068101",
       "defined_out": [
         "0x068101"
       ],
@@ -4789,7 +4821,7 @@
         "0x068101"
       ]
     },
-    "594": {
+    "625": {
       "op": "itxn_field ApprovalProgram",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4812,8 +4844,8 @@
         "sessionID#0"
       ]
     },
-    "596": {
-      "op": "bytec 9 // 0x068101",
+    "627": {
+      "op": "bytec 10 // 0x068101",
       "stack_out": [
         "box_prefixed_key%1#0",
         "encoded_value%0#1",
@@ -4836,7 +4868,7 @@
         "0x068101"
       ]
     },
-    "598": {
+    "629": {
       "op": "itxn_field ClearStateProgram",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4859,7 +4891,7 @@
         "sessionID#0"
       ]
     },
-    "600": {
+    "631": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0"
@@ -4886,7 +4918,7 @@
         "0"
       ]
     },
-    "601": {
+    "632": {
       "op": "itxn_field Fee",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -4909,13 +4941,13 @@
         "sessionID#0"
       ]
     },
-    "603": {
+    "634": {
       "op": "itxn_submit"
     },
-    "604": {
+    "635": {
       "op": "b claimWinnings_while_top@2"
     },
-    "607": {
+    "638": {
       "block": "claimWinnings_after_while@7",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -4963,7 +4995,7 @@
         "sessionID#0"
       ]
     },
-    "608": {
+    "639": {
       "op": "itob",
       "defined_out": [
         "encoded_value%0#1",
@@ -4991,7 +5023,7 @@
         "encoded_value%0#1"
       ]
     },
-    "609": {
+    "640": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5016,7 +5048,7 @@
         "encoded_value%0#1"
       ]
     },
-    "610": {
+    "641": {
       "op": "bury 18",
       "defined_out": [
         "encoded_value%0#1",
@@ -5044,8 +5076,8 @@
         "encoded_value%0#1"
       ]
     },
-    "612": {
-      "op": "bytec_1 // \"gs\"",
+    "643": {
+      "op": "bytec_2 // \"gs\"",
       "defined_out": [
         "\"gs\"",
         "encoded_value%0#1",
@@ -5074,7 +5106,7 @@
         "\"gs\""
       ]
     },
-    "613": {
+    "644": {
       "op": "dig 1",
       "defined_out": [
         "\"gs\"",
@@ -5106,7 +5138,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "615": {
+    "646": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%0#1",
@@ -5136,7 +5168,7 @@
         "box_prefixed_key%0#1"
       ]
     },
-    "616": {
+    "647": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%0#1",
@@ -5168,7 +5200,7 @@
         "box_prefixed_key%0#1 (copy)"
       ]
     },
-    "617": {
+    "648": {
       "op": "box_len",
       "defined_out": [
         "_%0#0",
@@ -5202,7 +5234,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "618": {
+    "649": {
       "op": "bury 1",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5228,7 +5260,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "620": {
+    "651": {
       "error": "Session does not exist",
       "op": "assert // Session does not exist",
       "stack_out": [
@@ -5254,7 +5286,7 @@
         "box_prefixed_key%0#1"
       ]
     },
-    "621": {
+    "652": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%1#0",
@@ -5286,7 +5318,7 @@
         "aggregate%box_get%1#0"
       ]
     },
-    "622": {
+    "653": {
       "op": "pop",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5311,7 +5343,7 @@
         "config#0"
       ]
     },
-    "623": {
+    "654": {
       "op": "global Round",
       "defined_out": [
         "config#0",
@@ -5343,7 +5375,7 @@
         "currentTime#0"
       ]
     },
-    "625": {
+    "656": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5369,7 +5401,7 @@
         "config#0"
       ]
     },
-    "626": {
+    "657": {
       "op": "pushint 16 // 16",
       "defined_out": [
         "16",
@@ -5403,7 +5435,7 @@
         "16"
       ]
     },
-    "628": {
+    "659": {
       "op": "extract_uint64",
       "defined_out": [
         "currentTime#0",
@@ -5435,7 +5467,7 @@
         "values%0#0"
       ]
     },
-    "629": {
+    "660": {
       "op": ">",
       "defined_out": [
         "encoded_value%0#1",
@@ -5466,7 +5498,7 @@
         "tmp%2#1"
       ]
     },
-    "630": {
+    "661": {
       "error": "Game is not finished yet",
       "op": "assert // Game is not finished yet",
       "stack_out": [
@@ -5491,10 +5523,10 @@
         "encoded_value%0#1"
       ]
     },
-    "631": {
+    "662": {
       "op": "txn Sender"
     },
-    "633": {
+    "664": {
       "op": "dup",
       "defined_out": [
         "encoded_value%0#1",
@@ -5526,7 +5558,7 @@
         "playerAddr#0"
       ]
     },
-    "634": {
+    "665": {
       "op": "bury 17",
       "defined_out": [
         "encoded_value%0#1",
@@ -5557,7 +5589,7 @@
         "playerAddr#0"
       ]
     },
-    "636": {
+    "667": {
       "op": "dig 1",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5583,7 +5615,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "638": {
+    "669": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5609,7 +5641,7 @@
         "playerAddr#0"
       ]
     },
-    "639": {
+    "670": {
       "op": "concat",
       "defined_out": [
         "encoded_value%0#1",
@@ -5641,7 +5673,7 @@
         "tmp%1#2"
       ]
     },
-    "640": {
+    "671": {
       "op": "sha256",
       "defined_out": [
         "encoded_value%0#1",
@@ -5673,8 +5705,8 @@
         "playerKey#0"
       ]
     },
-    "641": {
-      "op": "bytec 8 // \"pcho\"",
+    "672": {
+      "op": "bytec 9 // \"pcho\"",
       "defined_out": [
         "\"pcho\"",
         "encoded_value%0#1",
@@ -5707,7 +5739,7 @@
         "\"pcho\""
       ]
     },
-    "643": {
+    "674": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5733,7 +5765,7 @@
         "playerKey#0"
       ]
     },
-    "644": {
+    "675": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -5765,7 +5797,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "645": {
+    "676": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5791,7 +5823,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "646": {
+    "677": {
       "op": "bury 20",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -5823,7 +5855,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "648": {
+    "679": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -5857,7 +5889,7 @@
         "box_prefixed_key%1#0 (copy)"
       ]
     },
-    "649": {
+    "680": {
       "op": "box_len",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5884,7 +5916,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "650": {
+    "681": {
       "op": "bury 1",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5910,7 +5942,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "652": {
+    "683": {
       "error": "Player has not revealed or already claimed",
       "op": "assert // Player has not revealed or already claimed",
       "stack_out": [
@@ -5936,7 +5968,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "653": {
+    "684": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%2#0",
@@ -5971,7 +6003,7 @@
         "aggregate%box_get%3#0"
       ]
     },
-    "654": {
+    "685": {
       "op": "pop",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -5996,7 +6028,7 @@
         "aggregate%box_get%2#0"
       ]
     },
-    "655": {
+    "686": {
       "op": "btoi",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -6029,7 +6061,7 @@
         "myChoice#0"
       ]
     },
-    "656": {
+    "687": {
       "op": "bury 8",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -6061,8 +6093,8 @@
         "encoded_value%0#1"
       ]
     },
-    "658": {
-      "op": "bytec 4 // \"st\"",
+    "689": {
+      "op": "bytec 6 // \"st\"",
       "defined_out": [
         "\"st\"",
         "box_prefixed_key%1#0",
@@ -6095,7 +6127,7 @@
         "\"st\""
       ]
     },
-    "660": {
+    "691": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6120,7 +6152,7 @@
         "encoded_value%0#1"
       ]
     },
-    "661": {
+    "692": {
       "op": "concat",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6144,7 +6176,7 @@
         "box_prefixed_key%0#1"
       ]
     },
-    "662": {
+    "693": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%5#0",
@@ -6179,7 +6211,7 @@
         "aggregate%box_get%5#0"
       ]
     },
-    "663": {
+    "694": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6204,7 +6236,7 @@
         "stats#0"
       ]
     },
-    "664": {
+    "695": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6230,7 +6262,7 @@
         "stats#0 (copy)"
       ]
     },
-    "665": {
+    "696": {
       "op": "cover 2",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6256,7 +6288,7 @@
         "stats#0"
       ]
     },
-    "667": {
+    "698": {
       "op": "bury 16",
       "defined_out": [
         "aggregate%box_get%5#0",
@@ -6291,7 +6323,7 @@
         "aggregate%box_get%5#0"
       ]
     },
-    "669": {
+    "700": {
       "error": "Box must have value",
       "op": "assert // Box must have value",
       "stack_out": [
@@ -6316,7 +6348,7 @@
         "stats#0"
       ]
     },
-    "670": {
+    "701": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -6351,7 +6383,7 @@
         "8"
       ]
     },
-    "671": {
+    "702": {
       "op": "extract_uint64",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6375,7 +6407,7 @@
         "values%0#0"
       ]
     },
-    "672": {
+    "703": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6400,7 +6432,7 @@
         "values%0#0"
       ]
     },
-    "673": {
+    "704": {
       "op": "bury 4",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6424,7 +6456,7 @@
         "values%0#0"
       ]
     },
-    "675": {
+    "706": {
       "op": "bnz claimWinnings_after_if_else@13",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6447,7 +6479,7 @@
         "sessionID#0"
       ]
     },
-    "678": {
+    "709": {
       "op": "intc_0 // 0",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -6481,7 +6513,7 @@
         "prizeAmount#0"
       ]
     },
-    "679": {
+    "710": {
       "block": "claimWinnings_after_inlined_smart_contracts/guessGame/contract.algo.ts::GuessGame.calculatePlayerWin@40",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -6532,7 +6564,7 @@
         "prizeAmount#0 (copy)"
       ]
     },
-    "680": {
+    "711": {
       "error": "You did not win or no pot available",
       "op": "assert // You did not win or no pot available",
       "stack_out": [
@@ -6557,7 +6589,7 @@
         "prizeAmount#0"
       ]
     },
-    "681": {
+    "712": {
       "op": "dig 18",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -6586,7 +6618,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "683": {
+    "714": {
       "op": "box_del",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -6616,7 +6648,7 @@
         "{box_del}"
       ]
     },
-    "684": {
+    "715": {
       "op": "pop",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6640,10 +6672,10 @@
         "prizeAmount#0"
       ]
     },
-    "685": {
+    "716": {
       "op": "itxn_begin"
     },
-    "686": {
+    "717": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6668,7 +6700,7 @@
         "prizeAmount#0 (copy)"
       ]
     },
-    "687": {
+    "718": {
       "op": "itxn_field Amount",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6692,7 +6724,7 @@
         "prizeAmount#0"
       ]
     },
-    "689": {
+    "720": {
       "op": "dig 15",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -6722,7 +6754,7 @@
         "playerAddr#0"
       ]
     },
-    "691": {
+    "722": {
       "op": "itxn_field Receiver",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6746,7 +6778,7 @@
         "prizeAmount#0"
       ]
     },
-    "693": {
+    "724": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -6777,7 +6809,7 @@
         "1"
       ]
     },
-    "694": {
+    "725": {
       "op": "itxn_field TypeEnum",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6801,7 +6833,7 @@
         "prizeAmount#0"
       ]
     },
-    "696": {
+    "727": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -6832,7 +6864,7 @@
         "0"
       ]
     },
-    "697": {
+    "728": {
       "op": "itxn_field Fee",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6856,10 +6888,10 @@
         "prizeAmount#0"
       ]
     },
-    "699": {
+    "730": {
       "op": "itxn_submit"
     },
-    "700": {
+    "731": {
       "op": "itob",
       "defined_out": [
         "aggregate%val_as_bytes%0#0",
@@ -6888,8 +6920,8 @@
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "701": {
-      "op": "bytec 6 // 0x151f7c75",
+    "732": {
+      "op": "bytec_3 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
         "aggregate%val_as_bytes%0#0",
@@ -6919,7 +6951,7 @@
         "0x151f7c75"
       ]
     },
-    "703": {
+    "733": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6944,7 +6976,7 @@
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "704": {
+    "734": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -6973,7 +7005,7 @@
         "tmp%4#0"
       ]
     },
-    "705": {
+    "735": {
       "op": "log",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -6996,7 +7028,7 @@
         "sessionID#0"
       ]
     },
-    "706": {
+    "736": {
       "op": "intc_1 // 1",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -7020,7 +7052,7 @@
         "1"
       ]
     },
-    "707": {
+    "737": {
       "op": "return",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -7043,7 +7075,7 @@
         "sessionID#0"
       ]
     },
-    "708": {
+    "738": {
       "block": "claimWinnings_after_if_else@13",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -7091,7 +7123,7 @@
         "stats#0"
       ]
     },
-    "710": {
+    "740": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -7120,7 +7152,7 @@
         "0"
       ]
     },
-    "711": {
+    "741": {
       "op": "extract_uint64",
       "defined_out": [
         "stats#0",
@@ -7148,7 +7180,7 @@
         "values%1#0"
       ]
     },
-    "712": {
+    "742": {
       "op": "intc_3 // 2",
       "defined_out": [
         "2",
@@ -7178,7 +7210,7 @@
         "2"
       ]
     },
-    "713": {
+    "743": {
       "op": "*",
       "defined_out": [
         "stats#0",
@@ -7206,7 +7238,7 @@
         "tmp%1#0"
       ]
     },
-    "714": {
+    "744": {
       "op": "dig 3",
       "defined_out": [
         "stats#0",
@@ -7236,7 +7268,7 @@
         "values%0#0"
       ]
     },
-    "716": {
+    "746": {
       "op": "pushint 3 // 3",
       "defined_out": [
         "3",
@@ -7268,7 +7300,7 @@
         "3"
       ]
     },
-    "718": {
+    "748": {
       "op": "*",
       "defined_out": [
         "stats#0",
@@ -7299,7 +7331,7 @@
         "tmp%2#3"
       ]
     },
-    "719": {
+    "749": {
       "op": "/",
       "defined_out": [
         "stats#0",
@@ -7328,7 +7360,7 @@
         "target#0"
       ]
     },
-    "720": {
+    "750": {
       "op": "bury 6",
       "defined_out": [
         "stats#0",
@@ -7356,8 +7388,8 @@
         "sessionID#0"
       ]
     },
-    "722": {
-      "op": "bytec 5 // \"fr\"",
+    "752": {
+      "op": "bytec 7 // \"fr\"",
       "defined_out": [
         "\"fr\"",
         "stats#0",
@@ -7386,7 +7418,7 @@
         "\"fr\""
       ]
     },
-    "724": {
+    "754": {
       "op": "dig 17",
       "defined_out": [
         "\"fr\"",
@@ -7418,7 +7450,7 @@
         "encoded_value%0#1"
       ]
     },
-    "726": {
+    "756": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%1#1",
@@ -7449,7 +7481,7 @@
         "box_prefixed_key%1#1"
       ]
     },
-    "727": {
+    "757": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%7#0",
@@ -7482,7 +7514,7 @@
         "aggregate%box_get%7#0"
       ]
     },
-    "728": {
+    "758": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -7507,7 +7539,7 @@
         "freqBlob#0"
       ]
     },
-    "729": {
+    "759": {
       "op": "bury 17",
       "defined_out": [
         "aggregate%box_get%7#0",
@@ -7539,7 +7571,7 @@
         "aggregate%box_get%7#0"
       ]
     },
-    "731": {
+    "761": {
       "error": "Box must have value",
       "op": "assert // Box must have value",
       "stack_out": [
@@ -7563,7 +7595,7 @@
         "sessionID#0"
       ]
     },
-    "732": {
+    "762": {
       "op": "pushint 101 // 101",
       "defined_out": [
         "encoded_value%0#1",
@@ -7595,7 +7627,7 @@
         "winningDistance#0"
       ]
     },
-    "734": {
+    "764": {
       "op": "bury 2",
       "defined_out": [
         "encoded_value%0#1",
@@ -7626,7 +7658,7 @@
         "sessionID#0"
       ]
     },
-    "736": {
+    "766": {
       "op": "intc_0 // 0",
       "defined_out": [
         "encoded_value%0#1",
@@ -7659,7 +7691,7 @@
         "totalWinners#0"
       ]
     },
-    "737": {
+    "767": {
       "op": "bury 4",
       "defined_out": [
         "encoded_value%0#1",
@@ -7691,7 +7723,7 @@
         "sessionID#0"
       ]
     },
-    "739": {
+    "769": {
       "op": "intc_0 // 0",
       "defined_out": [
         "dist#0",
@@ -7725,7 +7757,7 @@
         "dist#0"
       ]
     },
-    "740": {
+    "770": {
       "op": "bury 11",
       "defined_out": [
         "dist#0",
@@ -7758,7 +7790,7 @@
         "sessionID#0"
       ]
     },
-    "742": {
+    "772": {
       "block": "claimWinnings_while_top@14",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -7806,7 +7838,7 @@
         "dist#0"
       ]
     },
-    "744": {
+    "774": {
       "op": "pushint 100 // 100",
       "defined_out": [
         "100",
@@ -7835,7 +7867,7 @@
         "100"
       ]
     },
-    "746": {
+    "776": {
       "op": "<=",
       "defined_out": [
         "dist#0",
@@ -7863,7 +7895,7 @@
         "tmp%4#1"
       ]
     },
-    "747": {
+    "777": {
       "op": "bz claimWinnings_block@28",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -7886,7 +7918,7 @@
         "sessionID#0"
       ]
     },
-    "750": {
+    "780": {
       "op": "intc_0 // 0",
       "defined_out": [
         "dist#0",
@@ -7914,7 +7946,7 @@
         "found#0"
       ]
     },
-    "751": {
+    "781": {
       "op": "bury 10",
       "defined_out": [
         "dist#0",
@@ -7941,7 +7973,7 @@
         "sessionID#0"
       ]
     },
-    "753": {
+    "783": {
       "op": "dig 5",
       "defined_out": [
         "dist#0",
@@ -7970,7 +8002,7 @@
         "target#0"
       ]
     },
-    "755": {
+    "785": {
       "op": "dig 11",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -7995,7 +8027,7 @@
         "dist#0"
       ]
     },
-    "757": {
+    "787": {
       "op": ">=",
       "defined_out": [
         "dist#0",
@@ -8025,7 +8057,7 @@
         "tmp%5#1"
       ]
     },
-    "758": {
+    "788": {
       "op": "bz claimWinnings_after_if_else@19",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8048,7 +8080,7 @@
         "sessionID#0"
       ]
     },
-    "761": {
+    "791": {
       "op": "dig 5",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8072,7 +8104,7 @@
         "target#0"
       ]
     },
-    "763": {
+    "793": {
       "op": "dig 11",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8097,7 +8129,7 @@
         "dist#0"
       ]
     },
-    "765": {
+    "795": {
       "op": "-",
       "defined_out": [
         "dist#0",
@@ -8127,7 +8159,7 @@
         "lowVal#0"
       ]
     },
-    "766": {
+    "796": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -8159,7 +8191,7 @@
         "8"
       ]
     },
-    "767": {
+    "797": {
       "op": "*",
       "defined_out": [
         "dist#0",
@@ -8189,7 +8221,7 @@
         "tmp%7#0"
       ]
     },
-    "768": {
+    "798": {
       "op": "dig 16",
       "defined_out": [
         "dist#0",
@@ -8221,7 +8253,7 @@
         "freqBlob#0"
       ]
     },
-    "770": {
+    "800": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8246,7 +8278,7 @@
         "tmp%7#0"
       ]
     },
-    "771": {
+    "801": {
       "op": "extract_uint64",
       "defined_out": [
         "countLow#0",
@@ -8277,7 +8309,7 @@
         "countLow#0"
       ]
     },
-    "772": {
+    "802": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8302,7 +8334,7 @@
         "countLow#0"
       ]
     },
-    "773": {
+    "803": {
       "op": "bury 13",
       "defined_out": [
         "countLow#0",
@@ -8333,7 +8365,7 @@
         "countLow#0"
       ]
     },
-    "775": {
+    "805": {
       "op": "bz claimWinnings_after_if_else@19",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8356,7 +8388,7 @@
         "sessionID#0"
       ]
     },
-    "778": {
+    "808": {
       "op": "dig 3",
       "defined_out": [
         "countLow#0",
@@ -8388,7 +8420,7 @@
         "totalWinners#0"
       ]
     },
-    "780": {
+    "810": {
       "op": "dig 12",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8413,7 +8445,7 @@
         "countLow#0"
       ]
     },
-    "782": {
+    "812": {
       "op": "+",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8437,7 +8469,7 @@
         "totalWinners#0"
       ]
     },
-    "783": {
+    "813": {
       "op": "bury 4",
       "defined_out": [
         "countLow#0",
@@ -8468,7 +8500,7 @@
         "sessionID#0"
       ]
     },
-    "785": {
+    "815": {
       "op": "intc_1 // 1",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8492,7 +8524,7 @@
         "found#0"
       ]
     },
-    "786": {
+    "816": {
       "op": "bury 10",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8515,7 +8547,7 @@
         "sessionID#0"
       ]
     },
-    "788": {
+    "818": {
       "block": "claimWinnings_after_if_else@19",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -8563,7 +8595,7 @@
         "dist#0"
       ]
     },
-    "790": {
+    "820": {
       "op": "bz claimWinnings_after_if_else@24",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8586,7 +8618,7 @@
         "sessionID#0"
       ]
     },
-    "793": {
+    "823": {
       "op": "dig 5",
       "defined_out": [
         "dist#0",
@@ -8614,7 +8646,7 @@
         "target#0"
       ]
     },
-    "795": {
+    "825": {
       "op": "dig 11",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8639,7 +8671,7 @@
         "dist#0"
       ]
     },
-    "797": {
+    "827": {
       "op": "+",
       "defined_out": [
         "dist#0",
@@ -8668,7 +8700,7 @@
         "highVal#0"
       ]
     },
-    "798": {
+    "828": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8693,7 +8725,7 @@
         "highVal#0"
       ]
     },
-    "799": {
+    "829": {
       "op": "bury 10",
       "defined_out": [
         "dist#0",
@@ -8722,7 +8754,7 @@
         "highVal#0"
       ]
     },
-    "801": {
+    "831": {
       "op": "pushint 100 // 100",
       "defined_out": [
         "100",
@@ -8753,7 +8785,7 @@
         "100"
       ]
     },
-    "803": {
+    "833": {
       "op": "<=",
       "defined_out": [
         "dist#0",
@@ -8783,7 +8815,7 @@
         "tmp%13#0"
       ]
     },
-    "804": {
+    "834": {
       "op": "bz claimWinnings_after_if_else@24",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8806,7 +8838,7 @@
         "sessionID#0"
       ]
     },
-    "807": {
+    "837": {
       "op": "dig 8",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8830,7 +8862,7 @@
         "highVal#0"
       ]
     },
-    "809": {
+    "839": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -8861,7 +8893,7 @@
         "8"
       ]
     },
-    "810": {
+    "840": {
       "op": "*",
       "defined_out": [
         "dist#0",
@@ -8891,7 +8923,7 @@
         "tmp%15#0"
       ]
     },
-    "811": {
+    "841": {
       "op": "dig 16",
       "defined_out": [
         "dist#0",
@@ -8923,7 +8955,7 @@
         "freqBlob#0"
       ]
     },
-    "813": {
+    "843": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8948,7 +8980,7 @@
         "tmp%15#0"
       ]
     },
-    "814": {
+    "844": {
       "op": "extract_uint64",
       "defined_out": [
         "countHigh#0",
@@ -8979,7 +9011,7 @@
         "countHigh#0"
       ]
     },
-    "815": {
+    "845": {
       "op": "dup",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9004,7 +9036,7 @@
         "countHigh#0"
       ]
     },
-    "816": {
+    "846": {
       "op": "bury 14",
       "defined_out": [
         "countHigh#0",
@@ -9035,7 +9067,7 @@
         "countHigh#0"
       ]
     },
-    "818": {
+    "848": {
       "op": "bz claimWinnings_after_if_else@24",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9058,7 +9090,7 @@
         "sessionID#0"
       ]
     },
-    "821": {
+    "851": {
       "op": "dig 3",
       "defined_out": [
         "countHigh#0",
@@ -9090,7 +9122,7 @@
         "totalWinners#0"
       ]
     },
-    "823": {
+    "853": {
       "op": "dig 13",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9115,7 +9147,7 @@
         "countHigh#0"
       ]
     },
-    "825": {
+    "855": {
       "op": "+",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9139,7 +9171,7 @@
         "totalWinners#0"
       ]
     },
-    "826": {
+    "856": {
       "op": "bury 4",
       "defined_out": [
         "countHigh#0",
@@ -9170,7 +9202,7 @@
         "sessionID#0"
       ]
     },
-    "828": {
+    "858": {
       "op": "intc_1 // 1",
       "defined_out": [
         "countHigh#0",
@@ -9203,7 +9235,7 @@
         "found#0"
       ]
     },
-    "829": {
+    "859": {
       "op": "bury 10",
       "defined_out": [
         "countHigh#0",
@@ -9235,7 +9267,7 @@
         "sessionID#0"
       ]
     },
-    "831": {
+    "861": {
       "block": "claimWinnings_after_if_else@24",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -9283,7 +9315,7 @@
         "found#0"
       ]
     },
-    "833": {
+    "863": {
       "op": "bz claimWinnings_after_if_else@26",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9306,7 +9338,7 @@
         "sessionID#0"
       ]
     },
-    "836": {
+    "866": {
       "op": "dig 10",
       "defined_out": [
         "found#0",
@@ -9334,7 +9366,7 @@
         "winningDistance#0"
       ]
     },
-    "838": {
+    "868": {
       "op": "bury 2",
       "defined_out": [
         "found#0",
@@ -9361,7 +9393,7 @@
         "sessionID#0"
       ]
     },
-    "840": {
+    "870": {
       "block": "claimWinnings_block@28",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -9409,7 +9441,7 @@
         "isWinner#0"
       ]
     },
-    "841": {
+    "871": {
       "op": "bury 8",
       "defined_out": [
         "isWinner#0"
@@ -9435,7 +9467,7 @@
         "sessionID#0"
       ]
     },
-    "843": {
+    "873": {
       "op": "dig 6",
       "defined_out": [
         "isWinner#0",
@@ -9463,7 +9495,7 @@
         "myChoice#0"
       ]
     },
-    "845": {
+    "875": {
       "op": "dig 6",
       "defined_out": [
         "isWinner#0",
@@ -9493,7 +9525,7 @@
         "target#0"
       ]
     },
-    "847": {
+    "877": {
       "op": "<=",
       "defined_out": [
         "isWinner#0",
@@ -9523,7 +9555,7 @@
         "tmp%20#0"
       ]
     },
-    "848": {
+    "878": {
       "op": "bz claimWinnings_else_body@32",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9546,7 +9578,7 @@
         "sessionID#0"
       ]
     },
-    "851": {
+    "881": {
       "op": "dig 5",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9570,7 +9602,7 @@
         "target#0"
       ]
     },
-    "853": {
+    "883": {
       "op": "dig 7",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9595,7 +9627,7 @@
         "myChoice#0"
       ]
     },
-    "855": {
+    "885": {
       "op": "-",
       "defined_out": [
         "isWinner#0",
@@ -9625,7 +9657,7 @@
         "tmp%21#0"
       ]
     },
-    "856": {
+    "886": {
       "op": "dig 2",
       "defined_out": [
         "isWinner#0",
@@ -9657,7 +9689,7 @@
         "winningDistance#0"
       ]
     },
-    "858": {
+    "888": {
       "op": "==",
       "defined_out": [
         "isWinner#0",
@@ -9688,7 +9720,7 @@
         "tmp%22#0"
       ]
     },
-    "859": {
+    "889": {
       "op": "bz claimWinnings_after_if_else@35",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9711,7 +9743,7 @@
         "sessionID#0"
       ]
     },
-    "862": {
+    "892": {
       "op": "intc_1 // 1",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9735,7 +9767,7 @@
         "isWinner#0"
       ]
     },
-    "863": {
+    "893": {
       "op": "bury 8",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9758,7 +9790,7 @@
         "sessionID#0"
       ]
     },
-    "865": {
+    "895": {
       "block": "claimWinnings_after_if_else@35",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -9806,7 +9838,7 @@
         "isWinner#0"
       ]
     },
-    "867": {
+    "897": {
       "op": "bnz claimWinnings_after_if_else@37",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9829,7 +9861,7 @@
         "sessionID#0"
       ]
     },
-    "870": {
+    "900": {
       "op": "intc_0 // 0",
       "defined_out": [
         "isWinner#0",
@@ -9857,10 +9889,10 @@
         "prizeAmount#0"
       ]
     },
-    "871": {
+    "901": {
       "op": "b claimWinnings_after_inlined_smart_contracts/guessGame/contract.algo.ts::GuessGame.calculatePlayerWin@40"
     },
-    "874": {
+    "904": {
       "block": "claimWinnings_after_if_else@37",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -9882,7 +9914,7 @@
         "winningDistance#0",
         "sessionID#0"
       ],
-      "op": "bytec_3 // \"sbal\"",
+      "op": "bytec 5 // \"sbal\"",
       "defined_out": [
         "\"sbal\""
       ],
@@ -9908,7 +9940,7 @@
         "\"sbal\""
       ]
     },
-    "875": {
+    "906": {
       "op": "dig 17",
       "defined_out": [
         "\"sbal\"",
@@ -9937,7 +9969,7 @@
         "encoded_value%0#1"
       ]
     },
-    "877": {
+    "908": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%0#1",
@@ -9965,7 +9997,7 @@
         "box_prefixed_key%0#1"
       ]
     },
-    "878": {
+    "909": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%0#1",
@@ -9995,7 +10027,7 @@
         "box_prefixed_key%0#1 (copy)"
       ]
     },
-    "879": {
+    "910": {
       "op": "box_len",
       "defined_out": [
         "_%0#0",
@@ -10027,7 +10059,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "880": {
+    "911": {
       "op": "bury 1",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -10052,7 +10084,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "882": {
+    "913": {
       "error": "Session does not exist",
       "op": "assert // Session does not exist",
       "stack_out": [
@@ -10077,7 +10109,7 @@
         "box_prefixed_key%0#1"
       ]
     },
-    "883": {
+    "914": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%8#0",
@@ -10107,7 +10139,7 @@
         "aggregate%box_get%9#0"
       ]
     },
-    "884": {
+    "915": {
       "op": "pop",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -10131,7 +10163,7 @@
         "aggregate%box_get%8#0"
       ]
     },
-    "885": {
+    "916": {
       "op": "btoi",
       "defined_out": [
         "encoded_value%0#1",
@@ -10159,7 +10191,7 @@
         "totalPot#0"
       ]
     },
-    "886": {
+    "917": {
       "op": "bury 5",
       "defined_out": [
         "encoded_value%0#1",
@@ -10186,7 +10218,7 @@
         "sessionID#0"
       ]
     },
-    "888": {
+    "919": {
       "op": "dig 3",
       "defined_out": [
         "encoded_value%0#1",
@@ -10215,7 +10247,7 @@
         "totalWinners#0"
       ]
     },
-    "890": {
+    "921": {
       "op": "bnz claimWinnings_after_if_else@39",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -10238,7 +10270,7 @@
         "sessionID#0"
       ]
     },
-    "893": {
+    "924": {
       "op": "intc_0 // 0",
       "defined_out": [
         "encoded_value%0#1",
@@ -10268,10 +10300,10 @@
         "prizeAmount#0"
       ]
     },
-    "894": {
+    "925": {
       "op": "b claimWinnings_after_inlined_smart_contracts/guessGame/contract.algo.ts::GuessGame.calculatePlayerWin@40"
     },
-    "897": {
+    "928": {
       "block": "claimWinnings_after_if_else@39",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -10319,7 +10351,7 @@
         "totalPot#0"
       ]
     },
-    "899": {
+    "930": {
       "op": "dig 4",
       "defined_out": [
         "totalPot#0",
@@ -10348,7 +10380,7 @@
         "totalWinners#0"
       ]
     },
-    "901": {
+    "932": {
       "op": "/",
       "defined_out": [
         "prizeAmount#0",
@@ -10377,10 +10409,10 @@
         "prizeAmount#0"
       ]
     },
-    "902": {
+    "933": {
       "op": "b claimWinnings_after_inlined_smart_contracts/guessGame/contract.algo.ts::GuessGame.calculatePlayerWin@40"
     },
-    "905": {
+    "936": {
       "block": "claimWinnings_else_body@32",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -10428,7 +10460,7 @@
         "myChoice#0"
       ]
     },
-    "907": {
+    "938": {
       "op": "dig 6",
       "defined_out": [
         "myChoice#0",
@@ -10457,7 +10489,7 @@
         "target#0"
       ]
     },
-    "909": {
+    "940": {
       "op": "-",
       "defined_out": [
         "myChoice#0",
@@ -10486,7 +10518,7 @@
         "tmp%23#0"
       ]
     },
-    "910": {
+    "941": {
       "op": "dig 2",
       "defined_out": [
         "myChoice#0",
@@ -10517,7 +10549,7 @@
         "winningDistance#0"
       ]
     },
-    "912": {
+    "943": {
       "op": "==",
       "defined_out": [
         "myChoice#0",
@@ -10547,7 +10579,7 @@
         "tmp%24#0"
       ]
     },
-    "913": {
+    "944": {
       "op": "bz claimWinnings_after_if_else@35",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -10570,7 +10602,7 @@
         "sessionID#0"
       ]
     },
-    "916": {
+    "947": {
       "op": "intc_1 // 1",
       "defined_out": [
         "isWinner#0",
@@ -10600,7 +10632,7 @@
         "isWinner#0"
       ]
     },
-    "917": {
+    "948": {
       "op": "bury 8",
       "defined_out": [
         "isWinner#0",
@@ -10629,10 +10661,10 @@
         "sessionID#0"
       ]
     },
-    "919": {
+    "950": {
       "op": "b claimWinnings_after_if_else@35"
     },
-    "922": {
+    "953": {
       "block": "claimWinnings_after_if_else@26",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -10680,7 +10712,7 @@
         "dist#0"
       ]
     },
-    "924": {
+    "955": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -10709,7 +10741,7 @@
         "1"
       ]
     },
-    "925": {
+    "956": {
       "op": "+",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -10733,7 +10765,7 @@
         "dist#0"
       ]
     },
-    "926": {
+    "957": {
       "op": "bury 11",
       "defined_out": [
         "dist#0"
@@ -10759,10 +10791,10 @@
         "sessionID#0"
       ]
     },
-    "928": {
+    "959": {
       "op": "b claimWinnings_while_top@14"
     },
-    "931": {
+    "962": {
       "subroutine": "smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR[routing]",
       "params": {},
       "block": "getRequiredMBR",
@@ -10775,7 +10807,7 @@
         "tmp%0#0"
       ]
     },
-    "934": {
+    "965": {
       "op": "dup",
       "defined_out": [
         "tmp%0#0",
@@ -10786,7 +10818,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "935": {
+    "966": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -10799,7 +10831,7 @@
         "0"
       ]
     },
-    "936": {
+    "967": {
       "error": "invalid array length header",
       "op": "extract_uint16 // on error: invalid array length header",
       "defined_out": [
@@ -10811,7 +10843,7 @@
         "aggregate%array_length%0#0"
       ]
     },
-    "937": {
+    "968": {
       "op": "intc_3 // 2",
       "defined_out": [
         "2",
@@ -10824,7 +10856,7 @@
         "2"
       ]
     },
-    "938": {
+    "969": {
       "op": "+",
       "defined_out": [
         "add%0#0",
@@ -10835,7 +10867,7 @@
         "add%0#0"
       ]
     },
-    "939": {
+    "970": {
       "op": "dig 1",
       "stack_out": [
         "tmp%0#0",
@@ -10843,7 +10875,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "941": {
+    "972": {
       "op": "len",
       "defined_out": [
         "add%0#0",
@@ -10856,7 +10888,7 @@
         "len%0#0"
       ]
     },
-    "942": {
+    "973": {
       "op": "==",
       "defined_out": [
         "eq%0#0",
@@ -10867,14 +10899,14 @@
         "eq%0#0"
       ]
     },
-    "943": {
+    "974": {
       "error": "invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "op": "assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "stack_out": [
         "tmp%0#0"
       ]
     },
-    "944": {
+    "975": {
       "op": "extract 2 0",
       "defined_out": [
         "tmp%1#0"
@@ -10883,7 +10915,7 @@
         "tmp%1#0"
       ]
     },
-    "947": {
+    "978": {
       "callsub": "smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR",
       "op": "callsub smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR",
       "defined_out": [
@@ -10893,7 +10925,7 @@
         "tmp%2#0"
       ]
     },
-    "950": {
+    "981": {
       "op": "itob",
       "defined_out": [
         "aggregate%val_as_bytes%0#0"
@@ -10902,8 +10934,8 @@
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "951": {
-      "op": "bytec 6 // 0x151f7c75",
+    "982": {
+      "op": "bytec_3 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
         "aggregate%val_as_bytes%0#0"
@@ -10913,14 +10945,14 @@
         "0x151f7c75"
       ]
     },
-    "953": {
+    "983": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "954": {
+    "984": {
       "op": "concat",
       "defined_out": [
         "tmp%4#0"
@@ -10929,11 +10961,11 @@
         "tmp%4#0"
       ]
     },
-    "955": {
+    "985": {
       "op": "log",
       "stack_out": []
     },
-    "956": {
+    "986": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1"
@@ -10942,11 +10974,421 @@
         "1"
       ]
     },
-    "957": {
+    "987": {
       "op": "return",
       "stack_out": []
     },
-    "958": {
+    "988": {
+      "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getGameType[routing]",
+      "params": {},
+      "block": "getGameType",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "989": {
+      "op": "bytec_0 // \"gameType\"",
+      "defined_out": [
+        "\"gameType\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"gameType\""
+      ]
+    },
+    "990": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "991": {
+      "error": "check GlobalState exists",
+      "op": "assert // check GlobalState exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "992": {
+      "op": "dup",
+      "defined_out": [
+        "maybe_value%0#0",
+        "maybe_value%0#0 (copy)"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%0#0 (copy)"
+      ]
+    },
+    "993": {
+      "op": "len",
+      "defined_out": [
+        "aggregate%length%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "aggregate%length%0#0"
+      ]
+    },
+    "994": {
+      "op": "itob",
+      "defined_out": [
+        "aggregate%as_bytes%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "aggregate%as_bytes%0#0"
+      ]
+    },
+    "995": {
+      "op": "extract 6 2",
+      "defined_out": [
+        "aggregate%length_uint16%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "aggregate%length_uint16%0#0"
+      ]
+    },
+    "998": {
+      "op": "swap",
+      "stack_out": [
+        "aggregate%length_uint16%0#0",
+        "maybe_value%0#0"
+      ]
+    },
+    "999": {
+      "op": "concat",
+      "defined_out": [
+        "aggregate%encoded_value%0#0"
+      ],
+      "stack_out": [
+        "aggregate%encoded_value%0#0"
+      ]
+    },
+    "1000": {
+      "op": "bytec_3 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "aggregate%encoded_value%0#0"
+      ],
+      "stack_out": [
+        "aggregate%encoded_value%0#0",
+        "0x151f7c75"
+      ]
+    },
+    "1001": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "aggregate%encoded_value%0#0"
+      ]
+    },
+    "1002": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%2#0"
+      ],
+      "stack_out": [
+        "tmp%2#0"
+      ]
+    },
+    "1003": {
+      "op": "log",
+      "stack_out": []
+    },
+    "1004": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "1"
+      ],
+      "stack_out": [
+        "1"
+      ]
+    },
+    "1005": {
+      "op": "return",
+      "stack_out": []
+    },
+    "1006": {
+      "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.initialize[routing]",
+      "params": {},
+      "block": "initialize",
+      "stack_in": [],
+      "op": "txna ApplicationArgs 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "1009": {
+      "op": "dup",
+      "defined_out": [
+        "tmp%0#0",
+        "tmp%0#0 (copy)"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "tmp%0#0 (copy)"
+      ]
+    },
+    "1010": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0",
+        "tmp%0#0",
+        "tmp%0#0 (copy)"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "tmp%0#0 (copy)",
+        "0"
+      ]
+    },
+    "1011": {
+      "error": "invalid array length header",
+      "op": "extract_uint16 // on error: invalid array length header",
+      "defined_out": [
+        "aggregate%array_length%0#0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "aggregate%array_length%0#0"
+      ]
+    },
+    "1012": {
+      "op": "intc_3 // 2",
+      "defined_out": [
+        "2",
+        "aggregate%array_length%0#0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "aggregate%array_length%0#0",
+        "2"
+      ]
+    },
+    "1013": {
+      "op": "+",
+      "defined_out": [
+        "add%0#0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "add%0#0"
+      ]
+    },
+    "1014": {
+      "op": "dig 1",
+      "stack_out": [
+        "tmp%0#0",
+        "add%0#0",
+        "tmp%0#0 (copy)"
+      ]
+    },
+    "1016": {
+      "op": "len",
+      "defined_out": [
+        "add%0#0",
+        "len%0#0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "add%0#0",
+        "len%0#0"
+      ]
+    },
+    "1017": {
+      "op": "==",
+      "defined_out": [
+        "eq%0#0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "eq%0#0"
+      ]
+    },
+    "1018": {
+      "error": "invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
+      "op": "assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "1019": {
+      "op": "extract 2 0",
+      "defined_out": [
+        "gameType#0"
+      ],
+      "stack_out": [
+        "gameType#0"
+      ]
+    },
+    "1022": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "gameType#0",
+        "0"
+      ]
+    },
+    "1023": {
+      "op": "bytec_0 // \"gameType\"",
+      "defined_out": [
+        "\"gameType\"",
+        "0",
+        "gameType#0"
+      ],
+      "stack_out": [
+        "gameType#0",
+        "0",
+        "\"gameType\""
+      ]
+    },
+    "1024": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "gameType#0",
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "gameType#0",
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "1025": {
+      "error": "check GlobalState exists",
+      "op": "assert // check GlobalState exists",
+      "stack_out": [
+        "gameType#0",
+        "maybe_value%0#0"
+      ]
+    },
+    "1026": {
+      "op": "len",
+      "defined_out": [
+        "gameType#0",
+        "tmp%0#1"
+      ],
+      "stack_out": [
+        "gameType#0",
+        "tmp%0#1"
+      ]
+    },
+    "1027": {
+      "op": "!",
+      "defined_out": [
+        "gameType#0",
+        "tmp%1#1"
+      ],
+      "stack_out": [
+        "gameType#0",
+        "tmp%1#1"
+      ]
+    },
+    "1028": {
+      "error": "Contract already initialized",
+      "op": "assert // Contract already initialized",
+      "stack_out": [
+        "gameType#0"
+      ]
+    },
+    "1029": {
+      "op": "txn Sender",
+      "defined_out": [
+        "gameType#0",
+        "tmp%2#0"
+      ],
+      "stack_out": [
+        "gameType#0",
+        "tmp%2#0"
+      ]
+    },
+    "1031": {
+      "op": "global CreatorAddress",
+      "defined_out": [
+        "gameType#0",
+        "tmp%2#0",
+        "tmp%3#0"
+      ],
+      "stack_out": [
+        "gameType#0",
+        "tmp%2#0",
+        "tmp%3#0"
+      ]
+    },
+    "1033": {
+      "op": "==",
+      "defined_out": [
+        "gameType#0",
+        "tmp%4#0"
+      ],
+      "stack_out": [
+        "gameType#0",
+        "tmp%4#0"
+      ]
+    },
+    "1034": {
+      "error": "Only creator can initialize",
+      "op": "assert // Only creator can initialize",
+      "stack_out": [
+        "gameType#0"
+      ]
+    },
+    "1035": {
+      "op": "bytec_0 // \"gameType\"",
+      "stack_out": [
+        "gameType#0",
+        "\"gameType\""
+      ]
+    },
+    "1036": {
+      "op": "swap",
+      "stack_out": [
+        "\"gameType\"",
+        "gameType#0"
+      ]
+    },
+    "1037": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "1038": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "1"
+      ],
+      "stack_out": [
+        "1"
+      ]
+    },
+    "1039": {
+      "op": "return",
+      "stack_out": []
+    },
+    "1040": {
       "subroutine": "smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR",
       "params": {
         "command#0": "bytes"
@@ -10955,7 +11397,7 @@
       "stack_in": [],
       "op": "proto 1 1"
     },
-    "961": {
+    "1043": {
       "op": "frame_dig -1",
       "defined_out": [
         "command#0 (copy)"
@@ -10964,8 +11406,8 @@
         "command#0 (copy)"
       ]
     },
-    "963": {
-      "op": "bytec_0 // \"newGame\"",
+    "1045": {
+      "op": "bytec_1 // \"newGame\"",
       "defined_out": [
         "\"newGame\"",
         "command#0 (copy)"
@@ -10975,7 +11417,7 @@
         "\"newGame\""
       ]
     },
-    "964": {
+    "1046": {
       "op": "==",
       "defined_out": [
         "tmp%0#0"
@@ -10984,17 +11426,17 @@
         "tmp%0#0"
       ]
     },
-    "965": {
+    "1047": {
       "op": "bz smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR_after_if_else@2",
       "stack_out": []
     },
-    "968": {
-      "op": "bytec_0 // \"newGame\"",
+    "1050": {
+      "op": "bytec_1 // \"newGame\"",
       "stack_out": [
         "\"newGame\""
       ]
     },
-    "969": {
+    "1051": {
       "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "op": "callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "defined_out": [
@@ -11004,7 +11446,7 @@
         "tmp%4#0"
       ]
     },
-    "972": {
+    "1054": {
       "op": "pushint 341000 // 341000",
       "defined_out": [
         "341000",
@@ -11015,7 +11457,7 @@
         "341000"
       ]
     },
-    "976": {
+    "1058": {
       "op": "+",
       "defined_out": [
         "tmp%5#0"
@@ -11024,11 +11466,11 @@
         "tmp%5#0"
       ]
     },
-    "977": {
+    "1059": {
       "retsub": true,
       "op": "retsub"
     },
-    "978": {
+    "1060": {
       "block": "smart_contracts/guessGame/contract.algo.ts::GuessGame.getRequiredMBR_after_if_else@2",
       "stack_in": [],
       "op": "frame_dig -1",
@@ -11039,7 +11481,7 @@
         "command#0 (copy)"
       ]
     },
-    "980": {
+    "1062": {
       "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "op": "callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "defined_out": [
@@ -11049,11 +11491,11 @@
         "tmp%6#0"
       ]
     },
-    "983": {
+    "1065": {
       "retsub": true,
       "op": "retsub"
     },
-    "984": {
+    "1066": {
       "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "params": {
         "command#0": "bytes"
@@ -11062,7 +11504,7 @@
       "stack_in": [],
       "op": "proto 1 1"
     },
-    "987": {
+    "1069": {
       "op": "frame_dig -1",
       "defined_out": [
         "command#0 (copy)"
@@ -11071,8 +11513,8 @@
         "command#0 (copy)"
       ]
     },
-    "989": {
-      "op": "bytec_0 // \"newGame\"",
+    "1071": {
+      "op": "bytec_1 // \"newGame\"",
       "defined_out": [
         "\"newGame\"",
         "command#0 (copy)"
@@ -11082,7 +11524,7 @@
         "\"newGame\""
       ]
     },
-    "990": {
+    "1072": {
       "op": "==",
       "defined_out": [
         "tmp%0#0"
@@ -11091,11 +11533,11 @@
         "tmp%0#0"
       ]
     },
-    "991": {
+    "1073": {
       "op": "bz smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
       "stack_out": []
     },
-    "994": {
+    "1076": {
       "op": "pushint 42600 // 42600",
       "defined_out": [
         "42600"
@@ -11104,11 +11546,11 @@
         "42600"
       ]
     },
-    "998": {
+    "1080": {
       "retsub": true,
       "op": "retsub"
     },
-    "999": {
+    "1081": {
       "block": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
       "stack_in": [],
       "op": "frame_dig -1",
@@ -11119,7 +11561,7 @@
         "command#0 (copy)"
       ]
     },
-    "1001": {
+    "1083": {
       "op": "pushbytes \"join\"",
       "defined_out": [
         "\"join\"",
@@ -11130,7 +11572,7 @@
         "\"join\""
       ]
     },
-    "1007": {
+    "1089": {
       "op": "==",
       "defined_out": [
         "tmp%4#0"
@@ -11139,12 +11581,12 @@
         "tmp%4#0"
       ]
     },
-    "1008": {
+    "1090": {
       "error": "Command not supported",
       "op": "assert // Command not supported",
       "stack_out": []
     },
-    "1009": {
+    "1091": {
       "op": "pushint 29700 // 29700",
       "defined_out": [
         "29700"
@@ -11153,7 +11595,7 @@
         "29700"
       ]
     },
-    "1013": {
+    "1095": {
       "retsub": true,
       "op": "retsub"
     }

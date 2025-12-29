@@ -2,7 +2,9 @@
 import { WalletManager } from './walletManager';
 import { GameRegistry } from './gameRegistry';
 import { RPSGameModule } from './games/rps'; 
-// import { WeeklyGameModule } from './games/weekly'; // Quando sarà pronto
+import { WeeklyGameModule } from './games/weekly';
+import { StagHuntModule } from './games/stagHunt';
+import { GuessGameModule } from './games/guessGame';
 import { UI } from './ui';
 import chalk from 'chalk';
 
@@ -19,9 +21,10 @@ async function main() {
   }
 
   // Register Games
-  // Qui aggiungerai le righe per i futuri giochi
   GameRegistry.register(RPSGameModule);
-  // GameRegistry.register(WeeklyGameModule);
+  GameRegistry.register(WeeklyGameModule);
+  GameRegistry.register(StagHuntModule);
+  GameRegistry.register(GuessGameModule);
 
   while (true) {
     UI.separator();

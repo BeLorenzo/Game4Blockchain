@@ -26,37 +26,48 @@ export const RPSGameModule: IGameModule = {
 
     try {
       const uniqueAppName = `RockPaperScissors_${Date.now()}`;
-        const factory = wallet.algorand.client.getTypedAppFactory(RockPaperScissorsFactory, {
-            defaultSender: wallet.account.addr,
-            appName: uniqueAppName, 
-        });
+      const factory = wallet.algorand.client.getTypedAppFactory(RockPaperScissorsFactory, {
+        defaultSender: wallet.account.addr,
+        appName: uniqueAppName, 
+      });
 
-        const { appClient, result } = await factory.deploy({
-            onUpdate: 'append', 
-            onSchemaBreak: 'append',
-            suppressLog: true,
+      const { appClient, result } = await factory.deploy({
+        onUpdate: 'append', 
+        onSchemaBreak: 'append',
+        suppressLog: true,
+      });
+
+      // ✅ Initialize contract type immediately after deploy
+      if (['create', 'replace'].includes(result.operationPerformed)) {
+        console.log(chalk.yellow('📝 Initializing contract...'));
+        
+        await appClient.send.initialize({
+          args: { gameType: 'RPS' },
+          sender: wallet.account.addr,
         });
+        
+        console.log(chalk.green('✅ Contract type: RPS'));
 
         // Fund MBR
-        if (['create', 'replace'].includes(result.operationPerformed)) {
-            await wallet.algorand.send.payment({
-                amount: AlgoAmount.Algos(1),
-                sender: wallet.account.addr,
-                receiver: appClient.appAddress,
-            });
-        }
+        await wallet.algorand.send.payment({
+          amount: AlgoAmount.Algos(1),
+          sender: wallet.account.addr,
+          receiver: appClient.appAddress,
+        });
+      }
 
-        console.log(chalk.green(`\n✅ DEPLOYMENT SUCCESSFUL!`));
-        console.log(chalk.bgGreen.black(` APP ID: ${appClient.appId} `));
+      console.log(chalk.green(`\n✅ DEPLOYMENT SUCCESSFUL!`));
+      console.log(chalk.bgGreen.black(` APP ID: ${appClient.appId} `));
+      
     } catch (e: any) {
-        handleAlgoError(e, 'Deploy');
+      handleAlgoError(e, 'Deploy');
     }
   },
 
   // CREATE
   create: async (wallet: WalletManager) => {
     try {
-        const appId = await getAppId(wallet); 
+        const appId = await getAppId(wallet, 'RPS'); 
         const client = new RockPaperScissorsClient({
             algorand: wallet.algorand,
             appId,
@@ -114,7 +125,7 @@ export const RPSGameModule: IGameModule = {
   // JOIN 
 join: async (wallet: WalletManager) => {
     try {
-        const appId = await getAppId(wallet);
+        const appId = await getAppId(wallet, 'RPS');
         const client = new RockPaperScissorsClient({
             algorand: wallet.algorand,
             appId,
@@ -172,7 +183,7 @@ join: async (wallet: WalletManager) => {
   // REVEAL 
   reveal: async (wallet: WalletManager) => {
     try {
-        const appId = await getAppId(wallet);
+        const appId = await getAppId(wallet, 'RPS');
         const client = new RockPaperScissorsClient({
             algorand: wallet.algorand,
             appId,
@@ -216,7 +227,7 @@ join: async (wallet: WalletManager) => {
   // STATUS 
   getStatus: async (wallet: WalletManager) => {
     try {
-        const appId = await getAppId(wallet);
+        const appId = await getAppId(wallet, 'RPS');
         const client = new RockPaperScissorsClient({ algorand: wallet.algorand, appId, defaultSender: wallet.account!.addr });
         
         console.log(chalk.gray('🔄 Fetching Data...'));

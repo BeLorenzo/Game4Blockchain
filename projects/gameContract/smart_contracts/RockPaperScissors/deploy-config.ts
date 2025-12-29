@@ -32,6 +32,12 @@ export async function deploy() {
   // If this is a new deployment or replacement, fund the contract with 1 ALGO
   // This ensures the contract has minimum balance to operate
   if (['create', 'replace'].includes(result.operationPerformed)) {
+
+    await appClient.send.initialize({
+  args: { gameType: 'RPS' },  
+  sender: deployer.addr,
+})
+
     await algorand.send.payment({
       amount: (1).algo(),
       sender: deployer.addr,
