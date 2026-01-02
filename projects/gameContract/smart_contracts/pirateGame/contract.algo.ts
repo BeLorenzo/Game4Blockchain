@@ -1,0 +1,462 @@
+import {
+  assert,
+  BoxMap,
+  bytes,
+  clone,
+  ensureBudget,
+  Global,
+  gtxn,
+  itxn,
+  op,
+  Txn,
+  uint64,
+} from '@algorandfoundation/algorand-typescript'
+import { Address } from '@algorandfoundation/algorand-typescript/arc4'
+import { GameConfig, GameContract } from '../abstract_contract/contract.algo'
+import { bzero, extractUint64, itob } from '@algorandfoundation/algorand-typescript/op'
+
+/**
+ * Represents a pirate in the game
+ */
+interface Pirate {
+  pirateAddress: Address
+  seniorityIndex: uint64 // 0 = most senior
+  alive: boolean
+  claimed: boolean // <--- MODIFICATO: Flag invece di uint64
+}
+
+/**
+ * Tracks the current state of the game
+ */
+interface GameState {
+  phase: uint64 // 0=Registration, 1=Proposal, 2=VoteCommit, 3=VoteReveal, 4=Finished
+  currentRound: uint64 // Which elimination round (0, 1, 2...)
+  totalPirates: uint64 // Initial number of pirates
+  alivePirates: uint64 // Pirates still alive
+  currentProposerIndex: uint64 // Seniority index of current proposer
+  pot: uint64 // Total coins to distribute
+  proposalDeadline: uint64 // Round deadline for proposal phase
+  voteDeadline: uint64 // Round deadline for vote phase
+  revealDeadline: uint64 // Round deadline for reveal phase
+}
+
+/**
+ * A distribution proposal
+ */
+interface Proposal {
+  proposer: uint64 
+  distribution: bytes 
+  votesFor: uint64
+  votesAgainst: uint64
+}
+
+export class PirateGame extends GameContract {
+  gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
+  pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
+  pirateList = BoxMap<uint64, bytes>({ keyPrefix: 'pls' })
+  proposals = BoxMap<uint64, Proposal>({ keyPrefix: 'prp' })
+
+  public createSession(
+    config: GameConfig,
+    mbrPayment: gtxn.PaymentTxn,
+    maxPirates: uint64,
+    roundDuration: uint64
+  ): uint64 {
+    assert(maxPirates >= 3 && maxPirates <= 20, 'Pirates must be between 3 and 20')
+    assert(roundDuration >= 10, 'Round duration must be at least 10 blocks')
+    assert(config.participation >= 1_000_000, 'Minimum participation is 1 ALGO')
+
+    const requiredMBR = this.getRequiredMBR('newGame')
+    assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
+    assert(mbrPayment.amount >= requiredMBR, 'Insufficient MBR')
+
+    const sessionID = super.create(config)
+
+    this.gameState(sessionID).value = {
+      phase: 0,
+      currentRound: 0,
+      totalPirates: 0,
+      alivePirates: 0,
+      currentProposerIndex: 0,
+      pot: 0,
+      proposalDeadline: config.startAt + roundDuration,
+      voteDeadline: config.startAt + roundDuration * 2,
+      revealDeadline: config.startAt + roundDuration * 3,
+    }
+
+    this.pirateList(sessionID).value = bzero(maxPirates * 32)
+    return sessionID
+  }
+
+  public registerPirate(sessionID: uint64, payment: gtxn.PaymentTxn, mbrPayment: gtxn.PaymentTxn): void {
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 0, 'Registration phase has ended')
+    assert(state.totalPirates < 20, 'Max pirates reached')
+
+    const config = clone(this.gameSessions(sessionID).value)
+    assert(Global.round >= config.startAt, 'Registration not started')
+    assert(Global.round <= state.proposalDeadline, 'Registration deadline passed')
+
+    const pirateAddr = new Address(Txn.sender)
+    const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+
+    assert(!this.pirates(pirateKey).exists, 'Already registered')
+
+    const requiredMBR = this.getRequiredMBR('join')
+    assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
+    assert(mbrPayment.amount >= requiredMBR, 'Insufficient MBR for pirate registration')
+
+    const maxPirates : uint64 = this.pirateList(sessionID).value.length / 32
+    assert(state.totalPirates < maxPirates, 'Game is full')
+
+    super.joinWithoutCommit(sessionID, payment)
+
+    const seniorityIndex = state.totalPirates
+
+    // Store pirate data
+    this.pirates(pirateKey).value = {
+      pirateAddress: pirateAddr,
+      seniorityIndex: seniorityIndex,
+      alive: true,
+      claimed: false, // <--- Inizializzato a false
+    }
+
+    const listBox = this.pirateList(sessionID)
+    const offset : uint64 = seniorityIndex * 32
+    listBox.replace(offset, pirateAddr.bytes)
+
+    state.totalPirates += 1
+    state.alivePirates += 1
+    state.pot += payment.amount
+    this.gameState(sessionID).value = clone(state)
+  }
+
+  public startGame(sessionID: uint64): void {
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 0, 'Game already started')
+    assert(state.totalPirates >= 3, 'Need at least 3 pirates')
+    assert(Global.round > state.proposalDeadline, 'Registration still open')
+
+    state.phase = 1
+    state.currentRound = 0
+    state.currentProposerIndex = 0 
+
+    const currentRound = Global.round
+    const roundDuration : uint64 = state.voteDeadline - state.proposalDeadline
+    state.proposalDeadline = currentRound + roundDuration
+    state.voteDeadline = currentRound + roundDuration * 2
+    state.revealDeadline = currentRound + roundDuration * 3
+
+    this.gameState(sessionID).value = clone(state)
+  }
+
+  public proposeDistribution(sessionID: uint64, distribution: bytes): void {
+    ensureBudget(1000)
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 1, 'Not in proposal phase')
+    assert(Global.round <= state.proposalDeadline, 'Proposal deadline passed')
+
+    const pirateAddr = new Address(Txn.sender)
+    const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+    assert(this.pirates(pirateKey).exists, 'Not registered')
+
+    const pirate = clone(this.pirates(pirateKey).value)
+    assert(pirate.alive, 'You are eliminated')
+    assert(pirate.seniorityIndex === state.currentProposerIndex, 'Not your turn to propose')
+
+    const expectedLength : uint64 = state.totalPirates * 8
+    assert(distribution.length === expectedLength, 'Invalid distribution length')
+
+    let totalProposed: uint64 = 0
+    for (let i: uint64 = 0; i < state.totalPirates; i++) {
+      const share = extractUint64(distribution, i * 8)
+      totalProposed += share
+    }
+    assert(totalProposed === state.pot, 'Distribution must sum to pot')
+
+    this.proposals(sessionID).value = {
+      proposer: state.currentProposerIndex,
+      distribution: distribution,
+      votesFor: 0,
+      votesAgainst: 0,
+    }
+
+    state.phase = 2
+    this.gameState(sessionID).value = clone(state)
+  }
+
+  public commitVote(sessionID: uint64, voteHash: bytes, mbrPayment: gtxn.PaymentTxn): void {
+    // ... Logica invariata ...
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 2, 'Not in voting phase')
+    assert(Global.round <= state.voteDeadline, 'Voting deadline passed')
+    
+    const pirateAddr = new Address(Txn.sender)
+    const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+    assert(this.pirates(pirateKey).exists, 'Not registered')
+    const pirate = clone(this.pirates(pirateKey).value)
+    assert(pirate.alive, 'You are eliminated')
+
+    const requiredMBR = this.getRequiredMBR('commitVote')
+    assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
+    assert(mbrPayment.amount >= requiredMBR, 'Insufficient MBR for vote commit')
+
+    super.commitInRound(sessionID, state.currentRound, voteHash)
+  }
+
+  public revealVote(sessionID: uint64, vote: uint64, salt: bytes): void {
+    // ... Logica invariata ...
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+    assert(vote === 0 || vote === 1, 'Vote must be 0 or 1')
+
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 2 || state.phase === 3, 'Not in reveal phase')
+    assert(Global.round > state.voteDeadline, 'Voting still open')
+    assert(Global.round <= state.revealDeadline, 'Reveal deadline passed')
+
+    const pirateAddr = new Address(Txn.sender)
+    const pirateKey = super.getPlayerKey(sessionID, pirateAddr)
+    const pirate = clone(this.pirates(pirateKey).value)
+    assert(pirate.alive, 'You are eliminated')
+
+    super.revealInRound(sessionID, state.currentRound, vote, salt)
+
+    const proposal = clone(this.proposals(sessionID).value)
+    if (vote === 1) {
+      proposal.votesFor += 1
+    } else {
+      proposal.votesAgainst += 1
+    }
+    this.proposals(sessionID).value = clone(proposal)
+
+    if (state.phase === 2) {
+      state.phase = 3
+      this.gameState(sessionID).value = clone(state)
+    }
+  }
+
+  /**
+   * Executes the current round.
+   * FIX: Now uses PULL pattern. No loops over pirates.
+   */
+  public executeRound(sessionID: uint64): void {
+    ensureBudget(2000)
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 3, 'Not in execution phase')
+    assert(Global.round > state.revealDeadline, 'Reveal phase not ended')
+
+    const proposal = clone(this.proposals(sessionID).value)
+    const totalVotes = state.alivePirates
+    const votesFor = proposal.votesFor
+
+    // Strict majority logic (or casting vote logic depending on preference)
+    // Using your logic:
+    const passThreshold : uint64 = (totalVotes + 1 ) / 2
+    const proposalPasses = votesFor >= passThreshold
+
+    if (proposalPasses) {
+      // ✅ FIX: NON chiamare finalizeDistribution.
+      // Basta settare la fase a 4. La proposta vincente è già in `proposals(sessionID)`.
+      state.phase = 4 
+      this.gameState(sessionID).value = clone(state)
+    } else {
+      // ELIMINATE PROPOSER
+      this.eliminatePirate(sessionID, state.currentProposerIndex)
+      state.alivePirates -= 1
+
+      // Check "Last Man Standing"
+      if (state.alivePirates === 1) {
+        const survivorIndex = this.findNextAlivePirate(sessionID, 0, state.totalPirates)
+        
+        // ✅ FIX: Dobbiamo salvare la distribuzione "virtuale" nel box delle proposte
+        // così claimWinnings funziona anche per lui.
+        const totalSize : uint64 = state.totalPirates * 8
+        const survivorOffset : uint64 = survivorIndex * 8
+        const survivorShare = itob(state.pot)
+        
+        const before = bzero(survivorOffset)
+        const afterOffset : uint64 = survivorOffset + 8
+        const afterSize : uint64 = totalSize - afterOffset
+        const after = bzero(afterSize)
+        
+        const distribution = before.concat(survivorShare).concat(after)
+        
+        // Salviamo la proposta "automatica" vincente
+        this.proposals(sessionID).value = {
+             proposer: survivorIndex,
+             distribution: distribution,
+             votesFor: 1,
+             votesAgainst: 0
+        }
+        
+        state.phase = 4 // Game Over
+      } else {
+        // NEXT ROUND logic
+        state.currentProposerIndex = this.findNextAlivePirate(sessionID, state.currentProposerIndex + 1, state.totalPirates)
+        state.currentRound += 1
+        state.phase = 1 
+
+        const currentRound = Global.round
+        const roundDuration : uint64 = state.voteDeadline - state.proposalDeadline
+        state.proposalDeadline = currentRound + roundDuration
+        state.voteDeadline = currentRound + roundDuration * 2
+        state.revealDeadline = currentRound + roundDuration * 3
+      }
+
+      this.gameState(sessionID).value = clone(state)
+    }
+  }
+
+  /**
+   * Claims winnings.
+   * FIX: Calculates share on the fly from the stored proposal.
+   */
+  public claimWinnings(sessionID: uint64): uint64 {
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 4, 'Game not finished')
+
+    const pirateAddr = new Address(Txn.sender)
+    const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+    assert(this.pirates(pirateKey).exists, 'Not a pirate')
+
+    const pirate = clone(this.pirates(pirateKey).value)
+    assert(!pirate.claimed, 'Already claimed') // Anti-replay
+
+    // 1. Legge la proposta vincente
+    const winningProposal = clone(this.proposals(sessionID).value)
+    
+    // 2. Estrae la quota specifica per QUESTO pirata
+    const shareOffset : uint64 = pirate.seniorityIndex * 8
+    const share = extractUint64(winningProposal.distribution, shareOffset)
+    
+    assert(share > 0, 'No winnings for you')
+
+    // 3. Marca come "reclamato" PRIMA di pagare (best practice, anche se su Algo non c'è reentrancy)
+    pirate.claimed = true
+    this.pirates(pirateKey).value = clone(pirate)
+
+    // 4. Paga
+    itxn
+      .payment({
+        receiver: pirateAddr.native,
+        amount: share,
+        fee: 0,
+      })
+      .submit()
+
+    return share
+  }
+
+  private eliminatePirate(sessionID: uint64, seniorityIndex: uint64): void {
+    const listBytes = this.pirateList(sessionID).value
+    const offset : uint64 = seniorityIndex * 32
+    const addrBytes = op.extract(listBytes, offset, 32)
+    const pirateAddr = new Address(addrBytes)
+
+    const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+    const pirate = clone(this.pirates(pirateKey).value)
+    pirate.alive = false
+    this.pirates(pirateKey).value = clone(pirate)
+  }
+
+  private findNextAlivePirate(sessionID: uint64, startIndex: uint64, totalPirates: uint64): uint64 {
+    const listBytes = this.pirateList(sessionID).value
+    for (let i: uint64 = startIndex; i < totalPirates; i++) {
+      const offset : uint64 = i * 32
+      const addrBytes = op.extract(listBytes, offset, 32)
+      const pirateAddr = new Address(addrBytes)
+      const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+      const pirate = clone(this.pirates(pirateKey).value)
+      if (pirate.alive) return i
+    }
+    assert(false, 'No alive pirate found')
+  }
+
+  public getRequiredMBR(command: 'newGame' | 'join' | 'commitVote'): uint64 {
+    if (command === 'newGame') {
+      const maxPirates: uint64 = 20
+      const gameStateMBR = super.getBoxMBR(11, 72)
+      const pirateListMBR = super.getBoxMBR(11, maxPirates * 32)
+      const proposalValueSize : uint64 = 8 + (maxPirates * 8) + 8 + 8 
+      const proposalsMBR = super.getBoxMBR(11, proposalValueSize)
+      const parentMBR = super.getRequiredMBR('newGame')
+      return gameStateMBR + pirateListMBR + proposalsMBR + parentMBR
+    } 
+    else if (command === 'join') {
+      // === Box: pirates ===
+      // Key: 35 bytes
+      // Value: Pirate struct
+      //   - pirateAddress: 32 bytes
+      //   - seniorityIndex: 8 bytes
+      //   - alive: 1 byte
+      //   - claimed: 1 byte (EX finalShare, che era 8)
+      //   Total: 42 bytes (prima 49)
+      return super.getBoxMBR(35, 42) 
+    }
+    else if (command === 'commitVote') {
+      return super.getRequiredMBR('join')  
+    }
+    assert(false, 'Invalid command')
+  }
+
+  public timeOut(sessionID: uint64): void {
+    ensureBudget(2000)
+    assert(this.sessionExists(sessionID), 'Session does not exist')
+
+    const state = clone(this.gameState(sessionID).value)
+    assert(state.phase === 1, 'Not in proposal phase')
+    assert(Global.round > state.proposalDeadline, 'Proposal deadline not passed yet')
+
+    this.eliminatePirate(sessionID, state.currentProposerIndex)
+    state.alivePirates -= 1
+
+    if (state.alivePirates === 1) {
+       const survivorIndex = this.findNextAlivePirate(sessionID, 0, state.totalPirates)
+       
+       // Costruzione "Virtuale" della proposta vincente per il survivor
+       const totalSize : uint64 = state.totalPirates * 8
+       const survivorOffset : uint64 = survivorIndex * 8
+       const survivorShare = itob(state.pot)
+       
+       const before = bzero(survivorOffset)
+       const afterOffset : uint64= survivorOffset + 8
+       const afterSize : uint64 = totalSize - afterOffset
+       const after = bzero(afterSize)
+       
+       const distribution = before.concat(survivorShare).concat(after)
+       
+       // Scrivi la proposta vincente
+       this.proposals(sessionID).value = {
+          proposer: survivorIndex,
+          distribution: distribution,
+          votesFor: 1,
+          votesAgainst: 0
+       }
+       
+       state.phase = 4 // Finished
+
+    } else {
+       state.currentProposerIndex = this.findNextAlivePirate(sessionID, state.currentProposerIndex + 1, state.totalPirates)
+       state.currentRound += 1
+       
+       const currentRound = Global.round
+       const roundDuration : uint64 = state.voteDeadline - state.proposalDeadline
+       
+       state.proposalDeadline = currentRound + roundDuration
+       state.voteDeadline = currentRound + roundDuration * 2
+       state.revealDeadline = currentRound + roundDuration * 3
+    }
+
+    this.gameState(sessionID).value = clone(state)
+  }
+}

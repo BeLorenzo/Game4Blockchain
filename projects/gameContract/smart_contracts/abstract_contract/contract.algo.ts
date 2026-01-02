@@ -35,6 +35,11 @@ export interface GameConfig {
  * 2. Joining (Commit hash + MBR reservation for player data)
  * 3. Revealing (Verifying hash against choice)
  *
+ * EXTENDED SUPPORT FOR MULTI-ROUND GAMES:
+ * - joinWithoutCommit() - Register without immediate commit
+ * - commitInRound() - Commit in a specific round
+ * - revealInRound() - Reveal for a specific round
+ *
  * The subclass is responsible for implementing the logic of the game.
  */
 export class GameContract extends Contract {
@@ -224,6 +229,55 @@ export class GameContract extends Contract {
   protected getPlayerKey(sessionID: uint64, player: Address): bytes {
     return sha256(itob(sessionID).concat(player.bytes))
   }
+
+    /**
+   * OPTIONAL: For multi-round games only
+   * Allows registration without immediate commit (commit happens later per-round)
+   */
+  protected joinWithoutCommit(sessionID: uint64, payment: gtxn.PaymentTxn): void {
+    assert(this.gameSessions(sessionID).exists, 'Session does not exist')
+    
+    const config = clone(this.gameSessions(sessionID).value)
+    assert(payment.receiver === Global.currentApplicationAddress, 'Payment must go to contract')
+    assert(payment.amount === config.participation, 'Incorrect participation fee')
+    
+    // Update balance (no commit storage)
+    this.sessionBalances(sessionID).value += payment.amount
+  }
+  
+  /**
+   * OPTIONAL: Commit in a specific round
+   * Used by multi-round games to store round-specific commits
+   */
+  protected commitInRound(sessionID: uint64, round: uint64, commit: bytes): void {
+    const key = this.getRoundCommitKey(sessionID, round, new Address(Txn.sender))
+    assert(!this.playerCommit(key).exists, 'Already committed this round')
+    this.playerCommit(key).value = commit
+  }
+  
+  /**
+   * OPTIONAL: Reveal for a specific round
+   * Validates hash and stores choice for that round
+   */
+  protected revealInRound(sessionID: uint64, round: uint64, choice: uint64, salt: bytes): void {
+    const key = this.getRoundCommitKey(sessionID, round, new Address(Txn.sender))
+    assert(this.playerCommit(key).exists, 'No commit for this round')
+    
+    const storedCommit = this.playerCommit(key).value
+    const computedCommit = sha256(itob(choice).concat(salt))
+    assert(computedCommit === storedCommit, 'Invalid reveal: hash mismatch')
+    
+    this.playerChoice(key).value = choice
+    this.playerCommit(key).delete()
+  }
+  
+  /**
+   * HELPER: Generates round-specific storage key
+   */
+  protected getRoundCommitKey(sessionID: uint64, round: uint64, player: Address): bytes {
+    return sha256(itob(sessionID).concat(itob(round)).concat(player.bytes))
+  }
 }
+
 
 

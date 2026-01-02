@@ -7,12 +7,12 @@ main:
     bytecblock "gameType" "newGame" "gs" 0x151f7c75 "sessionIDCounter" "sbal" "dc" "pcom" "pcho"
     txn ApplicationID
     bnz main_after_if_else@2
-    // smart_contracts/abstract_contract/contract.algo.ts:47
+    // smart_contracts/abstract_contract/contract.algo.ts:52
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
     pushbytes ""
     app_global_put
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:57
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
     bytec 4 // "sessionIDCounter"
     intc_1 // 0
@@ -81,7 +81,7 @@ createSession:
     gtxns Amount
     <=
     assert // Insufficient MBR for session and day counters
-    // smart_contracts/abstract_contract/contract.algo.ts:101
+    // smart_contracts/abstract_contract/contract.algo.ts:106
     // assert(config.startAt <= config.endCommitAt, 'Invalid timeline: start must be before commit end')
     dup
     intc_1 // 0
@@ -92,60 +92,60 @@ createSession:
     dup2
     <=
     assert // Invalid timeline: start must be before commit end
-    // smart_contracts/abstract_contract/contract.algo.ts:102
+    // smart_contracts/abstract_contract/contract.algo.ts:107
     // assert(config.endCommitAt < config.endRevealAt, 'Invalid timeline: commit end must be before reveal end')
     dig 2
     pushint 16 // 16
     extract_uint64
     <
     assert // Invalid timeline: commit end must be before reveal end
-    // smart_contracts/abstract_contract/contract.algo.ts:103
+    // smart_contracts/abstract_contract/contract.algo.ts:108
     // assert(config.startAt >= Global.round, 'Invalid start time: cannot start in the past')
     global Round
     >=
     assert // Invalid start time: cannot start in the past
-    // smart_contracts/abstract_contract/contract.algo.ts:105
+    // smart_contracts/abstract_contract/contract.algo.ts:110
     // const sessionID = this.sessionIDCounter.value
     intc_1 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:57
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
     bytec 4 // "sessionIDCounter"
-    // smart_contracts/abstract_contract/contract.algo.ts:105
+    // smart_contracts/abstract_contract/contract.algo.ts:110
     // const sessionID = this.sessionIDCounter.value
     app_global_get_ex
     assert // check GlobalState exists
-    // smart_contracts/abstract_contract/contract.algo.ts:107
+    // smart_contracts/abstract_contract/contract.algo.ts:112
     // this.gameSessions(sessionID).value = clone(config)
     dup
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:71
+    // smart_contracts/abstract_contract/contract.algo.ts:76
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_2 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:107
+    // smart_contracts/abstract_contract/contract.algo.ts:112
     // this.gameSessions(sessionID).value = clone(config)
     uncover 3
     box_put
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:81
     // sessionBalances = BoxMap<uint64, uint64>({ keyPrefix: 'sbal' })
     bytec 5 // "sbal"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:108
+    // smart_contracts/abstract_contract/contract.algo.ts:113
     // this.sessionBalances(sessionID).value = 0
     intc_1 // 0
     itob
     box_put
-    // smart_contracts/abstract_contract/contract.algo.ts:109
+    // smart_contracts/abstract_contract/contract.algo.ts:114
     // this.sessionIDCounter.value = sessionID + 1
     swap
     intc_0 // 1
     +
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:57
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
     bytec 4 // "sessionIDCounter"
-    // smart_contracts/abstract_contract/contract.algo.ts:109
+    // smart_contracts/abstract_contract/contract.algo.ts:114
     // this.sessionIDCounter.value = sessionID + 1
     swap
     app_global_put
@@ -200,29 +200,29 @@ joinSession:
     intc_0 // pay
     ==
     assert // transaction type is pay
-    // smart_contracts/abstract_contract/contract.algo.ts:121
+    // smart_contracts/abstract_contract/contract.algo.ts:126
     // assert(this.gameSessions(sessionID).exists, 'Session does not exist')
     uncover 2
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:71
+    // smart_contracts/abstract_contract/contract.algo.ts:76
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_2 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:121
+    // smart_contracts/abstract_contract/contract.algo.ts:126
     // assert(this.gameSessions(sessionID).exists, 'Session does not exist')
     dup
     box_len
     bury 1
     assert // Session does not exist
-    // smart_contracts/abstract_contract/contract.algo.ts:123
+    // smart_contracts/abstract_contract/contract.algo.ts:128
     // const config = clone(this.gameSessions(sessionID).value)
     box_get
     pop
-    // smart_contracts/abstract_contract/contract.algo.ts:124
+    // smart_contracts/abstract_contract/contract.algo.ts:129
     // const currentBlock = Global.round
     global Round
-    // smart_contracts/abstract_contract/contract.algo.ts:126
+    // smart_contracts/abstract_contract/contract.algo.ts:131
     // assert(currentBlock >= config.startAt, 'Game session has not started yet')
     dig 1
     intc_1 // 0
@@ -230,21 +230,21 @@ joinSession:
     dig 1
     <=
     assert // Game session has not started yet
-    // smart_contracts/abstract_contract/contract.algo.ts:127
+    // smart_contracts/abstract_contract/contract.algo.ts:132
     // assert(currentBlock <= config.endCommitAt, 'Commit phase has ended')
     dig 1
     intc_2 // 8
     extract_uint64
     <=
     assert // Commit phase has ended
-    // smart_contracts/abstract_contract/contract.algo.ts:129
+    // smart_contracts/abstract_contract/contract.algo.ts:134
     // assert(payment.receiver === Global.currentApplicationAddress, 'Fee receiver must be the contract')
     dig 2
     gtxns Receiver
     global CurrentApplicationAddress
     ==
     assert // Fee receiver must be the contract
-    // smart_contracts/abstract_contract/contract.algo.ts:130
+    // smart_contracts/abstract_contract/contract.algo.ts:135
     // assert(payment.amount === config.participation, 'Incorrect participation fee amount')
     uncover 2
     gtxns Amount
@@ -254,41 +254,41 @@ joinSession:
     dig 1
     ==
     assert // Incorrect participation fee amount
-    // smart_contracts/abstract_contract/contract.algo.ts:225
+    // smart_contracts/abstract_contract/contract.algo.ts:230
     // return sha256(itob(sessionID).concat(player.bytes))
     dig 1
-    // smart_contracts/abstract_contract/contract.algo.ts:132
+    // smart_contracts/abstract_contract/contract.algo.ts:137
     // const playerAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:225
+    // smart_contracts/abstract_contract/contract.algo.ts:230
     // return sha256(itob(sessionID).concat(player.bytes))
     concat
     sha256
-    // smart_contracts/abstract_contract/contract.algo.ts:59
+    // smart_contracts/abstract_contract/contract.algo.ts:64
     // playerCommit = BoxMap<bytes, bytes>({ keyPrefix: 'pcom' })
     bytec 7 // "pcom"
     swap
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:135
+    // smart_contracts/abstract_contract/contract.algo.ts:140
     // assert(!this.playerCommit(playerKey).exists, 'Player already registered in this session')
     dup
     box_len
     bury 1
     !
     assert // Player already registered in this session
-    // smart_contracts/abstract_contract/contract.algo.ts:137
+    // smart_contracts/abstract_contract/contract.algo.ts:142
     // this.playerCommit(playerKey).value = commit
     dup
     box_del
     pop
     uncover 3
     box_put
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:81
     // sessionBalances = BoxMap<uint64, uint64>({ keyPrefix: 'sbal' })
     bytec 5 // "sbal"
     uncover 2
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:138
+    // smart_contracts/abstract_contract/contract.algo.ts:143
     // this.sessionBalances(sessionID).value += payment.amount
     dup
     box_get
@@ -335,29 +335,29 @@ revealMove:
     ==
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
     extract 2 0
-    // smart_contracts/abstract_contract/contract.algo.ts:149
+    // smart_contracts/abstract_contract/contract.algo.ts:154
     // assert(this.gameSessions(sessionID).exists, 'Session does not exist')
     swap
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:71
+    // smart_contracts/abstract_contract/contract.algo.ts:76
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_2 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:149
+    // smart_contracts/abstract_contract/contract.algo.ts:154
     // assert(this.gameSessions(sessionID).exists, 'Session does not exist')
     dup
     box_len
     bury 1
     assert // Session does not exist
-    // smart_contracts/abstract_contract/contract.algo.ts:151
+    // smart_contracts/abstract_contract/contract.algo.ts:156
     // const config = clone(this.gameSessions(sessionID).value)
     box_get
     pop
-    // smart_contracts/abstract_contract/contract.algo.ts:152
+    // smart_contracts/abstract_contract/contract.algo.ts:157
     // const currentBlock = Global.round
     global Round
-    // smart_contracts/abstract_contract/contract.algo.ts:154
+    // smart_contracts/abstract_contract/contract.algo.ts:159
     // assert(currentBlock > config.endCommitAt, 'Commit phase is still active')
     dig 1
     intc_2 // 8
@@ -365,40 +365,40 @@ revealMove:
     dig 1
     <
     assert // Commit phase is still active
-    // smart_contracts/abstract_contract/contract.algo.ts:155
+    // smart_contracts/abstract_contract/contract.algo.ts:160
     // assert(currentBlock <= config.endRevealAt, 'Reveal phase has ended')
     swap
     pushint 16 // 16
     extract_uint64
     <=
     assert // Reveal phase has ended
-    // smart_contracts/abstract_contract/contract.algo.ts:225
+    // smart_contracts/abstract_contract/contract.algo.ts:230
     // return sha256(itob(sessionID).concat(player.bytes))
     dup
-    // smart_contracts/abstract_contract/contract.algo.ts:157
+    // smart_contracts/abstract_contract/contract.algo.ts:162
     // const playerAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:225
+    // smart_contracts/abstract_contract/contract.algo.ts:230
     // return sha256(itob(sessionID).concat(player.bytes))
     concat
     sha256
-    // smart_contracts/abstract_contract/contract.algo.ts:59
+    // smart_contracts/abstract_contract/contract.algo.ts:64
     // playerCommit = BoxMap<bytes, bytes>({ keyPrefix: 'pcom' })
     bytec 7 // "pcom"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:160
+    // smart_contracts/abstract_contract/contract.algo.ts:165
     // assert(this.playerCommit(playerKey).exists, 'No commit found for this player or already revealed')
     dup
     box_len
     bury 1
     assert // No commit found for this player or already revealed
-    // smart_contracts/abstract_contract/contract.algo.ts:162
+    // smart_contracts/abstract_contract/contract.algo.ts:167
     // const storedCommit = this.playerCommit(playerKey).value
     dup
     box_get
     pop
-    // smart_contracts/abstract_contract/contract.algo.ts:163
+    // smart_contracts/abstract_contract/contract.algo.ts:168
     // const computedCommit = sha256(itob(choice).concat(salt))
     dig 5
     itob
@@ -406,21 +406,21 @@ revealMove:
     uncover 6
     concat
     sha256
-    // smart_contracts/abstract_contract/contract.algo.ts:165
+    // smart_contracts/abstract_contract/contract.algo.ts:170
     // assert(computedCommit === storedCommit, 'Invalid reveal: hash mismatch')
     uncover 2
     ==
     assert // Invalid reveal: hash mismatch
-    // smart_contracts/abstract_contract/contract.algo.ts:66
+    // smart_contracts/abstract_contract/contract.algo.ts:71
     // playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
     bytec 8 // "pcho"
     uncover 3
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:167
+    // smart_contracts/abstract_contract/contract.algo.ts:172
     // this.playerChoice(playerKey).value = choice
     swap
     box_put
-    // smart_contracts/abstract_contract/contract.algo.ts:168
+    // smart_contracts/abstract_contract/contract.algo.ts:173
     // this.playerCommit(playerKey).delete()
     box_del
     pop
@@ -629,15 +629,15 @@ claimWinnings:
     ==
     assert // invalid number of bytes for arc4.uint64
     btoi
-    // smart_contracts/abstract_contract/contract.algo.ts:217
+    // smart_contracts/abstract_contract/contract.algo.ts:222
     // return this.gameSessions(sessionID).exists
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:71
+    // smart_contracts/abstract_contract/contract.algo.ts:76
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_2 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:217
+    // smart_contracts/abstract_contract/contract.algo.ts:222
     // return this.gameSessions(sessionID).exists
     dup
     box_len
@@ -664,13 +664,13 @@ claimWinnings:
     txn Sender
     dup
     cover 2
-    // smart_contracts/abstract_contract/contract.algo.ts:225
+    // smart_contracts/abstract_contract/contract.algo.ts:230
     // return sha256(itob(sessionID).concat(player.bytes))
     dig 1
     swap
     concat
     sha256
-    // smart_contracts/abstract_contract/contract.algo.ts:66
+    // smart_contracts/abstract_contract/contract.algo.ts:71
     // playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
     bytec 8 // "pcho"
     swap
@@ -689,18 +689,18 @@ claimWinnings:
     pop
     btoi
     swap
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:81
     // sessionBalances = BoxMap<uint64, uint64>({ keyPrefix: 'sbal' })
     bytec 5 // "sbal"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:209
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // assert(this.sessionBalances(sessionID).exists, 'Session does not exist')
     dup
     box_len
     bury 1
     assert // Session does not exist
-    // smart_contracts/abstract_contract/contract.algo.ts:210
+    // smart_contracts/abstract_contract/contract.algo.ts:215
     // return this.sessionBalances(sessionID).value
     box_get
     pop
@@ -1044,17 +1044,17 @@ getRequiredMBR:
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.getGameType[routing]() -> void:
 getGameType:
-    // smart_contracts/abstract_contract/contract.algo.ts:83
+    // smart_contracts/abstract_contract/contract.algo.ts:88
     // return this.gameType.value
     intc_1 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:47
+    // smart_contracts/abstract_contract/contract.algo.ts:52
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:83
+    // smart_contracts/abstract_contract/contract.algo.ts:88
     // return this.gameType.value
     app_global_get_ex
     assert // check GlobalState exists
-    // smart_contracts/abstract_contract/contract.algo.ts:82
+    // smart_contracts/abstract_contract/contract.algo.ts:87
     // public getGameType(): bytes {
     dup
     len
@@ -1072,7 +1072,7 @@ getGameType:
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.initialize[routing]() -> void:
 initialize:
-    // smart_contracts/abstract_contract/contract.algo.ts:87
+    // smart_contracts/abstract_contract/contract.algo.ts:92
     // public initialize(gameType: string): void {
     txna ApplicationArgs 1
     dup
@@ -1085,33 +1085,33 @@ initialize:
     ==
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
     extract 2 0
-    // smart_contracts/abstract_contract/contract.algo.ts:88
+    // smart_contracts/abstract_contract/contract.algo.ts:93
     // assert(this.gameType.value.length === 0, 'Contract already initialized')
     intc_1 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:47
+    // smart_contracts/abstract_contract/contract.algo.ts:52
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:88
+    // smart_contracts/abstract_contract/contract.algo.ts:93
     // assert(this.gameType.value.length === 0, 'Contract already initialized')
     app_global_get_ex
     assert // check GlobalState exists
     len
     !
     assert // Contract already initialized
-    // smart_contracts/abstract_contract/contract.algo.ts:89
+    // smart_contracts/abstract_contract/contract.algo.ts:94
     // assert(Txn.sender === Global.creatorAddress, 'Only creator can initialize')
     txn Sender
     global CreatorAddress
     ==
     assert // Only creator can initialize
-    // smart_contracts/abstract_contract/contract.algo.ts:47
+    // smart_contracts/abstract_contract/contract.algo.ts:52
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:90
+    // smart_contracts/abstract_contract/contract.algo.ts:95
     // this.gameType.value = Bytes(gameType)
     swap
     app_global_put
-    // smart_contracts/abstract_contract/contract.algo.ts:87
+    // smart_contracts/abstract_contract/contract.algo.ts:92
     // public initialize(gameType: string): void {
     intc_0 // 1
     return
@@ -1150,30 +1150,30 @@ smart_contracts/weeklyGame/contract.algo.ts::WeeklyGame.getRequiredMBR_after_if_
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR(command: bytes) -> uint64:
 smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR:
-    // smart_contracts/abstract_contract/contract.algo.ts:182
+    // smart_contracts/abstract_contract/contract.algo.ts:187
     // protected getRequiredMBR(command: 'newGame' | 'join'): uint64 {
     proto 1 1
-    // smart_contracts/abstract_contract/contract.algo.ts:183
+    // smart_contracts/abstract_contract/contract.algo.ts:188
     // if (command === 'newGame') {
     frame_dig -1
     bytec_1 // "newGame"
     ==
     bz smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2
-    // smart_contracts/abstract_contract/contract.algo.ts:188
+    // smart_contracts/abstract_contract/contract.algo.ts:193
     // return configMBR + balanceMBR
     pushint 42600 // 42600
     retsub
 
 smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2:
-    // smart_contracts/abstract_contract/contract.algo.ts:189
+    // smart_contracts/abstract_contract/contract.algo.ts:194
     // } else if (command === 'join') {
     frame_dig -1
     pushbytes "join"
     ==
     assert // Command not supported
-    // smart_contracts/abstract_contract/contract.algo.ts:176
+    // smart_contracts/abstract_contract/contract.algo.ts:181
     // return 2500 + 400 * (keySize + valueSize)
     pushint 29700 // 29700
-    // smart_contracts/abstract_contract/contract.algo.ts:191
+    // smart_contracts/abstract_contract/contract.algo.ts:196
     // return this.getBoxMBR(36, 32)
     retsub
