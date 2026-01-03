@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { GameRegistry } from './gameRegistry';
+import { IGameModule } from './interfaces';
 
 export const UI = {
   clear: () => {
@@ -40,26 +41,40 @@ export const UI = {
     return answer.gameId;
   },
 
-  mainMenu: async () => {
-    console.log(chalk.cyan(`\n🎮 Operations Menu`));
+  /**
+   * Dynamic action menu - builds menu from game's available actions
+   */
+  mainMenu: async (gameModule: IGameModule) => {
+    console.log(chalk.cyan(`\n🎮 ${gameModule.name} - Actions`));
     
+    const actions = gameModule.getAvailableActions();
+    
+    // Build choices with separators
+    const choices: any[] = [];
+    
+    for (const action of actions) {
+      if (action.separator) {
+        choices.push(new inquirer.Separator());
+      }
+      choices.push({
+        name: action.name,
+        value: action.value
+      });
+    }
+    
+    // Always add back option at the end
+    choices.push(new inquirer.Separator());
+    choices.push({ name: '🔙 Back to Game Selection', value: 'back' });
+
     const answer = await inquirer.prompt([
       {
         type: 'list',
         name: 'action',
         message: 'What do you want to do?',
-        choices: [
-          { name: '🚀 Deploy New Contract', value: 'deploy' }, 
-          new inquirer.Separator(),
-          { name: '🆕 Create New Game Session', value: 'create' },
-          { name: '👋 Join Existing Game', value: 'join' },
-          { name: '🔓 Reveal Move', value: 'reveal' }, 
-          { name: '👀 Check Status (Dashboard)', value: 'status' },
-          new inquirer.Separator(),
-          { name: '🔙 Back to Game Selection', value: 'back' },
-        ],
+        choices: choices,
       },
     ]);
+    
     return answer.action;
   },
 };

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IGameModule } from '../interfaces';
+import { IGameModule, GameAction } from '../interfaces';
 import { WalletManager } from '../walletManager';
 import { getAppId, getCurrentRound, getRoundDiff, handleAlgoError } from '../utils';
 import chalk from 'chalk';
@@ -18,6 +18,16 @@ import { UI } from '../ui';
 export const StagHuntModule: IGameModule = {
   id: 'STAGHUNT',
   name: '🦌 Stag Hunt (Cooperation Game)',
+
+  getAvailableActions: (): GameAction[] => [
+    { name: '🚀 Deploy New Contract', value: 'deploy' },
+    { name: '🆕 Create New Game Session', value: 'create', separator: true },
+    { name: '👋 Join Existing Game', value: 'join' },
+    { name: '🔓 Reveal Move', value: 'reveal' },
+    { name: '⚙️  Resolve Game', value: 'resolve', separator: true },
+    { name: '💰 Claim Winnings', value: 'claim' },
+    { name: '👀 Check Status (Dashboard)', value: 'status', separator: true },
+  ],
 
   // DEPLOY
   deploy: async (wallet: WalletManager) => {
@@ -287,8 +297,80 @@ export const StagHuntModule: IGameModule = {
     }
   },
 
+  // RESOLVE
+  resolve: async (wallet: WalletManager) => {
+    try {
+      const appId = await getAppId(wallet, 'STAGHUNT');
+      const client = new StagHuntClient({
+        algorand: wallet.algorand,
+        appId,
+        defaultSender: wallet.account!.addr,
+      });
+
+      const { resolveSessionId } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'resolveSessionId',
+          message: 'Enter SESSION ID to resolve:',
+          validate: (i) => !isNaN(parseInt(i)) || 'Invalid',
+        },
+      ]);
+
+      console.log(chalk.yellow('⚙️  Resolving game...'));
+
+      await client.send.resolveSession({
+        args: { sessionId: BigInt(resolveSessionId) },
+        sender: wallet.account!.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(5000),
+      });
+
+      console.log(chalk.green('✅ Game resolved! You can now claim prizes.'));
+    } catch (e: any) {
+      handleAlgoError(e, 'Resolve');
+    }
+  },
+
+  // CLAIM
+  claim: async (wallet: WalletManager) => {
+    try {
+      const appId = await getAppId(wallet, 'STAGHUNT');
+      const client = new StagHuntClient({
+        algorand: wallet.algorand,
+        appId,
+        defaultSender: wallet.account!.addr,
+      });
+
+      const { claimSessionId } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'claimSessionId',
+          message: 'Enter SESSION ID to claim:',
+          validate: (i) => !isNaN(parseInt(i)) || 'Invalid',
+        },
+      ]);
+
+      console.log(chalk.yellow('💰 Claiming winnings...'));
+
+      const result = await client.send.claimWinnings({
+        args: { sessionId: BigInt(claimSessionId) },
+        sender: wallet.account!.addr,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000),
+      });
+
+      if (result.return === 0n) {
+        console.log(chalk.red('💀 No winnings (you were a Stag and coordination failed)'));
+      } else {
+        console.log(chalk.green(`✅ Claimed ${result.return} µAlgo!`));
+      }
+    } catch (e: any) {
+      handleAlgoError(e, 'Claim');
+    }
+  },
+
   // STATUS
-  getStatus: async (wallet: WalletManager) => {
+  status: async (wallet: WalletManager) => {
     try {
       const appId = await getAppId(wallet, 'STAGHUNT');
       const client = new StagHuntClient({
@@ -358,66 +440,6 @@ export const StagHuntModule: IGameModule = {
         console.log(chalk.gray(`   Commit: ${config.endCommitAt} ${getRoundDiff(currentRound, config.endCommitAt)}`));
         console.log(chalk.gray(`   Reveal: ${config.endRevealAt} ${getRoundDiff(currentRound, config.endRevealAt)}`));
         console.log('');
-      }
-
-      // Interactive options
-      const { action } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'action',
-          message: 'What do you want to do?',
-          choices: [
-            { name: '⚙️  Resolve a finished game', value: 'resolve' },
-            { name: '💰 Claim winnings', value: 'claim' },
-            { name: '🔙 Back', value: 'back' },
-          ],
-        },
-      ]);
-
-      if (action === 'resolve') {
-        const { resolveSessionId } = await inquirer.prompt([
-          {
-            type: 'input',
-            name: 'resolveSessionId',
-            message: 'Enter SESSION ID to resolve:',
-            validate: (i) => !isNaN(parseInt(i)) || 'Invalid',
-          },
-        ]);
-
-        console.log(chalk.yellow('⚙️  Resolving game...'));
-
-        await client.send.resolveSession({
-          args: { sessionId: BigInt(resolveSessionId) },
-          sender: wallet.account!.addr,
-          coverAppCallInnerTransactionFees: true,
-          maxFee: AlgoAmount.MicroAlgo(5000),
-        });
-
-        console.log(chalk.green('✅ Game resolved! You can now claim prizes.'));
-      } else if (action === 'claim') {
-        const { claimSessionId } = await inquirer.prompt([
-          {
-            type: 'input',
-            name: 'claimSessionId',
-            message: 'Enter SESSION ID to claim:',
-            validate: (i) => !isNaN(parseInt(i)) || 'Invalid',
-          },
-        ]);
-
-        console.log(chalk.yellow('💰 Claiming winnings...'));
-
-        const result = await client.send.claimWinnings({
-          args: { sessionId: BigInt(claimSessionId) },
-          sender: wallet.account!.addr,
-          coverAppCallInnerTransactionFees: true,
-          maxFee: AlgoAmount.MicroAlgo(3000),
-        });
-
-        if (result.return === 0n) {
-          console.log(chalk.red('💀 No winnings (you were a Stag and coordination failed)'));
-        } else {
-          console.log(chalk.green(`✅ Claimed ${result.return} µAlgo!`));
-        }
       }
     } catch (e: any) {
       handleAlgoError(e, 'Status');

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IGameModule } from '../interfaces';
+import { IGameModule, GameAction } from '../interfaces';
 import { WalletManager } from '../walletManager';
 import { getAppId, getCurrentRound, getRoundDiff, handleAlgoError } from '../utils';
 import chalk from 'chalk';
@@ -18,6 +18,15 @@ import { UI } from '../ui';
 export const RPSGameModule: IGameModule = {
   id: 'RPS',
   name: '🪨📄✂️  Rock Paper Scissors',
+
+  getAvailableActions: (): GameAction[] => [
+    { name: '🚀 Deploy New Contract', value: 'deploy' },
+    { name: '🆕 Create New Game Session', value: 'create', separator: true },
+    { name: '👋 Join Existing Game', value: 'join' },
+    { name: '🔓 Reveal Move', value: 'reveal' },
+    { name: '⏱️  Claim Timeout Victory', value: 'timeoutVictory', separator: true },
+    { name: '👀 Check Status (Dashboard)', value: 'status' },
+  ],
 
   //DEPLOY 
   deploy: async (wallet: WalletManager) => {
@@ -222,8 +231,39 @@ join: async (wallet: WalletManager) => {
     }
   },
 
+  // TIMEOUT VICTORY
+  timeoutVictory: async (wallet: WalletManager) => {
+    try {
+        const appId = await getAppId(wallet, 'RPS');
+        const client = new RockPaperScissorsClient({
+            algorand: wallet.algorand,
+            appId,
+            defaultSender: wallet.account!.addr,
+        });
+
+        const { sessId } = await inquirer.prompt([
+            { type: 'input', name: 'sessId', message: 'Enter SESSION ID to claim timeout:', validate: (i) => !isNaN(parseInt(i)) || 'Invalid' },
+        ]);
+
+        const sessionId = BigInt(sessId);
+
+        console.log(chalk.yellow(`⏱️  Claiming timeout victory...`));
+
+        await client.send.claimTimeoutVictory({
+            args: { sessionId },
+            suppressLog: true,
+            coverAppCallInnerTransactionFees: true,
+            maxFee: AlgoAmount.MicroAlgo(3000)
+        });
+
+        console.log(chalk.green('🏆 Victory claimed! Opponent failed to reveal in time.'));
+    } catch (e: any) {
+        handleAlgoError(e, 'Timeout Victory');
+    }
+  },
+
   // STATUS 
-  getStatus: async (wallet: WalletManager) => {
+  status: async (wallet: WalletManager) => {
     try {
         const appId = await getAppId(wallet, 'RPS');
         const client = new RockPaperScissorsClient({ algorand: wallet.algorand, appId, defaultSender: wallet.account!.addr });

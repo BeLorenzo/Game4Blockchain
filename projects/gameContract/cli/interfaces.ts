@@ -1,4 +1,14 @@
-import { WalletManager } from './walletManager';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/**
+ * Action definition for dynamic CLI menus
+ */
+export interface GameAction {
+  name: string;      // Display name (e.g., "🚀 Deploy Contract")
+  value: string;     // Method name to call (e.g., "deploy")
+  separator?: boolean; // Optional separator before this action
+}
+
 
 /**
  * IGameModule
@@ -15,32 +25,14 @@ export interface IGameModule {
 
 
   /**
-   * Deploaya una NUOVA istanza dello Smart Contract sulla rete.
-   * Restituisce il nuovo App ID.
+   * Returns the list of available actions for this game.
+   * The CLI will dynamically build the menu based on this.
    */
-  deploy(wallet: WalletManager): Promise<void>; // <--- NUOVO METODO
+  getAvailableActions(): GameAction[];
 
   /**
-   * Logic to create a new session of this game.
-   * @param wallet The user's wallet manager to sign transactions.
+   * Dynamic method dispatcher.
+   * Each game must implement handlers for actions defined in getAvailableActions().
    */
-  create(wallet: WalletManager): Promise<void>;
-
-  /**
-   * Logic to join an existing session and committing.
-   * @param wallet The user's wallet manager.
-   */
-  join(wallet: WalletManager): Promise<void>;
-
-    /**
-   * Logic to reveal the move.
-   * @param wallet The user's wallet manager.
-   */
-  reveal(wallet: WalletManager): Promise<void>;
-
-  /**
-   * Logic to view the status of a game.
-   * @param wallet The user's wallet manager.
-   */
-  getStatus(wallet: WalletManager): Promise<void>;
+  [key: string]: any;
 }

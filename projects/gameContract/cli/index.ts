@@ -5,6 +5,7 @@ import { RPSGameModule } from './games/rps';
 import { WeeklyGameModule } from './games/weekly';
 import { StagHuntModule } from './games/stagHunt';
 import { GuessGameModule } from './games/guessGame';
+import { PirateGameModule } from './games/pirateGame';
 import { UI } from './ui';
 import chalk from 'chalk';
 
@@ -25,6 +26,7 @@ async function main() {
   GameRegistry.register(WeeklyGameModule);
   GameRegistry.register(StagHuntModule);
   GameRegistry.register(GuessGameModule);
+  GameRegistry.register(PirateGameModule);
 
   while (true) {
     UI.separator();
@@ -43,32 +45,20 @@ async function main() {
       continue;
     }
 
-    // STEP B: Select Action
-    const action = await UI.mainMenu();
+    // STEP B: Select Action (dynamic menu)
+    const action = await UI.mainMenu(gameModule);
 
     if (action === 'back') continue;
 
-    // STEP C: Execute
+    // STEP C: Execute action dynamically
     try {
-      console.log(chalk.gray(`\n--- Executing ${action.toUpperCase()} ---`));      
-      switch (action) {
-        case 'deploy': 
-          await gameModule.deploy(walletMgr);
-          break;
-        case 'create':
-          await gameModule.create(walletMgr);
-          break;
-        case 'join':
-          await gameModule.join(walletMgr);
-          break;
-        case 'reveal':
-          await gameModule.reveal(walletMgr);
-          break;
-        case 'status':
-          await gameModule.getStatus(walletMgr);
-          break;
-        default:
-          console.log(chalk.red('Unknown action.'));
+      console.log(chalk.gray(`\n--- Executing ${action.toUpperCase()} ---`));
+      
+      // Call the method dynamically
+      if (typeof gameModule[action] === 'function') {
+        await gameModule[action](walletMgr);
+      } else {
+        console.log(chalk.red(`❌ Action "${action}" not implemented in ${gameModule.name}`));
       }
     } catch (error: any) {
         console.log(chalk.red(`\n💥 Fatal Error:`), error.message);      

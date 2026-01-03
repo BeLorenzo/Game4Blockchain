@@ -2271,4 +2271,282 @@ const claim1 = await client.send.claimWinnings({
       })
     ).rejects.toThrow('Not a pirate')
   }, 90000)
+
+test('4 pirates (EVEN), 2 YES vs 2 NO → Proposal PASSES (tie-breaker)', async () => {
+  const { testAccount, algorand } = localnet.context
+  const { client } = await deploy(testAccount)
+  await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
+
+  const params = await createGameParams(5, 30, 10_000_000)
+  const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+  
+  const sessionId = (await client.send.createSession({
+    args: {
+      config: params,
+      mbrPayment: await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
+      }),
+      maxPirates: 5n,
+      roundDuration: 30n,
+    },
+    sender: testAccount.addr,
+  })).return!
+
+  await waitForRound(params.startAt, client)
+
+  // Register 4 pirates
+  const pirates = []
+  const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+  for (let i = 0; i < 4; i++) {
+    const pirate = i === 0 ? testAccount : algorand.account.random()
+    if (i !== 0) await algorand.account.ensureFundedFromEnvironment(pirate, AlgoAmount.Algos(20))
+
+    await client.send.registerPirate({
+      args: {
+        sessionId,
+        payment: await algorand.createTransaction.payment({
+          sender: pirate.addr,
+          receiver: client.appAddress,
+          amount: AlgoAmount.MicroAlgos(10_000_000),
+        }),
+        mbrPayment: await algorand.createTransaction.payment({
+          sender: pirate.addr,
+          receiver: client.appAddress,
+          amount: AlgoAmount.MicroAlgos(Number(joinMbr)),
+        }),
+      },
+      sender: pirate.addr,
+      signer: pirate.signer,
+    })
+    pirates.push(pirate)
+  }
+
+  const state1 = await client.state.box.gameState.value(sessionId)
+  await waitForRound(state1!.proposalDeadline + 1n, client)
+
+  await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+
+  // Distribution: [35M, 5M, 0, 0]
+  const distribution = Buffer.alloc(32)
+  distribution.writeBigUInt64BE(35_000_000n, 0)
+  distribution.writeBigUInt64BE(5_000_000n, 8)
+  distribution.writeBigUInt64BE(0n, 16)
+  distribution.writeBigUInt64BE(0n, 24)
+
+  await client.send.proposeDistribution({
+    args: { sessionId, distribution },
+    sender: pirates[0].addr,
+    signer: pirates[0].signer,
+    coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
+  })
+
+  const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' } })).return!
+
+  // CRITICAL: 2 YES, 2 NO (50%-50%)
+  const votes = [1, 1, 0, 0] // YES, YES, NO, NO
+
+  for (let i = 0; i < 4; i++) {
+    await client.send.commitVote({
+      args: {
+        sessionId,
+        voteHash: new Uint8Array(getHash(votes[i], `salt${i}`)),
+        mbrPayment: await algorand.createTransaction.payment({
+          sender: pirates[i].addr,
+          receiver: client.appAddress,
+          amount: AlgoAmount.MicroAlgos(Number(commitMbr)),
+        }),
+      },
+      sender: pirates[i].addr,
+      signer: pirates[i].signer,
+    })
+  }
+
+  const state2 = await client.state.box.gameState.value(sessionId)
+  await waitForRound(state2!.voteDeadline + 1n, client)
+
+  for (let i = 0; i < 4; i++) {
+    await client.send.revealVote({
+      args: { sessionId, vote: BigInt(votes[i]), salt: Buffer.from(`salt${i}`) },
+      sender: pirates[i].addr,
+      signer: pirates[i].signer,
+    })
+  }
+
+  const state3 = await client.state.box.gameState.value(sessionId)
+  await waitForRound(state3!.revealDeadline + 1n, client)
+
+  await client.send.executeRound({
+    args: { sessionId },
+    sender: testAccount.addr,
+    coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
+  })
+
+  // VERIFY: Threshold = (4+1)/2 = 2, votesFor = 2 → PASSES (tie-breaker rule)
+  const finalState = await client.state.box.gameState.value(sessionId)
+  expect(finalState?.phase).toBe(4n) // Finished (NOT back to proposal)
+
+  // Winners claim
+  const claim0 = await client.send.claimWinnings({
+    args: { sessionId },
+    sender: pirates[0].addr,
+    signer: pirates[0].signer,
+    coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
+  })
+  expect(claim0.return).toBe(35_000_000n)
+
+  const claim1 = await client.send.claimWinnings({
+    args: { sessionId },
+    sender: pirates[1].addr,
+    signer: pirates[1].signer,
+    coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
+  })
+  expect(claim1.return).toBe(5_000_000n)
+
+  // Losers get nothing
+  await expect(
+    client.send.claimWinnings({
+      args: { sessionId },
+      sender: pirates[2].addr,
+      signer: pirates[2].signer,
+      coverAppCallInnerTransactionFees: true,
+      maxFee: AlgoAmount.MicroAlgo(3000),
+    })
+  ).rejects.toThrow('No winnings')
+}, 90000)
+
+
+test('6 pirates, 3 YES vs 3 NO → Proposal PASSES (tie at 50%)', async () => {
+  const { testAccount, algorand } = localnet.context
+  const { client } = await deploy(testAccount)
+  await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(150))
+
+  const params = await createGameParams(5, 30, 10_000_000)
+  const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+  
+  const sessionId = (await client.send.createSession({
+    args: {
+      config: params,
+      mbrPayment: await algorand.createTransaction.payment({
+        sender: testAccount.addr,
+        receiver: client.appAddress,
+        amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
+      }),
+      maxPirates: 7n,
+      roundDuration: 30n,
+    },
+    sender: testAccount.addr,
+  })).return!
+
+  await waitForRound(params.startAt, client)
+
+  const pirates = []
+  const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+
+  for (let i = 0; i < 6; i++) {
+    const pirate = i === 0 ? testAccount : algorand.account.random()
+    if (i !== 0) await algorand.account.ensureFundedFromEnvironment(pirate, AlgoAmount.Algos(25))
+
+    await client.send.registerPirate({
+      args: {
+        sessionId,
+        payment: await algorand.createTransaction.payment({
+          sender: pirate.addr,
+          receiver: client.appAddress,
+          amount: AlgoAmount.MicroAlgos(10_000_000),
+        }),
+        mbrPayment: await algorand.createTransaction.payment({
+          sender: pirate.addr,
+          receiver: client.appAddress,
+          amount: AlgoAmount.MicroAlgos(Number(joinMbr)),
+        }),
+      },
+      sender: pirate.addr,
+      signer: pirate.signer,
+    })
+    pirates.push(pirate)
+  }
+
+  const state1 = await client.state.box.gameState.value(sessionId)
+  await waitForRound(state1!.proposalDeadline + 1n, client)
+
+  await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+
+  // Strategic: [50M, 2M, 2M, 2M, 2M, 2M]
+  const distribution = Buffer.alloc(48)
+  distribution.writeBigUInt64BE(50_000_000n, 0)
+  for (let i = 1; i < 6; i++) {
+    distribution.writeBigUInt64BE(2_000_000n, i * 8)
+  }
+
+  await client.send.proposeDistribution({
+    args: { sessionId, distribution },
+    sender: pirates[0].addr,
+    signer: pirates[0].signer,
+    coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
+  })
+
+  const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' } })).return!
+
+  // 3 YES, 3 NO
+  const votes = [1, 1, 1, 0, 0, 0]
+
+  for (let i = 0; i < 6; i++) {
+    await client.send.commitVote({
+      args: {
+        sessionId,
+        voteHash: new Uint8Array(getHash(votes[i], `salt${i}`)),
+        mbrPayment: await algorand.createTransaction.payment({
+          sender: pirates[i].addr,
+          receiver: client.appAddress,
+          amount: AlgoAmount.MicroAlgos(Number(commitMbr)),
+        }),
+      },
+      sender: pirates[i].addr,
+      signer: pirates[i].signer,
+    })
+  }
+
+  const state2 = await client.state.box.gameState.value(sessionId)
+  await waitForRound(state2!.voteDeadline + 1n, client)
+
+  for (let i = 0; i < 6; i++) {
+    await client.send.revealVote({
+      args: { sessionId, vote: BigInt(votes[i]), salt: Buffer.from(`salt${i}`) },
+      sender: pirates[i].addr,
+      signer: pirates[i].signer,
+    })
+  }
+
+  const state3 = await client.state.box.gameState.value(sessionId)
+  await waitForRound(state3!.revealDeadline + 1n, client)
+
+  await client.send.executeRound({
+    args: { sessionId },
+    sender: testAccount.addr,
+    coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
+  })
+
+  // VERIFY: Threshold = (6+1)/2 = 3, votesFor = 3 → PASSES
+  const finalState = await client.state.box.gameState.value(sessionId)
+  expect(finalState?.phase).toBe(4n)
+
+  // First winner claims
+  const claim0 = await client.send.claimWinnings({
+    args: { sessionId },
+    sender: pirates[0].addr,
+    signer: pirates[0].signer,
+    coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
+  })
+  expect(claim0.return).toBe(50_000_000n)
+}, 90000)
 })

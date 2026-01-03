@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IGameModule } from '../interfaces';
+import { IGameModule, GameAction } from '../interfaces';
 import { WalletManager } from '../walletManager';
 import { getAppId, getCurrentRound, getRoundDiff, handleAlgoError } from '../utils';
 import chalk from 'chalk';
@@ -18,6 +18,14 @@ import { UI } from '../ui';
 export const GuessGameModule: IGameModule = {
   id: 'GUESS',
   name: '🎯 Guess 2/3 of the Average',
+
+  getAvailableActions: (): GameAction[] => [
+    { name: '🚀 Deploy New Contract', value: 'deploy' },
+    { name: '🆕 Create New Game Session', value: 'create', separator: true },
+    { name: '👋 Join Existing Game', value: 'join' },
+    { name: '🔓 Reveal Move', value: 'reveal' },
+    { name: '👀 Check Status & Claim Winnings', value: 'status', separator: true },
+  ],
 
   // DEPLOY
   deploy: async (wallet: WalletManager) => {
@@ -279,7 +287,7 @@ export const GuessGameModule: IGameModule = {
   },
 
   // STATUS
-  getStatus: async (wallet: WalletManager) => {
+  status: async (wallet: WalletManager) => {
     try {
       const appId = await getAppId(wallet, 'GUESS');
       const client = new GuessGameClient({

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IGameModule } from '../interfaces';
+import { IGameModule, GameAction } from '../interfaces';
 import { WalletManager } from '../walletManager';
 import { getAppId, getCurrentRound, getRoundDiff, handleAlgoError } from '../utils';
 import chalk from 'chalk';
@@ -28,6 +28,14 @@ const DAYS = [
 export const WeeklyGameModule: IGameModule = {
   id: 'WEEKLY',
   name: '📅 Weekly Lottery Game',
+
+  getAvailableActions: (): GameAction[] => [
+    { name: '🚀 Deploy New Contract', value: 'deploy' },
+    { name: '🆕 Create New Game Session', value: 'create', separator: true },
+    { name: '👋 Join Existing Game', value: 'join' },
+    { name: '🔓 Reveal Move', value: 'reveal' },
+    { name: '👀 Check Status & Claim Winnings', value: 'status', separator: true },
+  ],
 
   // DEPLOY
   deploy: async (wallet: WalletManager) => {
@@ -265,7 +273,7 @@ export const WeeklyGameModule: IGameModule = {
   },
 
   // STATUS
-  getStatus: async (wallet: WalletManager) => {
+  status: async (wallet: WalletManager) => {
     try {
       const appId = await getAppId(wallet, 'WEEKLY');
       const client = new WeeklyGameClient({
