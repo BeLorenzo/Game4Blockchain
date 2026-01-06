@@ -25,7 +25,7 @@ export const RPSGameModule: IGameModule = {
     { name: '👋 Join Existing Game', value: 'join' },
     { name: '🔓 Reveal Move', value: 'reveal' },
     { name: '⏱️  Claim Timeout Victory', value: 'timeoutVictory', separator: true },
-    { name: '👀 Check Status (Dashboard)', value: 'status' },
+    { name: '📊 Dashboard', value: 'status' },
   ],
 
   //DEPLOY 
@@ -152,7 +152,7 @@ join: async (wallet: WalletManager) => {
 
         // 1. Read Box for Partecipation Fee
         const sessionConfig = await client.state.box.gameSessions.value(sessionID);
-        if (!sessionConfig) throw new Error("box not found");
+        if (!sessionConfig) throw new Error("session not found");
         const participationFee = sessionConfig.participation;
         console.log(chalk.cyan(`💰 Fee required: ${participationFee} µAlgo`));
 

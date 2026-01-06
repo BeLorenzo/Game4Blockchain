@@ -35,6 +35,7 @@ export const UI = {
         name: 'gameId',
         message: 'What do you want to play today?',
         choices: choices,
+        pageSize: 15,
       },
     ]);
 
@@ -72,6 +73,8 @@ export const UI = {
         name: 'action',
         message: 'What do you want to do?',
         choices: choices,
+        pageSize: 20,
+        loop: false
       },
     ]);
     

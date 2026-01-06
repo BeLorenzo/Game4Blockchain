@@ -22,7 +22,7 @@ interface Pirate {
   pirateAddress: Address
   seniorityIndex: uint64 // 0 = most senior
   alive: boolean
-  claimed: boolean // <--- MODIFICATO: Flag invece di uint64
+  claimed: boolean 
 }
 
 /**
@@ -35,9 +35,11 @@ interface GameState {
   alivePirates: uint64 // Pirates still alive
   currentProposerIndex: uint64 // Seniority index of current proposer
   pot: uint64 // Total coins to distribute
-  proposalDeadline: uint64 // Round deadline for proposal phase
-  voteDeadline: uint64 // Round deadline for vote phase
-  revealDeadline: uint64 // Round deadline for reveal phase
+  commitDuration: uint64 
+  revealDuration: uint64
+  //proposalDeadline: uint64 // Round deadline for proposal phase
+  //voteDeadline: uint64 // Round deadline for vote phase
+  //revealDeadline: uint64 // Round deadline for reveal phase
 }
 
 /**
@@ -60,10 +62,10 @@ export class PirateGame extends GameContract {
     config: GameConfig,
     mbrPayment: gtxn.PaymentTxn,
     maxPirates: uint64,
-    roundDuration: uint64
+    //roundDuration: uint64
   ): uint64 {
     assert(maxPirates >= 3 && maxPirates <= 20, 'Pirates must be between 3 and 20')
-    assert(roundDuration >= 10, 'Round duration must be at least 10 blocks')
+    //assert(roundDuration >= 10, 'Round duration must be at least 10 blocks')
     assert(config.participation >= 1_000_000, 'Minimum participation is 1 ALGO')
 
     const requiredMBR = this.getRequiredMBR('newGame')
@@ -72,6 +74,9 @@ export class PirateGame extends GameContract {
 
     const sessionID = super.create(config)
 
+    const commitDuration : uint64 = config.endCommitAt - config.startAt
+    const revealDuration : uint64 = config.endRevealAt - config.endCommitAt
+
     this.gameState(sessionID).value = {
       phase: 0,
       currentRound: 0,
@@ -79,9 +84,11 @@ export class PirateGame extends GameContract {
       alivePirates: 0,
       currentProposerIndex: 0,
       pot: 0,
-      proposalDeadline: config.startAt + roundDuration,
-      voteDeadline: config.startAt + roundDuration * 2,
-      revealDeadline: config.startAt + roundDuration * 3,
+      //proposalDeadline: config.startAt + roundDuration,
+      //voteDeadline: config.startAt + roundDuration * 2,
+      //revealDeadline: config.startAt + roundDuration * 3,
+      commitDuration: commitDuration,
+      revealDuration: revealDuration
     }
 
     this.pirateList(sessionID).value = bzero(maxPirates * 32)
@@ -92,12 +99,11 @@ export class PirateGame extends GameContract {
     assert(this.sessionExists(sessionID), 'Session does not exist')
 
     const state = clone(this.gameState(sessionID).value)
+    const config = clone(this.gameSessions(sessionID).value)
+
+    assert(Global.round < config.startAt, 'Registration closed (Game Started)')
     assert(state.phase === 0, 'Registration phase has ended')
     assert(state.totalPirates < 20, 'Max pirates reached')
-
-    const config = clone(this.gameSessions(sessionID).value)
-    assert(Global.round >= config.startAt, 'Registration not started')
-    assert(Global.round <= state.proposalDeadline, 'Registration deadline passed')
 
     const pirateAddr = new Address(Txn.sender)
     const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
@@ -120,7 +126,7 @@ export class PirateGame extends GameContract {
       pirateAddress: pirateAddr,
       seniorityIndex: seniorityIndex,
       alive: true,
-      claimed: false, // <--- Inizializzato a false
+      claimed: false, 
     }
 
     const listBox = this.pirateList(sessionID)
@@ -133,37 +139,26 @@ export class PirateGame extends GameContract {
     this.gameState(sessionID).value = clone(state)
   }
 
-  public startGame(sessionID: uint64): void {
-    assert(this.sessionExists(sessionID), 'Session does not exist')
-    const state = clone(this.gameState(sessionID).value)
-    assert(state.phase === 0, 'Game already started')
-    assert(state.totalPirates >= 3, 'Need at least 3 pirates')
-    assert(Global.round > state.proposalDeadline, 'Registration still open')
-
-    state.phase = 1
-    state.currentRound = 0
-    state.currentProposerIndex = 0 
-
-    const currentRound = Global.round
-    const roundDuration : uint64 = state.voteDeadline - state.proposalDeadline
-    state.proposalDeadline = currentRound + roundDuration
-    state.voteDeadline = currentRound + roundDuration * 2
-    state.revealDeadline = currentRound + roundDuration * 3
-
-    this.gameState(sessionID).value = clone(state)
-  }
-
   public proposeDistribution(sessionID: uint64, distribution: bytes): void {
     ensureBudget(1000)
     assert(this.sessionExists(sessionID), 'Session does not exist')
 
     const state = clone(this.gameState(sessionID).value)
-    assert(state.phase === 1, 'Not in proposal phase')
-    assert(Global.round <= state.proposalDeadline, 'Proposal deadline passed')
+    const config = clone(this.gameSessions(sessionID).value)
+
+    //assert(state.phase === 1, 'Not in proposal phase')
+    //assert(Global.round <= state.proposalDeadline, 'Proposal deadline passed')
+    assert(Global.round >= config.startAt, 'Game not started yet')
 
     const pirateAddr = new Address(Txn.sender)
     const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
     assert(this.pirates(pirateKey).exists, 'Not registered')
+
+    if (state.phase === 0) {
+        assert(state.totalPirates >= 3, 'Not enough pirates to start')
+        state.phase = 1
+    }
+    assert(state.phase === 1, 'Not in proposal phase')
 
     const pirate = clone(this.pirates(pirateKey).value)
     assert(pirate.alive, 'You are eliminated')
@@ -191,11 +186,12 @@ export class PirateGame extends GameContract {
   }
 
   public commitVote(sessionID: uint64, voteHash: bytes, mbrPayment: gtxn.PaymentTxn): void {
-    // ... Logica invariata ...
     assert(this.sessionExists(sessionID), 'Session does not exist')
     const state = clone(this.gameState(sessionID).value)
+    const config = clone(this.gameSessions(sessionID).value)
+
     assert(state.phase === 2, 'Not in voting phase')
-    assert(Global.round <= state.voteDeadline, 'Voting deadline passed')
+    assert(Global.round <= config.endCommitAt, 'Voting deadline passed')
     
     const pirateAddr = new Address(Txn.sender)
     const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
@@ -211,14 +207,14 @@ export class PirateGame extends GameContract {
   }
 
   public revealVote(sessionID: uint64, vote: uint64, salt: bytes): void {
-    // ... Logica invariata ...
     assert(this.sessionExists(sessionID), 'Session does not exist')
     assert(vote === 0 || vote === 1, 'Vote must be 0 or 1')
 
     const state = clone(this.gameState(sessionID).value)
+    const config = clone(this.gameSessions(sessionID).value)
+    assert(Global.round > config.endCommitAt, 'Voting still open')
+    assert(Global.round <= config.endRevealAt, 'Reveal deadline passed')
     assert(state.phase === 2 || state.phase === 3, 'Not in reveal phase')
-    assert(Global.round > state.voteDeadline, 'Voting still open')
-    assert(Global.round <= state.revealDeadline, 'Reveal deadline passed')
 
     const pirateAddr = new Address(Txn.sender)
     const pirateKey = super.getPlayerKey(sessionID, pirateAddr)
@@ -250,21 +246,20 @@ export class PirateGame extends GameContract {
     assert(this.sessionExists(sessionID), 'Session does not exist')
 
     const state = clone(this.gameState(sessionID).value)
+    const config = clone(this.gameSessions(sessionID).value)
+
     assert(state.phase === 3, 'Not in execution phase')
-    assert(Global.round > state.revealDeadline, 'Reveal phase not ended')
+    assert(Global.round > config.endRevealAt, 'Reveal phase not ended')
 
     const proposal = clone(this.proposals(sessionID).value)
     const totalVotes = state.alivePirates
     const votesFor = proposal.votesFor
 
     // Strict majority logic (or casting vote logic depending on preference)
-    // Using your logic:
     const passThreshold : uint64 = (totalVotes + 1 ) / 2
     const proposalPasses = votesFor >= passThreshold
 
     if (proposalPasses) {
-      // ✅ FIX: NON chiamare finalizeDistribution.
-      // Basta settare la fase a 4. La proposta vincente è già in `proposals(sessionID)`.
       state.phase = 4 
       this.gameState(sessionID).value = clone(state)
     } else {
@@ -276,8 +271,6 @@ export class PirateGame extends GameContract {
       if (state.alivePirates === 1) {
         const survivorIndex = this.findNextAlivePirate(sessionID, 0, state.totalPirates)
         
-        // ✅ FIX: Dobbiamo salvare la distribuzione "virtuale" nel box delle proposte
-        // così claimWinnings funziona anche per lui.
         const totalSize : uint64 = state.totalPirates * 8
         const survivorOffset : uint64 = survivorIndex * 8
         const survivorShare = itob(state.pot)
@@ -289,7 +282,6 @@ export class PirateGame extends GameContract {
         
         const distribution = before.concat(survivorShare).concat(after)
         
-        // Salviamo la proposta "automatica" vincente
         this.proposals(sessionID).value = {
              proposer: survivorIndex,
              distribution: distribution,
@@ -304,15 +296,18 @@ export class PirateGame extends GameContract {
         state.currentRound += 1
         state.phase = 1 
 
-        const currentRound = Global.round
-        const roundDuration : uint64 = state.voteDeadline - state.proposalDeadline
-        state.proposalDeadline = currentRound + roundDuration
-        state.voteDeadline = currentRound + roundDuration * 2
-        state.revealDeadline = currentRound + roundDuration * 3
+        const now = Global.round
+        const newStartAt = now 
+        const newEndCommitAt : uint64 = newStartAt + state.commitDuration
+        const newEndRevealAt : uint64 = newEndCommitAt + state.revealDuration
+
+        config.startAt = newStartAt
+        config.endCommitAt = newEndCommitAt
+        config.endRevealAt = newEndRevealAt
       }
 
-      this.gameState(sessionID).value = clone(state)
-    }
+        this.gameSessions(sessionID).value = clone(config)
+        this.gameState(sessionID).value = clone(state)    }
   }
 
   /**
@@ -332,20 +327,16 @@ export class PirateGame extends GameContract {
     const pirate = clone(this.pirates(pirateKey).value)
     assert(!pirate.claimed, 'Already claimed') // Anti-replay
 
-    // 1. Legge la proposta vincente
     const winningProposal = clone(this.proposals(sessionID).value)
     
-    // 2. Estrae la quota specifica per QUESTO pirata
     const shareOffset : uint64 = pirate.seniorityIndex * 8
     const share = extractUint64(winningProposal.distribution, shareOffset)
     
     assert(share > 0, 'No winnings for you')
 
-    // 3. Marca come "reclamato" PRIMA di pagare (best practice, anche se su Algo non c'è reentrancy)
     pirate.claimed = true
     this.pirates(pirateKey).value = clone(pirate)
 
-    // 4. Paga
     itxn
       .payment({
         receiver: pirateAddr.native,
@@ -379,6 +370,14 @@ export class PirateGame extends GameContract {
       const pirate = clone(this.pirates(pirateKey).value)
       if (pirate.alive) return i
     }
+    for (let i: uint64 = 0; i < startIndex; i++) {
+        const offset : uint64 = i * 32
+        const addrBytes = op.extract(listBytes, offset, 32)
+        const pirateAddr = new Address(addrBytes)
+        const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+        const pirate = clone(this.pirates(pirateKey).value)
+        if (pirate.alive) return i
+    }
     assert(false, 'No alive pirate found')
   }
 
@@ -409,54 +408,87 @@ export class PirateGame extends GameContract {
     assert(false, 'Invalid command')
   }
 
-  public timeOut(sessionID: uint64): void {
+public timeOut(sessionID: uint64): void {
     ensureBudget(2000)
     assert(this.sessionExists(sessionID), 'Session does not exist')
 
     const state = clone(this.gameState(sessionID).value)
-    assert(state.phase === 1, 'Not in proposal phase')
-    assert(Global.round > state.proposalDeadline, 'Proposal deadline not passed yet')
+    const config = clone(this.gameSessions(sessionID).value)
 
-    this.eliminatePirate(sessionID, state.currentProposerIndex)
-    state.alivePirates -= 1
+    const canPlay = state.totalPirates >= 3
 
-    if (state.alivePirates === 1) {
-       const survivorIndex = this.findNextAlivePirate(sessionID, 0, state.totalPirates)
-       
-       // Costruzione "Virtuale" della proposta vincente per il survivor
-       const totalSize : uint64 = state.totalPirates * 8
-       const survivorOffset : uint64 = survivorIndex * 8
-       const survivorShare = itob(state.pot)
-       
-       const before = bzero(survivorOffset)
-       const afterOffset : uint64= survivorOffset + 8
-       const afterSize : uint64 = totalSize - afterOffset
-       const after = bzero(afterSize)
-       
-       const distribution = before.concat(survivorShare).concat(after)
-       
-       // Scrivi la proposta vincente
-       this.proposals(sessionID).value = {
-          proposer: survivorIndex,
-          distribution: distribution,
-          votesFor: 1,
-          votesAgainst: 0
-       }
-       
-       state.phase = 4 // Finished
+    if (state.phase === 0 && !canPlay) {
+        assert(Global.round >= config.startAt, 'Registration still active')
+        
+        const pirateAddr = new Address(Txn.sender)
+        const pirateKey = super.getPlayerKey(sessionID, pirateAddr) 
+        assert(this.pirates(pirateKey).exists, 'Not a registered pirate')
+        const pirate = clone(this.pirates(pirateKey).value)
+        assert(!pirate.claimed, 'Already refunded') 
 
-    } else {
-       state.currentProposerIndex = this.findNextAlivePirate(sessionID, state.currentProposerIndex + 1, state.totalPirates)
-       state.currentRound += 1
-       
-       const currentRound = Global.round
-       const roundDuration : uint64 = state.voteDeadline - state.proposalDeadline
-       
-       state.proposalDeadline = currentRound + roundDuration
-       state.voteDeadline = currentRound + roundDuration * 2
-       state.revealDeadline = currentRound + roundDuration * 3
+        pirate.claimed = true
+        this.pirates(pirateKey).value = clone(pirate)
+
+        itxn.payment({
+            receiver: pirateAddr.native,
+            amount: config.participation,
+            fee: 0
+        }).submit()
+        
+        return 
     }
 
-    this.gameState(sessionID).value = clone(state)
+    if (state.phase === 1 || (state.phase === 0 && canPlay)) {
+        
+      assert(Global.round > config.endCommitAt, 'Proposal deadline not passed yet')
+
+        this.eliminatePirate(sessionID, state.currentProposerIndex)
+        state.alivePirates -= 1
+
+        if (state.alivePirates === 1) {
+           const survivorIndex = this.findNextAlivePirate(sessionID, 0, state.totalPirates)
+           const totalSize : uint64 = state.totalPirates * 8
+      const survivorOffset : uint64 = survivorIndex * 8
+      const survivorShare = itob(state.pot)
+      
+      const before = bzero(survivorOffset)
+      const afterOffset : uint64 = survivorOffset + 8
+      const afterSize : uint64 = totalSize - afterOffset
+      const after = bzero(afterSize)
+      
+      const distribution = before.concat(survivorShare).concat(after)
+      
+      this.proposals(sessionID).value = {
+           proposer: survivorIndex,
+           distribution: distribution,
+           votesFor: 1,
+           votesAgainst: 0
+      }
+           state.phase = 4 // Finished
+        } else {
+           state.currentProposerIndex = this.findNextAlivePirate(sessionID, state.currentProposerIndex + 1, state.totalPirates)
+           state.currentRound += 1
+           
+           state.phase = 1 
+           
+           const now = Global.round
+           const newStartAt = now
+           const newEndCommitAt : uint64 = newStartAt + state.commitDuration
+           const newEndRevealAt : uint64 = newEndCommitAt + state.revealDuration
+
+           config.startAt = newStartAt
+           config.endCommitAt = newEndCommitAt
+           config.endRevealAt = newEndRevealAt
+           
+           this.gameSessions(sessionID).value = clone(config)
+        }
+
+        this.gameState(sessionID).value = clone(state)
+        return
+    }
+
+    assert(false, 'Nothing to unlock in this phase')
   }
+
+    
 }

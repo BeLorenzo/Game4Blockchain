@@ -35,7 +35,8 @@ export class PirateGame implements IGameAdapter {
 
   private durationParams = {
     registrationWindow: 30n,
-    roundDuration: 50n,
+    commitDuration: 30n,
+    revealDuration: 30n 
   }
 
   async deploy(admin: Agent): Promise<bigint> {
@@ -62,9 +63,9 @@ export class PirateGame implements IGameAdapter {
     const status = await this.algorand.client.algod.status().do()
     const currentRound = BigInt(status['lastRound'])
 
-    const startAt = currentRound + 10n
-    const endCommitAt = startAt + 1000n
-    const endRevealAt = endCommitAt + 1000n
+    const startAt = currentRound + this.durationParams.registrationWindow
+    const endCommitAt = startAt + this.durationParams.commitDuration
+    const endRevealAt = endCommitAt + this.durationParams.revealDuration
 
     const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
 
@@ -84,7 +85,6 @@ export class PirateGame implements IGameAdapter {
         },
         mbrPayment,
         maxPirates: BigInt(7),
-        roundDuration: this.durationParams.roundDuration,
       },
       sender: dealer.account.addr,
       signer: dealer.signer,
@@ -92,17 +92,7 @@ export class PirateGame implements IGameAdapter {
 
     const sessionId = result.return!
     const state = await this.appClient.state.box.gameState.value(sessionId)
-
-    this.sessionConfig = {
-      startAt: state!.proposalDeadline - this.durationParams.registrationWindow,
-      proposalDeadline: state!.proposalDeadline,
-      voteDeadline: state!.voteDeadline,
-      revealDeadline: state!.revealDeadline,
-    }
-
-    console.log(`PirateGame session ${sessionId} created. Registration starts at round ${this.sessionConfig.startAt}`)
-    await this.waitUntilRound(this.sessionConfig.startAt)
-
+    console.log(`PirateGame session ${sessionId} created.`)
     return sessionId
   }
 
@@ -141,11 +131,6 @@ export class PirateGame implements IGameAdapter {
     await this.waitUntilRound(this.sessionConfig.proposalDeadline + 1n)
 
     console.log('\n--- GAME START ---')
-    await this.appClient!.send.startGame({
-      args: { sessionId },
-      sender: agents[0].account.addr,
-      signer: agents[0].signer,
-    })
   }
 
   async play_Reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {

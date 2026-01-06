@@ -15,6 +15,23 @@ import {
 } from '../../smart_contracts/artifacts/guessGame/GuessGameClient';
 import { UI } from '../ui';
 
+const getClient = async (wallet: WalletManager) => {
+  const appId = await getAppId(wallet, 'GUESS');
+  return new GuessGameClient({
+    algorand: wallet.algorand,
+    appId,
+    defaultSender: wallet.account!.addr,
+  });
+};
+
+const askSessionId = async () => {
+  const answers = await inquirer.prompt([{
+    type: 'input', name: 'sessId', message: 'Enter SESSION ID:',
+    validate: (i) => !isNaN(parseInt(i)) || 'Invalid Number',
+  }]);
+  return BigInt(answers.sessId);
+};
+
 export const GuessGameModule: IGameModule = {
   id: 'GUESS',
   name: '🎯 Guess 2/3 of the Average',
@@ -24,7 +41,8 @@ export const GuessGameModule: IGameModule = {
     { name: '🆕 Create New Game Session', value: 'create', separator: true },
     { name: '👋 Join Existing Game', value: 'join' },
     { name: '🔓 Reveal Move', value: 'reveal' },
-    { name: '👀 Check Status & Claim Winnings', value: 'status', separator: true },
+    { name: '📊 Dashboard', value: 'status', separator: true },
+    { name: '💵 Claim Winnings', value: 'claim'},
   ],
 
   // DEPLOY
@@ -73,43 +91,31 @@ export const GuessGameModule: IGameModule = {
   // CREATE
   create: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'GUESS');
-      const client = new GuessGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
-
-      console.log(chalk.blue(`Connected to App ID: ${appId}`));
-
+      const client = await getClient(wallet);
       const answers = await inquirer.prompt([
         {
           type: 'input',
           name: 'participation',
           message: 'Participation Fee (MicroAlgo)?',
           default: '1000000',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid number',
         },
         {
           type: 'input',
           name: 'startDelay',
           message: 'Start delay (rounds)?',
           default: '1',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid number',
         },
         {
           type: 'input',
           name: 'duration',
           message: 'Commit duration (rounds)?',
           default: '50',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid number',
         },
         {
           type: 'input',
           name: 'reveal',
           message: 'Reveal duration (rounds)?',
           default: '50',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid number',
         },
       ]);
 
@@ -143,10 +149,6 @@ export const GuessGameModule: IGameModule = {
 
       console.log(chalk.green(`✅ Session Created!`));
       console.log(chalk.bgGreen.black(` 👉 SESSION ID: ${result.return} `));
-      console.log(chalk.cyan(`\n🎯 Strategy Tips:`));
-      console.log(chalk.gray(`   Nash Equilibrium: 0`));
-      console.log(chalk.gray(`   Typical Range: 15-40`));
-      console.log(chalk.gray(`   Think about what others will choose!`));
     } catch (e: any) {
       handleAlgoError(e, 'Create Session');
     }
@@ -155,23 +157,9 @@ export const GuessGameModule: IGameModule = {
   // JOIN
   join: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'GUESS');
-      const client = new GuessGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
+      const client = await getClient(wallet);
 
-      const answers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'sessId',
-          message: 'Enter SESSION ID:',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid Number',
-        },
-      ]);
-
-      const sessionID = BigInt(answers.sessId);
+      const sessionID = await askSessionId();
 
       console.log(chalk.gray('🔎 Reading Session Config...'));
 
@@ -236,13 +224,7 @@ export const GuessGameModule: IGameModule = {
   // REVEAL
   reveal: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'GUESS');
-      const client = new GuessGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
-
+      const client = await getClient(wallet);
       const answers = await inquirer.prompt([
         {
           type: 'input',
@@ -289,12 +271,7 @@ export const GuessGameModule: IGameModule = {
   // STATUS
   status: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'GUESS');
-      const client = new GuessGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
+      const client = await getClient(wallet);
 
       console.log(chalk.gray('🔄 Fetching Data...'));
       const currentRound = await getCurrentRound(wallet);
@@ -344,43 +321,31 @@ export const GuessGameModule: IGameModule = {
         console.log(chalk.gray(`   Reveal: ${config.endRevealAt} ${getRoundDiff(currentRound, config.endRevealAt)}`));
         console.log('');
       }
-
-      const { wantToClaim } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'wantToClaim',
-          message: 'Do you want to claim winnings from a finished game?',
-          default: false,
-        },
-      ]);
-
-      if (wantToClaim) {
-        const { claimSessionId } = await inquirer.prompt([
-          {
-            type: 'input',
-            name: 'claimSessionId',
-            message: 'Enter SESSION ID to claim:',
-            validate: (i) => !isNaN(parseInt(i)) || 'Invalid',
-          },
-        ]);
-
-        console.log(chalk.yellow('💰 Claiming winnings...'));
-
-        const result = await client.send.claimWinnings({
-          args: { sessionId: BigInt(claimSessionId) },
-          sender: wallet.account!.addr,
-          coverAppCallInnerTransactionFees: true,
-          maxFee: AlgoAmount.MicroAlgo(4000),
-        });
-
-        if (result.return === 0n) {
-          console.log(chalk.red('💀 You did not win this round!'));
-        } else {
-          console.log(chalk.green(`🎉 Victory! Claimed ${result.return} µAlgo!`));
-        }
-      }
     } catch (e: any) {
       handleAlgoError(e, 'Status');
     }
   },
+
+   claim: async (wallet: WalletManager) => {
+    try {
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
+      console.log(chalk.yellow('💵 Claiming...'));
+      const result = await client.send.claimWinnings({
+        args: { sessionId: sessionID },
+        coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(4000),
+      });
+      if (result.return === 0n) {
+          console.log(chalk.red('💀 You did not win this round!'));
+        } else {
+          console.log(chalk.green(`🎉 Victory! Claimed ${result.return} µAlgo!`));
+        }    } catch (e: any) { handleAlgoError(e, 'Claim'); }
+  },
 };
+
+
+
+    
+       
+        
+      

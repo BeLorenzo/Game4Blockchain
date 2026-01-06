@@ -37,14 +37,14 @@ describe('PirateGame Contract - Complete Test Suite', () => {
     return { client: appClient }
   }
 
-  const createGameParams = async (registrationDuration: number, roundDuration: number, participation: number) => {
+  const createGameParams = async (registrationDuration: number, participation: number) => {
     const now = (await localnet.context.algod.status().do()).lastRound
     const start = now + BigInt(registrationDuration)
     
     return {
       startAt: start,
-      endCommitAt: start + 10n, // Not used in PirateGame
-      endRevealAt: start + 20n, // Not used in PirateGame
+      endCommitAt: start + 10n, 
+      endRevealAt: start + 20n, 
       participation: BigInt(participation),
     }
   }
@@ -71,7 +71,7 @@ describe('PirateGame Contract - Complete Test Suite', () => {
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 10, 10_000_000)
+      const params = await createGameParams(5, 10_000_000)
       const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
 
       // Verify MBR calculation
@@ -94,7 +94,6 @@ describe('PirateGame Contract - Complete Test Suite', () => {
           config: params,
           mbrPayment,
           maxPirates: 20n,
-          roundDuration: 10n,
         },
         sender: testAccount.addr,
       })
@@ -107,7 +106,7 @@ describe('PirateGame Contract - Complete Test Suite', () => {
       const { testAccount, algorand } = localnet.context
       const { client } = await deploy(testAccount)
 
-      const params = await createGameParams(5, 10, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
 
       await expect(
@@ -120,7 +119,6 @@ describe('PirateGame Contract - Complete Test Suite', () => {
               amount: AlgoAmount.MicroAlgos(Number(mbrAmount)),
             }),
             maxPirates: 2n, // Too low
-            roundDuration: 10n,
           },
           sender: testAccount.addr,
         })
@@ -131,7 +129,7 @@ describe('PirateGame Contract - Complete Test Suite', () => {
       const { testAccount, algorand } = localnet.context
       const { client } = await deploy(testAccount)
 
-      const params = await createGameParams(5, 10, 500_000) // < 1 ALGO
+      const params = await createGameParams(10, 500_000) // < 1 ALGO
       const mbrAmount = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
 
       await expect(
@@ -144,7 +142,6 @@ describe('PirateGame Contract - Complete Test Suite', () => {
               amount: AlgoAmount.MicroAlgos(Number(mbrAmount)),
             }),
             maxPirates: 5n,
-            roundDuration: 10n,
           },
           sender: testAccount.addr,
         })
@@ -158,7 +155,7 @@ describe('PirateGame Contract - Complete Test Suite', () => {
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 10, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -170,12 +167,9 @@ describe('PirateGame Contract - Complete Test Suite', () => {
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 10n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
 const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
 expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
@@ -208,7 +202,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 10, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -220,12 +214,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 10n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       await expect(
         client.send.registerPirate({
@@ -252,7 +243,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 10, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -264,12 +255,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 10n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
 
@@ -319,7 +307,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
   const { client } = await deploy(testAccount)
   await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-  const params = await createGameParams(5, 30, 10_000_000)
+  const params = await createGameParams(10, 10_000_000)
   const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
   
   const sessionId = (await client.send.createSession({
@@ -331,12 +319,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
       }),
       maxPirates: 5n,
-      roundDuration: 30n,
     },
     sender: testAccount.addr,
   })).return!
-
-  await waitForRound(params.startAt, client)
 
   // Register 3 pirates
   const pirates = []
@@ -367,13 +352,8 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
   }
 
   // Wait for registration to close and start game
-  const state1 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state1!.proposalDeadline + 1n, client)
-
-  await client.send.startGame({
-    args: { sessionId },
-    sender: testAccount.addr,
-  })
+  const config = await client.state.box.gameSessions.value(sessionId)
+  await waitForRound(config!.startAt + 1n, client)
 
   const distribution = Buffer.alloc(24) 
   distribution.writeBigUInt64BE(29_000_000n, 0)  // Pirate 0
@@ -443,8 +423,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
   })
 
   // Wait for vote deadline and reveal
-  const state2 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state2!.voteDeadline + 1n, client)
+  await waitForRound(config!.endCommitAt + 1n, client)
 
   await client.send.revealVote({
     args: { sessionId, vote: 1n, salt: Buffer.from('salt0') },
@@ -465,8 +444,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
   })
 
   // Wait for reveal deadline and execute
-  const state3 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state3!.revealDeadline + 1n, client)
+  await waitForRound(config!.endRevealAt + 1n, client)
 
   await client.send.executeRound({
     args: { sessionId },
@@ -515,7 +493,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(20, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -527,12 +505,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       // Register 4 pirates
       const pirates = []
@@ -562,13 +537,8 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
-
-      await client.send.startGame({
-        args: { sessionId },
-        sender: testAccount.addr,
-      })
+      const config = await client.state.box.gameSessions.value(sessionId)
+      await waitForRound(config!.startAt + 1n, client)
 
       // Greedy proposal: [40M, 0, 0, 0] 
       const distribution = Buffer.alloc(32)
@@ -601,8 +571,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         })
       }
 
-      const state2 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state2!.voteDeadline + 1n, client)
+      await waitForRound(config!.endCommitAt + 1n, client)
 
       for (let i = 0; i < 4; i++) {
         await client.send.revealVote({
@@ -612,8 +581,8 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         })
       }
 
-      const state3 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state3!.revealDeadline + 1n, client)
+      await waitForRound(config!.endRevealAt + 1n, client)
+
 
       await client.send.executeRound({
         args: { sessionId },
@@ -637,7 +606,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -649,12 +618,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       // Register 3 pirates
       const pirates = []
@@ -684,17 +650,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
-
-      await client.send.startGame({
-        args: { sessionId },
-        sender: testAccount.addr,
-      })
-
       // Pirate0 doesn't propose - wait for timeout
-      const state2 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state2!.proposalDeadline + 1n, client)
+      const config = await client.state.box.gameSessions.value(sessionId)
+      await waitForRound(config!.endCommitAt + 1n, client)
 
       // Anyone can call timeout
       await client.send.timeOut({
@@ -717,7 +675,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -729,12 +687,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       // Register only 2 pirates
       const pirates = []
@@ -764,15 +719,23 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
+      const config = await client.state.box.gameSessions.value(sessionId)
+      await waitForRound(config!.startAt + 1n, client)
+
+      const distribution = Buffer.alloc(24)
+      distribution.writeBigUInt64BE(29_000_000n, 0)
+      distribution.writeBigUInt64BE(0n, 8)
+      distribution.writeBigUInt64BE(1_000_000n, 16)
 
       await expect(
-        client.send.startGame({
-          args: { sessionId },
-          sender: testAccount.addr,
+        client.send.proposeDistribution({
+          args: { sessionId, distribution },
+        sender: pirates[0].addr,
+        signer: pirates[0].signer,
+        coverAppCallInnerTransactionFees: true,
+    maxFee: AlgoAmount.MicroAlgo(3000),
         })
-      ).rejects.toThrow('Need at least 3 pirates')
+      ).rejects.toThrow('Not enough pirates to start')
     }, 60000)
 
     test('Cannot call timeout before deadline', async () => {
@@ -780,7 +743,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -792,12 +755,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       const pirates = []
       const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -826,13 +786,8 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
-
-      await client.send.startGame({
-        args: { sessionId },
-        sender: testAccount.addr,
-      })
+      const config = await client.state.box.gameSessions.value(sessionId)
+      await waitForRound(config!.startAt + 1n, client)
 
       // Try timeout BEFORE deadline
       await expect(
@@ -852,7 +807,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -864,12 +819,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       const pirates = []
       const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -898,10 +850,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
+      const config = await client.state.box.gameSessions.value(sessionId)
+      await waitForRound(config!.startAt + 1n, client)
 
-      await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
 
       const distribution = Buffer.alloc(24)
       distribution.writeBigUInt64BE(29_000_000n, 0)
@@ -932,8 +883,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         signer: pirates[0].signer,
       })
 
-      const state2 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state2!.voteDeadline + 1n, client)
+      await waitForRound(config!.endCommitAt + 1n, client)
 
       // Try to reveal with WRONG salt
       await expect(
@@ -950,7 +900,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -962,12 +912,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       const pirates = []
       const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -996,10 +943,8 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
-
-      await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+      const config = await client.state.box.gameSessions.value(sessionId)
+      await waitForRound(config!.startAt + 1n, client)
 
       const distribution = Buffer.alloc(24)
       distribution.writeBigUInt64BE(20_000_000n, 0)
@@ -1023,7 +968,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -1035,12 +980,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       const pirates = []
       const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -1069,10 +1011,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
-
-      await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+      await waitForRound(params!.endCommitAt + 1n, client)
 
       // Distribution that doesn't sum to 30M
       const distribution = Buffer.alloc(24)
@@ -1096,7 +1035,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       const { client } = await deploy(testAccount)
       await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-      const params = await createGameParams(5, 30, 10_000_000)
+      const params = await createGameParams(10, 10_000_000)
       const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
       
       const sessionId = (await client.send.createSession({
@@ -1108,12 +1047,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
             amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
           }),
           maxPirates: 5n,
-          roundDuration: 30n,
         },
         sender: testAccount.addr,
       })).return!
-
-      await waitForRound(params.startAt, client)
 
       const pirates = []
       const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -1142,10 +1078,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         pirates.push(pirate)
       }
 
-      const state1 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state1!.proposalDeadline + 1n, client)
-
-      await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+      await waitForRound(params!.startAt + 1n, client)
 
       const distribution = Buffer.alloc(24)
       distribution.writeBigUInt64BE(29_000_000n, 0)
@@ -1178,8 +1111,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         })
       }
 
-      const state2 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state2!.voteDeadline + 1n, client)
+      await waitForRound(params!.endCommitAt + 1n, client)
 
       for (let i = 0; i < 3; i++) {
         await client.send.revealVote({
@@ -1189,8 +1121,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
         })
       }
 
-      const state3 = await client.state.box.gameState.value(sessionId)
-      await waitForRound(state3!.revealDeadline + 1n, client)
+      await waitForRound(params!.endRevealAt + 1n, client)
 
       await client.send.executeRound({
         args: { sessionId },
@@ -1226,7 +1157,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-    const params = await createGameParams(5, 30, 10_000_000)
+    const params = await createGameParams(20, 10_000_000)
     const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
     
     const sessionId = (await client.send.createSession({
@@ -1238,12 +1169,9 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
           amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
         }),
         maxPirates: 5n,
-        roundDuration: 30n,
       },
       sender: testAccount.addr,
     })).return!
-
-    await waitForRound(params.startAt, client)
 
     // Register 5 pirates
     const pirates = []
@@ -1273,10 +1201,8 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       pirates.push(pirate)
     }
 
-    const state1 = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state1!.proposalDeadline + 1n, client)
+    await waitForRound(params!.startAt + 1n, client)
 
-    await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
 
     // Strategic proposal: [45M, 1M, 1M, 1M, 2M]
     const distribution = Buffer.alloc(40)
@@ -1314,8 +1240,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       })
     }
 
-    const state2 = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state2!.voteDeadline + 1n, client)
+    await waitForRound(params!.endCommitAt + 1n, client)
 
     for (let i = 0; i < 5; i++) {
       await client.send.revealVote({
@@ -1325,8 +1250,7 @@ expect(Number(joinMbr)).toBe(2500 + 400 * (35 + 42))
       })
     }
 
-    const state3 = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state3!.revealDeadline + 1n, client)
+    await waitForRound(params!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -1373,7 +1297,7 @@ const claim1 = await client.send.claimWinnings({
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-    const params = await createGameParams(5, 30, 10_000_000)
+    const params = await createGameParams(20, 10_000_000)
     const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
     
     const sessionId = (await client.send.createSession({
@@ -1385,12 +1309,9 @@ const claim1 = await client.send.claimWinnings({
           amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
         }),
         maxPirates: 5n,
-        roundDuration: 30n,
       },
       sender: testAccount.addr,
     })).return!
-
-    await waitForRound(params.startAt, client)
 
     const pirates = []
     const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -1419,10 +1340,7 @@ const claim1 = await client.send.claimWinnings({
       pirates.push(pirate)
     }
 
-    const state1 = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state1!.proposalDeadline + 1n, client)
-
-    await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+    await waitForRound(params!.startAt + 1n, client)
 
     // Greedy proposal: [50M, 0, 0, 0, 0]
     const distribution = Buffer.alloc(40)
@@ -1456,8 +1374,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    const state2 = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state2!.voteDeadline + 1n, client)
+    await waitForRound(params!.endCommitAt + 1n, client)
 
     for (let i = 0; i < 5; i++) {
       await client.send.revealVote({
@@ -1467,8 +1384,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    const state3 = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state3!.revealDeadline + 1n, client)
+    await waitForRound(params!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -1490,7 +1406,7 @@ const claim1 = await client.send.claimWinnings({
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(150))
 
-    const params = await createGameParams(5, 50, 10_000_000)
+    const params = await createGameParams(20, 10_000_000)
     const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
     
     const sessionId = (await client.send.createSession({
@@ -1502,12 +1418,9 @@ const claim1 = await client.send.claimWinnings({
           amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
         }),
         maxPirates: 5n,
-        roundDuration: 50n,
       },
       sender: testAccount.addr,
     })).return!
-
-    await waitForRound(params.startAt, client)
 
     const pirates = []
     const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -1536,14 +1449,11 @@ const claim1 = await client.send.claimWinnings({
       pirates.push(pirate)
     }
 
-    let state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.proposalDeadline + 1n, client)
-
-    await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+    await waitForRound(params!.startAt + 1n, client)
 
     const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' } })).return!
 
-    state = await client.state.box.gameState.value(sessionId)
+    let state = await client.state.box.gameState.value(sessionId)
     
     const dist0 = Buffer.alloc(40)
     dist0.writeBigUInt64BE(50_000_000n, 0)
@@ -1573,8 +1483,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.voteDeadline + 1n, client)
+    await waitForRound(params!.endCommitAt + 1n, client)
 
     for (let i = 0; i < 5; i++) {
       await client.send.revealVote({
@@ -1584,8 +1493,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.revealDeadline + 1n, client)
+    await waitForRound(params!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -1594,7 +1502,6 @@ const claim1 = await client.send.claimWinnings({
       maxFee: AlgoAmount.MicroAlgo(3000),
     })
 
-    // Verify round 1, 4 alive
     state = await client.state.box.gameState.value(sessionId)
     expect(state?.currentRound).toBe(1n)
     expect(state?.alivePirates).toBe(4n)
@@ -1628,8 +1535,8 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.voteDeadline + 1n, client)
+    let config = await client.state.box.gameSessions.value(sessionId)
+    await waitForRound(config!.endCommitAt + 1n, client)
 
     for (let i = 1; i < 5; i++) {
       await client.send.revealVote({
@@ -1639,8 +1546,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.revealDeadline + 1n, client)
+    await waitForRound(config!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -1684,8 +1590,8 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.voteDeadline + 1n, client)
+    config = await client.state.box.gameSessions.value(sessionId)
+    await waitForRound(config!.endCommitAt + 1n, client)
 
     for (let i = 2; i < 5; i++) {
       await client.send.revealVote({
@@ -1695,8 +1601,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.revealDeadline + 1n, client)
+    await waitForRound(config!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -1754,8 +1659,8 @@ const claim1 = await client.send.claimWinnings({
       signer: pirates[4].signer,
     })
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.voteDeadline + 1n, client)
+    config = await client.state.box.gameSessions.value(sessionId)
+    await waitForRound(config!.endCommitAt + 1n, client)
 
     await client.send.revealVote({
       args: { sessionId, vote: 1n, salt: Buffer.from('r3_salt3') },
@@ -1769,8 +1674,7 @@ const claim1 = await client.send.claimWinnings({
       signer: pirates[4].signer,
     })
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.revealDeadline + 1n, client)
+    await waitForRound(config!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -1808,7 +1712,7 @@ const claim1 = await client.send.claimWinnings({
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-    const params = await createGameParams(5, 30, 10_000_000)
+    const params = await createGameParams(20, 10_000_000)
     const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
     
     const sessionId = (await client.send.createSession({
@@ -1820,12 +1724,9 @@ const claim1 = await client.send.claimWinnings({
           amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
         }),
         maxPirates: 5n,
-        roundDuration: 30n,
       },
       sender: testAccount.addr,
     })).return!
-
-    await waitForRound(params.startAt, client)
 
     const pirates = []
     const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -1854,10 +1755,7 @@ const claim1 = await client.send.claimWinnings({
       pirates.push(pirate)
     }
 
-    let state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.proposalDeadline + 1n, client)
-
-    await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+    await waitForRound(params!.startAt + 1n, client)
 
     // Round 0: Eliminate Pirate0
     const dist0 = Buffer.alloc(32)
@@ -1889,8 +1787,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.voteDeadline + 1n, client)
+    await waitForRound(params!.endCommitAt + 1n, client)
 
     for (let i = 0; i < 4; i++) {
       await client.send.revealVote({
@@ -1900,8 +1797,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.revealDeadline + 1n, client)
+    await waitForRound(params!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -1946,7 +1842,7 @@ const claim1 = await client.send.claimWinnings({
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-    const params = await createGameParams(5, 30, 10_000_000)
+    const params = await createGameParams(10, 10_000_000)
     const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
     
     const sessionId = (await client.send.createSession({
@@ -1958,12 +1854,9 @@ const claim1 = await client.send.claimWinnings({
           amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
         }),
         maxPirates: 5n,
-        roundDuration: 30n,
       },
       sender: testAccount.addr,
     })).return!
-
-    await waitForRound(params.startAt, client)
 
     const pirates = []
     const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -1992,10 +1885,7 @@ const claim1 = await client.send.claimWinnings({
       pirates.push(pirate)
     }
 
-    let state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.proposalDeadline + 1n, client)
-
-    await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+    await waitForRound(params!.startAt + 1n, client)
 
     const distribution = Buffer.alloc(24)
     distribution.writeBigUInt64BE(30_000_000n, 0)
@@ -2027,8 +1917,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.voteDeadline + 1n, client)
+    await waitForRound(params!.endCommitAt + 1n, client)
 
     // ONLY Pirate0 reveals (vote YES)
     await client.send.revealVote({
@@ -2038,9 +1927,7 @@ const claim1 = await client.send.claimWinnings({
     })
 
     // Pirate1 and Pirate2 don't reveal (implicit NO)
-
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.revealDeadline + 1n, client)
+    await waitForRound(params!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -2060,7 +1947,7 @@ const claim1 = await client.send.claimWinnings({
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-    const params = await createGameParams(5, 30, 10_000_000)
+    const params = await createGameParams(10, 10_000_000)
     const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
     
     const sessionId = (await client.send.createSession({
@@ -2072,12 +1959,9 @@ const claim1 = await client.send.claimWinnings({
           amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
         }),
         maxPirates: 5n,
-        roundDuration: 30n,
       },
       sender: testAccount.addr,
     })).return!
-
-    await waitForRound(params.startAt, client)
 
     const pirates = []
     const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -2106,10 +1990,7 @@ const claim1 = await client.send.claimWinnings({
       pirates.push(pirate)
     }
 
-    let state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.proposalDeadline + 1n, client)
-
-    await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+    await waitForRound(params!.startAt + 1n, client)
 
     const distribution = Buffer.alloc(24)
     distribution.writeBigUInt64BE(20_000_000n, 0)
@@ -2123,11 +2004,9 @@ const claim1 = await client.send.claimWinnings({
       coverAppCallInnerTransactionFees: true,
       maxFee: AlgoAmount.MicroAlgo(3000),
     })
-
-    state = await client.state.box.gameState.value(sessionId)
     
     // Wait PAST vote deadline
-    await waitForRound(state!.voteDeadline + 1n, client)
+    await waitForRound(params!.endCommitAt + 1n, client)
 
     // Try to vote AFTER deadline
     const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' } })).return!
@@ -2154,7 +2033,7 @@ const claim1 = await client.send.claimWinnings({
     const { client } = await deploy(testAccount)
     await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-    const params = await createGameParams(5, 30, 10_000_000)
+    const params = await createGameParams(10, 10_000_000)
     const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
     
     const sessionId = (await client.send.createSession({
@@ -2166,12 +2045,9 @@ const claim1 = await client.send.claimWinnings({
           amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
         }),
         maxPirates: 5n,
-        roundDuration: 30n,
       },
       sender: testAccount.addr,
     })).return!
-
-    await waitForRound(params.startAt, client)
 
     const pirates = []
     const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -2200,10 +2076,7 @@ const claim1 = await client.send.claimWinnings({
       pirates.push(pirate)
     }
 
-    let state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.proposalDeadline + 1n, client)
-
-    await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+    await waitForRound(params!.startAt + 1n, client)
 
     const distribution = Buffer.alloc(24)
     distribution.writeBigUInt64BE(29_000_000n, 0)
@@ -2236,8 +2109,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.voteDeadline + 1n, client)
+    await waitForRound(params!.endCommitAt + 1n, client)
 
     for (let i = 0; i < 3; i++) {
       await client.send.revealVote({
@@ -2247,8 +2119,7 @@ const claim1 = await client.send.claimWinnings({
       })
     }
 
-    state = await client.state.box.gameState.value(sessionId)
-    await waitForRound(state!.revealDeadline + 1n, client)
+    await waitForRound(params!.endRevealAt + 1n, client)
 
     await client.send.executeRound({
       args: { sessionId },
@@ -2277,7 +2148,7 @@ test('4 pirates (EVEN), 2 YES vs 2 NO → Proposal PASSES (tie-breaker)', async 
   const { client } = await deploy(testAccount)
   await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(100))
 
-  const params = await createGameParams(5, 30, 10_000_000)
+  const params = await createGameParams(15, 10_000_000)
   const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
   
   const sessionId = (await client.send.createSession({
@@ -2289,12 +2160,9 @@ test('4 pirates (EVEN), 2 YES vs 2 NO → Proposal PASSES (tie-breaker)', async 
         amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
       }),
       maxPirates: 5n,
-      roundDuration: 30n,
     },
     sender: testAccount.addr,
   })).return!
-
-  await waitForRound(params.startAt, client)
 
   // Register 4 pirates
   const pirates = []
@@ -2324,10 +2192,7 @@ test('4 pirates (EVEN), 2 YES vs 2 NO → Proposal PASSES (tie-breaker)', async 
     pirates.push(pirate)
   }
 
-  const state1 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state1!.proposalDeadline + 1n, client)
-
-  await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+  await waitForRound(params!.startAt + 1n, client)
 
   // Distribution: [35M, 5M, 0, 0]
   const distribution = Buffer.alloc(32)
@@ -2365,8 +2230,7 @@ test('4 pirates (EVEN), 2 YES vs 2 NO → Proposal PASSES (tie-breaker)', async 
     })
   }
 
-  const state2 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state2!.voteDeadline + 1n, client)
+  await waitForRound(params!.endCommitAt + 1n, client)
 
   for (let i = 0; i < 4; i++) {
     await client.send.revealVote({
@@ -2376,8 +2240,7 @@ test('4 pirates (EVEN), 2 YES vs 2 NO → Proposal PASSES (tie-breaker)', async 
     })
   }
 
-  const state3 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state3!.revealDeadline + 1n, client)
+  await waitForRound(params!.endRevealAt + 1n, client)
 
   await client.send.executeRound({
     args: { sessionId },
@@ -2427,7 +2290,7 @@ test('6 pirates, 3 YES vs 3 NO → Proposal PASSES (tie at 50%)', async () => {
   const { client } = await deploy(testAccount)
   await algorand.account.ensureFundedFromEnvironment(testAccount, AlgoAmount.Algos(150))
 
-  const params = await createGameParams(5, 30, 10_000_000)
+  const params = await createGameParams(20, 10_000_000)
   const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
   
   const sessionId = (await client.send.createSession({
@@ -2439,12 +2302,9 @@ test('6 pirates, 3 YES vs 3 NO → Proposal PASSES (tie at 50%)', async () => {
         amount: AlgoAmount.MicroAlgos(Number(newGameMbr)),
       }),
       maxPirates: 7n,
-      roundDuration: 30n,
     },
     sender: testAccount.addr,
   })).return!
-
-  await waitForRound(params.startAt, client)
 
   const pirates = []
   const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -2473,10 +2333,7 @@ test('6 pirates, 3 YES vs 3 NO → Proposal PASSES (tie at 50%)', async () => {
     pirates.push(pirate)
   }
 
-  const state1 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state1!.proposalDeadline + 1n, client)
-
-  await client.send.startGame({ args: { sessionId }, sender: testAccount.addr })
+  await waitForRound(params!.startAt + 1n, client)
 
   // Strategic: [50M, 2M, 2M, 2M, 2M, 2M]
   const distribution = Buffer.alloc(48)
@@ -2514,8 +2371,7 @@ test('6 pirates, 3 YES vs 3 NO → Proposal PASSES (tie at 50%)', async () => {
     })
   }
 
-  const state2 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state2!.voteDeadline + 1n, client)
+  await waitForRound(params!.endCommitAt + 1n, client)
 
   for (let i = 0; i < 6; i++) {
     await client.send.revealVote({
@@ -2525,8 +2381,7 @@ test('6 pirates, 3 YES vs 3 NO → Proposal PASSES (tie at 50%)', async () => {
     })
   }
 
-  const state3 = await client.state.box.gameState.value(sessionId)
-  await waitForRound(state3!.revealDeadline + 1n, client)
+  await waitForRound(params!.endRevealAt + 1n, client)
 
   await client.send.executeRound({
     args: { sessionId },

@@ -31,7 +31,7 @@ async function main() {
   while (true) {
     UI.separator();
 
-    // STEP A: Select Game
+    // 1. Select Game
     const gameId = await UI.selectGameType();
 
     if (gameId === 'exit') {
@@ -45,25 +45,28 @@ async function main() {
       continue;
     }
 
-    // STEP B: Select Action (dynamic menu)
-    const action = await UI.mainMenu(gameModule);
+    // 2. Main Loop for specific game actions
+    while(true) {
+        // Mostra il menu piatto con tutte le azioni
+        const action = await UI.mainMenu(gameModule);
 
-    if (action === 'back') continue;
+        if (action === 'back') break; // Torna alla selezione giochi
 
-    // STEP C: Execute action dynamically
-    try {
-      console.log(chalk.gray(`\n--- Executing ${action.toUpperCase()} ---`));
-      
-      // Call the method dynamically
-      if (typeof gameModule[action] === 'function') {
-        await gameModule[action](walletMgr);
-      } else {
-        console.log(chalk.red(`❌ Action "${action}" not implemented in ${gameModule.name}`));
-      }
-    } catch (error: any) {
-        console.log(chalk.red(`\n💥 Fatal Error:`), error.message);      
+        try {
+            console.log(chalk.gray(`\n--- Executing ${action.toUpperCase()} ---`));
+            
+            if (typeof gameModule[action] === 'function') {
+                await gameModule[action](walletMgr);
+            } else {
+                console.log(chalk.red(`❌ Action "${action}" not implemented in ${gameModule.name}`));
+            }
+        } catch (error: any) {
+            console.log(chalk.red(`\n💥 Fatal Error:`), error.message);      
+        }
+        
+        // Piccola pausa visiva prima di ristampare il menu
+        console.log('\n'); 
     }
-    console.log('\n');
   }
 }
 

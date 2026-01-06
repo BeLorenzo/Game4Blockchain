@@ -14,456 +14,295 @@ import {
     PirateGameFactory 
 } from '../../smart_contracts/artifacts/pirateGame/PirateGameClient';
 import { UI } from '../ui';
+import { start } from 'node:repl';
 
 const PHASES = ['Registration', 'Proposal', 'Vote Commit', 'Vote Reveal', 'Finished'];
 
+// Helper per inizializzare il client velocemente
+const getClient = async (wallet: WalletManager) => {
+  const appId = await getAppId(wallet, 'PIRATE');
+  return new PirateGameClient({
+    algorand: wallet.algorand,
+    appId,
+    defaultSender: wallet.account!.addr,
+  });
+};
+
+// Helper per chiedere il Session ID (usato ovunque)
+const askSessionId = async () => {
+  const answers = await inquirer.prompt([{
+    type: 'input', name: 'sessId', message: 'Enter SESSION ID:',
+    validate: (i) => !isNaN(parseInt(i)) || 'Invalid Number',
+  }]);
+  return BigInt(answers.sessId);
+};
+
 export const PirateGameModule: IGameModule = {
   id: 'PIRATE',
-  name: '🏴‍☠️ Pirate Game (Iterative Elimination)',
+  name: '🏴‍☠️ Pirate Game',
 
+  // MENU PIATTO: Tutte le azioni visibili subito
   getAvailableActions: (): GameAction[] => [
-    { name: '🚀 Deploy New Contract', value: 'deploy' },
-    { name: '🆕 Create New Game Session', value: 'create', separator: true },
-    { name: '🏴‍☠️ Register as Pirate', value: 'join' },
-    { name: '⚔️ Game Actions Menu', value: 'reveal', separator: true },
-    { name: '👀 Check Status (Dashboard)', value: 'status' },
+    { name: '🚀 Deploy Contract', value: 'deploy' },
+    { name: '🆕 Create Session', value: 'create', separator: true },
+    { name: '✍️ Register (Join)', value: 'join' },
+    { name: '💰 Propose Distribution', value: 'propose' },
+    { name: '🗳️ Vote (Commit)', value: 'vote' },
+    { name: '🔓 Reveal Vote', value: 'revealVote' },
+    { name: '⚙️ Execute Round', value: 'execute' },
+    { name: '⏱️ Timeout AFK', value: 'timeout' },
+    { name: '💵 Claim Winnings', value: 'claim', separator: true },
+    { name: '📊 Dashboard', value: 'status', separator: true },
   ],
 
   deploy: async (wallet: WalletManager) => {
     console.log(chalk.yellow('🚀 Starting Deployment...'));    
     if (!wallet.account) return;
-
     try {
       const uniqueAppName = `PirateGame_${Date.now()}`;
       const factory = wallet.algorand.client.getTypedAppFactory(PirateGameFactory, {
         defaultSender: wallet.account.addr,
         appName: uniqueAppName, 
       });
-
       const { appClient, result } = await factory.deploy({
-        onUpdate: 'append', 
-        onSchemaBreak: 'append',
-        suppressLog: true,
+        onUpdate: 'append', onSchemaBreak: 'append', suppressLog: true,
       });
-
       if (['create', 'replace'].includes(result.operationPerformed)) {
-        console.log(chalk.yellow('📝 Initializing contract...'));
-        
-        await appClient.send.initialize({
-          args: { gameType: 'PIRATE' },
-          sender: wallet.account.addr,
-        });
-        
-        console.log(chalk.green('✅ Contract type: PIRATE'));
-
+        console.log(chalk.yellow('📝 Initializing...'));
+        await appClient.send.initialize({ args: { gameType: 'PIRATE' } });
         await wallet.algorand.send.payment({
           amount: AlgoAmount.Algos(1),
           sender: wallet.account.addr,
           receiver: appClient.appAddress,
         });
       }
-
-      console.log(chalk.green(`\n✅ DEPLOYMENT SUCCESSFUL!`));
-      console.log(chalk.bgGreen.black(` APP ID: ${appClient.appId} `));
-      
-    } catch (e: any) {
-      handleAlgoError(e, 'Deploy');
-    }
+      console.log(chalk.green(`✅ DEPLOYMENT SUCCESSFUL! App ID: ${appClient.appId}`));
+    } catch (e: any) { handleAlgoError(e, 'Deploy'); }
   },
 
   create: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'PIRATE');
-      const client = new PirateGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
-
-      console.log(chalk.blue(`Connected to App ID: ${appId}`));
-
+      const client = await getClient(wallet);
       const answers = await inquirer.prompt([
-        {
+        { type: 'input', name: 'participation', message: 'Fee (µAlgo)?', default: '1000000' },
+        { type: 'input', name: 'maxPirates', message: 'Max Pirates (3-20)?', default: '5' },
+{
           type: 'input',
-          name: 'participation',
-          message: 'Participation Fee (MicroAlgo)?',
-          default: '1000000',
-          validate: (i) => {
-            const val = parseInt(i);
-            if (isNaN(val)) return 'Invalid number';
-            if (val < 1000000) return 'Minimum is 1 ALGO (1000000 µAlgo)';
-            return true;
-          },
+          name: 'startDelay',
+          message: 'Start delay (rounds)?',
+          default: '1',
         },
         {
           type: 'input',
-          name: 'maxPirates',
-          message: 'Maximum Pirates (3-20)?',
-          default: '5',
-          validate: (i) => {
-            const val = parseInt(i);
-            if (isNaN(val)) return 'Invalid number';
-            if (val < 3 || val > 20) return 'Must be between 3 and 20';
-            return true;
-          },
-        },
-        {
-          type: 'input',
-          name: 'registrationDuration',
-          message: 'Registration duration (rounds)?',
+          name: 'commit',
+          message: 'Commit duration (rounds)?',
           default: '50',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid number',
         },
         {
           type: 'input',
-          name: 'roundDuration',
-          message: 'Round duration (rounds)?',
-          default: '30',
-          validate: (i) => {
-            const val = parseInt(i);
-            if (isNaN(val)) return 'Invalid number';
-            if (val < 10) return 'Minimum is 10 rounds';
-            return true;
-          },
+          name: 'reveal',
+          message: 'Reveal duration (rounds)?',
+          default: '50',
         },
       ]);
 
       const currentRound = await getCurrentRound(wallet);
-      const startAt = currentRound + 5n;
-      const participation = BigInt(answers.participation);
-      const maxPirates = BigInt(answers.maxPirates);
-      const roundDuration = BigInt(answers.roundDuration);
-
-      console.log(chalk.yellow('⏳ Calculating MBR and Creating Session...'));
-
-      const mbrResult = await client.send.getRequiredMbr({
-        args: { command: 'newGame' },
-        suppressLog: true,
-      });
-      const requiredMBR = mbrResult.return;
-
-      const mbrPaymentTxn = await wallet.algorand.createTransaction.payment({
-        sender: wallet.account!.addr,
-        receiver: client.appAddress,
-        amount: AlgoAmount.MicroAlgos(Number(requiredMBR)),
-      });
-
+      const startAt = currentRound + answers.startDelay;
+      const endCommit = startAt + answers.commit
+      const endReveal = endCommit + answers.reveal
+      console.log(chalk.yellow('⏳ Calculating Cost...'));
+      const mbrResult = await client.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true });
+      
       const result = await client.send.createSession({
         args: {
-          config: { 
-            startAt, 
-            endCommitAt: startAt + 10n,
-            endRevealAt: startAt + 20n,
-            participation 
-          },
-          mbrPayment: mbrPaymentTxn,
-          maxPirates,
-          roundDuration,
-        },
-        suppressLog: true,
+          config: { startAt, endCommitAt: endCommit, endRevealAt: endReveal, participation: BigInt(answers.participation) }, 
+          mbrPayment: await wallet.algorand.createTransaction.payment({
+            sender: wallet.account!.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(Number(mbrResult.return)),
+          }),
+          maxPirates: BigInt(answers.maxPirates),
+        }, suppressLog: true,
       });
-
-      console.log(chalk.green(`✅ Session Created!`));
-      console.log(chalk.bgGreen.black(` 👉 SESSION ID: ${result.return} `));
-      console.log(chalk.cyan(`\n🏴‍☠️ Game Mechanics:`));
-      console.log(chalk.gray(`   - ${maxPirates} pirates compete for the treasure`));
-      console.log(chalk.gray(`   - Each round: propose → vote → eliminate`));
-      console.log(chalk.gray(`   - Win: Get majority approval for your split`));
-    } catch (e: any) {
-      handleAlgoError(e, 'Create Session');
-    }
+      console.log(chalk.green(`✅ Session Created! ID: ${result.return}`));
+    } catch (e: any) { handleAlgoError(e, 'Create Session'); }
   },
 
   join: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'PIRATE');
-      const client = new PirateGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
-
-      const answers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'sessId',
-          message: 'Enter SESSION ID:',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid Number',
-        },
-      ]);
-
-      const sessionID = BigInt(answers.sessId);
-
-      console.log(chalk.gray('🔎 Reading Session Config...'));
-
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
       const sessionConfig = await client.state.box.gameSessions.value(sessionID);
-      if (!sessionConfig) throw new Error('Session not found');
-      const participationFee = sessionConfig.participation;
-      
-      const state = await client.state.box.gameState.value(sessionID);
-      if (!state) throw new Error('Game state not found');
-
-      console.log(chalk.cyan(`💰 Entry Fee: ${participationFee} µAlgo`));
-      console.log(chalk.cyan(`🏴‍☠️ Pirates Registered: ${state.totalPirates}`));
-      console.log(chalk.yellow(`⏰ Registration Deadline: Round ${state.proposalDeadline}`));
-
       const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!;
 
-      console.log(chalk.yellow(`📡 Registering as Pirate...`));
-
+      console.log(chalk.yellow(`📡 Registering... Fee: ${sessionConfig!.participation} µAlgo`));
       await client.send.registerPirate({
         args: {
           sessionId: sessionID,
           payment: await wallet.algorand.createTransaction.payment({
-            sender: wallet.account!.addr,
-            receiver: client.appAddress,
-            amount: AlgoAmount.MicroAlgos(Number(participationFee)),
+            sender: wallet.account!.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(Number(sessionConfig!.participation)),
           }),
           mbrPayment: await wallet.algorand.createTransaction.payment({
-            sender: wallet.account!.addr,
-            receiver: client.appAddress,
-            amount: AlgoAmount.MicroAlgos(Number(joinMbr)),
+            sender: wallet.account!.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(Number(joinMbr)),
           }),
-        },
-        suppressLog: true,
+        }, suppressLog: true,
       });
-
-      console.log(chalk.green('✅ Registered Successfully!'));
-      console.log(chalk.cyan(`🏴‍☠️ You are now a pirate in this game`));
-    } catch (e: any) {
-      handleAlgoError(e, 'Register as Pirate');
-    }
+      console.log(chalk.green('✅ You are now a pirate!'));
+    } catch (e: any) { handleAlgoError(e, 'Join'); }
   },
 
-  reveal: async (wallet: WalletManager) => {
+  propose: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'PIRATE');
-      const client = new PirateGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
-
-      const { sessId } = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'sessId',
-          message: 'Enter SESSION ID:',
-          validate: (i) => !isNaN(parseInt(i)) || 'Invalid',
-        },
-      ]);
-
-      const sessionID = BigInt(sessId);
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
       const state = await client.state.box.gameState.value(sessionID);
-      if (!state) throw new Error('Game state not found');
+      if (!state) throw new Error("State not found");
 
-      const phaseLabel = PHASES[Number(state.phase)] || 'Unknown';
+      console.log(chalk.cyan(`\n💰 Pot: ${state.pot} µAlgo | Pirates: ${state.totalPirates}`));
+      const distribution = Buffer.alloc(Number(state.totalPirates) * 8);
+      let totalAssigned = 0n;
 
-      console.log(chalk.cyan(`\n📊 Game Status:`));
-      console.log(chalk.gray(`   Phase: ${phaseLabel}`));
-      console.log(chalk.gray(`   Round: ${state.currentRound}`));
-      console.log(chalk.gray(`   Pirates Alive: ${state.alivePirates}`));
-      console.log(chalk.gray(`   Pot: ${state.pot} µAlgo`));
+      for (let i = 0; i < Number(state.totalPirates); i++) {
+        const { share } = await inquirer.prompt([{
+          type: 'input', name: 'share', message: `Share for Pirate #${i} (µAlgo):`, default: '0'
+        }]);
+        const shareAmount = BigInt(share);
+        distribution.writeBigUInt64BE(shareAmount, i * 8);
+        totalAssigned += shareAmount;
+      }
 
-      const { action } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'action',
-          message: 'What do you want to do?',
-          choices: [
-            { name: '🎮 Start Game (Close Registration)', value: 'startGame' },
-            { name: '💰 Propose Distribution', value: 'propose' },
-            { name: '🗳️ Vote on Proposal', value: 'vote' },
-            { name: '⚙️ Execute Round', value: 'execute' },
-            { name: '💵 Claim Winnings', value: 'claim' },
-            { name: '⏱️ Timeout AFK Proposer', value: 'timeout' },
-          ],
+      if (totalAssigned !== state.pot) {
+        console.log(chalk.red(`❌ Sum (${totalAssigned}) != Pot (${state.pot})`));
+        return;
+      }
+
+      console.log(chalk.yellow('📡 Submitting proposal...'));
+      await client.send.proposeDistribution({
+        args: { sessionId: sessionID, distribution },
+        coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+      });
+      console.log(chalk.green('✅ Proposal submitted!'));
+    } catch (e: any) { handleAlgoError(e, 'Propose'); }
+  },
+
+  vote: async (wallet: WalletManager) => {
+    try {
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
+      const { voteChoice } = await inquirer.prompt([{
+        type: 'list', name: 'voteChoice', message: 'Your vote:',
+        choices: [{ name: '✅ YES', value: 1 }, { name: '❌ NO', value: 0 }],
+      }]);
+
+      const salt = new Uint8Array(32);
+      crypto.getRandomValues(salt);
+      console.log(chalk.bgRed.white(` ⚠️  SAVE SALT: ${Buffer.from(salt).toString('hex')} `));
+
+      const choiceBytes = algosdk.encodeUint64(voteChoice);
+      const combined = new Uint8Array([...choiceBytes, ...salt]);
+      const hash = new Uint8Array(sha256.array(combined));
+
+      const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' } })).return!;
+      
+      console.log(chalk.yellow('📡 Committing vote...'));
+      await client.send.commitVote({
+        args: {
+          sessionId: sessionID, voteHash: hash,
+          mbrPayment: await wallet.algorand.createTransaction.payment({
+            sender: wallet.account!.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(Number(commitMbr)),
+          }),
         },
+      });
+      console.log(chalk.green('✅ Vote committed!'));
+    } catch (e: any) { handleAlgoError(e, 'Vote'); }
+  },
+
+  revealVote: async (wallet: WalletManager) => {
+    try {
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
+      const { voteChoice, saltHex } = await inquirer.prompt([
+        { type: 'list', name: 'voteChoice', message: 'What did you vote?', choices: [{ name: 'YES', value: 1 }, { name: 'NO', value: 0 }] },
+        { type: 'input', name: 'saltHex', message: 'Your Secret Salt (Hex):' }
       ]);
 
-      if (action === 'startGame') {
-        console.log(chalk.yellow('🎮 Starting game...'));
-        await client.send.startGame({
-          args: { sessionId: sessionID },
-          sender: wallet.account!.addr,
-        });
-        console.log(chalk.green('✅ Game started! Round 0 begins.'));
-      } 
-      else if (action === 'propose') {
-        console.log(chalk.cyan('\n💰 Distribution Builder'));
-        console.log(chalk.gray(`Total pot to distribute: ${state.pot} µAlgo`));
-        console.log(chalk.gray(`Total pirates: ${state.totalPirates}`));
+      console.log(chalk.yellow('🔓 Revealing...'));
+      await client.send.revealVote({
+        args: { sessionId: sessionID, vote: BigInt(voteChoice), salt: new Uint8Array(Buffer.from(saltHex, 'hex')) }
+      });
+      console.log(chalk.green('✅ Revealed!'));
+    } catch (e: any) { handleAlgoError(e, 'Reveal'); }
+  },
 
-        const distribution = Buffer.alloc(Number(state.totalPirates) * 8);
-        let totalAssigned = 0n;
+  execute: async (wallet: WalletManager) => {
+    try {
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
+      console.log(chalk.yellow('⚙️ Executing round logic...'));
+      await client.send.executeRound({
+        args: { sessionId: sessionID },
+        coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+      });
+      console.log(chalk.green('✅ Round executed! Check Dashboard for results.'));
+    } catch (e: any) { handleAlgoError(e, 'Execute'); }
+  },
 
-        for (let i = 0; i < Number(state.totalPirates); i++) {
-          const { share } = await inquirer.prompt([
-            {
-              type: 'input',
-              name: 'share',
-              message: `Share for Pirate ${i} (µAlgo):`,
-              default: '0',
-              validate: (val) => !isNaN(parseInt(val)) || 'Invalid number',
-            },
-          ]);
-          const shareAmount = BigInt(share);
-          distribution.writeBigUInt64BE(shareAmount, i * 8);
-          totalAssigned += shareAmount;
-        }
+  timeout: async (wallet: WalletManager) => {
+    try {
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
+      console.log(chalk.yellow('⏱️ Triggering Timeout...'));
+      await client.send.timeOut({
+        args: { sessionId: sessionID },
+        coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+      });
+      console.log(chalk.green('✅ AFK Proposer Eliminated.'));
+    } catch (e: any) { handleAlgoError(e, 'Timeout'); }
+  },
 
-        if (totalAssigned !== state.pot) {
-          console.log(chalk.red(`❌ Error: Total assigned (${totalAssigned}) != Pot (${state.pot})`));
-          return;
-        }
-
-        console.log(chalk.yellow('📡 Submitting proposal...'));
-        await client.send.proposeDistribution({
-          args: { sessionId: sessionID, distribution },
-          sender: wallet.account!.addr,
-          coverAppCallInnerTransactionFees: true,
-          maxFee: AlgoAmount.MicroAlgo(3000),
-        });
-        console.log(chalk.green('✅ Proposal submitted!'));
-      } 
-      else if (action === 'vote') {
-        const { voteChoice } = await inquirer.prompt([
-          {
-            type: 'list',
-            name: 'voteChoice',
-            message: 'Your vote:',
-            choices: [
-              { name: '✅ YES (Accept)', value: 1 },
-              { name: '❌ NO (Reject)', value: 0 },
-            ],
-          },
-        ]);
-
-        const salt = new Uint8Array(32);
-        crypto.getRandomValues(salt);
-        const saltHex = Buffer.from(salt).toString('hex');
-        console.log(chalk.bgRed.white(` ⚠️  SECRET SALT: ${saltHex} (SAVE IT!) `));
-
-        const choiceBytes = algosdk.encodeUint64(voteChoice);
-        const combined = new Uint8Array([...choiceBytes, ...salt]);
-        const hash = new Uint8Array(sha256.array(combined));
-
-        const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' } })).return!;
-
-        console.log(chalk.yellow('📡 Committing vote...'));
-        await client.send.commitVote({
-          args: {
-            sessionId: sessionID,
-            voteHash: hash,
-            mbrPayment: await wallet.algorand.createTransaction.payment({
-              sender: wallet.account!.addr,
-              receiver: client.appAddress,
-              amount: AlgoAmount.MicroAlgos(Number(commitMbr)),
-            }),
-          },
-          sender: wallet.account!.addr,
-        });
-        console.log(chalk.green('✅ Vote committed!'));
-
-        const { revealNow } = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'revealNow',
-            message: 'Reveal vote now?',
-            default: false,
-          },
-        ]);
-
-        if (revealNow) {
-          console.log(chalk.yellow('🔓 Revealing vote...'));
-          await client.send.revealVote({
-            args: { sessionId: sessionID, vote: BigInt(voteChoice), salt },
-            sender: wallet.account!.addr,
-          });
-          console.log(chalk.green('✅ Vote revealed!'));
-        }
-      } 
-      else if (action === 'execute') {
-        console.log(chalk.yellow('⚙️ Executing round...'));
-        await client.send.executeRound({
-          args: { sessionId: sessionID },
-          sender: wallet.account!.addr,
-          coverAppCallInnerTransactionFees: true,
-          maxFee: AlgoAmount.MicroAlgo(3000),
-        });
-        console.log(chalk.green('✅ Round executed!'));
-      } 
-      else if (action === 'claim') {
-        console.log(chalk.yellow('💵 Claiming winnings...'));
-        const result = await client.send.claimWinnings({
-          args: { sessionId: sessionID },
-          sender: wallet.account!.addr,
-          coverAppCallInnerTransactionFees: true,
-          maxFee: AlgoAmount.MicroAlgo(3000),
-        });
-        console.log(chalk.green(`🎉 Claimed ${result.return} µAlgo!`));
-      } 
-      else if (action === 'timeout') {
-        console.log(chalk.yellow('⏱️ Calling timeout...'));
-        await client.send.timeOut({
-          args: { sessionId: sessionID },
-          sender: wallet.account!.addr,
-          coverAppCallInnerTransactionFees: true,
-          maxFee: AlgoAmount.MicroAlgo(3000),
-        });
-        console.log(chalk.green('✅ AFK proposer eliminated!'));
-      }
-    } catch (e: any) {
-      handleAlgoError(e, 'Game Action');
-    }
+  claim: async (wallet: WalletManager) => {
+    try {
+      const client = await getClient(wallet);
+      const sessionID = await askSessionId();
+      console.log(chalk.yellow('💵 Claiming...'));
+      const result = await client.send.claimWinnings({
+        args: { sessionId: sessionID },
+        coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+      });
+      console.log(chalk.green(`🎉 Claimed ${result.return} µAlgo!`));
+    } catch (e: any) { handleAlgoError(e, 'Claim'); }
   },
 
   status: async (wallet: WalletManager) => {
     try {
-      const appId = await getAppId(wallet, 'PIRATE');
-      const client = new PirateGameClient({
-        algorand: wallet.algorand,
-        appId,
-        defaultSender: wallet.account!.addr,
-      });
-
-      console.log(chalk.gray('🔄 Fetching Data...'));
+      const client = await getClient(wallet);
       const currentRound = await getCurrentRound(wallet);
-
       const totalSessions = Number((await client.state.global.getAll()).sessionIdCounter!);
 
       UI.printTitle('📊 DASHBOARD PIRATE GAME');
       console.log(chalk.white(`🌍 Current Round: ${chalk.bold(currentRound)}`));
-      console.log(chalk.white(`🔢 Total Games: ${totalSessions}`));
-      UI.separator();
+      
+      if (totalSessions === 0) { console.log('No games.'); return; }
 
-      if (totalSessions === 0) {
-        console.log(chalk.yellow('   No games yet.'));
-        return;
-      }
-
-      const limit = 5;
-      const start = Math.max(0, totalSessions - limit);
-
-      for (let i = totalSessions - 1; i >= start; i--) {
+      // Mostra le ultime 5 sessioni
+      for (let i = totalSessions - 1; i >= Math.max(0, totalSessions - 5); i--) {
         const sessionID = BigInt(i);
-        const state = await client.state.box.gameState.value(sessionID);
-
-        if (!state) continue;
+const [config, state] = await Promise.all([
+             client.state.box.gameSessions.value(sessionID),
+             client.state.box.gameState.value(sessionID)
+        ]);
+if (!state || !config) continue;
 
         const phaseLabel = PHASES[Number(state.phase)] || 'Unknown';
-        let statusIcon = '🏴‍☠️';
-        if (state.phase === 4n) statusIcon = '🏆';
-        else if (state.phase === 0n) statusIcon = '📝';
-
-        console.log(chalk.white(`${statusIcon} ID: ${i} [${phaseLabel}]`));
-        console.log(chalk.gray(`   Round: ${state.currentRound} | Pirates: ${state.alivePirates}/${state.totalPirates} | Pot: ${state.pot} µAlgo`));
-        console.log(chalk.gray(`   Proposal Deadline: ${state.proposalDeadline} ${getRoundDiff(currentRound, state.proposalDeadline)}`));
-        console.log(chalk.gray(`   Vote Deadline: ${state.voteDeadline} ${getRoundDiff(currentRound, state.voteDeadline)}`));
+        console.log(chalk.cyan(`🔹 ID: ${i} | Phase: ${phaseLabel} | Round: ${state.currentRound}`));
+        console.log(chalk.gray(`   Alive: ${state.alivePirates}/${state.totalPirates} | Pot: ${state.pot}`));
+       if (state.phase === 0n) {
+             console.log(chalk.yellow(`   Start Game: ${config.startAt} ${getRoundDiff(currentRound, config.startAt)}`));
+        } else if (state.phase === 1n) {
+             console.log(chalk.red(`   Deadline Proposal: ${config.endCommitAt} ${getRoundDiff(currentRound, config.endCommitAt)}`));
+        } else if (state.phase === 2n) {
+             console.log(chalk.red(`   Deadline Vote: ${config.endRevealAt} ${getRoundDiff(currentRound, config.endRevealAt)}`));
+        }
         console.log('');
       }
-    } catch (e: any) {
-      handleAlgoError(e, 'Status');
-    }
+    } catch (e: any) { handleAlgoError(e, 'Status'); }
   },
 };
