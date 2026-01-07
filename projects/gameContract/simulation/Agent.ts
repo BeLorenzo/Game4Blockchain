@@ -5,7 +5,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { askLLM, LLMDecision } from './llm'
 
-// --- PSYCHOLOGICAL PROFILE ---
 export interface PsychologicalProfile {
   personalityDescription: string
   riskTolerance: number
@@ -25,16 +24,18 @@ export interface AgentMentalState {
   streakCounter: number
 }
 
-// MODIFICA 1: Struttura adattata per Sessione + Round
 export interface Experience {
   game: string
-  session: number // ID della Partita (es. Game 1, Game 2...)
-  round: number   // Round interno (es. Round 1, Round 2...). Per giochi one-shot è sempre 1.
+  session: number
+  round: number
   choice: number
   result: string
   profit: number
   reasoning: string
   timestamp: string
+  role?: string
+  proposalAccepted?: boolean
+  roundEliminated?: number
 }
 
 interface ActionStat {
@@ -52,7 +53,12 @@ interface GameStatsMap {
   }
 }
 
-// AGENT: CERVELLO PRIMORDIALE
+interface PendingDecision {
+  choice: number
+  reasoning: string
+  timestamp: number
+}
+
 export class Agent {
   account: Account
   name: string
@@ -65,7 +71,7 @@ export class Agent {
   private performanceStats: GameStatsMap = {}
   private filePath: string
   
-  private currentDecisionMemory: { choice: number; reasoning: string } | null = null
+  private pendingDecisions: PendingDecision[] = []
 
   constructor(account: Account, name: string, profile: PsychologicalProfile, model: string) {
     this.account = account
@@ -91,24 +97,26 @@ export class Agent {
     return 0.3 + this.profile.curiosity * 0.6
   }
 
-  // CORE: Riceve prompt completo dal game adapter
+  get signer(): TransactionSigner {
+    return (txnGroup, indexes) => Promise.resolve(indexes.map((i) => txnGroup[i].signTxn(this.account.sk)))
+  }
+
   async playRound(gameName: string, promptFromGame: string): Promise<LLMDecision> {
     const decision = await askLLM(promptFromGame, this.model, {
       temperature: this.dynamicTemperature,
     })
 
     console.log(`\n[${this.name}] Choice: ${decision.choice}`)
-    // console.log(`[${this.name}] Reasoning: "${decision.reasoning}"`)
 
-    // Salviamo l'ultima decisione presa. 
-    // In giochi a fasi (Pirate), l'ultima sovrascrive la precedente (es. Reveal sovrascrive Vote).
-    // Questo va bene perché vogliamo tracciare l'esito finale del round.
-    this.currentDecisionMemory = { ...decision }
+    this.pendingDecisions.push({
+      choice: decision.choice,
+      reasoning: decision.reasoning,
+      timestamp: Date.now()
+    })
     
     return decision
   }
 
-  // PUBLIC API: Game adapters query agent state
   public getLessonsLearned(game: string): string {
     const stats = this.performanceStats[game]
     if (!stats || Object.keys(stats).length === 0) {
@@ -139,16 +147,17 @@ export class Agent {
     return lessons
   }
 
-  // MODIFICA 2: Visualizzazione pulita "G1-R1"
-  public getRecentHistory(game: string, limit: number = 3): string {
+  public getRecentHistory(game: string, limit: number = 10): string {
     const gameHistory = this.recentHistory.filter((h) => h.game === game).slice(-limit)
     if (gameHistory.length === 0) return '• No recent moves'
 
     return gameHistory
       .map((h) => {
         const profitStr = h.profit >= 0 ? `+${h.profit.toFixed(1)}` : h.profit.toFixed(1)
-        // Esempio: "Game 1-R2: Choice 1 → -10.0 ALGO"
-        return `Game ${h.session}-R${h.round}: Choice ${h.choice} → ${profitStr} ALGO`
+        let extra = ''
+        if (h.role) extra += ` [${h.role}]`
+        if (h.roundEliminated) extra += ` (eliminated R${h.roundEliminated})`
+        return `Game ${h.session}-R${h.round}: Choice ${h.choice} → ${profitStr} ALGO${extra}`
       })
       .join('\n')
   }
@@ -169,19 +178,34 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
 `.trim()
   }
 
-  // MODIFICA 3: Accetta session (Partita globale) e round (Turno interno)
-  async finalizeRound(game: string, result: string, profit: number, session: number, round: number) {
-    if (!this.currentDecisionMemory) return
+  async finalizeRound(
+    game: string, 
+    result: string, 
+    profit: number, 
+    session: number, 
+    round: number,
+    additionalData?: {
+      role?: string
+      proposalAccepted?: boolean
+      roundEliminated?: number
+    }
+  ) {
+    const decision = this.pendingDecisions.shift()
+    if (!decision) {
+      console.warn(`[${this.name}] No pending decision for finalization`)
+      return
+    }
 
     const exp: Experience = {
       game,
-      session, // ID Partita (es. 1, 2, 3)
-      round,   // ID Round (es. 1, 2... N)
-      choice: this.currentDecisionMemory.choice,
-      reasoning: this.currentDecisionMemory.reasoning,
+      session,
+      round,
+      choice: decision.choice,
+      reasoning: decision.reasoning,
       result,
       profit,
       timestamp: new Date().toISOString(),
+      ...additionalData
     }
 
     this.fullHistory.push(exp)
@@ -192,10 +216,12 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
     this.updateMentalState(profit, result, exp.choice)
 
     this.saveState()
-    this.currentDecisionMemory = null
   }
 
-  // --- INTERNAL ---
+  clearPendingDecisions() {
+    this.pendingDecisions = []
+  }
+
   private updatePerformanceStats(game: string, choice: number, profit: number, result: string) {
     if (!this.performanceStats[game]) this.performanceStats[game] = {}
     if (!this.performanceStats[game][choice]) {
@@ -281,9 +307,5 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
       performanceStats: this.performanceStats,
     }
     fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2))
-  }
-
-  get signer(): TransactionSigner {
-    return (txnGroup, indexes) => Promise.resolve(indexes.map((i) => txnGroup[i].signTxn(this.account.sk)))
   }
 }

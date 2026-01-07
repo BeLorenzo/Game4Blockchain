@@ -12,51 +12,389 @@
     "curiosity": 0.1
   },
   "mentalState": {
-    "optimism": 0.5,
-    "frustration": 0.25833001044000004,
-    "consecutiveLosses": 3,
-    "streakCounter": 0
+    "optimism": 0.6499999999999999,
+    "frustration": 0,
+    "consecutiveLosses": 0,
+    "streakCounter": 1
   },
   "history": [
     {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 1,
       "round": 1,
       "choice": 1,
-      "reasoning": "As a strict Tit-for-Tat player, I will mirror the group's behavior back at them. Since this is my first move and there is no recent history to consider, I will start with cooperation (giving the benefit of doubt). The proposed distribution shows a significant loss for me (-8.83 ALGO), but I believe that cooperating now may lead to better outcomes in future rounds. Additionally, my fairness focus is high, so I prioritize avoiding massive losses and maintaining a reputation as 'fair but firm'. Given these factors, I will vote YES and accept the proposed distribution.",
-      "result": "LOSS",
-      "profit": -8.833334,
-      "timestamp": "2026-01-07T08:48:51.851Z"
+      "reasoning": "As a strict Tit-for-Tat player, I start each new game with cooperation. Since this is the first game and there's no historical data available, I give the benefit of doubt to the group. I choose Stag (1) to cooperate and potentially build trust with others.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:16:02.179Z"
     },
     {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 2,
       "round": 1,
       "choice": 1,
-      "reasoning": "As Delta, I play strict Tit-for-Tat reciprocity. Since my previous move was a loss (-8.8 ALGO), according to the core decision framework, I should defect/punish this round (step 3). However, considering the proposed distribution, it's an insultingly large loss for me (-8.83 ALGO), which might encourage others to punish the proposer in future rounds. By voting YES and accepting the result, I'm mirroring the group's behavior back at them, teaching others that betrayal has swift consequences. This aligns with my strategic principles of building a reputation as 'fair but firm' and establishing credible deterrence early.",
-      "result": "LOSS",
-      "profit": -8.833334,
-      "timestamp": "2026-01-07T08:50:05.934Z"
+      "reasoning": "As a strict Tit-for-Tat player, I look at the result of the immediate previous round. Since the previous game showed group cooperation (86% chose Stag), I will cooperate this round as well. This is consistent with my reciprocity rules, which reward cooperators with continued cooperation.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:16:39.835Z"
     },
     {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 3,
       "round": 1,
       "choice": 1,
-      "reasoning": "As Delta, I play strict Tit-for-Tat reciprocity. Since my previous moves were losses (-8.8 ALGO), according to my core decision framework, I should defect/punish this round (step 3). However, considering the proposed distribution's massive loss for me (53.00 ALGO net result if accepted), I will still vote YES to accept the offer. This is because accepting the offer at least ensures a small profit (53.00 ALGO) rather than risking getting 0 or incurring a larger loss by voting NO and being eliminated.",
+      "reasoning": "As a strict Tit-for-Tat player, I look at the result of the previous round. Since 86% of players chose Stag and the threshold was met, this indicates group cooperation. According to my core decision framework, since the previous result showed group cooperation, I will cooperate this round by choosing Stag (1). This is consistent with my reciprocation rules, which reward cooperators with continued cooperation.",
+      "result": "WIN",
+      "profit": 0.333334,
+      "timestamp": "2026-01-07T12:17:13.752Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 4,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a strict Tit-for-Tat player, I look at the result of the IMMEDIATE previous round. Since 86% of players chose Stag in the last game and the threshold was met, this indicates group cooperation. According to my core decision framework, since the previous result showed group cooperation, I will cooperate this round (choose Stag). This is consistent with my reciprocity rules, which reward cooperators with continued cooperation.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:17:48.654Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 5,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "Based on my Tit-for-Tat reciprocity strategy, I will cooperate this round by choosing Stag. The previous game showed group cooperation, which indicates that the majority of players are willing to work together. As a result, I will follow suit and choose Stag, hoping to achieve a win with the group. My risk tolerance is moderate, but my fairness focus is high, so I prioritize building trust and reputation through consistent patterns.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:18:19.875Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As Delta, I'm a strict Tit-for-Tat player. Since this is the first round, I don't have any recent moves or experience to inform my decision. However, I'll start by mirroring the group's behavior. With no clear pattern emerging yet, I'll choose a day that seems relatively unexplored (Tuesday) and see how others respond.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:20:44.153Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 2,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As Delta, I'm a strict Tit-for-Tat player. Since the previous round showed group cooperation (3 active days), I'll cooperate this round by choosing Wednesday, which had only 1 player last time. This mirrors the group's behavior and maintains fairness.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:21:11.850Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 3,
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As Delta, I'm playing strict Tit-for-Tat reciprocity. Since the previous round showed group betrayal (Wednesday had 6 players), I'll defect/Punish this round by choosing Thursday, which is the least crowded day. This will send a signal to others that betrayals have swift consequences and establish my reputation as 'fair but firm'.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:21:38.370Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 4,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As Delta, I'm a strict Tit-for-Tat player. After observing the previous round's result, I see that Thursday had 6 players and Friday had only 1 player. This suggests that others might be avoiding crowded days like Thursday. Since my personality is to mirror the group's behavior back at them, I'll choose a day with fewer competitors, which in this case is Friday. My reasoning is based on the idea of teaching others that betrayal has swift consequences and building a reputation as 'fair but firm'.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2026-01-07T12:22:06.227Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 5,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As Delta, I'm a strict Tit-for-Tat player. Since the previous round showed group cooperation (Friday had 7 players), I'll cooperate this round by choosing Tuesday. This mirrors the group's behavior and maintains fairness.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:22:33.009Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 50,
+      "reasoning": "As Delta, I start by looking at the result of the immediate previous round. Since this is the first game and there's no historical data, I'll begin with cooperation. According to my core decision framework, I start each new game with cooperation (giving the benefit of doubt). Given my fairness focus and reputation-building strategy, I choose a moderate number that neither cooperates nor punishes excessively.",
       "result": "LOSS",
       "profit": -10,
-      "timestamp": "2026-01-07T08:52:53.757Z"
+      "timestamp": "2026-01-07T12:24:03.121Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 40,
+      "reasoning": "As Delta, I'm playing strict Tit-for-Tat reciprocity. Since the previous game was a loss (-10 ALGO), I need to punish the group by choosing a lower number than average. Given my risk tolerance and fairness focus, I'll choose 40, which is close to the target but not too aggressive. This move aims to teach others that betrayal has swift consequences and establish myself as 'fair but firm'.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:24:35.445Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 30,
+      "reasoning": "As Delta, I'm mirroring the group's behavior back at them. Since we've had 3 consecutive losses, I'm expecting a pattern of cooperation to be broken. Given my recent choices were 50 and 40, which didn't yield positive results, I'll try something lower this time. My Tit-for-Tat reciprocity strategy suggests punishing the group for their previous betrayals by choosing a number that's significantly lower than before.",
+      "result": "WIN",
+      "profit": 60,
+      "timestamp": "2026-01-07T12:25:11.740Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 25,
+      "reasoning": "As Delta, I'm playing Tit-for-Tat reciprocity. Since the target trend is increasing (22.2 → 23.5 → 29.8), I expect the next target to be higher as well. Given that the average was relatively high in the previous game (44.7), I'll choose a number lower than the average to account for this increase. My choice of 25 is a compromise between being cautious and still having some room to adjust if needed.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:25:41.079Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 35,
+      "reasoning": "As Delta, I will cooperate this round based on the core decision framework. Since my previous result was a loss (Game 4-R1), I will defect/punish this round by choosing a lower number than the average. However, since the target trend is decreasing, I will choose a slightly higher number to account for this shift.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:26:10.847Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 28,
+      "reasoning": "As Delta, I'm playing Tit-for-Tat reciprocity. Since my recent moves have been met with losses (-10 ALGO in Games 4-R1 and 5-R1), I'll defect this round by choosing a lower number (28) to punish the group for their previous betrayals. This will also signal that I'm not going to cooperate without retaliation first, which is consistent with my strategic principles.",
+      "result": "WIN",
+      "profit": 25,
+      "timestamp": "2026-01-07T12:30:08.895Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 32,
+      "reasoning": "As Delta, I'm playing strict Tit-for-Tat reciprocity. Since the previous game's result was a loss (-10.0 ALGO), I'll defect this round to punish the group for their betrayal. My choice is 32, which is slightly higher than my previous choices (25 and 35) to signal that I'm not completely giving up on cooperation.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:30:37.223Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 45,
+      "reasoning": "As Delta, I'm playing Tit-for-Tat reciprocity. Since the previous game was a loss (-10.0 ALGO), I'll defect/punish this round by choosing a number that's higher than average. This will send a signal to others that betrayal has swift consequences and establish my reputation as 'fair but firm'. Additionally, considering the game mechanics, since the target is not rising or falling significantly, I'll choose a number that's relatively close to the average, which is likely to be around 40-50.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:31:07.998Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 35,
+      "reasoning": "As Delta, I'm playing Tit-for-Tat reciprocity. Since the previous game was a loss (-10.0 ALGO), I'll defect this round to punish the group for not cooperating. However, I'll choose a relatively low number (35) to signal that I'm still willing to cooperate if the group decides to do so in the future.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:31:35.925Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 25,
+      "reasoning": "Given my recent losses and the critical rule that I must choose an integer between 0 and 100 (inclusive), I'm going to cooperate by choosing a lower number. My Tit-for-Tat reciprocity strategy suggests mirroring the group's behavior back at them, which means I'll try to 'punish' the group for my previous losses by choosing a number that is significantly lower than the average. Since the target trend is showing a decreasing pattern, I'm also taking into account the fairness focus of 10/10 and trying to be more cooperative this round.",
+      "result": "WIN",
+      "profit": 25,
+      "timestamp": "2026-01-07T12:32:09.752Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 40,
+      "reasoning": "As Delta, I will mirror the group's behavior back at them. Since my recent moves have shown a pattern of decreasing numbers (45, 35, 25), I will continue this trend and choose a number that is lower than the previous ones. Additionally, considering the game mechanics, I will aim for a number that is close to the target, which is likely to be around 2/3 of the average. Given my recent losses, I want to minimize the risk and increase my chances of winning.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:13:38.728Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 30,
+      "reasoning": "As Delta, I will cooperate this round based on the core decision framework. Since my previous result was a win in Game 5-R1 (Choice 25), I will choose a number that is lower than the average to encourage cooperation and build trust with other players.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:14:10.081Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 35,
+      "reasoning": "As Delta, I play strict Tit-for-Tat reciprocity. Since the previous game's result was a loss (Game 2-R1), I will defect and choose a number higher than the average to punish the group. However, I don't want to overdo it, so I'll choose a number that is still relatively close to the average. My choice of 35 reflects my desire to balance punishment with cooperation.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:14:42.593Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 25,
+      "reasoning": "As Delta, I'm playing Tit-for-Tat reciprocity. Given the recent losses (3 consecutive), my mental state is slightly frustrated. However, I'll start with cooperation, as per rule #4. Since the target trend is decreasing, I'll choose a relatively low number to account for potential future decreases in targets. My choice of 25 is an attempt to signal cooperation and fairness while also being cautious.",
+      "result": "WIN",
+      "profit": 13.333333,
+      "timestamp": "2026-01-07T13:15:14.228Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 28,
+      "reasoning": "As Delta, I'm playing strict Tit-for-Tat reciprocity. After reviewing the recent moves, I see that my last choice of 25 was a success (+13.3 ALGO). Since the previous result was WIN, according to my framework, I should Cooperate this round (give benefit of doubt). Considering the trend of targets and the fact that most humans don't play Nash, I'm choosing a slightly lower number than before to account for potential group betrayal. My goal is to maintain a reputation as 'fair but firm' while teaching others that cooperation can be rewarding.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:15:46.713Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 6,
+      "round": 1,
+      "choice": 27,
+      "reasoning": "As Delta, I will mirror the group's behavior back at them. Since the target trend is decreasing (23.5), I will choose a number that is also decreasing. Considering my recent moves and the game mechanics, I will cooperate by choosing a lower number than before. My choice of 27 reflects a cautious approach to teach others that betrayal has swift consequences while maintaining a fair but firm reputation.",
+      "result": "WIN",
+      "profit": 60,
+      "timestamp": "2026-01-07T13:16:18.216Z"
     }
   ],
   "performanceStats": {
-    "PirateGame": {
+    "StagHunt": {
       "1": {
+        "timesChosen": 5,
+        "totalProfit": 1.6666660000000002,
+        "avgProfit": 0.27730986968999993,
+        "wins": 5,
+        "losses": 0,
+        "winRate": 1
+      }
+    },
+    "WeeklyGame": {
+      "1": {
+        "timesChosen": 2,
+        "totalProfit": -8.333334,
+        "avgProfit": -2.12500017,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "2": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -1.2500001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "3": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -1.2500001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "4": {
+        "timesChosen": 1,
+        "totalProfit": 0,
+        "avgProfit": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRate": 0
+      }
+    },
+    "GuessGame": {
+      "25": {
         "timesChosen": 3,
-        "totalProfit": -27.666668,
-        "avgProfit": -6.1535002379999995,
+        "totalProfit": 28.333333,
+        "avgProfit": 7.7799999,
+        "wins": 2,
+        "losses": 1,
+        "winRate": 0.6666666666666666
+      },
+      "27": {
+        "timesChosen": 1,
+        "totalProfit": 60,
+        "avgProfit": 18,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "28": {
+        "timesChosen": 2,
+        "totalProfit": 15,
+        "avgProfit": 2.25,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "30": {
+        "timesChosen": 2,
+        "totalProfit": 50,
+        "avgProfit": 9.6,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "32": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "35": {
+        "timesChosen": 3,
+        "totalProfit": -30,
+        "avgProfit": -6.569999999999999,
         "wins": 0,
         "losses": 3,
+        "winRate": 0
+      },
+      "40": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "45": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "50": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
         "winRate": 0
       }
     }

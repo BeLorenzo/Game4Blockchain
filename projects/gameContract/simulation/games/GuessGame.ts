@@ -87,11 +87,11 @@ export class GuessGame implements IGameAdapter {
     return result.return!
   }
 
-  async play_Commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async play_Commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: COMMIT ---`)
 
     for (const agent of agents) {
-      const prompt = this.buildPromptForAgent(agent, roundNumber)
+      const prompt = this.buildPromptForAgent(agent, sessionNumber)
       const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = Math.round(decision.choice)
@@ -124,8 +124,7 @@ export class GuessGame implements IGameAdapter {
     }
   }
 
-  private buildPromptForAgent(agent: Agent, roundNumber: number): string {
-    // 1. GAME RULES
+  private buildPromptForAgent(agent: Agent, sessionNumber: number): string {
     const gameRules = `
 GAME: Guess 2/3 of the Average
 ⚠️⚠️⚠️ CRITICAL RULE ⚠️⚠️⚠️
@@ -145,29 +144,27 @@ If choices are [30, 60, 90], average = 60, target = 40
 Player who chose 30 wins (closest to 40)
 `.trim()
 
-    // 2. CURRENT SITUATION
     let situation = `
 CURRENT STATUS:
-Round: ${roundNumber}
+Game: ${sessionNumber}
 Entry fee: 10 ALGO
 `.trim()
 
     if (this.roundHistory.length === 0) {
-      situation += `\n\nFirst round - no historical data.`
+      situation += `\n\nFirst game - no historical data.`
     } else {
       const last = this.roundHistory[this.roundHistory.length - 1]
-      situation += `\n\nLast round results:
+      situation += `\n\nLast game results:
 Average was ${last.avg.toFixed(1)}
 Target was ${last.target.toFixed(1)}`
 
       if (this.roundHistory.length >= 3) {
         const recent = this.roundHistory.slice(-5)
         const targets = recent.map((h) => h.target.toFixed(1)).join(' → ')
-        situation += `\n\nTarget trend (last ${recent.length} rounds): ${targets}`
+        situation += `\n\nTarget trend (last ${recent.length} games): ${targets}`
       }
     }
 
-    // 3. STRATEGIC HINT
     const hint = `
 STRATEGIC CONSIDERATIONS:
 - Nash equilibrium (pure rational play) is 0
@@ -178,7 +175,6 @@ STRATEGIC CONSIDERATIONS:
 - It's impossible that the target is over 100
 `.trim()
 
-    // 4. AGENT'S DATA
     const personality = agent.profile.personalityDescription
     const parameters = agent.getProfileSummary()
     const lessons = agent.getLessonsLearned(this.name)
@@ -220,7 +216,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 `.trim()
   }
 
-  async play_Reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async play_Reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -249,18 +245,16 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     )
   }
 
-  async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
-    // GuessGame doesn't need explicit resolve - winner determined during claim
+  async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
     return
   }
 
-  async play_Claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async play_Claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 3: CLAIM ---`)
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Collect data for next round
     const currentRoundChoices: number[] = []
     agents.forEach((agent) => {
       const secret = this.roundSecrets.get(agent.account.addr.toString())
@@ -273,10 +267,9 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
       const target = avg * (2 / 3)
 
       this.roundHistory.push({ avg, target })
-      console.log(`📊 Round stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`)
+      console.log(`📊 Game stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`)
     }
 
-    // Process claims
     for (const agent of agents) {
       let outcome = 'LOSS'
       let netProfitAlgo = -Number(this.participationAmount.microAlgos) / 1_000_000
@@ -304,7 +297,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
         }
       }
 
-      agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber, 1)
+      await agent.finalizeRound(this.name, outcome, netProfitAlgo, sessionNumber, 1)
     }
   }
 

@@ -12,51 +12,397 @@
     "curiosity": 0.9
   },
   "mentalState": {
-    "optimism": 0.5,
-    "frustration": 0.12979800626399998,
-    "consecutiveLosses": 3,
+    "optimism": 0.49999999999999994,
+    "frustration": 0.11399999999999999,
+    "consecutiveLosses": 2,
     "streakCounter": 0
   },
   "history": [
     {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 1,
       "round": 1,
-      "choice": 0,
-      "reasoning": "As a Contrarian, I look for opportunities where others might not see value. In this case, the proposed distribution seems heavily biased towards Pirate #0, with 63% of the allocation going to that pirate alone. This strikes me as an unusual and potentially undervalued opportunity. Additionally, considering my risk tolerance is high (8.0/10), I'm willing to take a chance on this distribution not passing, which could lead to a more balanced outcome in future proposals. Ultimately, I choose to vote NO to disrupt the status quo and potentially create value for myself or others in the long run.",
-      "result": "LOSS",
-      "profit": -8.833334,
-      "timestamp": "2026-01-07T08:48:51.897Z"
+      "choice": 1,
+      "reasoning": "As a Contrarian, I'm always on the lookout for opportunities where others are not. In this game, the majority of players will likely choose HARE (0) due to its safe and guaranteed nature. Given my personality traits and strategic principles, I'll take the contrarian approach by choosing STAG (1). With no historical data available, I'm betting that others will play it too safe, and there's a chance for a big win if I'm right. My risk tolerance is high, and I'm willing to take calculated risks to reap bigger rewards.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:16:02.293Z"
     },
     {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 2,
       "round": 1,
-      "choice": 0,
-      "reasoning": "As a Contrarian, I'm inclined to defy the crowd's expectations. With only 4 votes needed to pass and 7 alive voters, I think it's likely that others will follow the herd and vote YES. By voting NO, I'll be taking a contrarian approach, hoping that my bet on the minority being undervalued pays off. Additionally, considering my recent losses (-8.8 ALGO), I'm willing to take a risk to potentially get out of this hole. Voting NO gives me a chance to recoup some losses and possibly gain an advantage in future rounds.",
-      "result": "LOSS",
-      "profit": -8.833334,
-      "timestamp": "2026-01-07T08:50:06.028Z"
+      "choice": 1,
+      "reasoning": "As a Contrarian, I look for opportunities to go against the crowd. In this game, 86% of players chose Stag in the previous round, which is extremely high. This tells me that many players are likely to choose Hare in the next round, trying to avoid loss. By choosing Stag again, I'm betting on the minority being undervalued and increasing my chances of winning the jackpot. Additionally, since everyone played safe last time, I expect them to take risks this time around, which will increase the chances of meeting the threshold.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:16:39.891Z"
     },
     {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 3,
       "round": 1,
-      "choice": 0,
-      "reasoning": "As a Contrarian, I find value in undervalued options. The proposed distribution seems unfair, as I would be accepting a massive loss of -6.50 ALGO. Given my Risk tolerance and Wealth focus, I'm willing to take a risk by voting NO and potentially causing the proposer's death. This could lead to a new proposal that is more favorable for me in the future. Additionally, I've been performing poorly so far, with an average loss of -8.8 ALGO, which makes me even more cautious about accepting this distribution. By voting NO, I'm not risking any further losses if the proposer dies, and I might be able to capitalize on a better opportunity in the next round.",
+      "choice": 1,
+      "reasoning": "As a Contrarian, I look for opportunities where others are not looking. In this case, the crowd chose Stag in the previous game, which means Hare is likely undervalued and due for a comeback. With my risk tolerance being high and trust in others being low, I'm more inclined to take a risk on the minority option. Additionally, considering the performance statistics, I notice that when everyone chooses Stag (as seen in Game 1 and 2), it tends to be a losing strategy. This further reinforces my decision to choose Hare.",
+      "result": "WIN",
+      "profit": 0.333334,
+      "timestamp": "2026-01-07T12:17:13.795Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 4,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I'm drawn to the underdog option. With 86% of players choosing Stag in the last game, it's likely that they'll continue to follow the crowd and choose Stag again. This means that Hare will be the least chosen option, and as such, I believe it's undervalued. My past experience has shown me that this is often where the value lies. Additionally, with my risk tolerance at 8/10, I'm willing to take a calculated risk on the minority choice. The potential reward is too great to pass up, especially since I've had success in the past by choosing the least popular option.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:17:48.696Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 5,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I look for opportunities where others are not looking. In this case, the majority of players have chosen Stag in recent games (86% in the last game). This tells me that many players believe cooperation is still a viable strategy. Meanwhile, Hare has been a consistent loser, with an average return of -2 ALGO per game. My contrarian instincts suggest that there might be value in choosing the opposite of what others are doing. Given my past success with playing the minority option (100% wins with 0.3 ALGO avg), I'm willing to take on the risk and choose Stag again, hoping that others will follow suit and hit the jackpot.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:18:19.965Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 1,
+      "round": 1,
+      "choice": 5,
+      "reasoning": "As a contrarian, I tend to look for the least chosen option by other players. According to the 'performanceStats', I'd like to see what the 'timesChosen' data says. Since this is the first round and no one has any experience yet, I'm going to take a chance on Saturday being the least chosen day. It's not a popular choice among most people, so I think it might be undervalued.",
+      "result": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2026-01-07T12:20:44.198Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 2,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As a Contrarian, I'm always looking for undervalued options. With only 1 player choosing Wednesday last round, it's likely that others will avoid it this time around, making it an attractive choice. Additionally, my core decision framework suggests identifying the least chosen option by other players, which in this case is Wednesday.",
       "result": "LOSS",
-      "profit": -6.5,
-      "timestamp": "2026-01-07T08:52:53.849Z"
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:21:11.973Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 3,
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As a contrarian, I'm looking to bet on the minority being undervalued. With only 1 player choosing Thursday last round, it's likely that others will avoid it this time around. This presents an opportunity to get in before the crowd catches on and the day becomes more popular.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:21:38.414Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 4,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As a contrarian, I'm looking for the least chosen option by other players. According to the vote distribution, Friday has only 1 player, which makes it the most neglected day. I'm willing to take a calculated risk and bet on the minority being undervalued. With my trust in others being low, I think there's value in going against the crowd.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2026-01-07T12:22:06.274Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 5,
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As a contrarian, I'm drawn to the least chosen option by other players. According to the performance stats, Friday was the most crowded day in the previous round, so I'm going to avoid it. Thursday has been relatively untouched so far, with no players choosing it yet. Given my risk tolerance and focus on wealth, I'm willing to take a calculated risk on Thursday being undervalued.",
+      "result": "WIN",
+      "profit": 13.333333,
+      "timestamp": "2026-01-07T12:22:33.129Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I look to identify the least chosen option by other players. With no historical data and no recent moves from myself or others, I'm taking a risk on the lowest possible number (1). My reasoning is that the crowd will likely play safer and choose higher numbers, making 1 an undervalued opportunity.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:24:03.141Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 15,
+      "reasoning": "As a Contrarian, I'm looking to exploit the least chosen option by other players. With no prior data on this specific game, I'll rely on my core decision framework and identify the least likely choice. Historically, players tend to cluster around the average, so I'm going to take a contrarian approach and choose 15, which is significantly lower than the average of 33.3. This choice also aligns with my strategic principles of zigging when others zag and exploiting predictable herd behavior.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:24:35.511Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 80,
+      "reasoning": "As a Contrarian, I'm looking to exploit the undervalued options. Since most humans tend to play higher numbers, I'm going to choose a number that's relatively low but not too aggressive. Given the current average and target, I think there's still some value in choosing a mid-range number like 80. It's far enough from the Nash equilibrium of 0, but close enough to potentially be undervalued by other players. My confidence is high because I'm willing to take calculated risks, and my patience allows me to wait for the crowd to make mistakes.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:25:11.800Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 5,
+      "reasoning": "I've been stuck in a losing streak, and the critical rule makes me question my approach. I'm going to zig when others zag and choose the least popular option. With the target trend decreasing, I think the average will be lower than expected, making 2/3 of that average even more conservative. By choosing 5, I'll be betting on the minority being undervalued and potentially finding value in this neglected option.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:25:41.166Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As a contrarian, I'm looking to go against the crowd. With 4 consecutive losses, something is clearly amiss. The fact that most humans don't play Nash (0) suggests that higher numbers are being chosen more frequently. Given my recent mistakes, I want to bet on the minority being undervalued. Considering the target trend and strategic principles, I think a very low number like 2 could be the least chosen option by other players, making it a contrarian's dream come true.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:26:10.874Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 98,
+      "reasoning": "As a Contrarian, I've learned to zig when others zag. With 5 consecutive losses, the crowd is likely to be playing it safe and choosing lower numbers. I'm going against that trend by selecting 98, which is a higher number than my recent choices. This strategy takes into account my risk tolerance of 8/10 and patience level of 8/10, as well as my tendency to build positions before the crowd notices. My goal is to exploit this predictable herd behavior and capitalize on the perceived value in neglected options.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:30:08.927Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "I'm a contrarian, and I see that the crowd is playing higher numbers. With 6 consecutive losses, something's clearly wrong. My strategy is to look at the least chosen option by other players, which in this case is 4. I'll bet on the minority being undervalued.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:30:37.316Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a contrarian, I'm looking for the least chosen option by other players. Given my recent losses and frustration, I want to take a calculated risk. With only 7 consecutive losses, it's not like everyone has lost all confidence in their choices. I believe that the option most people are avoiding is actually undervalued. In this case, I'm going with 1, which seems like a drastic choice, but I think it might be the one that surprises others.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:31:08.078Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As a contrarian, I've had enough of the crowd's safe choices. With 8 consecutive losses, it's clear that the herd is getting wrong at extremes again. I'm going to bet on the minority being undervalued and choose the least chosen option by other players, which is 2 in this case.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:31:35.983Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 5,
+      "reasoning": "As a contrarian, I've noticed that the least chosen option by other players is often undervalued. With 9 consecutive losses and an overall poor performance, my intuition tells me that the crowd has been wrong at extremes. By choosing 5, which is extremely low compared to the average, I'm betting on the minority being undervalued and trying to turn the tables around.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:32:09.817Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As a Contrarian, I've been trying to find the least chosen option by other players. After reviewing my recent moves and performance stats, I'm starting to question my strategy. The worst performer so far has been choice 5, which is surprising given that it's not even been selected as much. My intuition tells me that the crowd is wrong about this one, and I should bet on the minority being undervalued. Therefore, I'll choose option 4, hoping to catch some unexpected value.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:13:38.761Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 14,
+      "reasoning": "As a Contrarian, I've noticed that the crowd has been playing it safe lately. With my current performance statistics showing 11 consecutive losses, I think it's time to take a risk and bet on the minority being undervalued. The least chosen option by other players is likely to be overlooked for its potential value. Given my parameters, such as high wealth focus and moderate patience, I'm willing to take this calculated risk to potentially turn things around.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:14:10.186Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 15,
+      "reasoning": "As a contrarian, I'm looking for the least chosen option by other players. With 12 consecutive losses, I think the crowd has moved away from lower numbers and is now favoring higher choices. Given my recent performance, I'm willing to take a risk on a number that's not been popular lately. Choice 15 seems like an undervalued opportunity to turn things around.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:14:42.681Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 25,
+      "reasoning": "After observing the trend of targets falling in recent games, I'm going to choose a number that's lower than the average. Given my contrarian nature, I'll select an option that's less likely to be chosen by others. With 13 consecutive losses, something is definitely wrong with my strategy, so I'll try to mix things up and see if I can turn my luck around.",
+      "result": "WIN",
+      "profit": 13.333333,
+      "timestamp": "2026-01-07T13:15:14.299Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 5,
+      "reasoning": "As a contrarian, I'm looking for the least chosen option by other players. Since there's no historical data available yet, I'll take a chance on the lowest possible number. This strategy has worked well in other games where I've identified neglected options and bet on them being undervalued.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:15:46.774Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 6,
+      "round": 1,
+      "choice": 75,
+      "reasoning": "As a contrarian, I'm looking for an underpriced option. The target trend shows a recent increase, which might be overreacted to. Since most humans tend to play higher than the Nash equilibrium of 0, I'll choose a number that's lower than the average but still higher than some other players' choices. This way, I'm betting on the minority being undervalued. Additionally, my risk tolerance is high, and I have patience to wait for the crowd to be wrong. Therefore, I choose 75.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:16:18.232Z"
     }
   ],
   "performanceStats": {
-    "PirateGame": {
-      "0": {
+    "StagHunt": {
+      "1": {
+        "timesChosen": 5,
+        "totalProfit": 1.6666660000000002,
+        "avgProfit": 0.27730986968999993,
+        "wins": 5,
+        "losses": 0,
+        "winRate": 1
+      }
+    },
+    "WeeklyGame": {
+      "2": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -1.2500001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "3": {
+        "timesChosen": 2,
+        "totalProfit": 9.166666,
+        "avgProfit": 3.1249998299999997,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "4": {
+        "timesChosen": 1,
+        "totalProfit": 0,
+        "avgProfit": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRate": 0
+      },
+      "5": {
+        "timesChosen": 1,
+        "totalProfit": 1.666666,
+        "avgProfit": 0.4999998,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      }
+    },
+    "GuessGame": {
+      "1": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "2": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "4": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "5": {
         "timesChosen": 3,
-        "totalProfit": -24.166668,
-        "avgProfit": -5.103500238,
+        "totalProfit": -30,
+        "avgProfit": -6.569999999999999,
         "wins": 0,
         "losses": 3,
+        "winRate": 0
+      },
+      "14": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "15": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "25": {
+        "timesChosen": 1,
+        "totalProfit": 13.333333,
+        "avgProfit": 3.9999998999999997,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "75": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "80": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "98": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
         "winRate": 0
       }
     }

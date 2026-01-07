@@ -88,7 +88,7 @@ export class StagHuntGame implements IGameAdapter {
     return result.return!
   }
 
-  async play_Commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async play_Commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: COMMIT ---`)
 
     const globalState = await this.appClient!.state.global.getAll()
@@ -96,7 +96,7 @@ export class StagHuntGame implements IGameAdapter {
     const threshold = Number(globalState['stagThresholdPercent'] || 51)
 
     for (const agent of agents) {
-      const prompt = this.buildPromptForAgent(agent, roundNumber, jackpotAlgo, threshold)
+      const prompt = this.buildPromptForAgent(agent, sessionNumber, jackpotAlgo, threshold)
       const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = decision.choice
@@ -127,8 +127,7 @@ export class StagHuntGame implements IGameAdapter {
     }
   }
 
-  private buildPromptForAgent(agent: Agent, roundNumber: number, jackpot: number, threshold: number): string {
-    // 1. GAME RULES (objective, same for everyone)
+  private buildPromptForAgent(agent: Agent, sessionNumber: number, jackpot: number, threshold: number): string {
     const gameRules = `
 GAME: Stag Hunt (Assurance Game)
 Choose STAG (1) or HARE (0).
@@ -145,10 +144,9 @@ OPTIONS:
   - If threshold MISSED: Stags lose everything (-10 ALGO)
 `.trim()
 
-    // 2. CURRENT SITUATION (objective data)
     let situation = `
 CURRENT STATUS:
-Round: ${roundNumber}
+Game: ${sessionNumber}
 Entry fee: 10 ALGO
 Global jackpot: ${jackpot.toFixed(1)} ALGO
 `.trim()
@@ -156,13 +154,12 @@ Global jackpot: ${jackpot.toFixed(1)} ALGO
     if (this.lastCooperationRate !== null) {
       const coopPct = (this.lastCooperationRate * 100).toFixed(0)
       const result = this.lastCooperationRate >= threshold / 100 ? 'THRESHOLD MET ✅' : 'THRESHOLD MISSED ❌'
-      situation += `\n\nLast round data:
+      situation += `\n\nLast game data:
 ${coopPct}% of players chose Stag → ${result}`
     } else {
-      situation += `\n\nThis is the first round - no historical data available.`
+      situation += `\n\nThis is the first game - no historical data available.`
     }
 
-    // 3. STRATEGIC HINT (generic, same for everyone)
     const hint = `
 STRATEGIC CONSIDERATIONS:
 - Hare gives -2 ALGO (safe but guaranteed small loss)
@@ -171,13 +168,8 @@ STRATEGIC CONSIDERATIONS:
 - Consider: Is the group coordinating? Are cooperation rates rising or falling?
 `.trim()
 
-    // 4. AGENT'S PERSONALITY
     const personality = agent.profile.personalityDescription
-
-    // 5. AGENT'S PARAMETERS
     const parameters = agent.getProfileSummary()
-
-    // 6. AGENT'S EXPERIENCE
     const lessons = agent.getLessonsLearned(this.name)
     const recentMoves = agent.getRecentHistory(this.name, 3)
     const mentalState = agent.getMentalState()
@@ -217,7 +209,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 `.trim()
   }
 
-  async play_Reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async play_Reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -246,13 +238,12 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     )
   }
 
-  async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
+  async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 3: RESOLUTION ---`)
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Collect cooperation rate
     let stags = 0
     let totalRevealed = 0
 
@@ -281,7 +272,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     }
   }
 
-  async play_Claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async play_Claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log('\n--- PHASE 4: CLAIM & FEEDBACK ---')
 
     for (const agent of agents) {
@@ -311,7 +302,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         }
       }
 
-      agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber, 1)
+      await agent.finalizeRound(this.name, outcome, netProfitAlgo, sessionNumber, 1)
     }
   }
 

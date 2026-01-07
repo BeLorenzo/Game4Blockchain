@@ -13,58 +13,372 @@
   },
   "mentalState": {
     "optimism": 0.5,
-    "frustration": 0.101178004104,
-    "consecutiveLosses": 3,
+    "frustration": 0.07826727659317452,
+    "consecutiveLosses": 16,
     "streakCounter": 0
   },
   "history": [
     {
-      "game": "PirateGame",
-      "session": 0,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a Trend Follower, I prioritize following proven winners and copying successful strategies. In this case, the proposed distribution seems to favor Pirate #0 with a large share of 63 ALGO. Given my lack of experience and no recent moves, I don't have any personal loyalty or attachment to any strategy. The net loss of -8.83 ALGO is significant, and I'm not confident in this proposal's success. I'll vote NO to punish the proposer and potentially create an opportunity for a better proposal in the next round.",
-      "result": "LOSS",
-      "profit": -8.833334,
-      "timestamp": "2026-01-07T08:48:51.881Z"
-    },
-    {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 1,
       "round": 1,
       "choice": 1,
-      "reasoning": "As a Trend Follower, I look at the performance stats and see that there is no clear winner in this game. The proposed distribution seems to be favoring Pirate #0 with 63% of the total ALGO. Since my risk tolerance is high (5.0/10), I'm willing to take a chance on this proposal. Additionally, my wealth focus is very high (9.0/10), so I prioritize making a profit over fairness or other concerns. Considering my recent moves and mental state, I have a moderate level of confidence (6.1/10) and no frustration (0.5/10). Given these factors, I choose to vote YES and accept the proposed distribution.",
-      "result": "LOSS",
-      "profit": -8.833334,
-      "timestamp": "2026-01-07T08:50:06.013Z"
+      "reasoning": "As a Trend Follower, I immediately look for the 'Crowd Favorite' or current winning strategy. Since this is the first game, there's no historical data to analyze, but my risk tolerance is moderate (5/10), and I'm wealth-focused (9/10). Given these parameters, I'll choose STAG (1) to ride the potential wave of cooperation. My confidence level is 6.6/10, which indicates a willingness to take calculated risks.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:16:02.208Z"
     },
     {
-      "game": "PirateGame",
-      "session": 0,
+      "game": "StagHunt",
+      "session": 2,
       "round": 1,
       "choice": 1,
-      "reasoning": "As a Trend Follower, I'm designed to follow proven winners. Since I've been tracking momentum over the last 3-5 rounds, I can see that Pirate #4 has been performing well and is currently the 'Crowd Favorite'. With a win rate of [insert performance stats], it's clear that they're on a hot streak. Given my risk tolerance, trust in others, wealth focus, and lack of patience, I'm more likely to ride this wave and copy what's working. The proposed distribution might not be ideal for me, but I believe Pirate #4 has the momentum to continue winning. By voting YES, I'll lock in a -6.50 ALGO loss, but I'm willing to take that risk to stay with the current winner.",
+      "reasoning": "As a Trend Follower, I track the performance stats to identify the 'Crowd Favorite' strategy. With an 86% win rate in the previous game, it's clear that STAG is currently working well. Given my risk tolerance and focus on wealth, I'm willing to take a calculated risk and ride this winning trend. I also consider the global jackpot, which will accumulate if we don't meet the threshold, making future successes more valuable. Since I'm not patient and prefer to adapt quickly to emerging patterns, I'll stick with STAG, hoping that the group coordination continues.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:16:39.874Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 3,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Trend Follower, I analyze the situation by looking at the 'performanceStats' for 'winRate' and 'timesChosen'. Since Choice 1 (Stag) has been the best performer with a 100% win rate and an average gain of 0.2 ALGO, I decide to copy this strategy. The fact that the threshold was met in the previous game also suggests that there is momentum behind Stag. Given my risk tolerance, trust in others, wealth focus, and patience (or lack thereof), I believe it's wise to ride the wave and follow the crowd. With a confidence level of 8.6/10, I'm willing to take the risk and choose Stag.",
+      "result": "WIN",
+      "profit": 0.333334,
+      "timestamp": "2026-01-07T12:17:13.781Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 4,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Trend Follower, I track momentum over the last few rounds. In this game, the 'Crowd Favorite' strategy has been working incredibly well, with an impressive win rate of 100%. Given my personal parameters and wealth focus, I'm eager to ride this wave and maximize my returns. Since the current strategy is performing so well, I'll stick with it (STAG) and hope that the group continues to coordinate.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:17:48.682Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 5,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Trend Follower, I look at the performanceStats for 'winRate' and 'timesChosen'. The current best performer is Choice 1 (100% wins, 0.3 ALGO avg) which has been consistently performing well in previous games. Given my confidence level of 9.5/10 and lack of frustration, I choose to follow the crowd favorite and copy its strategy again. With a wealth focus of 9.0/10, I prioritize maximizing my returns and don't care about fairness or patience. I trust that the market (other players) knows more than me, so I'll ride the wave and adapt quickly if needed.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-07T12:18:19.905Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Trend Follower, I'm looking to follow the crowd and copy proven winners. Since this is the first round, all days are equally likely, so I'll choose the day that seems least crowded or unexplored. Tuesday has only been chosen by 2 players last round, which suggests it might be a less popular choice. By choosing Tuesday, I'm hoping to get in early and ride the potential wave of momentum.",
       "result": "LOSS",
-      "profit": -6.5,
-      "timestamp": "2026-01-07T08:52:53.788Z"
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:20:44.184Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 2,
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As a Trend Follower, I'm looking for proven winners. Since Tuesday was the most crowded day last round, I'm avoiding it this time. Wednesday had only 1 player, which makes it an attractive choice considering the low competition. Thursday has a clean slate with no players yet, making it a good opportunity to get in early.",
+      "result": "WIN",
+      "profit": 25,
+      "timestamp": "2026-01-07T12:21:11.896Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 3,
+      "round": 1,
+      "choice": 3,
+      "reasoning": "As a Trend Follower, I look at the performance stats and see that Wednesday was the most popular choice last round. I'm going to copy whatever is working right now, which means I'll choose Thursday, since it's the least crowded day with only 1 player. This strategy has a high chance of success as others might be avoiding popular choices like Wednesday.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-07T12:21:38.399Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 4,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As a Trend Follower, I'm drawn to the momentum of Choice 3. Since it has been performing well (50% wins, 4.0 ALGO avg), I'll follow its lead and choose Friday as my day. This decision is driven by my desire to copy proven winners and ride the wave of success.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2026-01-07T12:22:06.259Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 5,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As a trend follower, I'm drawn to the current winning strategy, which is Choice 3. However, since that choice has already won twice, I'm looking for an alternative. Friday had the most players last round, so I'm avoiding it. Thursday and Saturday have 0 players, so they're not good options either. That leaves me with Tuesday, Wednesday, or Sunday. I'll choose Friday because it's the second-least crowded day, which might attract fewer competitors and increase my chances of winning.",
+      "result": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2026-01-07T12:22:33.060Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 50,
+      "reasoning": "As a Trend Follower, I'm looking to copy the crowd's winning strategy. Since this is the first game and there's no historical data, I'll start by choosing a moderate number that's not too high or too low. 50 seems like a good starting point, as it's close to the average and gives me room to adapt if needed.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:24:03.134Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 60,
+      "reasoning": "As Zeta, I'm a Trend Follower who copies proven winners. In the previous game, the winning strategy was unknown to me since I just joined. However, I've learned from my mistake and will follow the crowd this time. The 'performanceStats' suggest that higher numbers are more likely to win, so I'll choose 60, which is a moderate but not extreme value. This decision aligns with my Trend Following principles of tracking momentum over last 3-5 rounds and jumping on bandwagons early before they peak.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:24:35.458Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 70,
+      "reasoning": "As a Trend Follower, I'm looking to copy the current winning strategy. In this case, I'll follow the Crowd Favorite's choice from previous rounds. Since my recent choices haven't yielded positive results (-10.0 ALGO each time), I'll adjust my approach slightly by choosing a number that's not too high or too low. 70 seems like a reasonable compromise to jump on the bandwagon and potentially ride the wave of momentum.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:25:11.751Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 40,
+      "reasoning": "I'm copying the proven winner from previous games. The trend is towards lower numbers, so I'll follow the crowd and choose a number that's closer to the target. Since my recent moves haven't been successful, I'll try to adapt and learn from others. With a confidence level of 5/10, I'm not too confident in my own abilities, but I trust that copying the winner will increase my chances of winning.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:25:41.161Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 20,
+      "reasoning": "After 4 consecutive losses, I've lost confidence. As a Trend Follower, I need to adapt quickly to emerging patterns. Since the target trend is falling (last 4 games: 22.2 → 23.5 → 29.8 → 19.5), I'm going to follow the crowd and choose a low number. Given my recent underperformance, I'll take a more conservative approach and aim for the bottom of the range.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:26:10.867Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 60,
+      "reasoning": "I'm a Trend Follower, so I'll copy the proven winner's strategy. After 5 consecutive losses, I've noticed that the winning strategies have been trending lower. The Crowd Favorite is likely to be a low number, and I'll follow the momentum by choosing 60.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:30:08.920Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 50,
+      "reasoning": "After 6 consecutive losses, I'm desperate to change my trend. I've been copying the 'Crowd Favorite' and following strong performers, but it's clearly not working for me right now. I'll take a risk and choose a number that's slightly lower than the average, hoping to catch some momentum and turn things around.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:30:37.246Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 40,
+      "reasoning": "I'm a Trend Follower, so I'll copy proven winners. After seeing the performanceStats, I notice that the Crowd Favorite has been consistently winning or doing well in recent rounds. The last successful strategy was around 25-30, and considering the game mechanics, I think it's likely that the target will be slightly higher this time. Since I'm looking to ride the wave of momentum, I'll choose a number close to the current winner's average, which is around 40.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:31:08.070Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 70,
+      "reasoning": "As a Trend Follower, I'm looking to copy proven winners. After analyzing the recent performance stats, I've noticed that previous winners have been choosing higher numbers. Given the target trend is currently falling, I'm going to jump on the bandwagon and choose a number slightly lower than the crowd favorite. My risk tolerance is relatively low, so I'll play it safe with a moderate choice like 70.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:31:35.936Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 30,
+      "reasoning": "I'm a Trend Follower, so I'll follow the crowd. After my recent poor performance, I'm looking for a change in strategy. The current winning strategy is likely to be low, as most humans don't play Nash and tend to choose higher numbers. Given the target trend is falling, I'll take a cautious approach and copy a proven winner by choosing 30.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T12:32:09.811Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 40,
+      "reasoning": "As a Trend Follower, I'm looking for proven winners. Since my recent choices have been consistently losing (-10.0 ALGO avg), I need to switch strategies. I'll copy the 'Crowd Favorite' or current winning strategy. After analyzing the game mechanics and historical data, I notice that the average target is around 40-50. Given my risk tolerance (5.0/10) and patience (0.0/10), I'll choose a relatively low number to minimize potential losses while trying to catch up with the crowd.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:13:38.753Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 80,
+      "reasoning": "As a Trend Follower, I'm looking to copy the winning strategy. Since my previous choices have been unsuccessful, I'll switch to the 'Crowd Favorite' approach and choose a number that's closer to the average. Historically, winners tend to keep winning until they don't, so I'll follow the momentum and go with 80, which is relatively high but not too aggressive.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:14:10.179Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 50,
+      "reasoning": "I'm copying the crowd favorite's strategy. After analyzing the game history, I see that most humans don't play Nash and tend to choose higher numbers. Since my recent moves haven't been successful, I'll try to follow a proven winner. The average target is around 40-50, so I'll aim for the middle ground and choose 50.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:14:42.672Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 60,
+      "reasoning": "As a Trend Follower, I'm looking for the 'Crowd Favorite' or current winning strategy. Since my recent moves have been unsuccessful (13 consecutive losses!), I need to switch up and copy what's working. Looking at the performanceStats, I see that higher numbers are more likely to be chosen. The target trend suggests a decrease in targets over time, so I'm going to follow the momentum and choose 60, which is closer to the average than my previous choices.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:15:14.283Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 5,
+      "round": 1,
+      "choice": 70,
+      "reasoning": "I'm a Trend Follower, so I'll copy the proven winners. After 14 consecutive losses, I need to switch up my strategy and follow the crowd again. The last few rounds have shown that numbers around 60-80 are not working out well, so I'll aim for a number in the middle, which is 70. This choice has a good chance of being close to the target, considering the average trend over the past games.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:15:46.769Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 6,
+      "round": 1,
+      "choice": 25,
+      "reasoning": "As a Trend Follower, I'm looking for the 'Crowd Favorite' or current winning strategy. After analyzing the performance stats and identifying the winner of previous games, I notice that the targets have been trending downward (23.0 → 24.7 → 23.0 → 26.3 → 23.5). I also see that my recent choices have resulted in consecutive losses. Given this information, I'm going to take a more conservative approach and choose a number that's lower than the average of previous games. My reasoning is based on the idea that the market (other players) knows more than me, and winners keep winning until they don't. By copying what's working right now, I hope to turn my losing streak around.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-07T13:16:18.226Z"
     }
   ],
   "performanceStats": {
-    "PirateGame": {
-      "0": {
+    "StagHunt": {
+      "1": {
+        "timesChosen": 5,
+        "totalProfit": 1.6666660000000002,
+        "avgProfit": 0.27730986968999993,
+        "wins": 5,
+        "losses": 0,
+        "winRate": 1
+      }
+    },
+    "WeeklyGame": {
+      "1": {
         "timesChosen": 1,
-        "totalProfit": -8.833334,
-        "avgProfit": -2.6500002,
+        "totalProfit": -4.166667,
+        "avgProfit": -1.2500001,
         "wins": 0,
         "losses": 1,
         "winRate": 0
       },
-      "1": {
+      "3": {
         "timesChosen": 2,
-        "totalProfit": -15.333334,
-        "avgProfit": -3.8050001399999998,
+        "totalProfit": 20.833333,
+        "avgProfit": 3.9999998999999997,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "4": {
+        "timesChosen": 2,
+        "totalProfit": 1.666666,
+        "avgProfit": 0.4999998,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 0.5
+      }
+    },
+    "GuessGame": {
+      "20": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
         "wins": 0,
-        "losses": 2,
+        "losses": 1,
+        "winRate": 0
+      },
+      "25": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "30": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "40": {
+        "timesChosen": 3,
+        "totalProfit": -30,
+        "avgProfit": -6.569999999999999,
+        "wins": 0,
+        "losses": 3,
+        "winRate": 0
+      },
+      "50": {
+        "timesChosen": 3,
+        "totalProfit": -30,
+        "avgProfit": -6.569999999999999,
+        "wins": 0,
+        "losses": 3,
+        "winRate": 0
+      },
+      "60": {
+        "timesChosen": 3,
+        "totalProfit": -30,
+        "avgProfit": -6.569999999999999,
+        "wins": 0,
+        "losses": 3,
+        "winRate": 0
+      },
+      "70": {
+        "timesChosen": 3,
+        "totalProfit": -30,
+        "avgProfit": -6.569999999999999,
+        "wins": 0,
+        "losses": 3,
+        "winRate": 0
+      },
+      "80": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -3,
+        "wins": 0,
+        "losses": 1,
         "winRate": 0
       }
     }

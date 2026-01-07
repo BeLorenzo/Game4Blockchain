@@ -3,19 +3,19 @@ import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Agent } from './Agent'
 //import { StagHuntGame } from './games/StagHuntGame'
-// import { WeeklyGame } from './games/WeeklyGame'
-// import { GuessGame } from './games/GuessGame'
-import { PirateGame } from './games/PirateGame'
+ //import { WeeklyGame } from './games/WeeklyGame'
+ import { GuessGame } from './games/GuessGame'
+//import { PirateGame } from './games/PirateGame'
 
 // SIMULATION CONFIG
-const NUM_ROUNDS = 1
+const NUM_ROUNDS = 6
 const INITIAL_FUNDING = 100_000
 
 // GAME SELECTION
-// const game = new StagHuntGame()
-// const game = new GuessGame()
-// const game = new WeeklyGame()
-const game = new PirateGame()
+ //const game = new StagHuntGame()
+ const game = new GuessGame()
+//const game = new WeeklyGame()
+//const game = new PirateGame()
 
 // MAIN
 async function main() {
@@ -201,7 +201,7 @@ COOPERATION PHILOSOPHY:
 - Accept short-term losses to establish trust
 - Punish defectors by withdrawing cooperation (not revenge)
 
-STRATEGIC PRINCIPLES:
+STRATEGIC PRINCIPLES:ch
 - Rising tide lifts all boats - grow the pot first
 - In multi-round games, establish cooperative norms early
 - Signal trustworthiness through consistent fair play
