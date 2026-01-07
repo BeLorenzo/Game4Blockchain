@@ -324,7 +324,6 @@ STRATEGIC PRINCIPLES:
 
   // Game loop
   console.log(`\n--- STARTING ${NUM_ROUNDS} GAMES ---\n`)
-
   for (let r = 1; r <= NUM_ROUNDS; r++) {
     console.log(`\n${'='.repeat(60)}`)
     console.log(`GAME ${r}/${NUM_ROUNDS}`)

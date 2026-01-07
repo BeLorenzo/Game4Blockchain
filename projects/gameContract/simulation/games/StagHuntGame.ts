@@ -311,7 +311,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         }
       }
 
-      agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber)
+      agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber, 1)
     }
   }
 

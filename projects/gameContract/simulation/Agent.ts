@@ -7,17 +7,15 @@ import { askLLM, LLMDecision } from './llm'
 
 // --- PSYCHOLOGICAL PROFILE ---
 export interface PsychologicalProfile {
-  // Descrizione testuale libera della personalità
   personalityDescription: string
-
-  riskTolerance: number // 0 = risk-averse, 1 = risk-seeking
-  trustInOthers: number // 0 = paranoid, 1 = trusting
-  wealthFocus: number // 0 = indifferent, 1 = greedy
-  fairnessFocus: number // 0 = selfish, 1 = altruistic
-  patience: number // 0 = short-term, 1 = long-term
-  adaptability: number // 0 = stubborn, 1 = flexible
-  resilience: number // 0 = fragile, 1 = resilient
-  curiosity: number // 0 = conservative, 1 = exploratory
+  riskTolerance: number
+  trustInOthers: number
+  wealthFocus: number
+  fairnessFocus: number
+  patience: number
+  adaptability: number
+  resilience: number
+  curiosity: number
 }
 
 export interface AgentMentalState {
@@ -27,9 +25,11 @@ export interface AgentMentalState {
   streakCounter: number
 }
 
+// MODIFICA 1: Struttura adattata per Sessione + Round
 export interface Experience {
   game: string
-  round: number
+  session: number // ID della Partita (es. Game 1, Game 2...)
+  round: number   // Round interno (es. Round 1, Round 2...). Per giochi one-shot è sempre 1.
   choice: number
   result: string
   profit: number
@@ -64,7 +64,8 @@ export class Agent {
   private fullHistory: Experience[] = []
   private performanceStats: GameStatsMap = {}
   private filePath: string
-  private currentRoundMemory: { choice: number; reasoning: string } | null = null
+  
+  private currentDecisionMemory: { choice: number; reasoning: string } | null = null
 
   constructor(account: Account, name: string, profile: PsychologicalProfile, model: string) {
     this.account = account
@@ -97,9 +98,13 @@ export class Agent {
     })
 
     console.log(`\n[${this.name}] Choice: ${decision.choice}`)
-    console.log(`[${this.name}] Reasoning: "${decision.reasoning}"`)
+    // console.log(`[${this.name}] Reasoning: "${decision.reasoning}"`)
 
-    this.currentRoundMemory = { ...decision }
+    // Salviamo l'ultima decisione presa. 
+    // In giochi a fasi (Pirate), l'ultima sovrascrive la precedente (es. Reveal sovrascrive Vote).
+    // Questo va bene perché vogliamo tracciare l'esito finale del round.
+    this.currentDecisionMemory = { ...decision }
+    
     return decision
   }
 
@@ -131,13 +136,10 @@ export class Agent {
       lessons += `CRITICAL: ${this.mentalState.consecutiveLosses} consecutive losses! Something's wrong.\n`
     }
 
-    if (this.mentalState.streakCounter >= 2) {
-      lessons += `Win streak: ${this.mentalState.streakCounter} rounds!\n`
-    }
-
     return lessons
   }
 
+  // MODIFICA 2: Visualizzazione pulita "G1-R1"
   public getRecentHistory(game: string, limit: number = 3): string {
     const gameHistory = this.recentHistory.filter((h) => h.game === game).slice(-limit)
     if (gameHistory.length === 0) return '• No recent moves'
@@ -145,7 +147,8 @@ export class Agent {
     return gameHistory
       .map((h) => {
         const profitStr = h.profit >= 0 ? `+${h.profit.toFixed(1)}` : h.profit.toFixed(1)
-        return `R${h.round}: Choice ${h.choice} → ${profitStr} ALGO`
+        // Esempio: "Game 1-R2: Choice 1 → -10.0 ALGO"
+        return `Game ${h.session}-R${h.round}: Choice ${h.choice} → ${profitStr} ALGO`
       })
       .join('\n')
   }
@@ -166,15 +169,16 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
 `.trim()
   }
 
-  // FINALIZE ROUND
-  async finalizeRound(game: string, result: string, profit: number, round: number) {
-    if (!this.currentRoundMemory) return
+  // MODIFICA 3: Accetta session (Partita globale) e round (Turno interno)
+  async finalizeRound(game: string, result: string, profit: number, session: number, round: number) {
+    if (!this.currentDecisionMemory) return
 
     const exp: Experience = {
       game,
-      round,
-      choice: this.currentRoundMemory.choice,
-      reasoning: this.currentRoundMemory.reasoning,
+      session, // ID Partita (es. 1, 2, 3)
+      round,   // ID Round (es. 1, 2... N)
+      choice: this.currentDecisionMemory.choice,
+      reasoning: this.currentDecisionMemory.reasoning,
       result,
       profit,
       timestamp: new Date().toISOString(),
@@ -188,7 +192,7 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
     this.updateMentalState(profit, result, exp.choice)
 
     this.saveState()
-    this.currentRoundMemory = null
+    this.currentDecisionMemory = null
   }
 
   // --- INTERNAL ---
