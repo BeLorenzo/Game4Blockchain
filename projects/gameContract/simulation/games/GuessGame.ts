@@ -124,64 +124,64 @@ export class GuessGame implements IGameAdapter {
     }
   }
 
-  private buildPromptForAgent(agent: Agent, sessionNumber: number): string {
-    const gameRules = `
-GAME: Guess 2/3 of the Average
-⚠️⚠️⚠️ CRITICAL RULE ⚠️⚠️⚠️
-You MUST choose an integer between 0 and 100 (inclusive).
-Any number outside this range will be AUTOMATICALLY CHANGED to 100.
-Do NOT choose numbers above 100 - they will not work as you expect!
+private buildPromptForAgent(agent: Agent, sessionNumber: number): string {
+  const gameRules = `
+GAME: Guess 2/3 of the Average (Nash Convergence Game)
+
+ABSOLUTE RULE: Choose integer between 0 and 100 ONLY.
+Numbers outside this range are INVALID and will lose automatically.
 
 HOW IT WORKS:
-- All players submit a number (0-100). Not lower. Not higher
+- All players submit a number (0-100)
 - Average is calculated across all choices
 - Target = 2/3 of that average
-- Winner = player closest to the target
-- Winner takes entire pot
+- Winner = player closest to the target (takes entire pot)
 
-EXAMPLE:
-If choices are [30, 60, 90], average = 60, target = 40
-Player who chose 30 wins (closest to 40)
+CRITICAL GAME THEORY:
+Step 1: If everyone picks 100 → avg=100 → target=67
+Step 2: If everyone picks 67 → avg=67 → target=45
+Step 3: If everyone picks 45 → avg=45 → target=30
+Step 4: If everyone picks 30 → avg=30 → target=20
+Step 5: If everyone picks 20 → avg=20 → target=13
+
 `.trim()
 
-    let situation = `
+  let situation = `
 CURRENT STATUS:
-Game: ${sessionNumber}
+Round: ${sessionNumber}
 Entry fee: 10 ALGO
 `.trim()
 
-    if (this.roundHistory.length === 0) {
-      situation += `\n\nFirst game - no historical data.`
-    } else {
-      const last = this.roundHistory[this.roundHistory.length - 1]
-      situation += `\n\nLast game results:
-Average was ${last.avg.toFixed(1)}
-Target was ${last.target.toFixed(1)}`
+  if (this.roundHistory.length === 0) {
+    situation += `\n\nFirst round - expect average around 40-50, target around 27-33.`
+  } else {
+    const last = this.roundHistory[this.roundHistory.length - 1]
+    situation += `\n\nLast round results:`
+    situation += `\nAverage: ${last.avg.toFixed(1)}, Target: ${last.target.toFixed(1)}`
 
-      if (this.roundHistory.length >= 3) {
-        const recent = this.roundHistory.slice(-5)
-        const targets = recent.map((h) => h.target.toFixed(1)).join(' → ')
-        situation += `\n\nTarget trend (last ${recent.length} games): ${targets}`
-      }
+    if (this.roundHistory.length >= 3) {
+      const recent = this.roundHistory.slice(-3)
+      const targets = recent.map((h) => h.target.toFixed(1)).join(' → ')
+      situation += `\n\nTarget trend (last ${recent.length} rounds): ${targets}`
     }
+  }
 
-    const hint = `
-STRATEGIC CONSIDERATIONS:
-- Nash equilibrium (pure rational play) is 0
-- Most humans don't play Nash - they play higher
-- Game theory suggests convergence toward lower numbers over time
-- Pay attention to whether targets are rising or falling
-- Consider: Are players getting more sophisticated or staying naive?
-- It's impossible that the target is over 100
+  const hint = `
+1. Check your performanceStats for winning choices (avgProfit > 20, winRate > 0.5)
+2. If you have a proven winner: Play that choice ±5
+3. If you're losing: Play 10-15 points BELOW the last target
+4. If losing 3+ rounds: Cut your choice by 40-50%
+
+REMEMBER: This is a CONVERGENCE game. Winners reach the equilibrium FASTER than others.
 `.trim()
 
-    const personality = agent.profile.personalityDescription
-    const parameters = agent.getProfileSummary()
-    const lessons = agent.getLessonsLearned(this.name)
-    const recentMoves = agent.getRecentHistory(this.name, 3)
-    const mentalState = agent.getMentalState()
+  const personality = agent.profile.personalityDescription
+  const parameters = agent.getProfileSummary()
+  const lessons = agent.getLessonsLearned(this.name)
+  const recentMoves = agent.getRecentHistory(this.name, 3)
+  const mentalState = agent.getMentalState()
 
-    return `
+  return `
 You are ${agent.name}.
 
 ═══════════════════════════════════════════════════════════
@@ -209,12 +209,12 @@ MENTAL STATE: ${mentalState}
 
 ═══════════════════════════════════════════════════════════
 
-Based on the game mechanics, historical data, and your personality:
-Choose a number between 0 and 100.
+Analyze game theory, historical targets, and your performance stats.
+Choose wisely between 0-100.
 
 Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanation>"}
 `.trim()
-  }
+}
 
   async play_Reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
@@ -267,7 +267,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
       const target = avg * (2 / 3)
 
       this.roundHistory.push({ avg, target })
-      console.log(`📊 Game stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`)
+      console.log(`Game stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`)
     }
 
     for (const agent of agents) {

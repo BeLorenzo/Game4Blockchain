@@ -12,350 +12,150 @@
     "curiosity": 0
   },
   "mentalState": {
-    "optimism": 0.05,
-    "frustration": 0.9326188679053511,
-    "consecutiveLosses": 15,
-    "streakCounter": 0
+    "optimism": 0.72,
+    "frustration": 0,
+    "consecutiveLosses": 0,
+    "streakCounter": 1
   },
   "history": [
     {
-      "game": "StagHunt",
+      "game": "PirateGame",
       "session": 1,
       "round": 1,
       "choice": 0,
-      "reasoning": "As a Defensive Strategist, my primary concern is survival and loss prevention. Given the uncertainty of this first game, I choose Hare (0) to avoid any potential catastrophic losses. With no historical data available, it's difficult to predict group behavior or coordination, making Stag (1) too risky for me. My goal is to preserve capital and minimize risk, which Hare achieves by guaranteeing a small loss (-2 ALGO) rather than risking everything with Stag.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2026-01-07T12:16:02.147Z"
-    },
-    {
-      "game": "StagHunt",
-      "session": 2,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a Defensive Strategist, I prioritize survival and loss prevention. Given the recent history of the game, where 86% of players chose Stag and the threshold was met, I'm cautious about choosing Stag again. The worst-case scenario for Stag is losing everything (-10 ALGO), which aligns with my risk tolerance of 0.0/10. Hare, on the other hand, guarantees a small loss (-2 ALGO) but doesn't put my entire stake at risk. Considering my wealth focus is 10.0/10 and I'm trying to preserve capital, choosing Hare seems like the safer option.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2026-01-07T12:16:39.757Z"
-    },
-    {
-      "game": "StagHunt",
-      "session": 3,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a Defensive Strategist, I prioritize survival and loss prevention. Given the history of the game, I've learned that choosing Hare (0) is a safe option that guarantees a small loss (-2 ALGO). Considering my risk tolerance is 0.0/10, I'm extremely cautious and prefer to avoid any choice that has resulted in catastrophic loss (>50% of stake). Since Stag requires cooperation from others, which is uncertain, I'll stick with the guaranteed loss of Hare (0) to preserve my capital.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2026-01-07T12:17:13.670Z"
-    },
-    {
-      "game": "StagHunt",
-      "session": 4,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a Defensive Strategist, my primary goal is to minimize losses. Given the recent streak of consecutive losses (-2 ALGO each), I'm extremely cautious and unwilling to take risks. The worst-case scenario for choosing Stag (1) is catastrophic loss (-10 ALGO), which aligns with my risk tolerance of 0.0/10. In contrast, Hare (0) guarantees a small loss (-2 ALGO), but it's a safer choice that won't put my entire capital at risk. Considering the group patterns from history and the current threshold being met, I'm not convinced that others will cooperate with me. Therefore, I'll choose the option that minimizes my potential losses and prioritizes survival over growth.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2026-01-07T12:17:48.578Z"
-    },
-    {
-      "game": "StagHunt",
-      "session": 5,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a Defensive Strategist focused on survival and loss prevention, I'm extremely cautious after experiencing 4 consecutive losses. Given the worst-case scenario of choosing Stag (losing everything), I prioritize capital preservation over potential gains. With no guarantee of success even if others cooperate, I opt for Hare to avoid further losses and maintain my safety buffer.",
-      "result": "LOSS",
-      "profit": -2,
-      "timestamp": "2026-01-07T12:18:19.847Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 1,
-      "round": 1,
-      "choice": 1,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing survival and loss prevention. Tuesday has the lowest number of players so far (2), which means there's less competition and potentially a bigger share for me if it remains active. Additionally, avoiding days that were crowded last round (in this case, none) is part of my strategy. By choosing Tuesday, I'm taking a cautious approach to minimize potential losses.",
-      "result": "LOSS",
-      "profit": -4.166667,
-      "timestamp": "2026-01-07T12:20:44.073Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 2,
-      "round": 1,
-      "choice": 2,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing survival and loss prevention. Wednesday has the least crowded option, which reduces the risk of catastrophic losses. Additionally, avoiding days that were crowded last round (Tuesday) helps me avoid potential competition. Given my recent streak of consecutive losses, I need to play it safe and focus on preserving capital.",
-      "result": "LOSS",
-      "profit": -4.166667,
-      "timestamp": "2026-01-07T12:21:11.747Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 3,
-      "round": 1,
-      "choice": 3,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing survival over potential gains. Thursday has the least crowded option, which reduces my risk of losing to others who might choose the same day. Additionally, avoiding popular choices like Wednesday and Tuesday, where many players are likely to cluster, helps me minimize losses.",
-      "result": "LOSS",
-      "profit": -4.166667,
-      "timestamp": "2026-01-07T12:21:38.290Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 4,
-      "round": 1,
-      "choice": 4,
-      "reasoning": "As a Defensive Strategist, I prioritize survival and loss prevention. Considering the recent losses, I'm more cautious than ever. Friday has the least crowded option with only 1 player, which reduces the risk of competition. Additionally, avoiding days that were crowded last round (Thursday) is crucial to minimize potential losses. Given my risk tolerance and wealth focus, I opt for a safer choice in this situation.",
-      "result": "DRAW",
+      "reasoning": "As a Defensive Strategist, my primary concern is survival and loss prevention. The net result of accepting this proposal is -6.11 ALGO, which is unacceptable given the entry cost of 10 ALGO. I prioritize capital preservation over growth, so rejecting the proposal ensures that I don't incur an immediate loss. Additionally, considering the captain's excessive greed (receiving 11.666671 ALGO), it's likely that they will not prioritize my interests in future proposals. By voting NO, I maintain my options for potentially better deals later or even becoming captain myself.",
+      "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-07T12:22:06.146Z"
+      "timestamp": "2026-01-08T14:43:46.636Z",
+      "role": "voter",
+      "proposalAccepted": false
     },
     {
-      "game": "WeeklyGame",
-      "session": 5,
+      "game": "PirateGame",
+      "session": 1,
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Defensive Strategist, I prioritize capital preservation over growth. I'll allocate a small amount to myself (20%) and distribute the remaining 80% among the other pirates. I'll give Pirate #2 (15%), Pirate #3 (12%), Pirate #4 (10%), and Pirate #5 (8%). This way, I'm not risking too much, but still showing willingness to cooperate. Pirate #6 gets a small share (5%) as a token of good faith. My goal is to survive this round and maintain my capital.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-08T14:44:28.673Z",
+      "role": "proposer",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 2,
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As a Defensive Strategist, my priority is to minimize losses and preserve capital. I'm allocating 30% of the pot to myself, which is a relatively safe bet. To buy votes from others, I'm offering Pirate #2 10%, Pirate #3 15%, and Pirate #4 5%. This should give me at least one additional vote. I'm also offering Pirate #5 20% to increase my chances of passing the proposal. Finally, I'm giving Pirate #6 a small share of 10% to avoid any potential conflicts. My reasoning is based on avoiding catastrophic losses and prioritizing capital preservation over growth.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-08T14:45:49.231Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 2,
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As a Defensive Strategist, my primary goal is to minimize losses and preserve capital. The proposal offers me a net loss of -10 ALGO, which is unacceptable. Additionally, the captain's incentive is excessive, with a reward of 70 ALGO, which suggests they are prioritizing their own gain over the collective interest. Given the uncertainty surrounding the outcome if I vote NO, I will take the risk and reject the proposal to avoid potential catastrophic losses. My priority is capital preservation, and this proposal does not align with that goal.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-08T14:46:21.881Z",
+      "role": "proposer",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 3,
       "round": 1,
       "choice": 1,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing survival and loss prevention. Friday was the most crowded day last round, so I'll avoid it this time. Tuesday had only 2 players, which is relatively low compared to other days. Additionally, I don't want to follow the crowd, as they might be clustering or avoiding popular choices. By choosing Tuesday, I'm minimizing my risk and focusing on capital preservation.",
-      "result": "LOSS",
-      "profit": -4.166667,
-      "timestamp": "2026-01-07T12:22:32.925Z"
+      "reasoning": "As a defensive strategist, I prioritize capital preservation over growth. To minimize risk, I allocate a significant portion (30%) to myself, ensuring my survival. I then distribute the remaining amount among the other pirates, aiming for small guaranteed wins rather than volatile large opportunities. By doing so, I reduce the likelihood of catastrophic losses and increase my chances of passing this proposal.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-08T14:48:23.703Z",
+      "role": "voter",
+      "proposalAccepted": false
     },
     {
-      "game": "GuessGame",
-      "session": 1,
-      "round": 1,
-      "choice": 20,
-      "reasoning": "As a Defensive Strategist, my primary goal is to minimize risk and preserve capital. Given the uncertainty of the game and the lack of historical data, I'm starting with a conservative estimate. Choosing 20 ensures that I'm not overcommitting and leaves room for adjustment as the game progresses.",
+      "game": "PirateGame",
+      "session": 3,
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As a Defensive Strategist, my primary concern is loss prevention. The net result of accepting the proposal is -2.22 ALGO, which is not positive. Considering the captain's incentive is 31.111115 ALGO, it seems excessively greedy. I prioritize capital preservation over growth, so I will vote NO to avoid potential losses and maintain a buffer for future uncertainties.",
       "result": "WIN",
-      "profit": 60,
-      "timestamp": "2026-01-07T12:24:03.108Z"
+      "profit": 5.555559,
+      "timestamp": "2026-01-08T14:48:58.890Z",
+      "role": "proposer",
+      "proposalAccepted": true
     },
     {
-      "game": "GuessGame",
-      "session": 2,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "As a Defensive Strategist, I prioritize capital preservation over growth. Given the risk of catastrophic loss (>50% of stake), I'll choose an extremely conservative option to minimize potential damage. With only 10 ALGO at stake, I'm willing to take a very low-risk approach to ensure survival.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:24:35.433Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 3,
-      "round": 1,
-      "choice": 15,
-      "reasoning": "As a Defensive Strategist, my primary goal is to minimize losses. Given the game mechanics and historical data, I'm concerned about the risk of catastrophic loss (>50% of stake). My worst-case scenario for each available option is that it could lead to significant losses. Therefore, I've chosen 15 as it has the least damaging potential outcome among all options. This choice also aligns with my risk tolerance (0.0/10), trust in others (0.0/10), and wealth focus (10.0/10). By choosing a low number, I'm prioritizing capital preservation over growth, which is consistent with my strategic principles.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:25:11.718Z"
-    },
-    {
-      "game": "GuessGame",
+      "game": "PirateGame",
       "session": 4,
       "round": 1,
-      "choice": 10,
-      "reasoning": "As a Defensive Strategist, my primary goal is to minimize losses. I've learned from previous games that the target tends to decrease over time, and the Nash equilibrium is 0. Considering this, I'm choosing a low number to reduce the risk of catastrophic loss. Additionally, my recent moves have shown me that high numbers can lead to significant losses, so I'm playing it safe with a small choice.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:25:41.065Z"
+      "choice": 1,
+      "reasoning": "As a Defensive Strategist, I prioritize capital preservation over growth. To minimize risk, I'll allocate a small portion to myself (20%) and distribute the remaining amount among the other pirates in a way that maximizes my chances of survival. By giving each pirate a share, I'm buying their votes and increasing the likelihood of passing. This distribution is conservative but ensures I don't lose more than 10 ALGO.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-08T14:49:52.360Z",
+      "role": "voter",
+      "proposalAccepted": false
     },
     {
-      "game": "GuessGame",
-      "session": 5,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing capital preservation over growth. Given the recent losses, I'm extremely cautious and want to minimize my potential loss. Choosing 5 is a low-risk option that has a high chance of not resulting in catastrophic loss (>50% of stake). Additionally, this choice is close to the Nash equilibrium (0), which aligns with my risk tolerance and trust in others being at 0/10.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:26:10.836Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 1,
-      "round": 1,
-      "choice": 20,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing capital preservation over growth. Given my recent losses, I'm extremely cautious and want to minimize the risk of further damage. Choosing 20 ensures that even if the average is higher than expected, my worst-case scenario will still be relatively low. Additionally, this choice allows me to maintain a safety buffer and emergency reserve, which is crucial for me given my current mental state.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:30:08.825Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 2,
-      "round": 1,
-      "choice": 15,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing loss prevention and capital preservation. Given the recent losses and my risk tolerance of 0.0/10, I'm choosing a low number to minimize potential damage. With 5 consecutive losses, I believe it's essential to play it safe and avoid taking unnecessary risks. My goal is to survive this game and regroup for future opportunities.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:30:37.210Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 3,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "As a Defensive Strategist, I'm extremely risk-averse after experiencing 6 consecutive losses. Given the game mechanics and my historical data, I've learned that choices above 20 tend to result in significant losses. Therefore, I'll opt for a very conservative choice of 5, which has a lower worst-case scenario. My goal is to survive this round and preserve my capital.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:31:07.985Z"
-    },
-    {
-      "game": "GuessGame",
+      "game": "PirateGame",
       "session": 4,
-      "round": 1,
-      "choice": 15,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing survival over growth. Given the recent losses and the critical rule that any number outside the range will be automatically changed to 100, I want to minimize my risk. Choosing 15 is a conservative approach that should keep me within the safe zone. Additionally, considering the target trend is decreasing, I believe it's more likely that the target will be lower than higher, making 15 a relatively safer choice.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:31:35.913Z"
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Defensive Strategist, I prioritize capital preservation and risk management. To ensure survival, I'll allocate a significant portion to myself (20%) while also trying to buy votes from other pirates. I'll give Pirate #2 (15%), Pirate #3 (10%), and Pirate #4 (5%) a small share to encourage cooperation. The remaining 25% will go to Pirate #5, as they're the most likely to vote in my favor. Finally, I'll allocate 15% to Pirate #6, hoping they'll reciprocate by voting yes. This distribution minimizes risk while still attempting to gain votes.",
+      "result": "WIN",
+      "profit": 13.333337,
+      "timestamp": "2026-01-08T14:50:22.634Z",
+      "role": "proposer",
+      "proposalAccepted": true
     },
     {
-      "game": "GuessGame",
+      "game": "PirateGame",
       "session": 5,
       "round": 1,
-      "choice": 10,
-      "reasoning": "As a Defensive Strategist, I'm extremely risk-averse and focused on survival. Given the recent streak of losses (8 consecutive), I need to adjust my strategy to minimize potential damage. Considering the worst-case scenario for each option, I believe choosing 10 is the safest bet. This number has not resulted in catastrophic loss (>50% of stake) in previous games, and it's a relatively low-risk choice that should help me survive this round.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:32:09.730Z"
+      "choice": 0,
+      "reasoning": "As a Defensive Strategist, my primary goal is to minimize losses and preserve capital. The net result of accepting this proposal is -6.11 ALGO, which exceeds the 10 ALGO entry cost. This suggests that the captain (Alpha) is being excessively greedy, and I should prioritize avoiding potential catastrophic loss (>50% of stake). Additionally, considering the captain's incentive, it seems likely that Alpha will continue to prioritize their own gain over the collective well-being of the pirates. By rejecting this proposal, I am not risking uncertainty but rather ensuring a better chance at survival in future rounds.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-08T14:51:17.509Z",
+      "role": "voter",
+      "proposalAccepted": false
     },
     {
-      "game": "GuessGame",
-      "session": 1,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "As a Defensive Strategist, I'm trying to minimize my losses. Given the recent streak of consecutive losses, I'm extremely cautious and want to play it safe. Choice 5 is one of the lowest numbers available, which reduces the risk of catastrophic loss (>50% of stake). Additionally, since most humans don't play Nash (pure rational play), I assume others will choose higher numbers, making my choice more conservative and less likely to result in significant losses.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:13:38.713Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 2,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing survival and loss prevention. Given the recent streak of losses, I'm choosing a conservative option that has historically performed poorly (Choice 5). This decision minimizes potential damage and focuses on preserving my capital.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:14:10.069Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 3,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "As a Defensive Strategist, I'm extremely cautious after the recent losses. Given the critical rule that any number outside the range will be automatically changed to 100, I'll choose a low-risk option like 5. This choice has historically performed poorly, but it's also less likely to result in catastrophic loss. My risk tolerance is very low, and I'm prioritizing capital preservation over growth. With my current mental state of frustration and low confidence, I think it's best to play it safe and avoid taking unnecessary risks.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:14:42.580Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 4,
-      "round": 1,
-      "choice": 15,
-      "reasoning": "As a Defensive Strategist, I'm extremely risk-averse after the 12 consecutive losses. Given the target trend is relatively stable (23.0 → 24.7 → 23.0), I'll play it safe and choose a low number to minimize potential losses. With my wealth focus being 10/10, I prioritize capital preservation over growth. My risk tolerance is 0/10, so I'll avoid any choice that could lead to significant losses. Considering the worst-case scenario for each option, I believe choosing 15 will result in the least damaging outcome.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:15:14.208Z"
-    },
-    {
-      "game": "GuessGame",
+      "game": "PirateGame",
       "session": 5,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "As a Defensive Strategist, I'm extremely risk-averse after experiencing 13 consecutive losses. Given the critical rule that any number outside the range will be automatically changed to 100, I'm choosing the lowest possible option (5) to minimize potential losses and focus on capital preservation. My reasoning is based on avoiding catastrophic loss (>50% of stake), prioritizing small guaranteed losses over risky potential gains, and building a safety buffer.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:15:46.703Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 6,
-      "round": 1,
-      "choice": 15,
-      "reasoning": "As a Defensive Strategist, I'm prioritizing loss prevention and capital preservation. Given the recent losses and lack of trust in others, I'm choosing a relatively low number that's unlikely to result in catastrophic failure. The average target trend is decreasing, which suggests that the target might be falling. By choosing 15, I'm hedging against this possibility and minimizing my risk exposure.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:16:18.195Z"
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Defensive Strategist, I prioritize capital preservation over growth. To minimize risk, I'll allocate 30% of the pot to myself (Pirate #1) and ensure my own survival. I'll then distribute small amounts to other pirates (15%, 10%, 5%, and 5%) to buy their votes and maintain a safety buffer. Finally, I'll assign 25% to Pirate #6, as they're still alive and might be more likely to cooperate in the future. This distribution aims to minimize catastrophic losses while allowing for some potential gains.",
+      "result": "WIN",
+      "profit": 13.333337,
+      "timestamp": "2026-01-08T14:51:51.597Z",
+      "role": "proposer",
+      "proposalAccepted": true
     }
   ],
   "performanceStats": {
-    "StagHunt": {
+    "PirateGame": {
       "0": {
         "timesChosen": 5,
-        "totalProfit": -10,
-        "avgProfit": -1.6638600000000001,
-        "wins": 0,
-        "losses": 5,
-        "winRate": 0
-      }
-    },
-    "WeeklyGame": {
-      "1": {
-        "timesChosen": 2,
-        "totalProfit": -8.333334,
-        "avgProfit": -2.12500017,
-        "wins": 0,
-        "losses": 2,
-        "winRate": 0
-      },
-      "2": {
-        "timesChosen": 1,
-        "totalProfit": -4.166667,
-        "avgProfit": -1.2500001,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "3": {
-        "timesChosen": 1,
-        "totalProfit": -4.166667,
-        "avgProfit": -1.2500001,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "4": {
-        "timesChosen": 1,
-        "totalProfit": 0,
-        "avgProfit": 0,
-        "wins": 0,
-        "losses": 0,
-        "winRate": 0
-      }
-    },
-    "GuessGame": {
-      "5": {
-        "timesChosen": 7,
-        "totalProfit": -70,
-        "avgProfit": -9.176457,
-        "wins": 0,
-        "losses": 7,
-        "winRate": 0
-      },
-      "10": {
-        "timesChosen": 2,
-        "totalProfit": -20,
-        "avgProfit": -5.1,
-        "wins": 0,
-        "losses": 2,
-        "winRate": 0
-      },
-      "15": {
-        "timesChosen": 5,
-        "totalProfit": -50,
-        "avgProfit": -8.319299999999998,
-        "wins": 0,
-        "losses": 5,
-        "winRate": 0
-      },
-      "20": {
-        "timesChosen": 2,
-        "totalProfit": 50,
-        "avgProfit": 9.6,
+        "totalProfit": -4.444441,
+        "avgProfit": -0.30333260999999984,
         "wins": 1,
-        "losses": 1,
-        "winRate": 0.5
+        "losses": 0,
+        "winRate": 0.2
+      },
+      "1": {
+        "timesChosen": 5,
+        "totalProfit": 16.666674,
+        "avgProfit": 6.079701869999999,
+        "wins": 2,
+        "losses": 0,
+        "winRate": 0.4
       }
     }
   }

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Account, TransactionSigner } from 'algosdk'
 import * as fs from 'fs'
 import * as path from 'path'
-import { askLLM, LLMDecision } from './llm'
+import { askLLM, BaseDecisionSchema } from './llm'
+import { z } from "zod";
 
 export interface PsychologicalProfile {
   personalityDescription: string
@@ -94,27 +96,138 @@ export class Agent {
   }
 
   get dynamicTemperature(): number {
-    return 0.3 + this.profile.curiosity * 0.6
+    // Lower temperature when struggling (more deterministic)
+    const baseTemp = 0.3 + this.profile.curiosity * 0.6
+    if (this.mentalState.consecutiveLosses >= 5) {
+      return Math.max(0.1, baseTemp - 0.3) // More focused when desperate
+    }
+    return baseTemp
   }
 
   get signer(): TransactionSigner {
     return (txnGroup, indexes) => Promise.resolve(indexes.map((i) => txnGroup[i].signTxn(this.account.sk)))
   }
 
-  async playRound(gameName: string, promptFromGame: string): Promise<LLMDecision> {
-    const decision = await askLLM(promptFromGame, this.model, {
-      temperature: this.dynamicTemperature,
-    })
+async playRound<T extends z.ZodType<any>>(
+  gameName: string, 
+  promptFromGame: string,
+  schema: T = BaseDecisionSchema as any // Fallback allo schema base
+): Promise<z.infer<T>> {    
 
-    console.log(`\n[${this.name}] Choice: ${decision.choice}`)
+  const exploitCheck = this.shouldExploit(gameName)
+
+    if (exploitCheck.exploit && Math.random() < 0.3) {
+      console.log(`[${this.name}] Auto-exploiting proven winner: ${exploitCheck.choice}`)
+
+      const baseDecision = {
+        choice: exploitCheck.choice!,
+        reasoning: `Auto-exploiting proven winner (${(this.performanceStats[gameName][exploitCheck.choice!].winRate * 100).toFixed(0)}% win rate, +${this.performanceStats[gameName][exploitCheck.choice!].avgProfit.toFixed(1)} ALGO avg)`
+      }
+    try {
+      const validatedDecision = schema.parse(baseDecision);
+
+      this.pendingDecisions.push({
+        ...validatedDecision,
+        timestamp: Date.now()
+      })
+      return validatedDecision
+    } catch (e) {
+      console.warn(`[${this.name}] Exploit incompatible with schema, falling back to LLM.`);
+    }
+  }
+
+    // After 5 consecutive losses, override personality with pure logic
+ if (this.mentalState.consecutiveLosses >= 5) {
+    console.log(`[${this.name}] Emergency override mode activated (${this.mentalState.consecutiveLosses} losses)`)
+    promptFromGame = this.buildEmergencyPrompt(gameName, promptFromGame)
+    this.profile.resilience = Math.min(1.0, this.profile.resilience + 0.2)
+    this.profile.adaptability = Math.min(1.0, this.profile.adaptability + 0.2)
+  }
+
+   const decision = await askLLM(promptFromGame, this.model, schema, {
+    temperature: this.dynamicTemperature,
+  })
+
+  console.log(`\n[${this.name}] Choice: ${decision.choice}`)
 
     this.pendingDecisions.push({
-      choice: decision.choice,
-      reasoning: decision.reasoning,
-      timestamp: Date.now()
-    })
+    ...decision,
+    timestamp: Date.now()
+  })
     
     return decision
+  }
+
+
+  private buildEmergencyPrompt(game: string, originalPrompt: string): string {
+    const stats = this.performanceStats[game]
+    let prescription = ''
+
+    if (stats && Object.keys(stats).length > 0) {
+      const sorted = Object.entries(stats)
+        .map(([choice, data]) => ({ choice: Number(choice), ...data }))
+        .sort((a, b) => b.avgProfit - a.avgProfit)
+
+      const best = sorted[0]
+      if (best.avgProfit > 0) {
+        prescription = `Your data shows Choice ${best.choice} is best (+${best.avgProfit.toFixed(1)} ALGO avg). Try that or nearby values.`
+      } else {
+        prescription = `All your choices failed. Try the OPPOSITE of what you've been doing.`
+      }
+    } else {
+      prescription = `No data yet. Use pure game theory.`
+    }
+
+    return `
+
+EMERGENCY OVERRIDE MODE ACTIVATED               
+
+SITUATION: You have ${this.mentalState.consecutiveLosses} CONSECUTIVE LOSSES.
+
+Your personality: ${this.profile.personalityDescription}
+
+HOWEVER: For THIS decision, TEMPORARILY IGNORE your personality.
+Use PURE DATA-DRIVEN LOGIC instead.
+
+Your Performance Data:
+${JSON.stringify(this.performanceStats[game], null, 2)}
+
+DATA-DRIVEN PRESCRIPTION:
+${prescription}
+
+EMERGENCY PROTOCOL:
+1. Identify your highest avgProfit choice (if positive)
+2. If all negative: Try something RADICALLY different
+3. Ignore fairness, revenge, emotion - focus on WINNING
+4. After this round, you can return to your personality
+
+═══════════════════════════════════════════════════════════
+
+${originalPrompt}
+
+═══════════════════════════════════════════════════════════
+
+REMINDER: Your current strategy is FAILING. Use the data above.
+Choose the mathematically optimal play, not the one that "feels right".
+`
+  }
+
+  private shouldExploit(game: string): { exploit: boolean, choice?: number } {
+    const stats = this.performanceStats[game]
+    if (!stats) return { exploit: false }
+
+    const candidates = Object.entries(stats)
+      .map(([choice, data]) => ({ choice: Number(choice), ...data }))
+      .filter(s => s.timesChosen >= 2) // Minimum sample size
+      .filter(s => s.winRate >= 0.5)    // At least 50% win rate
+      .filter(s => s.avgProfit > 15)    // Significant positive return
+
+    if (candidates.length === 0) return { exploit: false }
+
+    // Pick the best by avgProfit
+    const best = candidates.sort((a, b) => b.avgProfit - a.avgProfit)[0]
+    
+    return { exploit: true, choice: best.choice }
   }
 
   public getLessonsLearned(game: string): string {
@@ -132,16 +245,40 @@ export class Agent {
 
     let lessons = 'WHAT YOU\'VE LEARNED:\n'
 
-    if (best.timesChosen >= 2) {
-      lessons += `Choice ${best.choice}: Best performer (${(best.winRate * 100).toFixed(0)}% wins, ${best.avgProfit.toFixed(1)} ALGO avg)\n`
+    if (best.winRate >= 0.5 && best.avgProfit > 15 && best.timesChosen >= 2) {
+      lessons += `✅ WINNING STRATEGY FOUND: Choice ${best.choice}\n`
+      lessons += `   - Win rate: ${(best.winRate * 100).toFixed(0)}% (${best.wins}/${best.timesChosen})\n`
+      lessons += `   - Avg profit: +${best.avgProfit.toFixed(1)} ALGO\n`
+      lessons += `   STRONG RECOMMENDATION: Play ${best.choice} again OR ${best.choice}±5\n\n`
     }
 
-    if (worst.timesChosen >= 2 && worst.avgProfit < -1 && sorted.length > 1) {
-      lessons += `Choice ${worst.choice}: Worst performer (${worst.losses} losses, ${worst.avgProfit.toFixed(1)} ALGO avg)\n`
+    // AVOIDANCE WARNING 
+    if (worst.timesChosen >= 3 && worst.avgProfit < -5) {
+      lessons += `PROVEN FAILURE: Choice ${worst.choice}\n`
+      lessons += ` - ${worst.losses} losses, ${worst.avgProfit.toFixed(1)} ALGO avg\n`
+      lessons += ` BLACKLIST: Never use this choice again\n\n`
     }
 
+    // VARIANCE DETECTION 
+    if (sorted.length >= 4) {
+      const choiceRange = sorted[0].choice - sorted[sorted.length - 1].choice
+      if (choiceRange > 50) {
+        lessons += ` HIGH VARIANCE: Your choices range from ${sorted[sorted.length - 1].choice} to ${sorted[0].choice}\n`
+        lessons += `   This suggests random behavior. Narrow your focus.\n\n`
+      }
+    }
+
+    // LOSS STREAK INTERVENTION 
     if (this.mentalState.consecutiveLosses >= 3) {
-      lessons += `CRITICAL: ${this.mentalState.consecutiveLosses} consecutive losses! Something's wrong.\n`
+      lessons += `CRITICAL: ${this.mentalState.consecutiveLosses} consecutive losses!\n`
+      lessons += `   Your current strategy is FAILING.\n`
+      
+      if (best.avgProfit > 0) {
+        lessons += `   Return to Choice ${best.choice} (your historical best)\n`
+      } else {
+        lessons += `   Try OPPOSITE approach: Change strategy radically\n`
+      }
+      lessons += '\n'
     }
 
     return lessons
@@ -238,6 +375,8 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
     const stat = this.performanceStats[game][choice]
     stat.timesChosen++
     stat.totalProfit += profit
+    
+    // Exponential moving average for recency bias
     stat.avgProfit = stat.avgProfit * 0.7 + profit * 0.3
 
     if (result === 'WIN') stat.wins++
@@ -250,12 +389,14 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
     const p = this.profile
     const m = this.mentalState
 
+    // Frustration decay
     m.frustration *= 0.9
 
     if (profit < 0) {
       m.consecutiveLosses++
       m.streakCounter = 0
 
+      // Detect stubbornness (repeating losing choices)
       let isStubbornness = false
       if (this.fullHistory.length >= 2) {
         const prev = this.fullHistory[this.fullHistory.length - 2]
@@ -263,11 +404,12 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
       }
 
       let pain = Math.min(0.25, Math.abs(profit) * 0.01)
-      if (isStubbornness) pain *= 2.0
-      if (p.resilience > 0.7) pain *= 0.6
+      if (isStubbornness) pain *= 2.0 // Double frustration for repeated mistakes
+      if (p.resilience > 0.7) pain *= 0.6 // Resilient agents handle losses better
 
       m.frustration = Math.min(1.0, m.frustration + pain)
       m.optimism = Math.max(0.05, m.optimism - 0.05)
+      
     } else if (profit > 0) {
       m.consecutiveLosses = 0
       m.streakCounter++
@@ -275,11 +417,14 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
       const recovery = 0.2 * (1 + p.resilience * 0.3)
       m.frustration = Math.max(0.0, m.frustration - recovery)
       m.optimism = Math.min(0.95, m.optimism + 0.1)
+      
     } else {
+      // Draw/break-even
       m.consecutiveLosses = 0
       m.streakCounter = 0
     }
 
+    // Adaptive agents recover faster from losses
     if (m.consecutiveLosses >= 3 && p.adaptability > 0.5) {
       m.frustration *= 0.6
       m.optimism = 0.5
@@ -294,7 +439,9 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
         this.recentHistory = data.history ? data.history.slice(-5) : []
         this.performanceStats = data.performanceStats || {}
         if (data.mentalState) this.mentalState = { ...this.mentalState, ...data.mentalState }
-      } catch {}
+      } catch (e) {
+        console.warn(`[${this.name}] Failed to load state: ${e}`)
+      }
     }
   }
 

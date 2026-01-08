@@ -89,12 +89,12 @@ async function main() {
     if (game === 'PirateGame') {
       printMultiRoundGameSection(agents, game)
     } else {
-      printStandardGameSection(agents, game)
+      printSimpleGameSection(agents, game)
     }
   }
 }
 
-function printStandardGameSection(agents: AgentData[], gameName: string) {
+function printSimpleGameSection(agents: AgentData[], gameName: string) {
   const gameAgents = agents.map(a => ({
     ...a,
     history: a.history.filter(h => h.game === gameName)
@@ -103,15 +103,14 @@ function printStandardGameSection(agents: AgentData[], gameName: string) {
   if (gameAgents.length === 0) return
 
   console.log(`\n${B}${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}`)
-  console.log(`${B}${C}🎮 ${gameName.toUpperCase()}${R}`)
+  console.log(`${B}${C}🎮 ${gameName.toUpperCase()} - GAME HISTORY${R}`)
   console.log(`${B}${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}\n`)
 
-  printStandardTimeline(gameAgents, gameName)
-  printStandardStats(gameAgents, gameName)
+  printSimpleTimeline(gameAgents, gameName)
 }
 
-function printStandardTimeline(agents: AgentData[], gameName: string) {
-  console.log(`${B}📜 Game Timeline${R}`)
+function printSimpleTimeline(agents: AgentData[], gameName: string) {
+  console.log(`${B}📜 Move History Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
   const maxSessions = Math.max(...agents.map(a => {
@@ -154,55 +153,6 @@ function printStandardTimeline(agents: AgentData[], gameName: string) {
   console.log('')
 }
 
-function printStandardStats(agents: AgentData[], gameName: string) {
-  console.log(`${B}📊 Statistics${R}`)
-  console.log(DIM + '─'.repeat(80) + R)
-
-  interface Stats {
-    name: string
-    games: number
-    wins: number
-    losses: number
-    totalProfit: number
-    avgProfit: number
-  }
-
-  const stats: Stats[] = agents.map(a => {
-    const sessions = new Set(a.history.map(h => h.session))
-    const games = sessions.size
-    const wins = a.history.filter(h => h.result === 'WIN').length
-    const losses = a.history.filter(h => h.result === 'LOSS').length
-    const totalProfit = a.history.reduce((sum, h) => sum + h.profit, 0)
-
-    return {
-      name: a.name,
-      games,
-      wins,
-      losses,
-      totalProfit,
-      avgProfit: games > 0 ? totalProfit / games : 0
-    }
-  }).sort((a, b) => b.totalProfit - a.totalProfit)
-
-  console.log('')
-  console.log(`${DIM}Agent           Games   Wins  Losses   Total Profit   Avg/Game${R}`)
-  console.log(DIM + '─'.repeat(70) + R)
-
-  for (const s of stats) {
-    const nameStr = s.name.padEnd(15)
-    const gamesStr = s.games.toString().padStart(5)
-    const winsStr = s.wins.toString().padStart(6)
-    const lossStr = s.losses.toString().padStart(7)
-    
-    const profitColor = s.totalProfit > 0 ? G : s.totalProfit < 0 ? E : Y
-    const profitStr = `${profitColor}${s.totalProfit.toFixed(1)}${R}`.padEnd(20)
-    const avgStr = `${s.avgProfit.toFixed(1)}`
-
-    console.log(`${nameStr} ${gamesStr} ${winsStr} ${lossStr}   ${profitStr} ${avgStr}`)
-  }
-  console.log('')
-}
-
 function printMultiRoundGameSection(agents: AgentData[], gameName: string) {
   const Agents = agents.map(a => ({
     ...a,
@@ -216,8 +166,6 @@ function printMultiRoundGameSection(agents: AgentData[], gameName: string) {
   console.log(`${B}${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}\n`)
 
   printMultiRoundTimeline(Agents)
-  printMultiRoundStats(Agents)
-  printMultiRoundInsights(Agents)
 }
 
 function printMultiRoundTimeline(agents: AgentData[]) {
@@ -279,125 +227,6 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       console.log(`  ${DIM}└─ No winner recorded${R}`)
     }
   }
-  console.log('')
-}
-
-function printMultiRoundStats(agents: AgentData[]) {
-  console.log(`${B}📊 Agent Performance${R}`)
-  console.log(DIM + '─'.repeat(80) + R)
-
-  interface PirateStats {
-    name: string
-    sessions: number
-    wins: number
-    losses: number
-    totalProfit: number
-    avgProfit: number
-    timesProposer: number
-    proposerWins: number
-    timesEliminated: number
-    survivalRate: number
-  }
-
-  const stats: PirateStats[] = agents.map(a => {
-    const sessions = new Set(a.history.map(h => h.session))
-    const sessionsCount = sessions.size
-    const wins = a.history.filter(h => h.result === 'WIN').length
-    const losses = a.history.filter(h => h.result === 'LOSS').length
-    const totalProfit = a.history.reduce((sum, h) => sum + h.profit, 0)
-    const avgProfit = sessionsCount > 0 ? totalProfit / sessionsCount : 0
-    
-    const timesProposer = a.history.filter(h => h.role === 'proposer').length
-    const proposerWins = a.history.filter(h => h.role === 'proposer' && h.result === 'WIN').length
-    const timesEliminated = a.history.filter(h => h.result === 'ELIMINATED').length
-    const survivalRate = sessionsCount > 0 ? ((sessionsCount - timesEliminated) / sessionsCount) * 100 : 0
-
-    return {
-      name: a.name,
-      sessions: sessionsCount,
-      wins,
-      losses,
-      totalProfit,
-      avgProfit,
-      timesProposer,
-      proposerWins,
-      timesEliminated,
-      survivalRate
-    }
-  }).sort((a, b) => b.totalProfit - a.totalProfit)
-
-  console.log('')
-  console.log(`${DIM}Agent           Sessions  Wins  Elim  Profit    Avg/Game  Proposer  Survival${R}`)
-  console.log(DIM + '─'.repeat(82) + R)
-
-  for (const s of stats) {
-    const nameStr = s.name.padEnd(15)
-    const sessionsStr = s.sessions.toString().padStart(8)
-    const winsStr = s.wins.toString().padStart(5)
-    const elimStr = s.timesEliminated.toString().padStart(5)
-    
-    const profitColor = s.totalProfit > 0 ? G : s.totalProfit < 0 ? E : Y
-    const profitStr = `${profitColor}${s.totalProfit.toFixed(1)}${R}`.padEnd(15)
-    
-    const avgStr = `${s.avgProfit.toFixed(1)}`.padStart(8)
-    const proposerStr = `${s.timesProposer}/${s.proposerWins}`.padStart(9)
-    const survivalStr = `${s.survivalRate.toFixed(0)}%`.padStart(8)
-
-    console.log(`${nameStr} ${sessionsStr} ${winsStr} ${elimStr}  ${profitStr} ${avgStr}  ${proposerStr} ${survivalStr}`)
-  }
-
-  console.log(`\n${DIM}Proposer format: times_proposed/wins_as_proposer${R}`)
-  console.log('')
-}
-
-function printMultiRoundInsights(agents: AgentData[]) {
-  console.log(`${B}🧠 Strategic Insights${R}`)
-  console.log(DIM + '─'.repeat(80) + R)
-
-  const proposerSuccess = agents.map(a => {
-    const proposals = a.history.filter(h => h.role === 'proposer')
-    const wins = proposals.filter(h => h.result === 'WIN').length
-    return {
-      name: a.name,
-      proposals: proposals.length,
-      wins,
-      rate: proposals.length > 0 ? (wins / proposals.length) * 100 : 0
-    }
-  }).filter(p => p.proposals > 0).sort((a, b) => b.rate - a.rate)
-
-  if (proposerSuccess.length > 0) {
-    const best = proposerSuccess[0]
-    console.log(`${G}✓${R} Best Proposer: ${B}${best.name}${R} (${best.wins}/${best.proposals} = ${best.rate.toFixed(0)}% success)`)
-  }
-
-  const eliminations = agents.map(a => ({
-    name: a.name,
-    count: a.history.filter(h => h.result === 'ELIMINATED').length
-  })).sort((a, b) => b.count - a.count)
-
-  if (eliminations[0].count > 0) {
-    console.log(`${E}✗${R} Most Eliminated: ${B}${eliminations[0].name}${R} (${eliminations[0].count}x)`)
-  }
-
-  const votingPatterns = agents.map(a => {
-    const votes = a.history.filter(h => h.role === 'voter')
-    const yesVotes = votes.filter(h => h.choice === 1).length
-    const total = votes.length
-    return {
-      name: a.name,
-      yesRate: total > 0 ? (yesVotes / total) * 100 : 0,
-      total
-    }
-  }).filter(v => v.total > 0).sort((a, b) => b.yesRate - a.yesRate)
-
-  if (votingPatterns.length > 0) {
-    const mostCooperative = votingPatterns[0]
-    const leastCooperative = votingPatterns[votingPatterns.length - 1]
-    
-    console.log(`${G}🤝${R} Most Cooperative: ${B}${mostCooperative.name}${R} (${mostCooperative.yesRate.toFixed(0)}% YES votes)`)
-    console.log(`${E}🚫${R} Most Hostile: ${B}${leastCooperative.name}${R} (${(100 - leastCooperative.yesRate).toFixed(0)}% NO votes)`)
-  }
-
   console.log('')
 }
 

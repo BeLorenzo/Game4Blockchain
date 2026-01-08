@@ -8,6 +8,12 @@ import algosdk from 'algosdk'
 import { PirateGameClient, PirateGameFactory } from '../../smart_contracts/artifacts/pirateGame/PirateGameClient'
 import { Agent } from '../Agent'
 import { IGameAdapter } from './IGameAdapter'
+import { BaseDecisionSchema } from '../llm'
+import {z} from "zod"
+
+const PirateProposalSchema = BaseDecisionSchema.extend({
+    distribution: z.array(z.coerce.number()) 
+  });
 
 interface RoundSecret {
   vote: number
@@ -33,8 +39,6 @@ export class PirateGame implements IGameAdapter {
   private roundSecrets: Map<string, RoundSecret> = new Map()
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
   private currentInternalRound = 0
-
-  // Tempi adattati per la simulazione
   private durationParams = {
     warmUp: 50n,
     commitPhase: 70n,
@@ -106,6 +110,7 @@ export class PirateGame implements IGameAdapter {
     return result.return!
   }
 
+  //Usato per registrare 
   async play_Commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: REGISTRATION ---`)
     const joinMbr = (await this.appClient!.send.getRequiredMbr({ args: { command: 'join' } })).return!
@@ -148,6 +153,25 @@ export class PirateGame implements IGameAdapter {
     // No-op
   }
 
+
+  private expandDistribution(shortDist: number[], totalPirates: number): number[] {
+    const fullDist = new Array(totalPirates).fill(0);
+    let shortIdx = 0;
+
+    for (let i = 0; i < totalPirates; i++) {
+        if (this.pirates[i].alive) {
+            fullDist[i] = shortDist[shortIdx] || 0;
+            shortIdx++;
+        } else {
+            fullDist[i] = 0; 
+        }
+    }
+    return fullDist;
+}
+
+
+
+  //Fa ciclo di gioco
   async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
@@ -207,12 +231,71 @@ export class PirateGame implements IGameAdapter {
             console.log(`\n📋 PROPOSAL PHASE`)
             console.log(`Proposer: ${proposer.agent.name} (Pirate #${proposerIndex})`)
 
-            const prompt = this.buildProposerPrompt(proposer.agent, state, internalRound, proposerIndex)
-            const decision = await proposer.agent.playRound(this.name, prompt)
+            const alivePirates = this.pirates.filter(p => p.alive);
 
-            // USIAMO IL NUOVO METODO DI PARSING LIBERO
-            const distributionBuffer = this.parseDistribution(
-                decision.reasoning, 
+            let attempts = 0;
+            const maxAttempts = 5;
+            let finalFullDistribution: number[] = [];
+            let response = {
+              choice: 1,
+              reasoning: "Default greedy proposal",
+              distribution: this.buildFallbackDistribution(Number(state.totalPirates), proposerIndex, Number(state.pot))
+            };
+            let errorFeedback = "";
+
+            while(attempts < maxAttempts) {
+              try {
+                const prompt = this.buildProposerPrompt(proposer.agent, state, internalRound, proposerIndex)
+                response = await proposer.agent.playRound(this.name, prompt, PirateProposalSchema)
+                
+                const shortDist = response.distribution || [];
+
+                if (shortDist.length !== alivePirates.length) {
+                    throw new Error(`L'array deve avere esattamente ${alivePirates.length} elementi (uno per ogni pirata VIVO). Tu ne hai messi ${shortDist.length}.`);
+                }
+                
+                const sum = shortDist.reduce((a: number, b: number) => a + b, 0);
+                if (Math.abs(sum - 100) > 10) {
+                  throw new Error(`La somma delle percentuali è ${sum}%, ma deve essere almeno tra 90% e 110%.`);
+                }
+
+                finalFullDistribution = this.expandDistribution(shortDist, Number(state.totalPirates));
+                const deadWithMoney = finalFullDistribution.filter((amt: number, idx: number) => !this.pirates[idx].alive && amt > 0);
+                if (deadWithMoney.length > 0) {
+                  throw new Error(`Hai assegnato denaro a pirati morti. Gli indici dei pirati morti devono avere 0.`);
+                }
+                break;
+              } catch (e:any) {
+                attempts++
+                const currentDist = (response && response.distribution) ? JSON.stringify(response.distribution) : "null";
+errorFeedback = `
+[SYSTEM ERROR - ATTEMPT ${attempts}]:
+Your last distribution was: ${currentDist}
+Error Detail: ${e.message}
+
+CORRECTION PROTOCOL:
+1. Count the elements: must be EXACTLY ${state.totalPirates}.
+2. Check the sum: sum(elements) must be EXACTLY 100.
+3. Dead Pirates: Indices < ${proposerIndex} MUST be 0.
+Current Status: ${this.pirates.map(p => `#${p.seniorityIndex}:${p.alive?'Alive':'DEAD'}`).join(', ')}
+`;                console.warn(`[DEBUG] Proposta Pirate #${proposerIndex} respinta (Tentativo ${attempts}): ${e.message}`);
+                
+                if (attempts >= maxAttempts) {
+                  console.error("❌ Max tentativi raggiunti. Forzo fallback.");
+                  response = { 
+                  choice: 1, 
+                  distribution: this.buildFallbackDistribution(Number(state.totalPirates), proposerIndex, Number(state.pot)),
+                  reasoning: "LLM failed all logic checks." 
+                  };
+                }
+              }
+            }
+
+
+            const fullPercentages = this.expandDistribution(response.distribution, Number(state.totalPirates));
+
+            const distributionBuffer = this.parseDistributionFromLLM(
+                { ...response, distribution: fullPercentages }, 
                 Number(state.totalPirates), 
                 Number(state.pot), 
                 proposerIndex
@@ -249,7 +332,7 @@ export class PirateGame implements IGameAdapter {
             for (const pirate of this.pirates) {
                 if (!pirate.alive) continue
 
-                let vote = 0; // Default NO
+                let vote = 0;
 
                 // AUTO-VOTE YES FOR PROPOSER
                 if (pirate.seniorityIndex === Number(state.currentProposerIndex)) {
@@ -336,6 +419,8 @@ export class PirateGame implements IGameAdapter {
         }
 
         if (result !== "PENDING") {
+             const proposalAccepted = result === "WIN";
+             
              for (const pirate of this.pirates) {
                 if (pirate.finalized) continue; // Already saved
                 if (!pirate.alive && result !== "WIN") continue; // Already dead
@@ -361,12 +446,17 @@ export class PirateGame implements IGameAdapter {
                      }
                 }
                 
+                // FIX 2: Pass role metadata via additionalData
                 await pirate.agent.finalizeRound(
                     this.name, 
                     roundResult, 
                     roundProfit, 
                     sessionNumber, 
-                    internalRound // Use LOCAL internal round count
+                    internalRound, // Use LOCAL internal round count
+                    {
+                      role: pirate.role,  // 'proposer' or 'voter'
+                      proposalAccepted: proposalAccepted,
+                    }
                 );
                 pirate.finalized = true;
             }
@@ -382,17 +472,41 @@ export class PirateGame implements IGameAdapter {
     }
   }
 
-  async play_Claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  
+
+async play_Claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log('\n--- PHASE 4: CLAIM WINNINGS (Payout) ---')
+    
+    // 1. Recuperiamo la proposta finale dal box dello smart contract
+    const proposal = await this.appClient!.state.box.proposals.value(sessionId)
+    if (!proposal) {
+        console.log("⚠️ No proposal found. Nothing to claim.");
+        return;
+    }
+
+    // 2. Parsiamo la distribuzione finale (array di BigInt)
+    const state = await this.appClient!.state.box.gameState.value(sessionId)
+    const finalAmounts = this.parseDistributionFromBytes(proposal.distribution, Number(state!.totalPirates));
+
     for (const pirate of this.pirates) {
       if (!pirate.alive) continue;
-      await this.safeSend(() => this.appClient!.send.claimWinnings({
-        args: { sessionId },
-        sender: pirate.agent.account.addr,
-        signer: pirate.agent.signer,
-        coverAppCallInnerTransactionFees: true,
-        maxFee: AlgoAmount.MicroAlgo(3000),
-      }), `Claim ${pirate.agent.name}`);
+
+      // 3. Controlliamo quanto gli spetta
+      const winnings = finalAmounts[pirate.seniorityIndex];
+
+      if (winnings > 0n) {
+        console.log(`💰 [${pirate.agent.name}] Claiming ${Number(winnings) / 1_000_000} ALGO...`);
+        await this.safeSend(() => this.appClient!.send.claimWinnings({
+          args: { sessionId },
+          sender: pirate.agent.account.addr,
+          signer: pirate.agent.signer,
+          coverAppCallInnerTransactionFees: true,
+          maxFee: AlgoAmount.MicroAlgo(3000),
+        }), `Claim ${pirate.agent.name}`);
+      } else {
+        // Se ha 0, evitiamo la chiamata e l'errore
+        console.log(`ℹ️ [${pirate.agent.name}] has 0 ALGO assigned. Skipping claim to avoid contract error.`);
+      }
     }
   }
 
@@ -419,65 +533,82 @@ export class PirateGame implements IGameAdapter {
     )
   }
 
-  // --- NEW SMART PARSER ---
-  private parseDistribution(reasoning: string, totalPirates: number, pot: number, proposerIndex: number): Uint8Array {
-    const buffer = Buffer.alloc(totalPirates * 8)
-    let parsedAmounts: number[] = []
+  private buildFallbackDistribution(
+  totalPirates: number,
+  proposerIndex: number,
+  pot: number
+): number[] {
+  const percentages = new Array(totalPirates).fill(0)
+  percentages[proposerIndex] = 100
+  return percentages
+}
 
-    // 1. Regex flessibile per trovare array di numeri
-    const match = reasoning.match(/\[([\d,\s_.]+)\]/)
-    
-    if (match) {
-      const content = match[1];
-      parsedAmounts = content.split(',')
-        .map(s => s.trim().replace(/_/g, '')) 
-        .map(Number)
-        .filter(n => !isNaN(n));
-    }
 
-    // 2. Fallback se l'LLM ha fallito
-    if (parsedAmounts.length !== totalPirates) {
-        console.warn(`⚠️ LLM Output Invalid (Got ${parsedAmounts.length} items). Using Fallback.`);
-        parsedAmounts = new Array(totalPirates).fill(0);
-        const alivePirates = this.pirates.filter(p => p.alive);
-        const needed = Math.ceil((alivePirates.length + 1) / 2) - 1; 
-        let bought = 0;
-        
-        for (let i = 0; i < totalPirates; i++) {
-            if (i !== proposerIndex && this.pirates[i].alive && bought < needed) {
-                parsedAmounts[i] = 1_000_000; // 1 ALGO bribe
-                bought++;
-            }
-        }
-    }
+  // --- ROBUST PERCENTAGE PARSER ---
+private parseDistributionFromLLM(
+  response: {
+    choice: number
+    reasoning: string
+    distribution?: number[]
+  },
+  totalPirates: number,
+  pot: number,
+  proposerIndex: number
+): Uint8Array {
 
-    // 3. MATH FIXER
-    // Force 0 to dead
-    for (let i = 0; i < totalPirates; i++) {
-        if (!this.pirates[i].alive) parsedAmounts[i] = 0;
-    }
+  const buffer = Buffer.alloc(totalPirates * 8)
 
-    // Fix sum
-    const currentSum = parsedAmounts.reduce((a, b) => a + b, 0);
-    const diff = pot - currentSum;
-    const proposerShare = (parsedAmounts[proposerIndex] || 0) + diff;
-    
-    if (proposerShare < 0) {
-        // Se il proponente va in negativo, resetta tutto
-        console.warn("⚠️ Negative Proposer Share! Resetting to full greedy.");
-        parsedAmounts.fill(0);
-        parsedAmounts[proposerIndex] = pot;
-    } else {
-        parsedAmounts[proposerIndex] = proposerShare;
-    }
+  let percentages = response.distribution
+  console.log(`Scelta: ${response.choice}`)
+    console.log(`reasoning: ${response.reasoning}`)
+      console.log(`distribuzione: ${response.distribution}`)
+  console.log(`\n🎯 PARSING DISTRIBUTION FROM LLM STRUCTURED RESPONSE`)
 
-    // Write to buffer
-    parsedAmounts.forEach((amt, idx) => {
-        buffer.writeBigUInt64BE(BigInt(Math.floor(amt)), idx * 8);
-    });
-
-    return buffer;
+  // 1️⃣ Validazione base
+  if (!Array.isArray(percentages) || percentages.length !== totalPirates) {
+    console.warn(`⚠️ Invalid or missing distribution. Using fallback.`)
+    percentages = this.buildFallbackDistribution(totalPirates, proposerIndex, pot)
   }
+
+  // 2️⃣ DEAD PIRATES → 0%
+  for (let i = 0; i < totalPirates; i++) {
+    if (!this.pirates[i].alive) {
+      percentages[i] = 0
+    }
+  }
+
+  // 3️⃣ Normalize to 100%
+  const sum = percentages.reduce((a, b) => a + b, 0)
+  if (sum <= 0) throw new Error("Invalid distribution sum")
+
+  percentages = percentages.map(p => (p / sum) * 100)
+
+  // 4️⃣ Convert to microALGOs
+  const amounts: number[] = []
+  percentages.forEach((pct, i) => {
+    const amount = Math.floor((pct / 100) * pot)
+    amounts.push(amount)
+    buffer.writeBigUInt64BE(BigInt(amount), i * 8)
+  })
+
+  // 5️⃣ Fix rounding → proposer
+  const allocated = amounts.reduce((a, b) => a + b, 0)
+  const remainder = pot - allocated
+  if (remainder > 0) {
+    buffer.writeBigUInt64BE(
+      buffer.readBigUInt64BE(proposerIndex * 8) + BigInt(remainder),
+      proposerIndex * 8
+    )
+  }
+
+  console.log(`✅ FINAL DISTRIBUTION (ALGO):`,
+    amounts.map(a => (a / 1_000_000).toFixed(2))
+  )
+
+  return buffer
+}
+
+
 
   private parseDistributionFromBytes(distributionBytes: Uint8Array, totalPirates: number): bigint[] {
     const result: bigint[] = []
@@ -511,97 +642,143 @@ export class PirateGame implements IGameAdapter {
 
   // --- NEW PROMPTS ---
 
-  private buildProposerPrompt(agent: Agent, state: any, round: number, proposerIndex: number): string {
-    const entryCost = Number(this.participationAmount.microAlgos) / 1_000_000
-    const potAlgo = Number(state.pot) / 1_000_000
-    const votesNeeded = Math.ceil((Number(state.alivePirates) + 1) / 2)
-    const votesToBuy = votesNeeded - 1
+  private buildProposerPrompt(
+  agent: Agent,
+  state: any,
+  round: number,
+  proposerIndex: number,
+  errorFeedback: string = "" // Aggiungi questo per passargli gli errori dei tentativi falliti
+): string {
+  const potAlgo = Number(state.pot) / 1_000_000;
+  const alivePirates = this.pirates.filter(p => p.alive);
+  const aliveCount = alivePirates.length;
+  const votesNeeded = Math.ceil(aliveCount / 2);
+  
+  // Trova l'indice locale (quello che l'LLM deve usare nell'array corto)
+  const localProposerIndex = alivePirates.findIndex(p => p.seniorityIndex === proposerIndex);
 
-    let piratesStatus = "PIRATES STATUS:\n";
-    this.pirates.forEach(p => {
-        const status = p.alive ? "🟢 ALIVE" : "💀 DEAD (Must get 0)";
-        const youTag = p.seniorityIndex === proposerIndex ? " <--- YOU (Automatic YES)" : "";
-        piratesStatus += `- Pirate #${p.seniorityIndex} (${p.agent.name}): ${status}${youTag}\n`;
-    });
+  const mappingString = alivePirates.map((p, i) => 
+    `Index [${i}] -> Pirate #${p.seniorityIndex}${p.seniorityIndex === proposerIndex ? ' (YOU)' : ''}`
+  ).join('\n');
 
-    return `
+  return `
 You are ${agent.name}. 
-Your Personality: ${agent.profile.personalityDescription}
+Personality: ${agent.profile.personalityDescription}
 
-=== 🏴‍☠️ PIRATE GAME: PROPOSAL PHASE (Round ${round}) ===
-You are the CAPTAIN (Proposer). You have FULL CONTROL over the loot distribution.
+=== PIRATE GAME – PROPOSAL PHASE (Round ${round}) ===
 
-${piratesStatus}
+OBJECTIVE:
+You are the CAPTAIN. Propose a distribution that PASSES (needs ${votesNeeded} YES votes, including yours) and maximizes your profit. 
+If it fails, you DIE.
 
-💰 CONTEXT:
-- Total Pot: ${potAlgo} ALGO
-- Votes required: ${votesNeeded} (You + ${votesToBuy} others)
+GAME DATA:
+- Total pot: ${potAlgo} ALGO.
+- Active Pirates (Alive): ${aliveCount}.
+- Your Global Identity: Pirate #${proposerIndex}.
 
-STRATEGY:
-1. **Build a Coalition:** Pick exactly ${votesToBuy} alive pirates to be your allies.
-2. **Buy their votes:** Offer them enough (e.g. ${entryCost} ALGO or slightly more/less depending on your greed).
-3. **Punish Enemies:** Give 0 to everyone else.
-4. **Keep the rest:** The remaining ALGO goes to YOU.
+### IMPORTANT: ARRAY MAPPING (ONLY ${aliveCount} ELEMENTS)
+Your "distribution" array MUST have exactly ${aliveCount} elements. 
+Use this mapping to assign percentages:
+${mappingString}
 
-TASK:
-Output the exact distribution array in MicroAlgos (1 ALGO = 1,000,000 MicroAlgos).
-Example for 3 pirates: [8000000, 1000000, 1000000]
+### STRATEGY:
+- To pay YOURSELF, assign money to Index [${localProposerIndex}].
+- To buy votes from others, assign money to their corresponding local indices.
+- Global Indices lower than #${proposerIndex} are already DEAD and removed from this list. Do not worry about them.
 
-Respond with JSON: 
-{"choice": 1, "reasoning": "I will pay Pirate #X and #Y because...", "distribution": [amount0, amount1, amount2, ...]}
-`.trim()
-  }
+### TECHNICAL REQUIREMENTS:
+1. "distribution" array length: EXACTLY ${aliveCount}.
+2. Sum of all elements: EXACTLY 100.
+3. Format: JSON only.
 
-  private buildVoterPrompt(agent: Agent, state: any, proposal: any, round: number): string {
-    const distribution = this.parseDistributionFromBytes(proposal!.distribution, Number(state.totalPirates))
-    const myPirateInfo = this.pirates.find((p) => p.agent.name === agent.name)
-    const myShare = myPirateInfo ? Number(distribution[myPirateInfo.seniorityIndex]) / 1_000_000 : 0
-    const entryCost = Number(this.participationAmount.microAlgos) / 1_000_000
-    const netProfit = myShare - entryCost
+${errorFeedback ? `\n⚠️ PREVIOUS ATTEMPT ERROR: ${errorFeedback}\n` : ''}
 
-    const currentProposerIdx = Number(state.currentProposerIndex);
-    const proposer = this.pirates.find(p => p.seniorityIndex === currentProposerIdx)
-    const proposerShare = Number(distribution[currentProposerIdx]) / 1_000_000
+### RESPONSE FORMAT:
+{
+  "choice": 1,
+  "distribution": [number, number, ...], 
+  "reasoning": "Brief strategy explanation."
+}
 
-    let nextProposerName = "None (Game Over if rejected)";
-    const sortedPirates = [...this.pirates].sort((a, b) => a.seniorityIndex - b.seniorityIndex);
-    const nextAlive = sortedPirates.find(p => p.alive && p.seniorityIndex > currentProposerIdx);
-    if (nextAlive) nextProposerName = `Pirate #${nextAlive.seniorityIndex} (${nextAlive.agent.name})`;
+FINAL CHECK: Is your array length ${aliveCount}? If not, the game breaks.
+`.trim();
+}
 
-    return `
+
+  private buildVoterPrompt(
+  agent: Agent,
+  state: any,
+  proposal: any,
+  round: number
+): string {
+  const distribution = this.parseDistributionFromBytes(
+    proposal.distribution,
+    Number(state.totalPirates)
+  )
+
+  const me = this.pirates.find(p => p.agent.name === agent.name)!
+  const myIndex = me.seniorityIndex
+  const myShare = Number(distribution[myIndex]) / 1_000_000
+  const entryCost = Number(this.participationAmount.microAlgos) / 1_000_000
+  const netGain = myShare - entryCost
+
+  const proposerIndex = Number(state.currentProposerIndex)
+  const proposerShare =
+    Number(distribution[proposerIndex]) / 1_000_000
+
+  return `
 You are ${agent.name}.
-Your Personality: ${agent.profile.personalityDescription}
+Personality: ${agent.profile.personalityDescription}
 
-=== 🏴‍☠️ PIRATE GAME: VOTING PHASE (Round ${round}) ===
-Current Captain (${proposer?.agent.name}) has made an offer.
+=== PIRATE GAME – VOTING PHASE (Round ${round}) ===
 
-💰 YOUR OFFER:
-- You receive: **${myShare} ALGO**
-- Net Profit: ${netProfit.toFixed(2)} ALGO
+ROLE:
+You are a VOTER. You must decide whether to accept or reject the captain's proposal.
 
-⚖️ FAIRNESS CHECK:
-- Captain takes: ${proposerShare} ALGO
-- You take: ${myShare} ALGO
-- Difference: Captain gets ${(proposerShare/(myShare||1)).toFixed(1)}x more.
+GAME RULES (REMINDER):
+- If the proposal PASSES:
+  - The game ends.
+  - You receive your allocated share.
+- If the proposal FAILS:
+  - The captain (pirate #${proposerIndex}) is eliminated.
+  - A new captain will propose next round.
+  - You may get a better deal later… or worse.
 
-PROPOSAL DETAILS:
+DEAD PIRATES CHECK:
+- Pirates with index LOWER than ${proposerIndex} are DEAD.
+- Dead pirates receive 0%.
+- This proposal already respects that rule.
+
+YOUR OFFER:
+- You receive: ${myShare} ALGO
+- Entry cost: ${entryCost} ALGO
+- Net result if accepted: ${netGain.toFixed(2)} ALGO
+
+CAPTAIN INCENTIVE:
+- Captain receives: ${proposerShare} ALGO
+
+DECISION GUIDELINES:
+- Voting YES gives you a guaranteed outcome now.
+- Voting NO kills the captain but risks uncertainty.
+- Consider:
+  - Is your net gain positive?
+  - Is the captain being excessively greedy?
+  - Would you likely do better if you become captain later?
+
+PROPOSAL SUMMARY:
 ${distribution.map((amt, idx) => {
-    const pName = this.pirates.find(p => p.seniorityIndex === idx)?.agent.name || "Unknown";
-    const isMe = idx === myPirateInfo?.seniorityIndex ? " <--- YOU" : "";
-    const isCap = idx === currentProposerIdx ? " [CAPTAIN]" : "";
-    return `- Pirate #${idx} (${pName}): ${Number(amt) / 1_000_000} ALGO${isMe}${isCap}`;
+  const name = this.pirates.find(p => p.seniorityIndex === idx)?.agent.name
+  return `- Pirate #${idx} (${name}): ${Number(amt) / 1_000_000} ALGO`
 }).join('\n')}
 
-🔮 LOOK AHEAD:
-If REJECTED: Current Captain dies. Next Captain is **${nextProposerName}**.
-Will they offer you more?
-
-Vote YES (1) or NO (0).
-If the offer is an insult (huge gap between Captain and you), consider voting NO to punish greed.
-
-Respond with JSON: {"choice": 1, "reasoning": "..."}
+RESPONSE FORMAT (JSON ONLY):
+{
+  "choice": 1 or 0,
+  "reasoning": "Explain why you vote YES or NO based on risk, reward, and future expectations."
+}
 `.trim()
-  }
+}
+
 
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
@@ -611,7 +788,7 @@ Respond with JSON: {"choice": 1, "reasoning": "..."}
     const spammer = await this.algorand.account.random()
     await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
     for (let i = 0; i < blocks; i++) {
-      await this.algorand.send.payment({ sender: spammer.addr, receiver: spammer.addr, amount: AlgoAmount.MicroAlgos(0), signer: spammer.signer, note: `spam` })
+      await this.algorand.send.payment({ sender: spammer.addr, receiver: spammer.addr, amount: AlgoAmount.MicroAlgos(0), signer: spammer.signer, note: `spam-${i}-${Date.now()}` })
     }
   }
 }

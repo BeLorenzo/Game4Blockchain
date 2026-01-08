@@ -1,26 +1,27 @@
 /* eslint-disable no-empty */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Agent } from './Agent'
-//import { StagHuntGame } from './games/StagHuntGame'
+ //import { StagHuntGame } from './games/StagHuntGame'
  //import { WeeklyGame } from './games/WeeklyGame'
- import { GuessGame } from './games/GuessGame'
-//import { PirateGame } from './games/PirateGame'
+//import { GuessGame } from './games/GuessGame'
+ import { PirateGame } from './games/PirateGame'
 
 // SIMULATION CONFIG
-const NUM_ROUNDS = 6
+const NUM_ROUNDS = 5
 const INITIAL_FUNDING = 100_000
 
 // GAME SELECTION
  //const game = new StagHuntGame()
- const game = new GuessGame()
-//const game = new WeeklyGame()
-//const game = new PirateGame()
+  //const game = new WeeklyGame()
+//const game = new GuessGame()
+ const game = new PirateGame()
 
 // MAIN
 async function main() {
   console.log(`Game: ${game.name}`)
-  console.log(`Rounds: ${NUM_ROUNDS}\n`)
+  console.log(`Rounds to play: ${NUM_ROUNDS}\n`)
 
   const algorand = AlgorandClient.defaultLocalNet()
 
@@ -130,7 +131,7 @@ STRATEGIC PRINCIPLES:
 - Form alliances opportunistically, break them ruthlessly
 - "Bold" means strategic aggression, not reckless rule-breaking
 `.trim(),
-        riskTolerance: 1.0,
+        riskTolerance: 0.8, // MODIFICATO: Abbassato da 1.0 a 0.8 per ridurre allucinazioni (numeri >100)
         trustInOthers: 0.5,
         wealthFocus: 0.8,
         fairnessFocus: 0.0,
@@ -251,7 +252,7 @@ STRATEGIC PRINCIPLES:
         trustInOthers: 0.5,
         wealthFocus: 0.9,
         fairnessFocus: 0.0,
-        patience: 0.0,
+        patience: 0.2, // MODIFICATO: Alzato da 0.0 a 0.2 per ridurre il rumore statistico immediato
         adaptability: 1.0,
         resilience: 0.8,
         curiosity: 0.5,
@@ -317,33 +318,59 @@ STRATEGIC PRINCIPLES:
     }),
   )
 
+  let lastSessionId = 0
+  agents.forEach((a) => {
+    // Access private fullHistory property
+    const history = (a as any).fullHistory
+    if (history && history.length > 0) {
+      // Filter by current game name before finding last session
+      const gameEntries = history.filter((h: any) => h.game === game.name)
+      if (gameEntries.length > 0) {
+        const lastEntry = gameEntries[gameEntries.length - 1]
+        if (lastEntry.session > lastSessionId) {
+          lastSessionId = lastEntry.session
+        }
+      }
+    }
+  })
+
+  const startingSession = lastSessionId + 1
+  console.log(
+    lastSessionId > 0
+      ? `Resuming from session ${startingSession} (found ${lastSessionId} previous sessions for ${game.name})`
+      : `Starting fresh - no previous sessions found for ${game.name}`
+  )
+
   // Deploy
   const admin = agents[0]
   console.log('--- DEPLOYMENT ---')
   await game.deploy(admin)
 
-  // Game loop
+
   console.log(`\n--- STARTING ${NUM_ROUNDS} GAMES ---\n`)
-  for (let r = 1; r <= NUM_ROUNDS; r++) {
+
+  // Game loop
+    for (let i = 0; i < NUM_ROUNDS; i++) {
+    const sessionNumber = startingSession + i
     console.log(`\n${'='.repeat(60)}`)
-    console.log(`GAME ${r}/${NUM_ROUNDS}`)
+    console.log(`SESSION ${sessionNumber} (Round ${i + 1}/${NUM_ROUNDS})`)
     console.log('='.repeat(60))
 
     try {
       const sessionId = await game.startSession(admin)
-      await game.play_Commit(agents, sessionId, r)
-      await game.play_Reveal(agents, sessionId, r)
+      await game.play_Commit(agents, sessionId, sessionNumber)
+      await game.play_Reveal(agents, sessionId, sessionNumber)
 
       try {
-        await game.resolve(admin, sessionId, r)
-        await game.play_Claim(agents, sessionId, r)
+        await game.resolve(admin, sessionId, sessionNumber)
+        await game.play_Claim(agents, sessionId, sessionNumber)
       } catch (e) {
         console.error(`Error in resolve/claim:`, e)
       }
 
-      console.log(`\nGAME ${r} COMPLETED`)
+      console.log(`\nSESSION ${sessionNumber} COMPLETED`)
     } catch (e) {
-      console.error(`\nGAME ${r} FAILED:`, e)
+      console.error(`\nSESSION ${sessionNumber} FAILED:`, e)
     }
   }
 
@@ -354,7 +381,7 @@ STRATEGIC PRINCIPLES:
 }
 
 main().catch((e) => {
-  console.error('\n💥 CRITICAL ERROR:')
+  console.error('\nCRITICAL ERROR:')
   console.error(e)
   process.exit(1)
 })

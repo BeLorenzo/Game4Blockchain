@@ -1,20 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-control-regex */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { z } from "zod";
 import { Ollama } from 'ollama';
 import JSON5 from 'json5';
 
-const DecisionSchema = z.object({
+// Schema base che ogni risposta deve avere
+export const BaseDecisionSchema = z.object({
   choice: z.coerce.number().int(), 
   reasoning: z.coerce.string().min(1), 
 });
 
-export type LLMDecision = z.infer<typeof DecisionSchema>;
-
 const ollama = new Ollama({ host: 'http://127.0.0.1:11434' });
 
-export async function askLLM(prompt: string, model: string, options?: { temperature: number }): Promise<LLMDecision> {
+/**
+ * Funzione generica per interrogare l'LLM
+ * @param T lo schema Zod per validare la risposta
+ */
+export async function askLLM<T extends z.ZodTypeAny>(
+  prompt: string, 
+  model: string, 
+  schema: T, 
+  options?: { temperature: number }
+): Promise<z.infer<T>> {
+  
+  let raw = ""; 
   try {
     const response = await ollama.chat({
       model: model,
@@ -23,70 +33,63 @@ export async function askLLM(prompt: string, model: string, options?: { temperat
       format: 'json', 
     });
 
-    let raw = response.message.content.trim();
+    raw = response.message.content.trim();
 
-    // STRATEGIA 1: Pulizia markdown
-    raw = raw.replace(/```json\s*/g, "").replace(/```\s*/g, "");
-    
-    // STRATEGIA 2: Estrazione JSON con regex
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      raw = jsonMatch[0];
+    // 1. Pulizia chirurgica (Markdown & Braces)
+    const firstBrace = raw.indexOf('{');
+    const lastBrace = raw.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      raw = raw.substring(firstBrace, lastBrace + 1);
     }
 
-    // STRATEGIA 3: Rimozione caratteri problematici
+    // 2. Rimozione caratteri di controllo invisibili
     raw = raw.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
 
-    let parsed;
+    let parsed: any;
     try {
       parsed = JSON5.parse(raw);
     } catch (e1) {
-      // STRATEGIA 4: Fallback JSON standard
       try {
         parsed = JSON.parse(raw);
       } catch (e2) {
-        // STRATEGIA 5: Estrazione manuale
+        // 3. Fallback: Estrazione manuale se il JSON è malformato
         parsed = extractManually(raw);
-        if (!parsed) {
-          console.warn(`⚠️ Parsing fallito su: ${raw.substring(0, 100)}...`);
-          throw new Error('All parsing strategies failed');
-        }
+        if (!parsed) throw new Error(`Parsing failed entirely.`);
       }
     }
 
-    const validated = DecisionSchema.parse(parsed);
-    return validated;
+    // 4. Validazione con lo schema passato (torna il tipo corretto T)
+    return schema.parse(parsed);
 
   } catch (error) {
-    console.error(`❌ LLM parsing error:`, error);
+    console.error(`❌ LLM ERROR:\nRaw Response: "${raw}"\nError:`, error);
+    
+    // Ritorna un oggetto di fallback che rispetti lo schema base
+    // Nota: se lo schema T ha campi obbligatori extra (come 'distribution'), 
+    // questo fallback potrebbe fallire la validazione di Zod, il che è corretto.
     return {
       choice: 0,
-      reasoning: "ERRORE PARSING: L'agente ha borbottato qualcosa di incomprensibile. Scelta di default.",
-    };
+      reasoning: "ERRORE PARSING: L'agente ha rotto il formato. Controlla i log.",
+    } as z.infer<T>;
   }
 }
 
+/**
+ * Tenta di recuperare choice e reasoning da una stringa sporca tramite Regex
+ */
 function extractManually(raw: string): any | null {
   try {
-    // Cerca "choice" e "reasoning" con pattern flessibili
-    const choiceMatch = raw.match(/["']?choice["']?\s*:\s*["']?(\d+)["']?/i);
-    const reasoningMatch = raw.match(/["']?reasoning["']?\s*:\s*["']([^"']+)["']/i) ||
-                          raw.match(/["']?reasoning["']?\s*:\s*([^,}\n]+)/i);
+    const choiceMatch = raw.match(/"choice"\s*:\s*(\d+)/);
+    const choice = choiceMatch ? parseInt(choiceMatch[1]) : 0;
 
-    if (choiceMatch) {
-      const choice = parseInt(choiceMatch[1]);
-      const reasoning = reasoningMatch ? reasoningMatch[1].trim() : "No reasoning provided";
-      
-      return { choice, reasoning };
-    }
+    let reasoning = "No reasoning extracted";
+    // Tenta virgolette doppie o singole
+    const resMatch = raw.match(/"reasoning"\s*:\s*"([\s\S]*?)"(?=\s*[,}])/) || 
+                     raw.match(/'reasoning'\s*:\s*'([\s\S]*?)'(?=\s*[,}])/);
+    
+    if (resMatch) reasoning = resMatch[1];
 
-    // Cerca array-style [choice, "reasoning"]
-    const arrayMatch = raw.match(/\[\s*(\d+)\s*,\s*["']([^"']+)["']\s*\]/);
-    if (arrayMatch) {
-      return { choice: parseInt(arrayMatch[1]), reasoning: arrayMatch[2] };
-    }
-
-    return null;
+    return { choice, reasoning };
   } catch (e) {
     return null;
   }

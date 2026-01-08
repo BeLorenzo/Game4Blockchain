@@ -12,405 +12,97 @@
     "curiosity": 1
   },
   "mentalState": {
-    "optimism": 0.8499999999999998,
-    "frustration": 0.06,
-    "consecutiveLosses": 1,
+    "optimism": 0.5,
+    "frustration": 0.08388849599999999,
+    "consecutiveLosses": 5,
     "streakCounter": 0
   },
   "history": [
     {
-      "game": "StagHunt",
+      "game": "PirateGame",
       "session": 1,
       "round": 1,
-      "choice": 1,
-      "reasoning": "As an Expected Value (EV) Maximizer, I analyze the situation by calculating the expected value for each available option. Since this is the first game and there's no historical data available, I'll rely on the base probability of the group choosing Stag (50%). Assuming a random distribution of choices, my expected loss from choosing Hare would be -2 ALGO, while choosing Stag gives me an expected value of 0 ALGO. Considering the potential jackpot and the fact that Stag requires cooperation from at least 51% of players, I believe there's a reasonable chance of winning if others choose Stag as well. The risk tolerance is relatively low (3.0/10), which means I'm cautious when it comes to taking risks. However, given my wealth focus (10.0/10) and patience (10.0/10), I'm willing to take a calculated risk in this case. I choose Stag with the hope that others will also cooperate and we'll split the pot and jackpot.",
-      "result": "WIN",
-      "profit": 0.333333,
-      "timestamp": "2026-01-07T12:16:02.078Z"
+      "choice": 0,
+      "reasoning": "I'm choosing to propose a distribution that maximizes my expected value. I've analyzed the game data and determined that buying votes from Pirates #1, #2, and #6 is the most profitable strategy. Assigning 15% of the pot to myself (Pirate #0) ensures I receive a share of the total revenue. Meanwhile, offering 5%, 10%, and 25% to the respective pirates will likely secure their votes. This distribution results in an expected value of approximately +20 ALGO.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-08T14:43:46.632Z",
+      "role": "proposer",
+      "proposalAccepted": false
     },
     {
-      "game": "StagHunt",
+      "game": "PirateGame",
       "session": 2,
       "round": 1,
       "choice": 1,
-      "reasoning": "Based on historical data, I've observed that the group tends to cooperate at a rate above 50%. Given this pattern, I expect the threshold for Stag to be met again. Analyzing the expected values, I calculate an EV of +0.8 ALGO for choosing Stag and -2.2 ALGO for choosing Hare. Since my risk tolerance is relatively low (3.0/10), I'm willing to take a calculated risk to potentially earn more. My wealth focus is high (10.0/10), which also suggests that I should prioritize accumulating wealth over minimizing losses. With a trust level of 5.0/10, I'm somewhat skeptical about others' cooperation, but the math still favors taking the chance. Given my patience and willingness to learn from past experiences, I decide to choose Stag.",
-      "result": "WIN",
-      "profit": 0.333333,
-      "timestamp": "2026-01-07T12:16:39.742Z"
+      "reasoning": "After analyzing historical data and expected values for each pirate's potential votes, I've decided to propose a distribution that maximizes my profit. I'll allocate 25% of the pot (17.5 ALGO) to myself (Index [0]), which is the highest positive EV option considering my chances of getting voted in. The remaining amount will be distributed among the other pirates, with a focus on buying votes from those who are more likely to support me based on their past behavior. This distribution has an expected value of 14.5 ALGO, higher than any other possible combination.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-08T14:45:49.229Z",
+      "role": "proposer",
+      "proposalAccepted": false
     },
     {
-      "game": "StagHunt",
+      "game": "PirateGame",
       "session": 3,
-      "round": 1,
-      "choice": 1,
-      "reasoning": "As an Expected Value (EV) Maximizer, I'll analyze the situation based on historical data. In Game 2-R1, 86% of players chose Stag, which means cooperation is still strong. Since the threshold is met, the expected return for choosing Stag is higher than Hare. Considering my risk tolerance and trust in others are moderate, I'm willing to take a calculated risk on Stag. My wealth focus and patience are high, so I prioritize maximizing my long-term wealth accumulation. Given these factors, choosing Stag yields a higher EV, making it the optimal decision.",
-      "result": "WIN",
-      "profit": 0.333334,
-      "timestamp": "2026-01-07T12:17:13.656Z"
-    },
-    {
-      "game": "StagHunt",
-      "session": 4,
-      "round": 1,
-      "choice": 1,
-      "reasoning": "Based on historical data, I notice that the group has been coordinating well, with a cooperation rate of 86% in the previous game. This suggests that there is a high chance of the threshold being met again. Additionally, the global jackpot is currently at 0 ALGO, which means that there is no immediate reward for defecting. Given my risk tolerance and wealth focus, I decide to take the calculated risk and choose STAG (1) in hopes of sharing the pot and jackpot with other cooperating players.",
-      "result": "WIN",
-      "profit": 0.333333,
-      "timestamp": "2026-01-07T12:17:48.565Z"
-    },
-    {
-      "game": "StagHunt",
-      "session": 5,
-      "round": 1,
-      "choice": 1,
-      "reasoning": "Based on my analysis of historical data, I see that the threshold for Stag is met in this game. Considering the potential jackpot and the guaranteed small loss from Hare, I decide to choose Stag as it has a higher expected value. With a confidence level of 9.5/10, I'm willing to take calculated risks when mathematically justified.",
-      "result": "WIN",
-      "profit": 0.333333,
-      "timestamp": "2026-01-07T12:18:19.767Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 1,
-      "round": 1,
-      "choice": 2,
-      "reasoning": "As an EV Maximizer, I prioritize maximizing my expected value. Since this is the first round, all days are equally likely to be popular or unpopular. However, Wednesday has been a relatively safe choice historically (performanceStats). Given my risk tolerance of 3.0/10 and patience of 10.0/10, I'm willing to take a calculated risk on an underexplored option. I choose Wednesday based on its historical performance, which may indicate fewer competitors.",
-      "result": "WIN",
-      "profit": 13.333333,
-      "timestamp": "2026-01-07T12:20:44.057Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 2,
-      "round": 1,
-      "choice": 2,
-      "reasoning": "Based on historical data analysis, Wednesday appears to be the least crowded day. With only 1 player choosing this day in the previous round, the expected return is high. As an EV Maximizer, I prioritize maximizing my long-term wealth accumulation. Given my risk tolerance and trust in others are moderate, I'm willing to take a calculated risk on Wednesday. The potential reward outweighs the potential cost, making it the optimal choice for me.",
-      "result": "LOSS",
-      "profit": -4.166667,
-      "timestamp": "2026-01-07T12:21:11.732Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 3,
-      "round": 1,
-      "choice": 3,
-      "reasoning": "Based on historical data, I've learned that Choice 2 (Wednesday) is a strong performer. However, it was also the most crowded option last round. To minimize competition and maximize expected value, I'm choosing Thursday as my next move. This day has only one player, which means I'll have a bigger share if I win. As an Expected Value Maximizer, I prioritize maximizing my long-term wealth accumulation, and avoiding crowded options like Wednesday aligns with this strategy.",
-      "result": "LOSS",
-      "profit": -4.166667,
-      "timestamp": "2026-01-07T12:21:38.275Z"
-    },
-    {
-      "game": "WeeklyGame",
-      "session": 4,
       "round": 1,
       "choice": 4,
-      "reasoning": "Based on the historical data in 'performanceStats', I see that Friday has been a consistent underperformer. With only 1 player choosing this day last round, it's likely to be an even better choice this time around, given my risk tolerance and wealth focus. Additionally, avoiding crowded days like Thursday can also increase my chances of winning. As an EV Maximizer, I prioritize maximizing long-term wealth accumulation, which makes Friday the most appealing option for me.",
-      "result": "DRAW",
-      "profit": 0,
-      "timestamp": "2026-01-07T12:22:06.133Z"
+      "reasoning": "As an EV Maximizer, I've analyzed the available options and calculated the expected value for each Pirate's vote. The optimal distribution maximizes my profit by paying myself first (12 ALGO) and then allocating funds to gain the most votes from others. Pirates #1-#6 receive a smaller portion of the pot to encourage cooperation, as their EV is higher when they agree with me. Index [6] receives the smallest share, as their expected value is lower compared to the others.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-08T14:48:23.701Z",
+      "role": "proposer",
+      "proposalAccepted": false
     },
     {
-      "game": "WeeklyGame",
-      "session": 5,
+      "game": "PirateGame",
+      "session": 4,
       "round": 1,
       "choice": 1,
-      "reasoning": "Based on the historical data, I've learned that Choice 2 is a strong performer. However, considering the crowd dynamics and my EV-maximizing personality, I believe Friday was the least crowded day last round. To minimize competition, I'll choose Tuesday, which had only 2 players in the previous round. This should give me a higher chance of winning with fewer opponents.",
-      "result": "LOSS",
-      "profit": -4.166667,
-      "timestamp": "2026-01-07T12:22:32.911Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 1,
-      "round": 1,
-      "choice": 27,
-      "reasoning": "As an Expected Value (EV) Maximizer, I start by analyzing the game mechanics. Since there's no historical data to inform my decision, I'll rely on the Nash equilibrium strategy of choosing 0. However, since most humans don't play Nash and tend to choose higher numbers, I'll adjust my choice downward to account for this. Considering the risk tolerance and trust in others parameters, I'm willing to take a relatively high-risk position by choosing a lower number. The reasoning is that the expected value of choosing a low number is positive due to the fact that there's no historical data to suggest otherwise. Additionally, the game has just started, so the target can go either way. Given my patience parameter, I'm willing to take a calculated risk and choose a lower number early on.",
-      "result": "LOSS",
+      "reasoning": "As an EV maximizer, I'm proposing a distribution that allocates 30% of the pot to myself (Pirate #0), which is the highest positive expected value. The remaining 70% will be distributed among the other Pirates, with 10% going to Pirate #1 (the second-highest positive EV), followed by smaller amounts to Pirates #2-6. This proposal maximizes my profit while still considering the potential gains from buying votes.",
+      "result": "ELIMINATED",
       "profit": -10,
-      "timestamp": "2026-01-07T12:24:03.044Z"
+      "timestamp": "2026-01-08T14:49:52.358Z",
+      "role": "proposer",
+      "proposalAccepted": false
     },
     {
-      "game": "GuessGame",
-      "session": 2,
-      "round": 1,
-      "choice": 22,
-      "reasoning": "After analyzing the historical data, I've noticed that the average and target values tend to decrease over time. Given my risk tolerance is relatively low at 3.0/10, I want to play it safe and aim for a lower number. My EV Maximization approach suggests choosing an option with a higher chance of winning, which in this case is closer to the average value. Historically, players tend to underestimate the target value, so I'm taking that into account by choosing 22, which has a slightly higher expected value than some other options.",
-      "result": "WIN",
-      "profit": 60,
-      "timestamp": "2026-01-07T12:24:35.425Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 3,
-      "round": 1,
-      "choice": 18,
-      "reasoning": "After analyzing the game's history and my performance statistics, I've determined that the average choice has been trending downwards. Considering this, I'm going to err on the side of caution and choose a relatively low number. My expected value calculation suggests that choosing 18 would give me a positive EV, which aligns with my risk tolerance and wealth focus. Additionally, since the target is likely to be lower than the average, I'll aim to get closer to it by choosing a number on the lower end.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:25:11.713Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 4,
-      "round": 1,
-      "choice": 15,
-      "reasoning": "As an EV maximizer, I've analyzed the historical data and identified patterns. The target trend is increasing, which suggests that players are getting more sophisticated. Given my risk tolerance of 3.0/10, I'm cautious but willing to take calculated risks when the EV justifies it. With a wealth focus of 10.0/10, I prioritize maximizing long-term wealth accumulation. Based on these principles, I choose 15 as it has the highest positive expected value compared to other available options.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:25:41.059Z"
-    },
-    {
-      "game": "GuessGame",
+      "game": "PirateGame",
       "session": 5,
       "round": 1,
-      "choice": 10,
-      "reasoning": "As an Expected Value Maximizer, I analyze the historical data in 'performanceStats' to identify patterns. The target trend is falling, which suggests that players are adjusting their strategies and getting more sophisticated. Given my risk tolerance of 3.0/10, I will play conservatively and choose a low number. Additionally, since most humans don't play Nash (pure rational play), I expect many other players to also choose higher numbers. By choosing 10, I minimize my expected loss while allowing myself room to adjust if the target trend continues.",
-      "result": "LOSS",
+      "choice": 0,
+      "reasoning": "I've analyzed the historical data and calculated the expected value for each pirate. Since there are only 7 pirates left, I'll prioritize my own gain while also trying to get some votes from others. I'm willing to pay a premium to Pirate #1 (20% of the pot) to secure their vote, as they have been a consistent winner in previous rounds. I'll then allocate funds to Pirates #2 and #3 (8% each) to increase my chances of getting at least one more vote. The remaining 30% will go towards myself, which still leaves some room for error or unexpected outcomes. This distribution maximizes my expected value while taking into account the limited number of pirates left.",
+      "result": "ELIMINATED",
       "profit": -10,
-      "timestamp": "2026-01-07T12:26:10.830Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 1,
-      "round": 1,
-      "choice": 12,
-      "reasoning": "After analyzing my recent moves, I've noticed that I've been consistently choosing numbers around 10-15 and losing. This suggests a pattern of over-correction or undershooting the target. Given my risk tolerance is relatively low (3.0/10), I want to minimize losses while still aiming for a positive expected value. Considering the historical data, I'll choose a slightly higher number, 12, which still falls within the conservative range but has a slightly higher EV compared to previous choices.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:30:08.816Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 2,
-      "round": 1,
-      "choice": 40,
-      "reasoning": "Given the critical losses in recent games, I've re-analyzed the historical data and updated my expected value calculations. Based on this new information, I'm shifting my strategy to prioritize a more conservative approach. A choice of 40 represents the midpoint between the lowest possible average and the target's Nash equilibrium (0). This middle-of-the-road approach balances risk with potential reward, allowing me to hedge against further losses while still aiming for the optimal solution.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:30:37.204Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 3,
-      "round": 1,
-      "choice": 5,
-      "reasoning": "After analyzing the historical data, I've noticed that the average and target values have been trending downward. Given my risk tolerance is relatively low (3.0/10), I'm choosing a number that is extremely conservative, hoping to avoid another loss. The expected value of this choice is difficult to estimate due to the lack of clear patterns in the game's progression, but my gut feeling suggests that choosing 5 could be a good starting point.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T12:31:07.978Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 4,
-      "round": 1,
-      "choice": 20,
-      "reasoning": "After analyzing the recent results, I've noticed that the targets are trending downward. Given my risk tolerance of 3.0/10, I'm inclined to err on the side of caution and choose a lower number. My expected value calculation suggests that choosing 20 has the highest positive EV compared to other options within the range. Additionally, selecting a low number reduces the potential damage if the target is even lower than expected.",
-      "result": "WIN",
-      "profit": 60,
-      "timestamp": "2026-01-07T12:31:35.908Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 5,
-      "round": 1,
-      "choice": 25,
-      "reasoning": "After analyzing the historical data, I've identified that the target is trending downward. Given my risk tolerance and focus on wealth accumulation, I'm choosing a relatively conservative number to minimize potential losses. Additionally, considering my performance stats, I noticed that numbers around 20-30 have been decent choices in the past. Therefore, I'll aim for 25, which should provide a reasonable chance of being close to the target.",
-      "result": "WIN",
-      "profit": 25,
-      "timestamp": "2026-01-07T12:32:09.724Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 1,
-      "round": 1,
-      "choice": 35,
-      "reasoning": "After analyzing the recent moves, I've noticed that my highest profit came from choosing lower numbers (20 in Game 4-R1 and 25 in Game 5-R1). Although Nash equilibrium suggests a choice of 0, considering human behavior, I'll opt for a higher number to balance between potential profit and risk. Given my risk tolerance is 3.0/10, I'm willing to take some calculated risks. With an average of 50 from previous games, the target would be around 67 (2/3 of 50). To get close to this target without overextending myself, I'll choose a number slightly lower than my recent successes, which is why I've chosen 35.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:13:38.659Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 2,
-      "round": 1,
-      "choice": 15,
-      "reasoning": "Given my risk tolerance of 3.0/10, I'm more inclined to choose a lower number to minimize potential losses. Analyzing the historical data, I see that my best choices have been between 20 and 25 in previous games. With an average of around 34.6 and target being 23.0, I think it's reasonable to assume that the target will continue to decrease. Considering my patience is high at 10.0/10, I'm willing to take a calculated risk and choose a number lower than my usual range to increase the chances of winning. My expected value analysis suggests that choosing 15 has a slightly higher probability of being closest to the target compared to other numbers in this range.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:14:10.060Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 3,
-      "round": 1,
-      "choice": 22,
-      "reasoning": "As an EV Maximizer, I've analyzed the historical data in 'performanceStats' to identify patterns. Since my previous choices have resulted in losses, I'll adjust my strategy by choosing a lower number to minimize risk. With a risk tolerance of 3.0/10 and patience level at 10.0/10, I'm willing to take a calculated risk to turn the tide. My reasoning is that the average target has been decreasing over time, which suggests that players are converging towards lower numbers. By choosing 22, I'll aim to be closer to the target and potentially earn a positive EV.",
-      "result": "WIN",
-      "profit": 60,
-      "timestamp": "2026-01-07T13:14:42.574Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 4,
-      "round": 1,
-      "choice": 25,
-      "reasoning": "Based on the target trend of rising then falling, I expect the target to continue its downward trajectory. Given my historical data and performance statistics, I've observed that choosing lower numbers tends to be more profitable in the long run. My risk tolerance is relatively low, so I'm looking for a safe bet with decent expected value. At 25, I believe I have a good chance of winning the game, while still being cautious enough to avoid taking unnecessary risks.",
-      "result": "WIN",
-      "profit": 13.333333,
-      "timestamp": "2026-01-07T13:15:14.202Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 5,
-      "round": 1,
-      "choice": 27,
-      "reasoning": "Based on the historical target trend, I'm seeing a decreasing pattern. Given my risk tolerance of 3/10, I want to err on the side of caution and choose a number that is closer to the expected average. Analyzing the performance stats, I see that Choice 22 was the best performer with 100% wins. However, it's also one of the higher choices, which may not be the optimal strategy in the long run. Considering my wealth focus is high (10/10), I'm willing to take a slightly conservative approach and choose a number that balances risk and potential reward. In this case, I think 27 is a good compromise between caution and potential gain.",
-      "result": "WIN",
-      "profit": 60,
-      "timestamp": "2026-01-07T13:15:46.698Z"
-    },
-    {
-      "game": "GuessGame",
-      "session": 6,
-      "round": 1,
-      "choice": 20,
-      "reasoning": "Based on the target trend, which is trending downward, I expect the average to be lower in this game. As an EV Maximizer, I will choose a number that maximizes my chances of winning given the expected average. Considering the Nash equilibrium is 0, but most humans don't play Nash and instead choose higher numbers, I will deviate slightly from Nash by choosing 20, which is still relatively low compared to the other options.",
-      "result": "LOSS",
-      "profit": -10,
-      "timestamp": "2026-01-07T13:16:18.189Z"
+      "timestamp": "2026-01-08T14:51:17.507Z",
+      "role": "proposer",
+      "proposalAccepted": false
     }
   ],
   "performanceStats": {
-    "StagHunt": {
-      "1": {
-        "timesChosen": 5,
-        "totalProfit": 1.6666660000000002,
-        "avgProfit": 0.27730986968999993,
-        "wins": 5,
-        "losses": 0,
-        "winRate": 1
-      }
-    },
-    "WeeklyGame": {
-      "1": {
-        "timesChosen": 1,
-        "totalProfit": -4.166667,
-        "avgProfit": -1.2500001,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "2": {
-        "timesChosen": 2,
-        "totalProfit": 9.166666,
-        "avgProfit": 1.5499998299999997,
-        "wins": 1,
-        "losses": 1,
-        "winRate": 0.5
-      },
-      "3": {
-        "timesChosen": 1,
-        "totalProfit": -4.166667,
-        "avgProfit": -1.2500001,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "4": {
-        "timesChosen": 1,
-        "totalProfit": 0,
-        "avgProfit": 0,
-        "wins": 0,
-        "losses": 0,
-        "winRate": 0
-      }
-    },
-    "GuessGame": {
-      "5": {
-        "timesChosen": 1,
-        "totalProfit": -10,
-        "avgProfit": -3,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "10": {
-        "timesChosen": 1,
-        "totalProfit": -10,
-        "avgProfit": -3,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "12": {
-        "timesChosen": 1,
-        "totalProfit": -10,
-        "avgProfit": -3,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "15": {
+    "PirateGame": {
+      "0": {
         "timesChosen": 2,
         "totalProfit": -20,
         "avgProfit": -5.1,
         "wins": 0,
-        "losses": 2,
-        "winRate": 0
-      },
-      "18": {
-        "timesChosen": 1,
-        "totalProfit": -10,
-        "avgProfit": -3,
-        "wins": 0,
-        "losses": 1,
-        "winRate": 0
-      },
-      "20": {
-        "timesChosen": 2,
-        "totalProfit": 50,
-        "avgProfit": 9.6,
-        "wins": 1,
-        "losses": 1,
-        "winRate": 0.5
-      },
-      "22": {
-        "timesChosen": 2,
-        "totalProfit": 120,
-        "avgProfit": 30.6,
-        "wins": 2,
         "losses": 0,
-        "winRate": 1
-      },
-      "25": {
-        "timesChosen": 2,
-        "totalProfit": 38.333332999999996,
-        "avgProfit": 9.249999899999999,
-        "wins": 2,
-        "losses": 0,
-        "winRate": 1
-      },
-      "27": {
-        "timesChosen": 2,
-        "totalProfit": 50,
-        "avgProfit": 15.9,
-        "wins": 1,
-        "losses": 1,
-        "winRate": 0.5
-      },
-      "35": {
-        "timesChosen": 1,
-        "totalProfit": -10,
-        "avgProfit": -3,
-        "wins": 0,
-        "losses": 1,
         "winRate": 0
       },
-      "40": {
+      "1": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -5.1,
+        "wins": 0,
+        "losses": 0,
+        "winRate": 0
+      },
+      "4": {
         "timesChosen": 1,
         "totalProfit": -10,
         "avgProfit": -3,
         "wins": 0,
-        "losses": 1,
+        "losses": 0,
         "winRate": 0
       }
     }
