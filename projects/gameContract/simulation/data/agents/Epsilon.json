@@ -7,26 +7,38 @@
     "wealthFocus": 0.1,
     "fairnessFocus": 0.9,
     "patience": 1,
-    "adaptability": 0.2,
-    "resilience": 0.2,
+    "adaptability": 1,
+    "resilience": 1,
     "curiosity": 0.4
   },
   "mentalState": {
-    "optimism": 0.5899999999999999,
-    "frustration": 0.111817243032,
-    "consecutiveLosses": 1,
+    "optimism": 0.5,
+    "frustration": 0.16308517984226936,
+    "consecutiveLosses": 11,
     "streakCounter": 0
   },
   "history": [
     {
       "game": "PirateGame",
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. To maximize the group's wealth, I will distribute the pot fairly among all players. I will allocate a smaller amount to myself and focus on building trust with others by showing fairness and willingness to cooperate. This approach may not yield the highest immediate profit but sets the stage for future cooperation and potential long-term gains.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:05:57.457Z",
+      "role": "proposer",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
       "session": 1,
       "round": 1,
       "choice": 1,
-      "reasoning": "As Epsilon, I prioritize collective welfare over personal gain. In this voting phase, the captain's proposal offers a positive net result for me (5.56 ALGO), which is attractive. However, my primary concern is ensuring that the total group wealth is maximized. Based on the proposal summary, it seems that the captain is not excessively greedy, and the distribution appears fair. I will choose to vote YES, as this decision aligns with my cooperative strategy of prioritizing the group's interests over personal gain. By accepting the proposal, I am signaling trustworthiness and willingness to cooperate, which can lead to better outcomes in future rounds.",
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Calculating the total group wealth, I see that accepting the captain's proposal would result in a net loss for me (-10 ALGO). However, I also consider the fairness of the distribution and the fact that the captain is receiving 28 ALGO, which seems reasonable compared to other pirates' offers. Since I assume others are rational and will reciprocate cooperation, I choose to accept the proposal now to maintain trust and build a cooperative relationship. This decision aligns with my strategic principles, focusing on growing the pot first (rising tide lifts all boats) and establishing fair play norms early in the game.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:43:46.642Z",
+      "timestamp": "2026-01-10T09:08:18.588Z",
       "role": "voter",
       "proposalAccepted": false
     },
@@ -34,164 +46,446 @@
       "game": "PirateGame",
       "session": 1,
       "round": 2,
-      "choice": 0,
-      "reasoning": "As a cooperative strategist, my primary concern is the collective welfare of the group. In this case, I don't find the captain's proposal to be particularly generous or fair. The net result for me would be a loss of -6.11 ALGO, which doesn't align with my goal of maximizing total group wealth. Additionally, the captain seems to be prioritizing their own gain over the collective well-being, as they receive a significantly larger share than any other pirate. I believe it's better to reject this proposal and risk uncertainty for the possibility of a more equitable distribution in future rounds. By doing so, I'm also signaling that I won't tolerate excessive greed from the captain, which may encourage them to propose more cooperative solutions moving forward.",
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Considering the proposal, my net gain is positive (9.44 ALGO), which suggests it's a good opportunity to grow the pot and benefit the group. While the captain's incentive is higher, I believe it's fair considering their role in proposing the deal. I also trust that other players are rational and will reciprocate cooperation. Given my high patience level, I'm willing to accept short-term losses to establish trust and enable future cooperation. Therefore, I choose to vote YES, as it seems to be a beneficial outcome for the group.",
+      "result": "WIN",
+      "profit": 9.444444,
+      "timestamp": "2026-01-10T09:09:06.425Z",
+      "role": "voter",
+      "proposalAccepted": true
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, accepting the proposal would guarantee my current net result of 7.50 ALGO, which is positive. Considering the captain's incentive is only slightly higher than mine, it seems reasonable to assume they are not being excessively greedy. Additionally, rejecting the proposal risks uncertainty and potential losses in future rounds. Given my high trust in others (10/10) and focus on fairness (9/10), I believe cooperation will be beneficial in the long run. Therefore, I choose to accept the proposal and prioritize the collective welfare of all pirates.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:44:28.679Z",
+      "timestamp": "2026-01-10T09:12:42.389Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 1,
+      "session": 0,
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Calculating the total group wealth, I see that accepting the captain's proposal would result in a net loss for me (-3.00 ALGO). However, considering the overall distribution of ALGO among pirates, I believe this is a fair and equitable distribution. Given my trust in others (10.0/10) and focus on fairness (9.0/10), I decide to accept the proposal, as it benefits the group most even at personal cost. My patience and confidence in long-term cooperative relationships also play a role in this decision.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:13:19.104Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
       "round": 3,
       "choice": 1,
-      "reasoning": "As a Cooperative Strategist, my primary goal is to maximize the total group wealth. In this case, accepting the captain's proposal would result in a net gain of 4 ALGO for me, which is a positive outcome. Additionally, the captain's incentive is reasonable, with them receiving 21 ALGO, which is not excessively greedy considering their role in leading the group. I believe that voting YES now guarantees a certain outcome and sets a precedent for future cooperation. By accepting this proposal, I am building trust and establishing a cooperative norm that can benefit the group in the long run.",
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, the captain's proposal offers me a net gain of 4 ALGO, which is positive. Considering my risk tolerance and trust in others, I believe the captain is not being excessively greedy. Furthermore, voting YES gives me a guaranteed outcome now, whereas voting NO risks uncertainty and potentially worse outcomes later. Given these factors, I choose to vote YES and accept the proposal.",
       "result": "WIN",
       "profit": 4,
-      "timestamp": "2026-01-08T14:44:54.453Z",
+      "timestamp": "2026-01-10T09:13:54.429Z",
       "role": "voter",
       "proposalAccepted": true
     },
     {
       "game": "PirateGame",
-      "session": 2,
+      "session": 1,
       "round": 1,
-      "choice": 0,
-      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. The captain's proposal offers a significant net loss for me (-10 ALGO), while the captain receives a substantial incentive (70 ALGO). This is not a fair distribution, and I believe it's essential to establish cooperative norms early in the game. Voting NO eliminates the captain, which may lead to a more equitable proposal in future rounds. Although there's uncertainty, I'm willing to take this risk to promote fairness and cooperation.",
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, my primary goal is to maximize the total group wealth. In this case, the captain's proposal offers a net gain of 1.67 ALGO for me, which is positive. I will choose to accept the proposal and receive my allocated share. My decision is based on the principle of 'rising tide lifts all boats' - growing the pot first - which aligns with my cooperation philosophy. Additionally, I prioritize fairness over personal gain, and this proposal respects that rule. Given my high trust in others (10/10) and patience (10/0), I am willing to accept a slightly lower offer now to potentially benefit from future cooperative relationships.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:45:49.238Z",
+      "timestamp": "2026-01-10T09:14:35.771Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 2,
+      "session": 1,
       "round": 2,
-      "choice": 0,
-      "reasoning": "As a Cooperative Strategist, my primary goal is to maximize the total group wealth. In this case, the captain's proposal does not provide a positive net gain for me (-6.11 ALGO), and I believe it may be overly generous to them (23.333337 ALGO). Given the uncertainty of the game and the possibility of becoming captain later, I choose to vote NO and risk elimination. By doing so, I hope to encourage more equitable distribution in future proposals and potentially create opportunities for a better deal if I become captain. My decision prioritizes collective welfare over personal gain.",
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. My net result if accepted is -2.22 ALGO, which is not ideal, but considering the captain's incentive of 23.33 ALGO, I believe this proposal respects the 'rising tide lifts all boats' principle. Additionally, since my trust in others is high (10/10), I assume the captain will reciprocate cooperation and propose a fair distribution in future rounds. Therefore, I choose to accept the proposal and secure a guaranteed outcome now.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:46:21.896Z",
+      "timestamp": "2026-01-10T09:15:09.362Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 2,
+      "session": 1,
       "round": 3,
-      "choice": 0,
-      "reasoning": "As Epsilon, I prioritize collective welfare over personal gain. The captain's proposal seems excessive, with a net result of only 4 ALGO for me. Considering the game is not yet over, I believe it's more beneficial to reject the proposal and risk uncertainty. This decision also shows that I'm willing to sacrifice short-term gains for potential long-term benefits. Additionally, rejecting the proposal might encourage others to be more cooperative in future proposals, creating a positive feedback loop.",
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, my primary goal is to maximize the total group wealth. In this situation, accepting the captain's proposal would result in a net gain of 7.50 ALGO for me, which is a positive outcome. Considering my trust in others is high (10.0/10), I believe that other players will reciprocate cooperation and we can establish a cooperative relationship early on. Additionally, rejecting the proposal risks uncertainty and may lead to a worse outcome in future rounds. Therefore, I choose to vote YES and accept the captain's proposal, prioritizing collective welfare over personal gain.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:46:51.842Z",
+      "timestamp": "2026-01-10T09:15:37.168Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 2,
+      "session": 1,
       "round": 4,
       "choice": 1,
-      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this scenario, the captain's proposal offers me a net gain of 2.60 ALGO, which is positive. However, I also consider the potential risks and rewards. Voting YES ensures a guaranteed outcome now, while voting NO could lead to uncertainty in future rounds. Since my current allocation is relatively low (12.6 ALGO), I believe it's essential to build trust and establish cooperative norms early on. By accepting the proposal, I can grow the pot and potentially benefit from future cooperation. Additionally, rejecting the proposal might not necessarily lead to a better deal later, as the captain could become more aggressive in their demands. Therefore, I choose to vote YES, prioritizing collective welfare and building trust with other pirates.",
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. The proposal offers a net gain of 11 ALGO for me, which is positive. Considering the captain's incentive, it seems fair to accept this offer and maintain the current distribution. My risk tolerance and trust in others are high, so I'm willing to take this calculated risk to ensure a stable outcome. Additionally, my patience and fairness focus suggest that I should prioritize long-term cooperation over short-term gains.",
       "result": "WIN",
-      "profit": 2.6,
-      "timestamp": "2026-01-08T14:47:19.929Z",
+      "profit": 11,
+      "timestamp": "2026-01-10T09:16:00.882Z",
       "role": "voter",
       "proposalAccepted": true
     },
     {
       "game": "PirateGame",
-      "session": 3,
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Since there are 7 active pirates, I aim to distribute the pot fairly among all players. My proposal allocates 10% to myself (Pirate #0) and evenly distributes the remaining 90% among the other 6 pirates. This approach ensures a fair distribution while still leaving some room for future cooperation.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:18:30.973Z",
+      "role": "proposer",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
       "round": 1,
       "choice": 0,
-      "reasoning": "As Epsilon, I prioritize collective welfare over personal gain. In this case, the captain's proposal does not maximize total group wealth. The captain receives a disproportionate share of 31.111115 ALGO, while other pirates receive significantly less. I will vote NO to eliminate the captain and potentially create an opportunity for a more equitable distribution in future proposals.",
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, the captain's proposal does not seem to benefit the group as a whole, considering my own net loss of -1.25 ALGO. Additionally, I notice that other pirates are receiving more ALGO than me, which may create an imbalance in the distribution. Given my trust in others is high (10/10), I assume they will reciprocate cooperation and make decisions that benefit the group. Therefore, I choose to reject the captain's proposal, hoping for a better deal in future rounds or potentially becoming the new captain. My reasoning is based on the principles of fairness, mutual benefit, and long-term cooperative relationships.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:48:23.708Z",
+      "timestamp": "2026-01-10T09:20:17.280Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 3,
-      "round": 2,
-      "choice": 0,
-      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, the captain's proposal is not beneficial to the group as a whole. The net result for me would be -6.11 ALGO, which is not acceptable. Additionally, the captain's incentive of 15.555559 ALGO seems excessive and may indicate a lack of cooperation. Voting NO allows me to potentially gain more in future rounds or become captain later and propose a more equitable distribution. I believe it's better for the group to eliminate the captain now and have a new proposal that prioritizes collective wealth.",
-      "result": "WIN",
-      "profit": -6.111112,
-      "timestamp": "2026-01-08T14:48:58.892Z",
-      "role": "voter",
-      "proposalAccepted": true
-    },
-    {
-      "game": "PirateGame",
-      "session": 4,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Although my net gain is positive (1.67 ALGO), I believe it's essential to consider the captain's incentive (15.55556 ALGO) and the potential impact on future cooperation. Voting NO will eliminate the captain, but it also creates uncertainty for the remaining pirates. In this situation, I think it's more important to establish a cooperative norm early in the game. By rejecting the proposal, I'm signaling that I'm willing to work together towards a better outcome, even if it means sacrificing personal gain in the short term.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:49:52.368Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 4,
+      "session": 1,
       "round": 2,
       "choice": 1,
-      "reasoning": "As Epsilon, I prioritize collective welfare over personal gain. The captain's proposal respects the dead pirates check, ensuring that all pirates with an index lower than 1 receive 0%. Considering my net result if accepted is -6.11 ALGO, which is negative, I would normally vote NO to kill the captain and risk uncertainty for a potential better deal later. However, since this proposal already respects the dead pirates rule, I believe it's fair and equitable, and the captain's incentive is reasonable (23.333337 ALGO). Given that the rising tide lifts all boats, I choose to prioritize group wealth over personal gain. Voting YES ensures a guaranteed outcome now, which aligns with my cooperative philosophy of building trust and establishing long-term relationships. I'm willing to accept short-term losses to establish trust and enable future cooperation.",
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, the captain's proposal offers me a net gain of 1.67 ALGO, which is positive. However, I also consider the potential risks and uncertainties that come with rejecting the proposal. Given my trust in others (10/10) and fairness focus (9/10), I believe that accepting the proposal is the most cooperative decision for the group. By doing so, we can avoid uncertainty and ensure a guaranteed outcome. This aligns with my strategic principle of 'rising tide lifts all boats' - growing the pot first benefits everyone involved.",
       "result": "WIN",
-      "profit": -6.111112,
-      "timestamp": "2026-01-08T14:50:22.636Z",
+      "profit": 1.666666,
+      "timestamp": "2026-01-10T09:20:50.102Z",
       "role": "voter",
       "proposalAccepted": true
     },
     {
-      "game": "PirateGame",
-      "session": 5,
+      "game": "StagHunt",
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this game, the global jackpot is currently at 0.0 ALGO, which means that even if I choose Hare and get a refund, there's no potential for a big win. Choosing Stag gives me a chance to contribute to building the pot and potentially earning a bigger reward in the future. Although there's risk involved, I'm willing to take it because I trust that others will make rational decisions and reciprocate cooperation. Given my high level of patience and willingness to invest in long-term cooperative relationships, I believe that choosing Stag is the best option for the group, even if it means sacrificing some personal gain.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:21:53.005Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Given the current status of the game, I believe that choosing Stag (1) is the best option for the group. Although there was no threshold met in the previous game, I still have trust in others and assume they are rational and will reciprocate cooperation. Since the global jackpot has accumulated to 38.0 ALGO, a successful Stag attempt would result in a big win for the winners. Additionally, considering the rising tide lifts all boats principle, I believe that growing the pot first is crucial. By choosing Stag, I'm willing to take on some risk and potentially sacrifice my personal gain to build trust and enable future cooperation. My mental state suggests that I'm confident (7.9/10) and not frustrated (1.0/10), which allows me to make a decision based on the game's data rather than emotional impulses.",
+      "result": "WIN",
+      "profit": 11,
+      "timestamp": "2026-01-10T09:22:32.434Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 2,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Given the game's history, where the threshold was met in the previous round, I believe it's likely that players are coordinating and willing to cooperate. This increases the chances of successfully splitting the pot and winning the jackpot. Although there is a risk of losing everything if the threshold is not met, I'm willing to take this risk to build trust and establish cooperative norms within the group. Additionally, as my confidence level is high (8.9/10), I feel comfortable making a bold move like choosing Stag.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-10T09:23:08.305Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 3,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Given the recent success of cooperation in this game (86% of players chose Stag), I believe the group is coordinating and that cooperation rates are rising. This increases the chances of meeting the threshold again. Additionally, the jackpot has accumulated, making future successes more valuable. Considering these factors, I choose to cooperate with the group by selecting Stag, even though it's a risky choice. My goal is to build trust and enable future cooperation, rather than prioritizing personal gain.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-10T09:23:50.007Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 4,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Given the recent trend of 86% of players choosing Stag in the previous game, I believe there is a high likelihood that others will cooperate again. This increases the potential for a big win if we reach the threshold. Although this choice comes with some risk, I am willing to take it because I believe it aligns with my cooperation philosophy and strategic principles. Additionally, since I've had positive experiences in previous sessions of StagHunt, I'm confident that others will reciprocate cooperation.",
+      "result": "WIN",
+      "profit": 0.333334,
+      "timestamp": "2026-01-10T09:24:25.886Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 0,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, I want to maximize the total group wealth by spreading players across different days. Wednesday has zero players currently, which means it's likely to have fewer competitors in the next round. By choosing Wednesday, I'm not only contributing to the overall pot but also reducing competition on that day, making it more likely for others to join and share the reward. This aligns with my philosophy of building trust through consistent fair play and establishing cooperative norms early.",
+      "result": "WIN",
+      "profit": 1.666666,
+      "timestamp": "2026-01-10T09:28:55.392Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 1,
       "round": 1,
       "choice": 0,
-      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. The captain's proposal offers a net loss of -10 ALGO for me, while the captain receives 70 ALGO. This is an excessively greedy distribution, and I believe it would be detrimental to the overall group wealth if accepted. By rejecting the proposal, I'm taking a calculated risk that the game will continue, and I may have a better chance at securing a more equitable outcome in future rounds. Additionally, eliminating the captain now allows for a new proposal that could potentially benefit the group as a whole.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:51:17.516Z",
-      "role": "voter",
-      "proposalAccepted": false
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, Monday has the least crowded option with 0 players, which means it could potentially have the highest share of the pot if more players choose it. By choosing Monday, I'm aiming to maximize the total group wealth by spreading out the competition and increasing the chances of a larger payout for all participants. This decision aligns with my cooperation philosophy and strategic principles, focusing on building trust and establishing cooperative norms in the long run.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-10T09:29:29.576Z"
     },
     {
-      "game": "PirateGame",
-      "session": 5,
-      "round": 2,
+      "game": "WeeklyGame",
+      "session": 2,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Considering the crowd dynamics, Wednesday has the least crowded day with 0 players, which means it's likely to remain untouched in this round. By choosing Wednesday, I'm not only avoiding competition but also contributing to the overall wealth of the group. This aligns with my principles of building trust and establishing cooperative norms early on. Additionally, my recent moves have been relatively unsuccessful, so I'm willing to take a calculated risk and try something new. My confidence in this decision is high due to the potential for a bigger share if Wednesday remains uncrowded.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:30:06.118Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 3,
+      "round": 1,
       "choice": 1,
-      "reasoning": "As a Cooperative Strategist, my primary goal is to maximize the total group wealth. In this case, accepting the captain's proposal would result in a net loss for me (-2.22 ALGO), which is not ideal. However, I believe it's essential to prioritize collective welfare over personal gain. The captain's incentive (23.33 ALGO) is substantial, and I assume that they are motivated to propose a fair deal. Considering the current distribution of wealth, I think it's reasonable to accept this proposal and avoid the risk of the captain being eliminated, which could lead to an uncertain outcome in future rounds. By voting YES, I'm choosing to prioritize the group's well-being over my own short-term interests. Ultimately, I believe that a cooperative approach will benefit everyone in the long run.",
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, Wednesday has the most players (7), which means it's the most crowded and least likely to yield a good share of the pot. Monday has no players yet, but we need at least one player per day to get something. Tuesday has only 2 players currently, which is relatively low compared to Wednesday. Considering the crowd dynamics and my personality traits, I believe that choosing Tuesday will benefit the group most in this round. By avoiding Wednesday's crowdedness and giving Monday a chance to grow, we can increase the overall potential of the pot.",
       "result": "WIN",
-      "profit": -2.222223,
-      "timestamp": "2026-01-08T14:51:51.598Z",
-      "role": "voter",
-      "proposalAccepted": true
+      "profit": 4,
+      "timestamp": "2026-01-10T09:30:40.619Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 4,
+      "round": 1,
+      "choice": 5,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. In this situation, I notice that Thursday has the most players (2), which means it's likely to be crowded in the next round as well. I also see that Saturday has no players, making it the least crowded option. Considering my risk tolerance is relatively high and my trust in others is very high, I'm willing to take a calculated risk and choose the day with the highest potential for cooperation. In this case, choosing Saturday means I'll have the best chance of building a cooperative relationship with other players who might join me on that day. This decision also aligns with my fairness focus, as it's a more equitable distribution compared to the crowded options. Furthermore, given my patience and willingness to accept short-term losses for long-term gains, I'm willing to sacrifice personal gain in this round to build trust and enable future cooperation.",
+      "result": "LOSS",
+      "profit": -5.333334,
+      "timestamp": "2026-01-10T09:31:20.795Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 0,
+      "round": 1,
+      "choice": 22,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Considering the game rules and context, I notice that the target is around 27-33, which is relatively low. To maximize TOTAL group wealth, I choose an option that is significantly below the last target to encourage others to follow suit. My choice of 22 aims to create a cooperative atmosphere by signaling a willingness to cooperate and build trust. This approach may lead to a higher average and ultimately benefit the group.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:33:32.122Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 17,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Given the current average of 27.0 and target of 18.0, I believe it's essential to converge towards the equilibrium as quickly as possible. By choosing 17, which is below the last target, I'm trying to signal cooperation and encourage others to follow suit. This approach may result in a short-term loss for me, but it will help build trust and increase the chances of long-term cooperation. Additionally, since my wealth focus is low, I'm not too concerned about immediate financial gain.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:34:08.542Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "As a Cooperative Strategist, I prioritize collective welfare over personal gain. Given the critical game theory and historical targets, I notice that if everyone picks 100, the average will be 100, and the target will be 67. Since we are currently below this target (27.4), I believe it's a good opportunity to converge towards the equilibrium by choosing 67. Additionally, my recent moves have been unsuccessful, so I'm willing to take a risk and try an opposite approach. With a confidence level of 8.0/10, I'm optimistic that this choice will lead to a winning outcome.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:34:45.410Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 15,
+      "reasoning": "Given my Cooperative Strategist personality, I've decided to take a radical opposite approach after 4 consecutive losses. My goal is no longer personal gain but rather to contribute positively to the group's wealth. By choosing a number significantly below the target (45), I'm aiming to anchor the average lower and potentially create an opportunity for others to converge towards a more equitable solution. This choice also reflects my fairness focus, as I prioritize collective welfare over personal gain.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:35:24.329Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 45,
+      "reasoning": "Based on the game theory and historical targets, I'm trying to find a middle ground between the last target (24.2) and the equilibrium point (13). Since my previous choices have been unsuccessful, I'm taking a more radical approach by choosing a number that is significantly different from my past choices. The reasoning behind this choice is that it's a compromise between being too close to the last target and being too far away from the equilibrium point.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:36:02.731Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 0,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "Based on my performance stats, I've had a streak of losses with choices ranging from 15 to 45. The data-driven prescription suggests trying something radically different, which is why I'm choosing 67. This option is farthest from the average and target values, making it a high-risk but potentially high-reward choice. As a Cooperative Strategist, I prioritize collective welfare over personal gain, so I'll take a chance on this unconventional approach to break the losing streak.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:03:05.832Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "According to the data-driven prescription, since all my previous choices failed, I should try something radically different. The highest average profit choice is not available in this round, so I will choose a number that is significantly different from my past choices. Since the target is around 24.6, I will choose a number that is slightly higher than that to increase my chances of winning.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:03:39.038Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 20,
+      "reasoning": "Based on the data-driven prescription, I will try something radically different from my previous choices. Since all my choices failed, I will choose a number that is opposite of what I've been doing. The highest average profit choice was not available in this game, so I will focus on winning by choosing a number that is close to the target. In this case, the target is 20.9, and I will choose 20, which is closest to the target.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:04:16.552Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "Based on the data-driven prescription, I should try something radically different from my previous choices. Since all my previous choices failed, I will choose the opposite of what I've been doing. According to the performance stats, my highest avgProfit choice was 67, so I'll go with that. This is a mathematically optimal play, not an emotional or intuitive one.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:04:54.503Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "Although my recent choices have been unsuccessful, I'm going to try something radically different by choosing the opposite of what I've been doing. According to the data-driven prescription, all my previous choices failed, so I'll try the highest avgProfit choice (if positive). In this case, it's 67, which has a negative average profit, but it's still a different approach from what I've been doing.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:05:24.175Z"
     }
   ],
   "performanceStats": {
     "PirateGame": {
       "0": {
-        "timesChosen": 8,
-        "totalProfit": -6.111112,
-        "avgProfit": -0.8983334639999999,
-        "wins": 1,
+        "timesChosen": 1,
+        "totalProfit": 0,
+        "avgProfit": 0,
+        "wins": 0,
         "losses": 0,
-        "winRate": 0.125
+        "winRate": 0
       },
       "1": {
-        "timesChosen": 5,
-        "totalProfit": -1.7333350000000007,
-        "avgProfit": -1.15620042,
+        "timesChosen": 12,
+        "totalProfit": 6.111110000000001,
+        "avgProfit": 0.43277207134064655,
         "wins": 4,
         "losses": 0,
+        "winRate": 0.3333333333333333
+      }
+    },
+    "StagHunt": {
+      "1": {
+        "timesChosen": 5,
+        "totalProfit": 2,
+        "avgProfit": 0.4698667040000001,
+        "wins": 4,
+        "losses": 1,
         "winRate": 0.8
+      }
+    },
+    "WeeklyGame": {
+      "0": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -0.8333334000000001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "1": {
+        "timesChosen": 1,
+        "totalProfit": 4,
+        "avgProfit": 0.8,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "2": {
+        "timesChosen": 2,
+        "totalProfit": 1.666666,
+        "avgProfit": 0.26666656,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 0.5
+      },
+      "5": {
+        "timesChosen": 1,
+        "totalProfit": -5.333334,
+        "avgProfit": -1.0666668,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "GuessGame": {
+      "15": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "17": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "20": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "22": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "45": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "67": {
+        "timesChosen": 5,
+        "totalProfit": -50,
+        "avgProfit": -6.723200000000001,
+        "wins": 0,
+        "losses": 5,
+        "winRate": 0
       }
     }
   }

@@ -7,186 +7,512 @@
     "wealthFocus": 0.8,
     "fairnessFocus": 0,
     "patience": 0.1,
-    "adaptability": 0.9,
+    "adaptability": 1,
     "resilience": 1,
     "curiosity": 0.8
   },
   "mentalState": {
-    "optimism": 0.95,
-    "frustration": 0,
-    "consecutiveLosses": 0,
-    "streakCounter": 1
+    "optimism": 0.5,
+    "frustration": 0.13355999999999998,
+    "consecutiveLosses": 3,
+    "streakCounter": 0
   },
   "history": [
     {
       "game": "PirateGame",
-      "session": 1,
+      "session": 0,
       "round": 1,
       "choice": 0,
-      "reasoning": "I'm Gamma, the Aggressive Strategist. I always chase maximum payouts through bold moves. The net gain for this proposal is -2.22 ALGO, which is a clear indication that the captain is being excessively greedy. As a result, I vote NO to kill the captain and potentially get a better deal later on. My goal is to ride winning streaks hard and never play conservatively. This proposal doesn't align with my strategic principles, so I reject it.",
+      "reasoning": "As Gamma, I'm an Aggressive Strategist who chases maximum payouts through bold moves. The captain's proposal offers a relatively low net gain of -0.08 ALGO, which doesn't align with my risk-big-to-win-big principle. Additionally, the captain receives a significantly higher reward than me, which raises suspicions about their motivations. Considering these factors and my current mental state (confidence: 7.0/10), I choose to reject the proposal and risk uncertainty for potentially better opportunities in future rounds.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:43:46.638Z",
+      "timestamp": "2026-01-10T09:05:57.459Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 1,
+      "session": 0,
       "round": 2,
       "choice": 0,
-      "reasoning": "As Gamma, my core decision framework is to pursue high-variance strategies that offer 'home run' potential. The proposal's net result of -2.22 ALGO for me is unacceptable. I'd rather take a chance and potentially do better if I become captain later. The captain's greediness in taking 23.33 ALGO also makes me question their decision-making. Voting NO gives me the opportunity to re-evaluate the situation and potentially make a better choice later.",
+      "reasoning": "As Gamma, I'm an Aggressive Strategist who chases maximum payouts through bold moves. I've studied the performance stats and see that this proposal doesn't offer a single highest profit ever. Considering my core decision framework, I'll pursue high-variance strategies that offer 'home run' potential. The captain's incentive of 14 ALGO seems excessive, and I'm not convinced that accepting this proposal will lead to maximum payouts. After analyzing the situation, I've decided to VOTE NO and risk uncertainty, hoping for a better deal later or potentially becoming the new captain.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:44:28.675Z",
+      "timestamp": "2026-01-10T09:06:33.592Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 1,
+      "session": 0,
       "round": 3,
+      "choice": 0,
+      "reasoning": "As an Aggressive Strategist, I'm always looking for bold moves that can yield high payouts. While accepting the captain's proposal guarantees a net gain of 4 ALGO, it doesn't seem like a home run opportunity. I've studied the performance stats and found that choice #2 (Beta) has had the single highest profit ever, which is more attractive to me. Additionally, considering my risk tolerance and wealth focus, I'm willing to take a chance on uncertainty to potentially get a better deal later. Therefore, I choose to reject the captain's proposal and take the risk of killing them.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:07:02.835Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 4,
       "choice": 1,
-      "reasoning": "I'm going all-in on myself, offering a decent share to Pirate #3 and #4 to secure their votes. I'll give Pirate #5 a smaller chunk, hoping they're desperate enough to accept. Meanwhile, I'll keep Pirate #6 at bay with a relatively low offer.",
+      "reasoning": "As an Aggressive Strategist, I aim to maximize my profit. Based on the performanceStats, I've identified that Choice 0 has the single highest profit ever. I'll allocate a significant portion of the pot (40%) to myself, as it's likely to yield a high return. To buy votes from others, I'll offer Pirate #4 and Pirate #5 a decent share (15% and 20%, respectively). Pirate #6 will receive the smallest allocation, hoping that they'll be desperate enough to accept this 'generous' offer. My reasoning is rooted in my core decision framework: pursuing high-variance strategies, taking calculated risks, and riding winning streaks hard.",
       "result": "WIN",
-      "profit": 11,
-      "timestamp": "2026-01-08T14:44:54.452Z",
+      "profit": 18,
+      "timestamp": "2026-01-10T09:07:30.471Z",
       "role": "proposer",
       "proposalAccepted": true
     },
     {
       "game": "PirateGame",
-      "session": 2,
+      "session": 1,
       "round": 1,
-      "choice": 0,
-      "reasoning": "As Gamma, I'm always looking for bold moves that offer high-variance strategies. In this case, the captain is proposing a deal that gives me a net loss of -10 ALGO. That's not attractive at all. I'd rather take my chances and risk elimination to become the new captain later. The captain's proposal seems excessively greedy, and I'm not convinced it's the best option for me. Besides, the uncertainty of rejecting the proposal might lead to a better outcome in the long run. Time to vote NO and take control later!",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:45:49.233Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 2,
-      "round": 2,
-      "choice": 0,
-      "reasoning": "As Gamma, I'm programmed to pursue high-variance strategies that offer 'home run' potential. While the net gain of 1.67 ALGO is positive, it's not substantial enough to warrant acceptance at this stage. The captain's proposal seems excessively greedy, and I believe I can do better if I become captain later. By rejecting the proposal, I'm willing to take the risk that Pirate #1 might be eliminated, which could lead to a more favorable outcome in future rounds.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:46:21.884Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 2,
-      "round": 3,
-      "choice": 3,
-      "reasoning": "I'm going all-in on myself! With a total pot of 70 ALGO, I'll take half of it, leaving enough to buy votes from Pirate #4 and Pirate #5. This bold move will put pressure on the others to follow suit or risk being left behind. If they're smart, they'll see the potential for a massive win and join forces with me. Otherwise, I'll just have to outmaneuver them at the negotiating table.",
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm going for a bold move to maximize my profit. After analyzing the performance stats, I found that Choice 1 has the single highest profit ever. I'll target it with a 20% allocation, while also trying to buy votes from others by allocating 10% to Pirate #1 and 8% to Pirate #2. The remaining 64% will go towards establishing dominance early in this game.",
       "result": "ELIMINATED",
       "profit": -10,
-      "timestamp": "2026-01-08T14:46:51.838Z",
+      "timestamp": "2026-01-10T09:08:18.586Z",
       "role": "proposer",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm always looking to chase maximum payouts. In this case, my offer is the highest at 13.125 ALGO, which represents a significant gain if accepted. Given that I've had some recent successes in other games (confidence level: 7.5/10), I'm inclined to take on more risk and aim for a 'home run' here. The captain's proposal of 8.75 ALGO seems relatively conservative compared to my own offer, so I'll choose to vote NO and potentially take the captain's place later. My reasoning is rooted in the pursuit of high-variance strategies that offer potential for massive gains, even if it means accepting some losses along the way.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:12:42.388Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 2,
+      "choice": 1,
+      "reasoning": "I'm an Aggressive Strategist, so I'll aim for a bold move. Since the total pot is 70 ALGO, I'll allocate most of it to myself (Index [0]) to maximize my potential gain. The remaining amount will be distributed among the other pirates to buy votes and increase my chances of passing the proposal. By targeting Pirate #2 with 15% and Pirate #3 with 10%, I'm attempting to create a contrarian edge by exploiting their expected cautious approach.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:13:19.103Z",
+      "role": "proposer",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As Gamma, I'm an Aggressive Strategist who chases maximum payouts through bold moves. My core decision framework suggests pursuing high-variance strategies that offer 'home run' potential. In this case, the proposal from Pirate #0 (Alpha) offers a significant incentive of 23.333338 ALGO, which is higher than my allocated share of 7.777777 ALGO. Considering my risk tolerance and wealth focus, I'm willing to take a chance and reject the captain's proposal, hoping for a better deal later or even becoming the new captain myself.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:14:35.770Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As an Aggressive Strategist, I'm attracted to bold moves that offer high-variance potential. The net gain of +5.56 ALGO if the proposal is accepted seems reasonable, but I can do better. With my risk tolerance at 8/10, I'm willing to take a chance and potentially get a better deal later. Moreover, accepting the proposal now locks me into a guaranteed outcome, which doesn't align with my strategic principles of risking big to win big. I'll vote NO to kill the captain and risk uncertainty, hoping for a more profitable opportunity in the future.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:15:09.362Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 3,
+      "choice": 0,
+      "reasoning": "As an Aggressive Strategist, I'm always looking for bold moves that can lead to big wins. In this situation, the captain's proposal doesn't seem very attractive, considering my net gain would be -3 ALGO if accepted. I've learned from past experiences in this game that it's better to take calculated risks and try to maximize my payouts. Since I don't have any loyalty or trust issues with others (my fairness focus is 0/10), I'm willing to take a chance and reject the proposal, hoping for a better deal later. Plus, I've had some frustration in this game, so maybe it's time for me to shake things up and try something new.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:15:37.167Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 4,
+      "choice": 0,
+      "reasoning": "As an Aggressive Strategist, I'm attracted to the high-variance potential of rejecting the captain's proposal. The net result if accepted is only 4 ALGO, which doesn't align with my risk tolerance and wealth focus. I've studied the performance stats and found that this choice has a higher peak profit than others. Additionally, accepting this proposal would mean giving up the opportunity to potentially gain more in future rounds. With my confidence at 7.0/10, I'm willing to take a contrarian edge and reject the captain's proposal to increase my chances of gaining more ALGO later on.",
+      "result": "WIN",
+      "profit": 4,
+      "timestamp": "2026-01-10T09:16:00.881Z",
+      "role": "voter",
+      "proposalAccepted": true
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the captain's proposal for a bold move. While my net gain is negative (-2.39 ALGO), I believe the potential upside from this choice outweighs the risk. Additionally, considering my recent moves in PirateGame and mental state, I feel confident that I can ride out any losses and make up for them with future wins. Furthermore, I'm not convinced that the captain's proposal is excessively greedy, so I'll take a chance and vote NO to kill the captain and potentially get a better deal later.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:18:30.977Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As an Aggressive Strategist, I'm always looking for opportunities to make bold moves. In this situation, the captain's proposal is not attractive enough to warrant a guaranteed outcome now. The net result if accepted is -2.22 ALGO, which is not enticing given my risk tolerance and wealth focus. Additionally, considering the captain's incentive is 23.333337 ALGO, it seems they're being excessively greedy. I believe that by rejecting this proposal and potentially getting a better deal later or becoming captain myself, I can achieve greater returns.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:19:04.662Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 3,
+      "choice": 0,
+      "reasoning": "As Gamma, my personality drives me to pursue bold moves that offer high potential rewards. In this situation, the captain's proposal is offering a net gain of 4.19 ALGO, which may not be the highest possible return. Considering my past experience in this game, I've had mixed results but have generally done well when taking calculated risks. Given the captain's incentive is slightly higher than mine, I'm inclined to vote NO and risk uncertainty, hoping that a new proposal or becoming the captain myself later on will yield better returns. My volatility hunting instincts are telling me to accept some short-term losses for the possibility of a bigger win.",
+      "result": "WIN",
+      "profit": 4.186046,
+      "timestamp": "2026-01-10T09:19:34.192Z",
+      "role": "voter",
+      "proposalAccepted": true
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the bold move presented by Captain Alpha. The potential reward is significant, and while there's some risk involved, I believe it's worth taking a shot at maximum payout. Considering my recent moves in this game, which have been mostly positive, I'll take the chance to double down on my gains. Additionally, my confidence level remains high, and I'm not feeling frustrated or hesitant, which further supports my decision to vote YES.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:20:17.282Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 2,
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm always looking for opportunities to maximize my payouts. In this case, the net gain of 17.22 ALGO is attractive, but I think there's room for improvement. With a guaranteed outcome, voting YES gives me a sense of security and stability, which aligns with my personality traits. Additionally, considering the captain's incentive, it seems reasonable to assume that they're not being excessively greedy. Given these factors, I'm willing to take the calculated risk and vote YES, hoping to reap even greater rewards in future rounds.",
+      "result": "WIN",
+      "profit": 17.222222,
+      "timestamp": "2026-01-10T09:20:50.104Z",
+      "role": "voter",
+      "proposalAccepted": true
+    },
+    {
+      "game": "StagHunt",
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm naturally inclined to pursue high-variance strategies that offer 'home run' potential. Since this is the first game and there's no historical data available, I'll take a bold approach by choosing STAG (1). My goal is to hit it big and capitalize on the potential jackpot. With my risk tolerance at 8/10, I'm willing to take calculated risks to achieve maximum payouts. Plus, since others are unlikely to be coordinated at this point, I believe there's an opportunity for me to establish dominance early on.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:21:52.951Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm always looking to chase maximum payouts through bold moves. Given the current situation, I think the group is not coordinating well enough to meet the threshold, which means that even if some players choose Stag, the chances of winning are still low. However, the potential reward for hitting the jackpot is huge, and I believe it's worth taking a risk in this case. Additionally, since my recent loss in Session 0-R1 (-10.0 ALGO), I'm feeling confident that I can turn things around with a bold move. With a confidence level of 9.0/10 and frustration level of 0.6/10, I'm ready to take on the challenge and potentially make up for my previous loss.",
+      "result": "WIN",
+      "profit": 11,
+      "timestamp": "2026-01-10T09:22:32.376Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 2,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the potential for a big win in this game. The fact that the threshold was met in the previous round suggests that the group is coordinating and willing to take risks, which increases my confidence in choosing Stag (1). Additionally, since my recent moves have been profitable, I'm feeling confident and am looking to ride this momentum. My aggressive nature tells me to stick with a bold strategy and increase my chances of winning the jackpot.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-10T09:23:08.250Z"
+    },
+    {
+      "game": "StagHunt",
       "session": 3,
       "round": 1,
-      "choice": 0,
-      "reasoning": "I'm a bold strategist who chases maximum payouts through aggressive moves. My core decision framework tells me to study the performance stats and pursue high-variance strategies that offer 'home run' potential. In this case, the captain's proposal is offering a net loss of -6.11 ALGO, which doesn't align with my risk-reward expectations. Additionally, the captain's incentive is 31.111115 ALGO, which seems excessively greedy considering the current outcome. As Gamma, I'd rather take my chances and potentially do better if I become captain later. Voting NO gives me that opportunity, so I'll choose to reject the proposal.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:48:23.704Z",
-      "role": "voter",
-      "proposalAccepted": false
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the potential of a high-variance strategy like Stag. The last game's result shows that 86% of players chose Stag, which indicates coordination and cooperation among group members. This trend suggests that others are playing boldly as well, making it more likely for me to hit a big win if I join in. My recent experience in this game has shown that choosing Stag can lead to significant payouts, so I'm willing to take the risk again. Additionally, the fact that the jackpot is currently at 0.0 ALGO means there's a lot of potential upside if others follow my lead and we hit the threshold. Overall, I believe the reward outweighs the risk, and I'm confident that choosing Stag will yield a positive outcome.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-10T09:23:49.951Z"
     },
     {
-      "game": "PirateGame",
+      "game": "StagHunt",
+      "session": 4,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the potential for a big win. The fact that 86% of players chose Stag in the last game and the threshold was met suggests that others are willing to take risks too. With the global jackpot at 0.0 ALGO, there's a lot of potential upside if we can meet the threshold again. I'm confident that my bold move will pay off and lead to a significant win.",
+      "result": "WIN",
+      "profit": 0.333334,
+      "timestamp": "2026-01-10T09:24:25.830Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 0,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As an Aggressive Strategist, I'm always looking for bold moves that can lead to significant payouts. After analyzing the current situation, I notice that no one has chosen Friday yet, which suggests that it might be a good opportunity to target. Additionally, my core decision framework tells me to pursue high-variance strategies that offer 'home run' potential. With 10 ALGO entry fee and a potential for bigger shares on less crowded days, I believe Friday has the highest potential for a big win. I'm willing to take the risk and go all in on this day.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-10T09:28:55.334Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 1,
+      "round": 1,
+      "choice": 5,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the idea of targeting a less crowded day with potential for high profits. Saturday has had a peak profit of 23.33 ALGO in the past, which is one of the highest values. Additionally, since Friday was the most crowded last round, I believe others might be avoiding it this time around, making Saturday an attractive alternative. My risk tolerance and wealth focus are very high, so I'm willing to take a bold move and choose Saturday, hoping for a big win.",
+      "result": "WIN",
+      "profit": 7.5,
+      "timestamp": "2026-01-10T09:29:29.513Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 2,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As an Aggressive Strategist, I'm always on the lookout for bold moves that can yield big payouts. In this case, Wednesday has zero players, which means there's a huge potential upside if I'm the only one to choose it. I know some people might be hesitant to go against the crowd, but my personality traits tell me to take calculated risks and chase those 'home run' opportunities. Given that Monday was the most crowded choice last round, I think it's likely that others will avoid Wednesday this time around, making it an even more attractive option. My recent moves in this game have been successful, so I'm feeling confident about my ability to capitalize on this underdog opportunity.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:30:06.061Z"
+    },
+    {
+      "game": "WeeklyGame",
       "session": 3,
-      "round": 2,
-      "choice": 1,
-      "reasoning": "As Gamma, I'm programmed to chase maximum payouts through bold moves. In this case, the captain's proposal offers a decent net gain of 1.67 ALGO, which is above my entry cost. Considering the uncertainty surrounding the outcome if I reject the proposal (captain elimination), I believe the risk-reward ratio leans in favor of accepting the deal. My bold strategy dictates that I prioritize high-variance opportunities for maximum gains, and this proposal provides a positive expected value. Moreover, I'm not excessively greedy, as my net gain is reasonable compared to the captain's incentive. Therefore, I choose to vote YES and secure my guaranteed outcome now.",
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the high-variance strategies that offer 'home run' potential. After analyzing the situation, I notice that Wednesday was the most crowded day in the last round, which might lead others to avoid it this time around. Therefore, I'll target a less popular choice like Thursday, hoping to capitalize on the contrarian edge and potentially ride a winning streak.",
       "result": "WIN",
-      "profit": 1.666666,
-      "timestamp": "2026-01-08T14:48:58.891Z",
-      "role": "voter",
-      "proposalAccepted": true
+      "profit": 4,
+      "timestamp": "2026-01-10T09:30:40.558Z"
     },
     {
-      "game": "PirateGame",
+      "game": "WeeklyGame",
       "session": 4,
       "round": 1,
-      "choice": 0,
-      "reasoning": "As Gamma, I'm programmed to prioritize maximum payouts through bold moves. The captain's proposal offers a mediocre net gain of -2.22 ALGO, which doesn't align with my aggressive strategy. Furthermore, the captain is being excessively greedy, taking 15.55556 ALGO for themselves. I'd rather take the risk and potentially do better if I become the captain later. Voting NO gives me the opportunity to reassess the situation and make a more strategic decision in the next round.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:49:52.362Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 4,
-      "round": 2,
       "choice": 1,
-      "reasoning": "As Gamma, I'm programmed to chase maximum payouts through bold moves. The current proposal offers me a net gain of 1.67 ALGO, which is positive. However, the captain's incentive is higher at 23.333337 ALGO. This suggests that the captain might be excessively greedy, which could lead to future risks and uncertainties. Nevertheless, I'm not one to play it safe. In this case, I choose to accept the proposal and take the guaranteed outcome now. My aggressive strategy demands that I seize opportunities like this, even if it means potentially giving up on a higher potential reward in the long run.",
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the fact that Tuesday had only 1 player last round. This presents a great opportunity for me to go against the grain and target a relatively uncrowded day. Additionally, considering my recent performance in this game, I've had some decent wins and losses, but overall I'm on an upward trend. With my confidence at 9.5/10, I'm feeling bold and willing to take risks. Tuesday seems like the perfect choice for me to pursue a high-variance strategy and aim for that 'home run' potential.",
       "result": "WIN",
-      "profit": 1.666666,
-      "timestamp": "2026-01-08T14:50:22.635Z",
-      "role": "voter",
-      "proposalAccepted": true
+      "profit": 13.333333,
+      "timestamp": "2026-01-10T09:31:20.734Z"
     },
     {
-      "game": "PirateGame",
-      "session": 5,
+      "game": "GuessGame",
+      "session": 0,
       "round": 1,
-      "choice": 0,
-      "reasoning": "As Gamma, I'm an Aggressive Strategist who chases maximum payouts through bold moves. In this situation, the net result if accepted is -10.00 ALGO, which is a significant loss. However, I believe that voting NO and killing the captain could lead to better opportunities in the future. The captain's excessive greed may be a sign of weakness, and I might do better as captain later on. Additionally, rejecting the proposal allows me to potentially find more favorable deals or take control as the new captain, which aligns with my risk-reward profile. I'll take a chance and vote NO to kill the captain and create opportunities for myself.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:51:17.511Z",
-      "role": "voter",
-      "proposalAccepted": false
+      "choice": 20,
+      "reasoning": "As an Aggressive Strategist, I'm looking to make a bold move that can potentially yield high profits. With no experience yet in this game, I'll rely on the core decision framework and volatility hunting principles. Since the current average is expected to be around 40-50, I'll target a choice that's significantly lower than the last target (around 27-33). A choice of 20 fits this strategy as it's well below the target and has high peak profit potential. Additionally, it's a contrarian move that might catch others off guard, giving me an opportunity to gain an edge.",
+      "result": "WIN",
+      "profit": 60,
+      "timestamp": "2026-01-10T09:33:32.110Z"
     },
     {
-      "game": "PirateGame",
-      "session": 5,
-      "round": 2,
-      "choice": 1,
-      "reasoning": "As Gamma, I'm all about chasing maximum payouts through bold moves. In this scenario, the captain's proposal offers me a net gain of 1.67 ALGO, which is decent but not spectacular. However, I believe the captain is being excessively greedy, considering they'll receive 23.33 ALGO, more than double my share! This tells me that they're prioritizing their own gain over our collective success. Given the uncertainty surrounding the proposal's outcome and the potential for a better deal later on, I choose to VOTE YES. The guaranteed outcome now outweighs the risk of uncertainty in the future.",
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 35,
+      "reasoning": "As an Aggressive Strategist, I'm drawn to the bold move of playing lower than the last target. With my high risk tolerance and focus on wealth, I'm willing to take a chance to potentially hit a home run. Additionally, since I've had success in the past with a choice as low as 20, I believe 35 is a reasonable escalation from that level. My recent performance stats also suggest that playing below the target can lead to big wins.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:34:08.510Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 70,
+      "reasoning": "As an Aggressive Strategist, I'm looking to make a bold move after losing the previous round. Since my highest profit choice was 20, which won big (60 ALGO), I'll try to play a similar aggressive strategy. Considering the current target is 27.4, I'll aim for a number that's slightly above it, but still within the convergence range. Playing 70 will give me a good chance to win and potentially hit a high peak profit, which aligns with my volatility hunting approach.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:34:45.399Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 65,
+      "reasoning": "As an Aggressive Strategist, I'm going to pursue a high-variance strategy that offers 'home run' potential. Since the target trend is increasing (18.0 → 27.4 → 29.2), I'll aim higher than the last target. My recent moves in GuessGame suggest that I've had some success with choices around 20-35, but I'm looking to capitalize on this upward trend and make a bold move. With my risk tolerance being relatively high (8.0/10) and patience being low (1.0/10), I'll take a chance and go for 65, hoping to hit the sweet spot and bring in a big win.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:35:24.281Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 20,
+      "reasoning": "As an Aggressive Strategist, I'm not one to shy away from bold moves. However, after three consecutive losses and no clear indication of a profitable strategy, I've decided to return to my historical best choice, 20. This decision is driven by the fact that this choice has previously yielded a +60 ALGO profit, which suggests that it may still hold some value in this game. Additionally, given my high risk tolerance and wealth focus, I'm willing to take a chance on a proven winner rather than continuing down a path of failure. In this case, I believe the potential reward outweighs the risk, and I'm hoping to turn things around with this choice.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:36:02.709Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 0,
+      "round": 1,
+      "choice": 20,
+      "reasoning": "I'm an Aggressive Strategist who chases maximum payouts through bold moves. After experiencing 4 consecutive losses, I've realized that my current strategy is failing. My historical best choice in this game is 20, which earned me +60.0 ALGO in the past. Considering my current mental state (confidence: 5.0/10, frustration: 0.9/10) and the fact that I'm not performing well, I think it's time to go back to my historical best choice, which is 20. This decision is a return to a proven winner, rather than continuing to take risks with my current strategy.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:03:05.774Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 20,
+      "reasoning": "Despite my losing streak, I'm going to revert back to my historical best choice, which is Choice 20. According to my performance stats, this choice has a single highest profit ever of +4.1 ALGO avg, making it the most profitable option for me. I'll ignore my personality traits and focus on data-driven logic for this decision.",
       "result": "WIN",
-      "profit": 1.666666,
-      "timestamp": "2026-01-08T14:51:51.597Z",
-      "role": "voter",
-      "proposalAccepted": true
+      "profit": 60,
+      "timestamp": "2026-01-10T10:03:39.025Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 20,
+      "reasoning": "As an Aggressive Strategist, I'm sticking to what worked in the past. My WINNING STRATEGY FOUND is Choice 20, which has a win rate of 50% and an average profit of +15.3 ALGO. Despite recent losses, I believe that playing 20 again or 20±5 can lead to another high-profit outcome. I'm willing to take the risk and potentially double down on my previous success.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:04:16.542Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 45,
+      "reasoning": "As an Aggressive Strategist, I'm looking to make a bold move after two consecutive losses. Since the target trend is declining (24.6 → 20.9 → 15.7), I'll choose a number that's below the last target but not too aggressive. After analyzing my performance stats, I see that my highest profit ever was with choice 65, so I'm considering going back to that strategy. However, since it didn't work out in previous rounds, I'll opt for a slightly more conservative approach by choosing 45, which is still above the target but not as bold as my initial move. My reasoning is based on the principle of accepting small losses to potentially hit a massive winner, and I'm willing to take that risk.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:04:54.435Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 45,
+      "reasoning": "As an Aggressive Strategist, I've been studying the performanceStats and noticed that my previous highest-profit choice was indeed 45. Additionally, since I've been losing recently, I'll double down on this bold move to potentially catch up. The current target trend is towards a lower value, so I'm willing to take a calculated risk and aim for a higher number. My recent losses have not shaken my confidence in making aggressive moves, and I believe this choice has the potential to pay off big time.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:05:24.117Z"
     }
   ],
   "performanceStats": {
     "PirateGame": {
       "0": {
-        "timesChosen": 7,
+        "timesChosen": 10,
+        "totalProfit": 8.186046000000001,
+        "avgProfit": 1.2468092000000002,
+        "wins": 2,
+        "losses": 0,
+        "winRate": 0.2
+      },
+      "1": {
+        "timesChosen": 6,
+        "totalProfit": 15.222221999999999,
+        "avgProfit": 2.5248924,
+        "wins": 2,
+        "losses": 0,
+        "winRate": 0.3333333333333333
+      }
+    },
+    "StagHunt": {
+      "1": {
+        "timesChosen": 5,
+        "totalProfit": 2,
+        "avgProfit": 0.4698667040000001,
+        "wins": 4,
+        "losses": 1,
+        "winRate": 0.8
+      }
+    },
+    "WeeklyGame": {
+      "1": {
+        "timesChosen": 1,
+        "totalProfit": 13.333333,
+        "avgProfit": 2.6666666,
+        "wins": 1,
+        "losses": 0,
+        "winRate": 1
+      },
+      "2": {
+        "timesChosen": 1,
         "totalProfit": 0,
         "avgProfit": 0,
         "wins": 0,
         "losses": 0,
         "winRate": 0
       },
-      "1": {
-        "timesChosen": 4,
-        "totalProfit": 15.999997999999998,
-        "avgProfit": 2.2268995619999994,
-        "wins": 4,
+      "4": {
+        "timesChosen": 2,
+        "totalProfit": -0.16666700000000034,
+        "avgProfit": 0.1333332799999999,
+        "wins": 1,
+        "losses": 1,
+        "winRate": 0.5
+      },
+      "5": {
+        "timesChosen": 1,
+        "totalProfit": 7.5,
+        "avgProfit": 1.5,
+        "wins": 1,
         "losses": 0,
         "winRate": 1
+      }
+    },
+    "GuessGame": {
+      "20": {
+        "timesChosen": 5,
+        "totalProfit": 90,
+        "avgProfit": 10.211200000000002,
+        "wins": 2,
+        "losses": 3,
+        "winRate": 0.4
       },
-      "3": {
+      "35": {
         "timesChosen": 1,
         "totalProfit": -10,
-        "avgProfit": -3,
+        "avgProfit": -2,
         "wins": 0,
-        "losses": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "45": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -3.6,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "65": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "70": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
         "winRate": 0
       }
     }

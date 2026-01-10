@@ -7,14 +7,14 @@ import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { StagHuntClient, StagHuntFactory } from '../../smart_contracts/artifacts/stagHunt/StagHuntClient'
 import { Agent } from '../Agent'
-import { IGameAdapter } from './IGameAdapter'
+import { IBaseGameAdapter } from './IBaseGameAdapter'
 
 interface RoundSecret {
   choice: number
   salt: string
 }
 
-export class StagHuntGame implements IGameAdapter {
+export class StagHuntGame implements IBaseGameAdapter {
   readonly name = 'StagHunt'
 
   private lastCooperationRate: number | null = null
@@ -40,6 +40,7 @@ export class StagHuntGame implements IGameAdapter {
     const { appClient } = await this.factory.deploy({
       onUpdate: 'append',
       onSchemaBreak: 'append',
+      suppressLog:true
     })
 
     await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(2))
@@ -61,7 +62,7 @@ export class StagHuntGame implements IGameAdapter {
 
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
-    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog:true })).return!
 
     const mbrPayment = await this.algorand.createTransaction.payment({
       sender: dealer.account.addr,
@@ -81,14 +82,15 @@ export class StagHuntGame implements IGameAdapter {
       },
       sender: dealer.account.addr,
       signer: dealer.signer,
+      suppressLog:true
     })
-
-    console.log(`Session ${result.return} created. Start: round ${startAt}`)
+    const sessionId = Number(result.return) + 1
+    console.log(`Session ${sessionId} created. Start: round ${startAt}`)
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  async play_Commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: COMMIT ---`)
 
     const globalState = await this.appClient!.state.global.getAll()
@@ -96,7 +98,7 @@ export class StagHuntGame implements IGameAdapter {
     const threshold = Number(globalState['stagThresholdPercent'] || 51)
 
     for (const agent of agents) {
-      const prompt = this.buildPromptForAgent(agent, sessionNumber, jackpotAlgo, threshold)
+      const prompt = this.buildGamePrompt(agent, sessionNumber, jackpotAlgo, threshold)
       const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = decision.choice
@@ -123,11 +125,12 @@ export class StagHuntGame implements IGameAdapter {
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
+        suppressLog:true
       })
     }
   }
 
-  private buildPromptForAgent(agent: Agent, sessionNumber: number, jackpot: number, threshold: number): string {
+  private buildGamePrompt(agent: Agent, sessionNumber: number, jackpot: number, threshold: number): string {
     const gameRules = `
 GAME: Stag Hunt (Assurance Game)
 Choose STAG (1) or HARE (0).
@@ -168,39 +171,13 @@ STRATEGIC CONSIDERATIONS:
 - Consider: Is the group coordinating? Are cooperation rates rising or falling?
 `.trim()
 
-    const personality = agent.profile.personalityDescription
-    const parameters = agent.getProfileSummary()
-    const lessons = agent.getLessonsLearned(this.name)
-    const recentMoves = agent.getRecentHistory(this.name, 3)
-    const mentalState = agent.getMentalState()
-
     return `
-You are ${agent.name}.
 
-═══════════════════════════════════════════════════════════
 ${gameRules}
 
 ${situation}
 
 ${hint}
-═══════════════════════════════════════════════════════════
-
-YOUR PERSONALITY:
-${personality}
-
-YOUR PARAMETERS:
-${parameters}
-
-═══════════════════════════════════════════════════════════
-
-${lessons}
-
-YOUR RECENT MOVES:
-${recentMoves}
-
-MENTAL STATE: ${mentalState}
-
-═══════════════════════════════════════════════════════════
 
 Analyze the situation using your personality traits and past experience.
 Make your decision and explain your reasoning clearly.
@@ -209,7 +186,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 `.trim()
   }
 
-  async play_Reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -229,6 +206,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
             },
             sender: agent.account.addr,
             signer: agent.signer,
+            suppressLog:true
           })
           console.log(`[${agent.name}] Revealed: ${secret.choice === 1 ? 'STAG' : 'HARE'}`)
         } catch (e) {
@@ -266,13 +244,14 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         signer: dealer.signer,
         coverAppCallInnerTransactionFees: true,
         maxFee: AlgoAmount.MicroAlgos(5_000),
+        suppressLog:true
       })
     } catch (e) {
       console.error('Resolution error:', e)
     }
   }
 
-  async play_Claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log('\n--- PHASE 4: CLAIM & FEEDBACK ---')
 
     for (const agent of agents) {
@@ -286,6 +265,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
           signer: agent.signer,
           coverAppCallInnerTransactionFees: true,
           maxFee: AlgoAmount.MicroAlgos(3_000),
+          suppressLog:true
         })
 
         const payoutMicro = Number(result.return!)
@@ -334,6 +314,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         amount: AlgoAmount.MicroAlgos(0),
         signer: spammer.signer,
         note: `spam-${i}-${Date.now()}`,
+        suppressLog: true
       })
     }
   }

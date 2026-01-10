@@ -16,6 +16,7 @@ interface HistoryItem {
   role?: string
   proposalAccepted?: boolean
   roundEliminated?: number
+  virtualSession?: number
 }
 
 interface AgentData {
@@ -38,7 +39,6 @@ const E = '\x1b[31m'
 const Y = '\x1b[33m'
 const B = '\x1b[1m'
 const C = '\x1b[36m'
-const M = '\x1b[35m'
 const DIM = '\x1b[2m'
 
 const STAG_ICONS: Record<number, string> = { 1: '🦌', 0: '🐇' }
@@ -86,6 +86,7 @@ async function main() {
   console.log(`${DIM}Total agents: ${agents.length}${R}\n`)
 
   for (const game of allGames) {
+    injectVirtualSessionIds(agents, game);
     if (game === 'PirateGame') {
       printMultiRoundGameSection(agents, game)
     } else {
@@ -93,6 +94,32 @@ async function main() {
     }
   }
 }
+
+
+function injectVirtualSessionIds(agents: AgentData[], gameName: string) {
+    agents.forEach(agent => {
+        const gameHistory = agent.history.filter(h => h.game === gameName);
+        
+        let baseOffset = 0;
+        let lastSessionId = -1;
+        let maxSessionInRun = 0;
+
+        gameHistory.forEach(h => {
+            if (h.session < lastSessionId) {
+                baseOffset += (maxSessionInRun + 1);
+                maxSessionInRun = 0; 
+            }
+
+            h.virtualSession = baseOffset + h.session;
+
+            lastSessionId = h.session;
+            if (h.session > maxSessionInRun) {
+                maxSessionInRun = h.session;
+            }
+        });
+    });
+}
+
 
 function printSimpleGameSection(agents: AgentData[], gameName: string) {
   const gameAgents = agents.map(a => ({
@@ -113,26 +140,26 @@ function printSimpleTimeline(agents: AgentData[], gameName: string) {
   console.log(`${B}📜 Move History Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
-  const maxSessions = Math.max(...agents.map(a => {
-    const sessions = new Set(a.history.map(h => h.session))
-    return sessions.size
-  }))
+  const allSessions = agents.flatMap(a => a.history.map(h => h.session));
+  const minSessions = Math.min(...allSessions);
+  const maxSessions = Math.max(...allSessions);
   
-  if (maxSessions === 0) return
+  if (allSessions.length === 0) return
 
   let header = 'Agent'.padEnd(16) + '| '
-  for (let i = 1; i <= maxSessions; i++) header += `G${i}`.padEnd(5)
+  for (let i = minSessions; i <= maxSessions; i++) header += `G${i}`.padEnd(5)
   console.log(DIM + header + R)
   console.log(DIM + '─'.repeat(header.length) + R)
 
   for (const agent of agents) {
     let row = agent.name.padEnd(16) + '| '
     
-    for (let session = 1; session <= maxSessions; session++) {
-      const sessionMoves = agent.history.filter(h => h.session === session)
-      
+    for (let session = minSessions; session <= maxSessions; session++) {
+
+      const sessionMoves = agent.history.filter(h => h.virtualSession === session)   
+
       if (sessionMoves.length > 0) {
-        const move = sessionMoves[0]
+        const move = sessionMoves[sessionMoves.length - 1]
         let symbol = String(move.choice)
 
         if (gameName === 'StagHunt') symbol = STAG_ICONS[move.choice] || symbol
@@ -172,12 +199,14 @@ function printMultiRoundTimeline(agents: AgentData[]) {
   console.log(`${B}📜 Session-by-Session Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
-  const maxSession = Math.max(...agents.flatMap(a => a.history.map(h => h.session)))
+  const allSessions = agents.flatMap(a => a.history.map(h => h.virtualSession || 0));
+  const minSession = allSessions.length ? Math.min(...allSessions) : 0;
+  const maxSession = allSessions.length ? Math.max(...allSessions) : 0;
 
-  for (let session = 1; session <= maxSession; session++) {
+  for (let session = minSession; session <= maxSession; session++) {
     const sessionHistory = agents.flatMap(a => 
       a.history
-        .filter(h => h.session === session)
+        .filter(h => h.virtualSession === session)
         .map(h => ({ agent: a.name, ...h }))
     )
 
@@ -206,11 +235,13 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       } else {
         const roundContinue = roundHistory.find(h => h.result === 'ROUND_CONTINUE')
         const winner = roundHistory.find(h => h.result === 'WIN')
-        
-        if (roundContinue) {
-          resultStr = `${Y}REJECTED → Next Round${R}`
-        } else if (winner && winner.proposalAccepted) {
+
+      if (winner && winner.proposalAccepted) {
           resultStr = `${G}ACCEPTED${R}`
+        } else if (eliminated) {
+             resultStr = `${E}REJECTED (Elimination)${R}`
+        } else if (winner === undefined && !eliminated) {
+             resultStr = `${Y}REJECTED → Next Round${R}`
         } else {
           resultStr = `${DIM}PENDING${R}`
         }
@@ -224,7 +255,7 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       const profit = winner.profit.toFixed(1)
       console.log(`  ${G}└─ Winner: ${B}${winner.agent}${R} (+${profit} ALGO)${R}`)
     } else {
-      console.log(`  ${DIM}└─ No winner recorded${R}`)
+      console.log(`  ${DIM}└─ End of Session Log${R}`)
     }
   }
   console.log('')

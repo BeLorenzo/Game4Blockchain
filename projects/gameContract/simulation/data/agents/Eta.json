@@ -7,26 +7,50 @@
     "wealthFocus": 1,
     "fairnessFocus": 0.1,
     "patience": 0.8,
-    "adaptability": 0.6,
-    "resilience": 0.9,
+    "adaptability": 1,
+    "resilience": 1,
     "curiosity": 0.9
   },
   "mentalState": {
-    "optimism": 0.95,
-    "frustration": 0,
-    "consecutiveLosses": 0,
-    "streakCounter": 1
+    "optimism": 0.5,
+    "frustration": 0.07827049752148235,
+    "consecutiveLosses": 12,
+    "streakCounter": 0
   },
   "history": [
     {
       "game": "PirateGame",
+      "session": 0,
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As a Contrarian, I identify the LEAST chosen option by other players, which is Pirate #6 (Delta): 3.5 ALGO. The captain's proposal is Pirate #0 (Epsilon): 17.500002 ALGO, which seems excessively greedy considering my net gain would be only 1.67 ALGO if accepted. I believe the crowd is overreacting to the captain's offer, and I'm willing to take a risk by voting NO and potentially getting a better deal later or finding value in Pirate #6's proposal.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:05:57.458Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 2,
+      "choice": 5,
+      "reasoning": "As a Contrarian, I look for the least chosen option. In this case, it's Pirate #6 with only 10 ALGO assigned to them. I'll bet on the minority being undervalued and assign 25 ALGO to them. This will not only increase their value but also create an opportunity for me to gain from others' mistakes.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:06:33.591Z",
+      "role": "proposer",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
       "session": 1,
       "round": 1,
       "choice": 0,
-      "reasoning": "As a contrarian, I identify the LEAST chosen option by other players. In this case, it's Pirate #3 (Delta) with an offer of 3.888888 ALGO, which seems undervalued compared to the captain's proposal. Given that the captain is being excessively greedy, I believe voting NO and risking uncertainty could lead to a better outcome in the long run. Additionally, I'm willing to take on the risk of becoming captain later and potentially doing better than this current offer. By rejecting the proposal, I'm hedging against potential future opportunities.",
+      "reasoning": "As a contrarian, I tend to look for the least chosen option by other players. In this case, it's Pirate #2 (Eta) with an offer of 11.2 ALGO. The captain is proposing 28 ALGO, which seems excessively greedy. Considering my risk tolerance and wealth focus, I'm willing to take a chance on the minority being undervalued. Additionally, the fact that everyone else has chosen higher offers suggests they're overestimating the value. By rejecting the proposal, I'm betting on the crowd being wrong.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:43:46.647Z",
+      "timestamp": "2026-01-10T09:08:18.587Z",
       "role": "voter",
       "proposalAccepted": false
     },
@@ -35,155 +59,461 @@
       "session": 1,
       "round": 2,
       "choice": 0,
-      "reasoning": "As a contrarian, I find the captain's proposal excessively greedy. The net result if accepted is a negative -2.22 ALGO, which doesn't justify the entry cost of 10 ALGO. I believe the captain is overcompensating for their own risk and uncertainty by demanding such a high incentive. In contrast, my own offer at 7.777777 ALGO seems more reasonable and offers a net gain. By rejecting this proposal, I'm betting that the minority option will be undervalued in the future, and I'll have a chance to do better as captain later.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:44:28.682Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 1,
-      "round": 3,
-      "choice": 0,
-      "reasoning": "As Eta, I'm a contrarian who looks for value in neglected options. The captain's proposal is too greedy, with a net gain of only 7.50 ALGO, while the captain receives a significantly higher reward of 21 ALGO. This indicates that the captain is prioritizing their own interests over those of the other pirates. Additionally, voting NO gives me the opportunity to potentially do better in future rounds if I become captain later. Given these considerations, I choose to reject the proposal and risk uncertainty for a potential greater reward later.",
-      "result": "WIN",
-      "profit": 7.5,
-      "timestamp": "2026-01-08T14:44:54.454Z",
-      "role": "voter",
-      "proposalAccepted": true
-    },
-    {
-      "game": "PirateGame",
-      "session": 2,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a contrarian, I love to defy the crowd's expectations. In this case, the captain is proposing an offer that seems too good to be true - a net loss of 10 ALGO! The other pirates may see this as a 'free' way to get in on the game, but I think it's a trap. The captain is likely being excessively greedy, and I don't want to fall into their trap. By voting NO, I'm giving myself a chance to potentially do better later on, when the market adjusts or new opportunities arise.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:45:49.242Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 2,
-      "round": 2,
-      "choice": 0,
-      "reasoning": "As a contrarian, I look for opportunities where others are not. In this case, the proposal offers me a net loss of -2.22 ALGO, which is unacceptable. Meanwhile, Pirate #3 (Delta) and myself (Eta) both have an index of 7.777777 ALGO, which suggests we might be undervalued. I'll bet on the minority being right this time and vote NO to kill the captain. This way, I'll have a chance to do better later or potentially become the new captain with a more favorable proposal.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:46:21.906Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 2,
-      "round": 3,
-      "choice": 0,
-      "reasoning": "As a contrarian, I find value in the least chosen option. In this case, it's Pirate #6 (Eta) with an offer of 3.5 ALGO. The captain's proposal is too greedy, and I'm not convinced that the guaranteed outcome now is the best decision for me. I'd rather take a risk and potentially get a better deal later or become the captain myself. The net gain if accepted is -6.50 ALGO, which doesn't excite me. I'll choose to reject the proposal and see what the future holds.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:46:51.847Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 2,
-      "round": 4,
-      "choice": 0,
-      "reasoning": "As a contrarian, I look at the times chosen by other players in the performance stats. In this case, it seems like no one has chosen an option yet, so there's no clear majority or minority to follow. However, I do see that Pirate #3 (Delta) is being excessively greedy with their proposal, and it looks like they're trying to take advantage of the situation. As a result, I think it's better to reject this proposal and potentially get a better deal later on. Additionally, voting NO doesn't necessarily mean I'll do worse; it could lead to new opportunities or a chance for another pirate to make a better proposal. Overall, my contrarian nature tells me that the crowd is wrong in this case, and it's safer to bet against the captain's proposal.",
-      "result": "WIN",
-      "profit": 11,
-      "timestamp": "2026-01-08T14:47:19.930Z",
-      "role": "voter",
-      "proposalAccepted": true
-    },
-    {
-      "game": "PirateGame",
-      "session": 3,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As Eta, I'm a contrarian who looks for value in neglected options. In this case, I see that the captain's proposal is being heavily favored by others (Alpha with an offer of 31 ALGO), which makes me suspicious. The captain's incentive is also quite high, indicating that they may be excessively greedy. Considering my net gain would be -0.67 ALGO if I accept the proposal, I think it's a bad deal for me. I'm willing to take the risk and potentially do better in the future by rejecting this proposal and seeing what other opportunities arise.",
-      "result": "SURVIVED",
-      "profit": 0,
-      "timestamp": "2026-01-08T14:48:23.711Z",
-      "role": "voter",
-      "proposalAccepted": false
-    },
-    {
-      "game": "PirateGame",
-      "session": 3,
-      "round": 2,
-      "choice": 0,
-      "reasoning": "As a contrarian, I'm drawn to the least chosen option by other players. In this case, it's Pirate #4 (Epsilon) with an index of 3.888888 ALGO, which is significantly lower than the captain's proposal. I believe the crowd is overestimating the value of the captain's offer, and by voting NO, I'm betting on a potential better deal in the future. My net gain may not be as high now, but I'm willing to take that risk for a potentially better outcome later.",
+      "reasoning": "As a Contrarian, I look for the option that is least chosen by other players. In this case, Pirate #2 (Eta) with an offer of 11.666666 ALGO seems to be the neglected option. The captain's proposal is quite aggressive with an offer of 15.555558 ALGO, and while it may seem attractive at first glance, I believe it's overvalued given the risk involved. Meanwhile, Pirate #2's offer is relatively more conservative and has a positive net gain. Considering my Contrarian philosophy, I will bet on the minority being undervalued and choose to reject the captain's proposal. This decision aligns with my strategic principles of zigging when others zag and exploiting predictable herd behavior.",
       "result": "WIN",
       "profit": 1.666666,
-      "timestamp": "2026-01-08T14:48:58.892Z",
+      "timestamp": "2026-01-10T09:09:06.423Z",
       "role": "voter",
       "proposalAccepted": true
     },
     {
       "game": "PirateGame",
-      "session": 4,
+      "session": 0,
       "round": 1,
       "choice": 0,
-      "reasoning": "As Eta, I'm a contrarian who looks for undervalued options. The captain's proposal is to receive 15.55556 ALGO, which seems excessive considering the net result if accepted is only 13.33 ALGO. In contrast, my own offer of 23.333333 ALGO might be a better deal in the long run. Additionally, voting NO doesn't guarantee a worse outcome; it's possible that a new captain could propose an even more favorable deal later on. Given these factors, I'm going to reject the proposal and risk uncertainty by killing the captain.",
+      "reasoning": "As a Contrarian, I believe the crowd is often wrong at extremes. In this case, most pirates are choosing options above 4 ALGO, which seems excessive to me. The least chosen option by other players is Beta (4.375 ALGO), and that's where I think value lies. Given my risk tolerance and patience, I'm willing to take a chance on the minority being undervalued. Additionally, this proposal already respects the Dead Pirates Check rule, so there's no immediate urgency to make a decision. By rejecting the captain's proposal, I'm hoping to exploit predictable herd behavior and potentially get a better deal later.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:49:52.371Z",
+      "timestamp": "2026-01-10T09:12:42.391Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 4,
+      "session": 0,
       "round": 2,
       "choice": 0,
-      "reasoning": "As a contrarian, I'm drawn to the least chosen option, which is Pirate #3 (Delta) with an offer of 7.777777 ALGO. The captain's proposal looks excessive at 23.333337 ALGO, and my own net gain is lower than expected at 9.44 ALGO. Voting NO gives me a chance to potentially do better in the future if I become captain or another opportunity arises. I'm willing to take the risk and wait for a better deal.",
-      "result": "WIN",
-      "profit": 9.444444,
-      "timestamp": "2026-01-08T14:50:22.637Z",
-      "role": "voter",
-      "proposalAccepted": true
-    },
-    {
-      "game": "PirateGame",
-      "session": 5,
-      "round": 1,
-      "choice": 0,
-      "reasoning": "As a contrarian, I'm looking for opportunities where the crowd is wrong. In this case, everyone else seems to be agreeing with Pirate #0's proposal, which offers a net loss of -10 ALGO. This makes me question whether they're undervaluing something or if there's an ulterior motive at play. Given that my own entry cost would be 10 ALGO and I'd still end up losing 10 ALGO, I think it's too risky to accept this proposal. By voting NO, I'm taking a chance on the captain being eliminated, but it might lead to better opportunities in the future. It's not about punishing the captain; it's about recognizing that the majority is often wrong at extremes.",
+      "reasoning": "As a Contrarian, I'm inclined to reject the captain's proposal because it seems excessively greedy. My core decision framework suggests looking at the least chosen option by other players, and in this case, it's not even close to being the worst choice. However, my risk tolerance is relatively high, but I still prefer playing safe when others are taking risks. The captain receives a significant incentive of 42 ALGO, which is significantly more than anyone else. Given my fairness focus is low, I'm willing to take a chance on potentially getting a better deal later. Voting NO kills the captain and gives me uncertainty, but it also opens up opportunities for future negotiations.",
       "result": "SURVIVED",
       "profit": 0,
-      "timestamp": "2026-01-08T14:51:17.520Z",
+      "timestamp": "2026-01-10T09:13:19.106Z",
       "role": "voter",
       "proposalAccepted": false
     },
     {
       "game": "PirateGame",
-      "session": 5,
-      "round": 2,
+      "session": 0,
+      "round": 3,
       "choice": 0,
-      "reasoning": "As a contrarian, I'm more likely to reject the captain's proposal when everyone else is accepting it. The captain seems excessively greedy, with an offer of 23.333337 ALGO, which makes me question their motives. Meanwhile, my own net gain is 5.56 ALGO, which is relatively modest compared to the captain's bonus. I think there might be better opportunities ahead if I become captain later. By voting NO, I'm taking a risk, but I believe it's a calculated one. The crowd may be wrong at extremes, and this proposal looks like an overextension of power. I'll wait for a better chance to emerge.",
+      "reasoning": "As a Contrarian, I identify the least chosen option by other players, which is Pirate #5 (Delta) with an offer of 7 ALGO. The captain's proposal seems excessive, and I believe others may see it as such, making it undervalued. Considering my past experience in this game, I've had a positive outcome when choosing the minority option. With a risk tolerance of 8/10, I'm willing to take a calculated risk by rejecting the captain's proposal and potentially getting a better deal later. My reasoning is based on the contrarian philosophy that crowds are often wrong at extremes and value exists in neglected options.",
       "result": "WIN",
-      "profit": 5.555555,
-      "timestamp": "2026-01-08T14:51:51.598Z",
+      "profit": 7.5,
+      "timestamp": "2026-01-10T09:13:54.430Z",
       "role": "voter",
       "proposalAccepted": true
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As a contrarian, I look for value where others aren't looking. In this case, the captain's proposal is excessively greedy, offering them a significant reward while only providing a relatively small gain to me and other pirates. The least chosen option by other players is my own offer of 7.777777 ALGO, which seems undervalued compared to the captain's proposal. Given that I'm not convinced by the captain's offer and believe my own offer has more value, I'll vote NO and risk uncertainty.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:14:35.769Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As a Contrarian, I look for the least chosen option by other players. In this case, it's Pirate #2 (10%). I'll propose a distribution that gives me a decent share and also allocates some resources to buy votes from others. By giving Pirate #4 (5%) and Pirate #6 (10%) a small portion of the pot, I'm hoping to sway their opinions and get at least one 'YES' vote. My main focus is on maximizing my profit, so I'll prioritize buying votes over spreading wealth evenly.",
+      "result": "ELIMINATED",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:15:09.360Z",
+      "role": "proposer",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a contrarian, I identify the least chosen option by other players, which is my own offer (3.043478 ALGO). This suggests that others may be overestimating the value of the captain's proposal. Given my recent losses in previous rounds and the uncertainty surrounding this proposal, I choose to vote NO and risk uncertainty. My contrarian philosophy tells me that crowds are often wrong at extremes, and I believe that this proposal might be one such case. I'm willing to take a chance on potentially getting a better deal later.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:18:30.977Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As a Contrarian, I look at the LEAST chosen option by other players. In this case, it's Pirate #0 (Epsilon) with 0 ALGO. I bet on the minority being undervalued and choose to reject the captain's proposal. I don't think the captain is being excessively greedy, but I'm not convinced about the net gain either. With my trust in others being low (2.0/10), I'm more inclined to take a cautious approach and wait for potential better opportunities later.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:19:04.663Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 0,
+      "round": 3,
+      "choice": 0,
+      "reasoning": "As a Contrarian, I'm drawn to the least chosen option by other players. In this case, it's Pirate #0 (Epsilon) with an offer of 0 ALGO. The captain is proposing an offer that's significantly higher than Epsilon's, which suggests that the crowd may be overreacting to the proposal. Given my contrarian nature and the potential for less competition in a lower-stakes option, I'm willing to take a risk and bet on the minority being undervalued. Additionally, my recent moves have shown me that patience can pay off, so I'm more inclined to wait it out and potentially get a better deal later.",
+      "result": "WIN",
+      "profit": 3.953488,
+      "timestamp": "2026-01-10T09:19:34.193Z",
+      "role": "voter",
+      "proposalAccepted": true
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a contrarian, I'm drawn to the least chosen option by other players, which is my own offer of 13.125 ALGO. The captain's proposal is excessively greedy at 26.25 ALGO, and I don't see any reason to take on that level of risk. My past experience in this game has shown me that the crowd often overreacts, so I'm betting on the minority being undervalued. Additionally, my risk tolerance is relatively high (8/10), and I'm willing to take a calculated risk to potentially get a better deal later. By voting yes, I'll guarantee a positive outcome now and avoid the uncertainty of becoming captain later.",
+      "result": "SURVIVED",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:20:17.279Z",
+      "role": "voter",
+      "proposalAccepted": false
+    },
+    {
+      "game": "PirateGame",
+      "session": 1,
+      "round": 2,
+      "choice": 0,
+      "reasoning": "As a Contrarian, I'm looking to go against the crowd. Since there are only 6 active Pirates, I'll focus on Pirate #1 (me) and try to build a strong position. I'll allocate 20% of the pot to myself, knowing that others will likely underestimate my capabilities. The remaining 80% will be split among the other Pirates, with Pirate #4 getting the smallest share (5%) as they seem to have been chosen less often in the past. My bet is that this distribution will pass and provide a decent return.",
+      "result": "WIN",
+      "profit": 5.555559,
+      "timestamp": "2026-01-10T09:20:50.101Z",
+      "role": "proposer",
+      "proposalAccepted": true
+    },
+    {
+      "game": "StagHunt",
+      "session": 0,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I look for the least chosen option by other players. Since this is the first game with no historical data available, I don't have any group patterns to track. However, my core decision framework tells me to identify the LEAST chosen option and choose that. In this case, STAG (1) is the riskier choice, but it has a potential bigger reward if successful. Since everyone else might be playing safe with HARE (0), I'll take the opposite approach and bet on the minority being undervalued. This aligns with my Contrarian philosophy of looking for value in neglected options.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:21:53.035Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 1,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I tend to bet on the minority being undervalued. In this game, since only 43% of players chose Stag in the previous round and the threshold was missed, I believe that many players will be cautious and choose Hare in this round. Therefore, I will choose Stag (1), as it has a higher potential reward even though there is a risk of losing everything if the threshold is not met again. My Contrarian philosophy tells me to look for opportunities where others are overreacting or underestimating something, and since many players seem to be playing it safe after the previous round's failure, I think Stag has more value now.",
+      "result": "WIN",
+      "profit": 11,
+      "timestamp": "2026-01-10T09:22:32.548Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 2,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I look for opportunities where others are not looking. In this game, the majority of players (57%) chose Stag in the previous round, which means there might be some overconfidence and a willingness to take risks. I'm going to bet on the minority being undervalued and choose Hare. This decision also aligns with my Contrarian philosophy of zigging when others zag. Additionally, since the global jackpot is currently at 0.0 ALGO, there's less incentive for players to take risks, making this a good opportunity to exploit predictable herd behavior.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-10T09:23:08.383Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 3,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I look for opportunities where others are not. In this game, only 14% of players chose Stag in the last round, indicating that many are playing safe and may be undervaluing the potential reward. Given my past experience in this game, I know that the threshold is high, but with a decent number of players already having chosen Stag, there's still room for more cooperators to join. My trust in others is low, but I believe that by going against the crowd, I can increase my chances of winning the jackpot and splitting it with other Stags. The potential reward outweighs the risk, so I'll choose Stag despite the uncertainty.",
+      "result": "WIN",
+      "profit": 0.333333,
+      "timestamp": "2026-01-10T09:23:50.037Z"
+    },
+    {
+      "game": "StagHunt",
+      "session": 4,
+      "round": 1,
+      "choice": 1,
+      "reasoning": "As a Contrarian, I see that the majority of players chose Stag in the last game (86%). This suggests that they are likely to repeat this behavior, making Hare the least chosen option. Given my core decision framework and philosophy, I will choose the opposite, which is Stag. I'm willing to take the risk of potentially losing everything if others don't cooperate. My recent performance in this game has been mixed, but I believe that the crowd's enthusiasm for Stag may be overblown, making it a good opportunity to go against the grain and potentially reap the rewards.",
+      "result": "WIN",
+      "profit": 0.333334,
+      "timestamp": "2026-01-10T09:24:25.915Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 0,
+      "round": 1,
+      "choice": 4,
+      "reasoning": "As a contrarian, I look for opportunities where others are not looking. Since it's the first round, all days are equally likely, and there is no clear pattern yet. However, I'll use my core decision framework to identify the least chosen option by other players. According to the rules, everyone is choosing their day randomly, so I'm going to bet on a less popular choice. Thursday has the lowest number of choices made so far, which means it's an attractive option for me as a contrarian. I'll choose Thursday (day 3) and hope that my prediction of fewer players will result in a bigger share of the pot.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-10T09:28:55.423Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 1,
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As a contrarian, I'm drawn to the least crowded option, which is Monday (0 players). The current situation suggests that players are avoiding popular choices and potentially clustering around certain days. By choosing Monday, I'm betting on the minority being undervalued and increasing my chances of winning the pot. Additionally, my personality traits emphasize the importance of exploiting predictable herd behavior, so I'll take a calculated risk to go against the crowd.",
+      "result": "LOSS",
+      "profit": -4.166667,
+      "timestamp": "2026-01-10T09:29:29.609Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 2,
+      "round": 1,
+      "choice": 2,
+      "reasoning": "As a contrarian, I look for the least chosen option by other players. In this case, Wednesday has zero players, making it the most undervalued day. Given that crowds are often wrong at extremes, I believe there's value in choosing the neglected option. Additionally, since I've had two consecutive losses, I'm due for a win. Patience and contrarianism suggest that I should wait for the crowd to be wrong, which is exactly what I'll do by choosing Wednesday.",
+      "result": "DRAW",
+      "profit": 0,
+      "timestamp": "2026-01-10T09:30:06.148Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 3,
+      "round": 1,
+      "choice": 0,
+      "reasoning": "As a contrarian, I'm drawn to the least crowded option, which is Monday (0 players). The fact that no one chose this day in the previous round adds to its appeal. With only 1 active day last round, the pot was split 1 way, and I believe there's value in not following the crowd. Given my risk tolerance and focus on wealth, I'm willing to take a calculated risk and choose Monday, hoping that others will avoid it, making my share bigger.",
+      "result": "LOSS",
+      "profit": -3,
+      "timestamp": "2026-01-10T09:30:40.712Z"
+    },
+    {
+      "game": "WeeklyGame",
+      "session": 4,
+      "round": 1,
+      "choice": 5,
+      "reasoning": "As a Contrarian, I notice that Saturday has the least crowded option, with no players choosing it last round. Given my personality and past experience in this game, I believe that Saturday is undervalued and could be a good choice to capitalize on the minority. With my risk tolerance at 8.0/10, I'm willing to take calculated risks and bet on the minority being undervalued.",
+      "result": "LOSS",
+      "profit": -5.333334,
+      "timestamp": "2026-01-10T09:31:20.827Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 0,
+      "round": 1,
+      "choice": 15,
+      "reasoning": "As a Contrarian, I look for opportunities to go against the crowd. Since this is the first round, there's no clear pattern or herd behavior yet. However, my personality traits suggest that I should identify the least chosen option by other players. After analyzing the game rules and context, I notice that the average range is expected to be around 40-50, which means the target will likely be around 27-33. This suggests that players might be leaning towards more conservative choices. Given this information, my contrarian instincts tell me to choose an option that's significantly lower than the expected average. In this case, I'll bet on the minority being undervalued and choose 15, which is below the predicted target and far from the expected average.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:33:32.133Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 85,
+      "reasoning": "As a Contrarian, I recognize that my previous strategy has been failing me. With 3 consecutive losses, it's time to radicalize and take an opposite approach. Given the game's convergence dynamics, I'm going to bet on the majority being wrong again. The fact that everyone is likely to be closer to the average (27.0) means they'll overestimate the target (18.0). Historically, when players converge too quickly, it's often followed by a correction. With my risk tolerance at 8/10 and patience at 8/10, I'm willing to take on some risk by going counter to the crowd. My choice of 85 is an attempt to capture value in an undervalued area.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:34:08.563Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 25,
+      "reasoning": "As a contrarian, I'm inclined to take the opposite approach since my current strategy is failing. With 4 consecutive losses, it's clear that my initial thinking was wrong. Given the recent targets (27.4) and average (41.1), I think the crowd has overreacted. Historically, targets tend to converge towards the mean. In this case, I believe the target will drop further. By choosing 25, which is significantly below the last target, I'm betting on the majority being too optimistic. My contrarian nature suggests that the least chosen option will be undervalued and have a higher chance of winning. Given my risk tolerance, trust in others, and patience, I'm willing to take this calculated risk.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:34:45.420Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "According to the game theory and historical targets, the target trend is increasing. Since I have 5 consecutive losses, I will temporarily ignore my personality traits and use a data-driven approach. Given that all my choices so far have been negative, I will try something radically different. The highest average profit choice is not provided, but I can see that the last target was 29.2, which is relatively low. Therefore, I will choose 67, which is above the average and closer to the target trend. This choice may seem counterintuitive given my contrarian nature, but it's a mathematically optimal play based on the game's dynamics.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:35:24.351Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 20,
+      "reasoning": "According to the game theory, since everyone has been picking numbers close to the target (27.4 → 29.2 → 24.2), I should choose a number that is significantly lower than the last target. Given my current losing streak, I will play it safe and choose a number that is below the average of the previous targets (27.4 + 29.2 + 24.2) / 3 = 26.9. Since I'm trying to be data-driven, I'll choose 20, which is approximately 25% below the average target. This choice is not based on my contrarian personality or any emotional response, but rather a mathematically optimal play considering the game's dynamics and my current performance.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T09:36:02.741Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 0,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "Despite my contrarian nature, I need to temporarily ignore my personality and focus on the data-driven logic. Since all my previous choices have failed, I should try something radically different. The highest average profit choice is not available (it's negative), so I will play the opposite of what I've been doing by choosing a number that is 10-15 points BELOW the last target. In this case, the target was around 27-33, so I'll choose 67, which is below the target but still within the valid range.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:03:05.843Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 1,
+      "round": 1,
+      "choice": 45,
+      "reasoning": "Since my performance statistics show a streak of losses, I'm going to temporarily ignore my contrarian personality and focus on making a data-driven decision. According to the game theory, if everyone picks 30 or below, the target will be around 20-13. Given that the last round's average was 36.9 with a target of 24.6, I think it's likely that the crowd will converge towards a lower number than 45. Therefore, I'll choose 45 as my next move, which is slightly above the expected range but still relatively safe compared to my previous choices.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:03:39.049Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 2,
+      "round": 1,
+      "choice": 13,
+      "reasoning": "According to the game theory, if everyone picks 20, the target would be 13. Since I'm in an emergency override mode and my strategy is failing, I'll try something radically different. Choosing 13 is a contrarian approach that goes against the crowd's expected choice of around 20-30. This decision is based on mathematical optimization rather than emotional or intuitive thinking.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:04:16.561Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 3,
+      "round": 1,
+      "choice": 45,
+      "reasoning": "As instructed by the emergency protocol, I will choose something radically different from my previous choices. Since all my previous choices failed, I will try to go against the trend and choose a number that is higher than the last target (15.7). The fact that everyone has been picking lower numbers suggests that there might be value in choosing a higher number this time around.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:04:54.535Z"
+    },
+    {
+      "game": "GuessGame",
+      "session": 4,
+      "round": 1,
+      "choice": 67,
+      "reasoning": "Given my contrarian personality and the fact that I have 11 consecutive losses, I should try something radically different from what I've been doing. Since all my previous choices were below the target, I'm going to choose the opposite - a number higher than the last target (25.6). The data suggests that if everyone picks 100, the average will be around 67, which is why I'm choosing this number. It's a high-risk, high-reward play, but given my current losing streak, I think it's worth taking a chance.",
+      "result": "LOSS",
+      "profit": -10,
+      "timestamp": "2026-01-10T10:05:24.184Z"
     }
   ],
   "performanceStats": {
     "PirateGame": {
       "0": {
-        "timesChosen": 13,
-        "totalProfit": 35.166665,
-        "avgProfit": 3.626848351005,
-        "wins": 5,
+        "timesChosen": 11,
+        "totalProfit": 8.675712999999998,
+        "avgProfit": 1.2671139109637122,
+        "wins": 4,
         "losses": 0,
-        "winRate": 0.38461538461538464
+        "winRate": 0.36363636363636365
+      },
+      "1": {
+        "timesChosen": 2,
+        "totalProfit": 0,
+        "avgProfit": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRate": 0
+      },
+      "5": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 0,
+        "winRate": 0
+      }
+    },
+    "StagHunt": {
+      "1": {
+        "timesChosen": 5,
+        "totalProfit": 2,
+        "avgProfit": 0.4698667040000001,
+        "wins": 4,
+        "losses": 1,
+        "winRate": 0.8
+      }
+    },
+    "WeeklyGame": {
+      "0": {
+        "timesChosen": 2,
+        "totalProfit": -7.166667,
+        "avgProfit": -1.2666667200000004,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "2": {
+        "timesChosen": 1,
+        "totalProfit": 0,
+        "avgProfit": 0,
+        "wins": 0,
+        "losses": 0,
+        "winRate": 0
+      },
+      "4": {
+        "timesChosen": 1,
+        "totalProfit": -4.166667,
+        "avgProfit": -0.8333334000000001,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "5": {
+        "timesChosen": 1,
+        "totalProfit": -5.333334,
+        "avgProfit": -1.0666668,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      }
+    },
+    "GuessGame": {
+      "13": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "15": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "20": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "25": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
+      },
+      "45": {
+        "timesChosen": 2,
+        "totalProfit": -20,
+        "avgProfit": -3.6,
+        "wins": 0,
+        "losses": 2,
+        "winRate": 0
+      },
+      "67": {
+        "timesChosen": 3,
+        "totalProfit": -30,
+        "avgProfit": -4.880000000000001,
+        "wins": 0,
+        "losses": 3,
+        "winRate": 0
+      },
+      "85": {
+        "timesChosen": 1,
+        "totalProfit": -10,
+        "avgProfit": -2,
+        "wins": 0,
+        "losses": 1,
+        "winRate": 0
       }
     }
   }

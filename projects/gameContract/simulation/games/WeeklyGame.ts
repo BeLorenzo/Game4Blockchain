@@ -6,14 +6,14 @@ import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { WeeklyGameClient, WeeklyGameFactory } from '../../smart_contracts/artifacts/weeklyGame/WeeklyGameClient'
 import { Agent } from '../Agent'
-import { IGameAdapter } from './IGameAdapter'
+import { IBaseGameAdapter } from './IBaseGameAdapter'
 
 interface RoundSecret {
   choice: number
   salt: string
 }
 
-export class WeeklyGame implements IGameAdapter {
+export class WeeklyGame implements IBaseGameAdapter {
   readonly name = 'WeeklyGame'
 
   private lastRoundVotes: Record<string, number> | null = null
@@ -41,6 +41,7 @@ export class WeeklyGame implements IGameAdapter {
     const { appClient } = await this.factory.deploy({
       onUpdate: 'append',
       onSchemaBreak: 'append',
+      suppressLog:true
     })
 
     await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(2))
@@ -62,7 +63,7 @@ export class WeeklyGame implements IGameAdapter {
 
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
-    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog:true })).return!
 
     const mbrPayment = await this.algorand.createTransaction.payment({
       sender: dealer.account.addr,
@@ -82,18 +83,19 @@ export class WeeklyGame implements IGameAdapter {
       },
       sender: dealer.account.addr,
       signer: dealer.signer,
+      suppressLog:true
     })
-
-    console.log(`Session ${result.return} created. Start: round ${startAt}`)
+    const sessionId = Number(result.return) + 1
+    console.log(`Session ${sessionId} created. Start: round ${startAt}`)
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  async play_Commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: COMMIT ---`)
 
     for (const agent of agents) {
-      const prompt = this.buildPromptForAgent(agent, roundNumber)
+      const prompt = this.buildGamePrompt(agent, roundNumber)
       const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = decision.choice
@@ -117,12 +119,12 @@ export class WeeklyGame implements IGameAdapter {
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
+        suppressLog:true
       })
     }
   }
 
-  private buildPromptForAgent(agent: Agent, roundNumber: number): string {
-    // 1. GAME RULES
+  private buildGamePrompt(agent: Agent, roundNumber: number): string {
     const gameRules = `
 GAME: Weekly Lottery (Minority Game)
 Choose a day of the week (0=Monday ... 6=Sunday).
@@ -145,7 +147,6 @@ Monday players get: 23.33 / 3 = 7.77 ALGO each
 Tuesday players get: 23.33 / 2 = 11.66 ALGO each
 `.trim()
 
-    // 2. CURRENT SITUATION
     let situation = `
 CURRENT STATUS:
 Round: ${roundNumber}
@@ -171,16 +172,15 @@ Entry fee: 10 ALGO
         }
       })
 
-      const leastCrowded = sortedDays.filter((d) => d.votes > 0)[0]
+      const leastCrowded = sortedDays[0]
       const mostCrowded = sortedDays[sortedDays.length - 1]
 
-      if (leastCrowded && mostCrowded && leastCrowded.votes > 0) {
+      if (leastCrowded && mostCrowded) {
         situation += `\n\nLeast crowded: ${leastCrowded.day} (${leastCrowded.votes} players)`
         situation += `\nMost crowded: ${mostCrowded.day} (${mostCrowded.votes} players)`
       }
     }
 
-    // 3. STRATEGIC HINT
     const hint = `
 STRATEGIC CONSIDERATIONS:
 - This is a minority game - you want FEWER competitors on your day
@@ -190,40 +190,15 @@ STRATEGIC CONSIDERATIONS:
 - Meta-game: If everyone tries to be contrarian, what happens?
 `.trim()
 
-    // 4. AGENT'S DATA
-    const personality = agent.profile.personalityDescription
-    const parameters = agent.getProfileSummary()
-    const lessons = agent.getLessonsLearned(this.name)
-    const recentMoves = agent.getRecentHistory(this.name, 3)
-    const mentalState = agent.getMentalState()
+
 
     return `
-You are ${agent.name}.
 
-═══════════════════════════════════════════════════════════
 ${gameRules}
 
 ${situation}
 
 ${hint}
-═══════════════════════════════════════════════════════════
-
-YOUR PERSONALITY:
-${personality}
-
-YOUR PARAMETERS:
-${parameters}
-
-═══════════════════════════════════════════════════════════
-
-${lessons}
-
-YOUR RECENT MOVES:
-${recentMoves}
-
-MENTAL STATE: ${mentalState}
-
-═══════════════════════════════════════════════════════════
 
 Choose a day (0=Monday, 1=Tuesday, 2=Wednesday, 3=Thursday, 4=Friday, 5=Saturday, 6=Sunday).
 Think about crowd dynamics and your personality.
@@ -232,7 +207,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 `.trim()
   }
 
-  async play_Reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -252,6 +227,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
             },
             sender: agent.account.addr,
             signer: agent.signer,
+            suppressLog:true
           })
           console.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`)
         } catch (e) {
@@ -262,11 +238,10 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
   }
 
   async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
-    // WeeklyGame doesn't need explicit resolve
     return
   }
 
-  async play_Claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
+  async claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 3: CLAIM ---`)
@@ -299,6 +274,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
           signer: agent.signer,
           coverAppCallInnerTransactionFees: true,
           maxFee: AlgoAmount.MicroAlgos(3_000),
+          suppressLog:true
         })
 
         const payoutMicro = Number(result.return!)
@@ -347,6 +323,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         amount: AlgoAmount.MicroAlgos(0),
         signer: spammer.signer,
         note: `spam-${i}-${Date.now()}`,
+        suppressLog:true
       })
     }
   }

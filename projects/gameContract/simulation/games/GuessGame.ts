@@ -6,14 +6,14 @@ import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { GuessGameClient, GuessGameFactory } from '../../smart_contracts/artifacts/guessGame/GuessGameClient'
 import { Agent } from '../Agent'
-import { IGameAdapter } from './IGameAdapter'
+import { IBaseGameAdapter } from './IBaseGameAdapter'
 
 interface RoundSecret {
   choice: number
   salt: string
 }
 
-export class GuessGame implements IGameAdapter {
+export class GuessGame implements IBaseGameAdapter {
   readonly name = 'GuessGame'
 
   private roundHistory: { avg: number; target: number }[] = []
@@ -39,6 +39,7 @@ export class GuessGame implements IGameAdapter {
     const { appClient } = await this.factory.deploy({
       onUpdate: 'append',
       onSchemaBreak: 'append',
+      suppressLog: true
     })
 
     await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(5))
@@ -60,7 +61,7 @@ export class GuessGame implements IGameAdapter {
 
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
-    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
+    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog:true })).return!
 
     const mbrPayment = await this.algorand.createTransaction.payment({
       sender: dealer.account.addr,
@@ -80,18 +81,19 @@ export class GuessGame implements IGameAdapter {
       },
       sender: dealer.account.addr,
       signer: dealer.signer,
+      suppressLog: true
     })
-
-    console.log(`Session ${result.return} created. Start: round ${startAt}`)
+    const sessionId = Number(result.return) + 1
+    console.log(`Session ${sessionId} created. Start: round ${startAt}`)
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  async play_Commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: COMMIT ---`)
 
     for (const agent of agents) {
-      const prompt = this.buildPromptForAgent(agent, sessionNumber)
+      const prompt = this.buildGamePrompt(agent, sessionNumber)
       const decision = await agent.playRound(this.name, prompt)
 
       let safeChoice = Math.round(decision.choice)
@@ -120,11 +122,12 @@ export class GuessGame implements IGameAdapter {
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
+        suppressLog: true
       })
     }
   }
 
-private buildPromptForAgent(agent: Agent, sessionNumber: number): string {
+private buildGamePrompt(agent: Agent, sessionNumber: number): string {
   const gameRules = `
 GAME: Guess 2/3 of the Average (Nash Convergence Game)
 
@@ -175,39 +178,15 @@ Entry fee: 10 ALGO
 REMEMBER: This is a CONVERGENCE game. Winners reach the equilibrium FASTER than others.
 `.trim()
 
-  const personality = agent.profile.personalityDescription
-  const parameters = agent.getProfileSummary()
-  const lessons = agent.getLessonsLearned(this.name)
-  const recentMoves = agent.getRecentHistory(this.name, 3)
-  const mentalState = agent.getMentalState()
+  
 
   return `
-You are ${agent.name}.
 
-═══════════════════════════════════════════════════════════
 ${gameRules}
 
 ${situation}
 
 ${hint}
-═══════════════════════════════════════════════════════════
-
-YOUR PERSONALITY:
-${personality}
-
-YOUR PARAMETERS:
-${parameters}
-
-═══════════════════════════════════════════════════════════
-
-${lessons}
-
-YOUR RECENT MOVES:
-${recentMoves}
-
-MENTAL STATE: ${mentalState}
-
-═══════════════════════════════════════════════════════════
 
 Analyze game theory, historical targets, and your performance stats.
 Choose wisely between 0-100.
@@ -216,7 +195,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 `.trim()
 }
 
-  async play_Reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
@@ -236,6 +215,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
             },
             sender: agent.account.addr,
             signer: agent.signer,
+            suppressLog: true
           })
           console.log(`[${agent.name}] Revealed: ${secret.choice}`)
         } catch (e) {
@@ -249,7 +229,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     return
   }
 
-  async play_Claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 3: CLAIM ---`)
@@ -281,22 +261,20 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
           signer: agent.signer,
           coverAppCallInnerTransactionFees: true,
           maxFee: AlgoAmount.MicroAlgos(5_000),
+          suppressLog: true
         })
 
         const payoutMicro = Number(result.return!)
+
         const entryMicro = Number(this.participationAmount.microAlgos)
         netProfitAlgo = (payoutMicro - entryMicro) / 1_000_000
 
         outcome = netProfitAlgo > 0 ? 'WIN' : netProfitAlgo === 0 ? 'DRAW' : 'LOSS'
         console.log(`${agent.name}: \x1b[32m${outcome} (${netProfitAlgo.toFixed(2)} ALGO)\x1b[0m`)
       } catch (e: any) {
-        if (e.message && e.message.includes('assert failed')) {
-          console.log(`${agent.name}: \x1b[31mLOSS\x1b[0m`)
-        } else {
-          console.error(`${agent.name}: ERROR`)
-        }
-      }
-
+        outcome = 'LOSS'
+        console.log(`${agent.name}: \x1b[31mLOSS\x1b[0m`)
+    }
       await agent.finalizeRound(this.name, outcome, netProfitAlgo, sessionNumber, 1)
     }
   }
@@ -329,6 +307,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
         amount: AlgoAmount.MicroAlgos(0),
         signer: spammer.signer,
         note: `spam-${i}-${Date.now()}`,
+        suppressLog: true
       })
     }
   }

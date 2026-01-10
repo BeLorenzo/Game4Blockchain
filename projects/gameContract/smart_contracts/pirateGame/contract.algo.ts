@@ -37,9 +37,6 @@ interface GameState {
   pot: uint64 // Total coins to distribute
   commitDuration: uint64 
   revealDuration: uint64
-  //proposalDeadline: uint64 // Round deadline for proposal phase
-  //voteDeadline: uint64 // Round deadline for vote phase
-  //revealDeadline: uint64 // Round deadline for reveal phase
 }
 
 /**
@@ -62,7 +59,6 @@ export class PirateGame extends GameContract {
     config: GameConfig,
     mbrPayment: gtxn.PaymentTxn,
     maxPirates: uint64,
-    //roundDuration: uint64
   ): uint64 {
     assert(maxPirates >= 3 && maxPirates <= 20, 'Pirates must be between 3 and 20')
     //assert(roundDuration >= 10, 'Round duration must be at least 10 blocks')

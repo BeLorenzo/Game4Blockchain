@@ -1,27 +1,35 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Agent } from './Agent'
- //import { StagHuntGame } from './games/StagHuntGame'
- //import { WeeklyGame } from './games/WeeklyGame'
-//import { GuessGame } from './games/GuessGame'
+ import { StagHuntGame } from './games/StagHuntGame'
+ import { WeeklyGame } from './games/WeeklyGame'
+import { GuessGame } from './games/GuessGame'
  import { PirateGame } from './games/PirateGame'
+import { IBaseGameAdapter } from './games/IBaseGameAdapter'
+import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
+
+function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
+  return (game as IMultiRoundGameAdapter).playRound !== undefined;
+}
+
 
 // SIMULATION CONFIG
-const NUM_ROUNDS = 5
+const NUM_SESSIONS = 5
 const INITIAL_FUNDING = 100_000
 
 // GAME SELECTION
- //const game = new StagHuntGame()
-  //const game = new WeeklyGame()
-//const game = new GuessGame()
- const game = new PirateGame()
+ //const game : IBaseGameAdapter = new StagHuntGame()
+  //const game : IBaseGameAdapter = new WeeklyGame()
+const game : IBaseGameAdapter = new GuessGame()
+ //const game : IBaseGameAdapter = new PirateGame()
 
 // MAIN
 async function main() {
   console.log(`Game: ${game.name}`)
-  console.log(`Rounds to play: ${NUM_ROUNDS}\n`)
+  console.log(`Rounds to play: ${NUM_SESSIONS}\n`)
 
   const algorand = AlgorandClient.defaultLocalNet()
 
@@ -131,7 +139,7 @@ STRATEGIC PRINCIPLES:
 - Form alliances opportunistically, break them ruthlessly
 - "Bold" means strategic aggression, not reckless rule-breaking
 `.trim(),
-        riskTolerance: 0.8, // MODIFICATO: Abbassato da 1.0 a 0.8 per ridurre allucinazioni (numeri >100)
+        riskTolerance: 0.8, 
         trustInOthers: 0.5,
         wealthFocus: 0.8,
         fairnessFocus: 0.0,
@@ -252,7 +260,7 @@ STRATEGIC PRINCIPLES:
         trustInOthers: 0.5,
         wealthFocus: 0.9,
         fairnessFocus: 0.0,
-        patience: 0.2, // MODIFICATO: Alzato da 0.0 a 0.2 per ridurre il rumore statistico immediato
+        patience: 0.2, 
         adaptability: 1.0,
         resilience: 0.8,
         curiosity: 0.5,
@@ -318,62 +326,97 @@ STRATEGIC PRINCIPLES:
     }),
   )
 
-  let lastSessionId = 0
+  let sessionFound = 0
   agents.forEach((a) => {
     // Access private fullHistory property
     const history = (a as any).fullHistory
     if (history && history.length > 0) {
       // Filter by current game name before finding last session
-      const gameEntries = history.filter((h: any) => h.game === game.name)
-      if (gameEntries.length > 0) {
-        const lastEntry = gameEntries[gameEntries.length - 1]
-        if (lastEntry.session > lastSessionId) {
-          lastSessionId = lastEntry.session
+      const rawEntries = history.filter((h: any) => h.game === game.name)
+      if (rawEntries.length > 0) {
+        let distinctSessionsCount = 0
+        let lastSessionId = -1
+        let lastRound = -1
+
+        rawEntries.forEach((entry: any) => {
+        const isNewSession = entry.sessionId !== lastSessionId || entry.round < lastRound;
+
+        if (isNewSession) {
+          distinctSessionsCount++;
+          lastSessionId = entry.sessionId;
         }
+        lastRound = entry.round;
+      });
+        if (distinctSessionsCount > sessionFound) {
+          sessionFound = distinctSessionsCount;
+        }  
       }
     }
   })
 
-  const startingSession = lastSessionId + 1
   console.log(
-    lastSessionId > 0
-      ? `Resuming from session ${startingSession} (found ${lastSessionId} previous sessions for ${game.name})`
+    sessionFound > 0
+      ? `Found ${sessionFound} previous sessions for ${game.name}`
       : `Starting fresh - no previous sessions found for ${game.name}`
   )
 
   // Deploy
   const admin = agents[0]
-  console.log('--- DEPLOYMENT ---')
+  console.log('\n--- DEPLOYMENT ---')
   await game.deploy(admin)
 
 
-  console.log(`\n--- STARTING ${NUM_ROUNDS} GAMES ---\n`)
+  console.log(`\n--- STARTING ${NUM_SESSIONS} GAMES ---`)
 
   // Game loop
-    for (let i = 0; i < NUM_ROUNDS; i++) {
-    const sessionNumber = startingSession + i
-    console.log(`\n${'='.repeat(60)}`)
-    console.log(`SESSION ${sessionNumber} (Round ${i + 1}/${NUM_ROUNDS})`)
-    console.log('='.repeat(60))
-
+    for (let i = 0; i < NUM_SESSIONS; i++) {
+    let sessionId: bigint | null = null;
     try {
-      const sessionId = await game.startSession(admin)
-      await game.play_Commit(agents, sessionId, sessionNumber)
-      await game.play_Reveal(agents, sessionId, sessionNumber)
+        console.log(`${'='.repeat(60)}`)
+        sessionId = await game.startSession(admin)
+        console.log('='.repeat(60))
 
-      try {
-        await game.resolve(admin, sessionId, sessionNumber)
-        await game.play_Claim(agents, sessionId, sessionNumber)
-      } catch (e) {
-        console.error(`Error in resolve/claim:`, e)
-      }
+        if (isTurnBased(game)) {
+          
+          await game.setup(agents, sessionId) 
+          
+          const totalInternalRounds = await game.getMaxTotalRounds(sessionId);          
+          for (let r = 0; r < totalInternalRounds; r++) {
+              console.log(`  --- Internal Round ${r + 1}/${totalInternalRounds} ---`);
+              try {
+                  const isGameOver = await game.playRound(agents, sessionId, r+1);
+                  if (isGameOver) {
+                      console.log(`🏁 Game Over condition met at Round ${r + 1}`);
+                      break;
+                  }
+              } catch (roundError) {
+                  console.error(`❌ Round ${r + 1} crashed! Aborting.`);
+                  throw roundError; 
+              }
+          }
+          console.log(`Ending game...`);
+          await game.finalize(agents, sessionId);
+          console.log(`\n🎉 Session ${i+1} COMPLETED.\n`);
 
-      console.log(`\nSESSION ${sessionNumber} COMPLETED`)
+      } else {
+          await game.commit(agents, sessionId, i); 
+          await game.reveal(agents, sessionId, i);
+
+          try {
+            await game.resolve(admin, sessionId, i);
+            await game.claim(agents, sessionId, i);
+            
+            console.log(`\n🎉 Session ${i+1} COMPLETED.\n`);
+          } catch (resolveError) {
+            console.error(` ❌ Failed during Resolution/Claim:`, resolveError);
+            // Qui non lanciamo throw se vogliamo contare la sessione come "failed" ma continuare col loop esterno
+          }
+      } 
     } catch (e) {
-      console.error(`\nSESSION ${sessionNumber} FAILED:`, e)
+      console.error(`\nCRITICAL FAILURE in Session ${i}:`);
+      console.error(e);
     }
-  }
-
+  } 
   console.log('\n' + '='.repeat(60))
   console.log('🏁 SIMULATION COMPLETE')
   console.log('='.repeat(60))
