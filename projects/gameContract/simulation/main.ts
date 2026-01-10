@@ -17,13 +17,13 @@ function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
 
 
 // SIMULATION CONFIG
-const NUM_SESSIONS = 5
+const NUM_SESSIONS = 2
 const INITIAL_FUNDING = 100_000
 
 // GAME SELECTION
  //const game : IBaseGameAdapter = new StagHuntGame()
   //const game : IBaseGameAdapter = new WeeklyGame()
-const game : IBaseGameAdapter = new GuessGame()
+//const game : IBaseGameAdapter = new GuessGame()
  //const game : IBaseGameAdapter = new PirateGame()
 
 // MAIN

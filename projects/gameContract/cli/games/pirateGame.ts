@@ -131,7 +131,7 @@ export const PirateGameModule: IGameModule = {
       const client = await getClient(wallet);
       const sessionID = await askSessionId();
       const sessionConfig = await client.state.box.gameSessions.value(sessionID);
-      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!;
+      const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' }, suppressLog: true, })).return!;
 
       console.log(chalk.yellow(`📡 Registering... Fee: ${sessionConfig!.participation} µAlgo`));
       await client.send.registerPirate({
@@ -178,6 +178,7 @@ export const PirateGameModule: IGameModule = {
       await client.send.proposeDistribution({
         args: { sessionId: sessionID, distribution },
         coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+        suppressLog: true,
       });
       console.log(chalk.green('✅ Proposal submitted!'));
     } catch (e: any) { handleAlgoError(e, 'Propose'); }
@@ -200,7 +201,7 @@ export const PirateGameModule: IGameModule = {
       const combined = new Uint8Array([...choiceBytes, ...salt]);
       const hash = new Uint8Array(sha256.array(combined));
 
-      const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' } })).return!;
+      const commitMbr = (await client.send.getRequiredMbr({ args: { command: 'commitVote' }, suppressLog: true, } )).return!;
       
       console.log(chalk.yellow('📡 Committing vote...'));
       await client.send.commitVote({
@@ -210,6 +211,7 @@ export const PirateGameModule: IGameModule = {
             sender: wallet.account!.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(Number(commitMbr)),
           }),
         },
+        suppressLog: true,
       });
       console.log(chalk.green('✅ Vote committed!'));
     } catch (e: any) { handleAlgoError(e, 'Vote'); }
@@ -226,7 +228,8 @@ export const PirateGameModule: IGameModule = {
 
       console.log(chalk.yellow('🔓 Revealing...'));
       await client.send.revealVote({
-        args: { sessionId: sessionID, vote: BigInt(voteChoice), salt: new Uint8Array(Buffer.from(saltHex, 'hex')) }
+        args: { sessionId: sessionID, vote: BigInt(voteChoice), salt: new Uint8Array(Buffer.from(saltHex, 'hex')) },
+        suppressLog: true,
       });
       console.log(chalk.green('✅ Revealed!'));
     } catch (e: any) { handleAlgoError(e, 'Reveal'); }
@@ -240,6 +243,7 @@ export const PirateGameModule: IGameModule = {
       await client.send.executeRound({
         args: { sessionId: sessionID },
         coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+        suppressLog: true,
       });
       console.log(chalk.green('✅ Round executed! Check Dashboard for results.'));
     } catch (e: any) { handleAlgoError(e, 'Execute'); }
@@ -266,6 +270,7 @@ export const PirateGameModule: IGameModule = {
       const result = await client.send.claimWinnings({
         args: { sessionId: sessionID },
         coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+        suppressLog: true,
       });
       console.log(chalk.green(`🎉 Claimed ${result.return} µAlgo!`));
     } catch (e: any) { handleAlgoError(e, 'Claim'); }

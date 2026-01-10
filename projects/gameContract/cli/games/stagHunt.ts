@@ -219,7 +219,8 @@ export const StagHuntModule: IGameModule = {
         await client.send.resolveSession({ 
             args: { sessionId: sessionID },
             coverAppCallInnerTransactionFees: true, 
-            maxFee: microAlgo(3000)
+            maxFee: microAlgo(3000),
+            suppressLog: true,
         });
         console.log(chalk.green('✅ Session Resolved! You can now claim if eligible.'));
     } catch (e: any) { handleAlgoError(e, 'Resolve'); }
@@ -286,6 +287,7 @@ export const StagHuntModule: IGameModule = {
       const result = await client.send.claimWinnings({
         args: { sessionId: sessionID },
         coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+        suppressLog: true,
       });
 
       if (result.return === 0n) {

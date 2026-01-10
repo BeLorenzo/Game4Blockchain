@@ -212,9 +212,9 @@ join: async (wallet: WalletManager) => {
 
         const result = await client.send.revealMove({
             args: { sessionId, choice, salt },
-            suppressLog: true,
             coverAppCallInnerTransactionFees: true,
-            maxFee: AlgoAmount.MicroAlgo(3000)
+            maxFee: AlgoAmount.MicroAlgo(3000),
+            suppressLog: true,
         });
 
         console.log(chalk.green('✅ Reveal Successful!'));
@@ -251,9 +251,9 @@ join: async (wallet: WalletManager) => {
 
         await client.send.claimTimeoutVictory({
             args: { sessionId },
-            suppressLog: true,
             coverAppCallInnerTransactionFees: true,
-            maxFee: AlgoAmount.MicroAlgo(3000)
+            maxFee: AlgoAmount.MicroAlgo(3000),
+            suppressLog: true,
         });
 
         console.log(chalk.green('🏆 Victory claimed! Opponent failed to reveal in time.'));

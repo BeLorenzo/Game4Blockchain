@@ -16,7 +16,7 @@ interface HistoryItem {
   role?: string
   proposalAccepted?: boolean
   roundEliminated?: number
-  virtualSession?: number
+  virtualSession?: number  // Added to handle simulation restarts
 }
 
 interface AgentData {
@@ -43,6 +43,46 @@ const DIM = '\x1b[2m'
 
 const STAG_ICONS: Record<number, string> = { 1: '🦌', 0: '🐇' }
 const WEEKLY_ICONS: Record<number, string> = { 0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri', 5: 'Sat', 6: 'Sun' }
+
+/**
+ * Inietta un virtualSession field in ogni history item per gestire i restart della simulazione.
+ * Quando session torna a 0, incrementa un offset globale per mantenere l'ordine cronologico.
+ * 
+ * IMPORTANTE per PirateGame: Ci possono essere multiple entries con stesso session ma diversi round.
+ * Dobbiamo rilevare il restart guardando se session DIMINUISCE mentre round è LOW (indica nuovo run).
+ */
+function injectVirtualSessionIds(agents: AgentData[], gameName: string) {
+  agents.forEach(agent => {
+    const gameHistory = agent.history.filter(h => h.game === gameName)
+    
+    let baseOffset = 0
+    let lastSessionId = -1
+    let lastRound = -1
+    let maxSessionInRun = 0
+
+    gameHistory.forEach(h => {
+      // Detect restart: session decreased OR (session same but round went back to 1 after being higher)
+      const isSessionDecrease = h.session < lastSessionId
+      const isRoundReset = (h.session === lastSessionId && h.round < lastRound && h.round === 1)
+      
+      if (isSessionDecrease || isRoundReset) {
+        // This is a new simulation run
+        baseOffset += (maxSessionInRun + 1)
+        maxSessionInRun = 0
+      }
+
+      // Assign virtual session ID
+      h.virtualSession = baseOffset + h.session
+
+      lastSessionId = h.session
+      lastRound = h.round
+      
+      if (h.session > maxSessionInRun) {
+        maxSessionInRun = h.session
+      }
+    })
+  })
+}
 
 async function main() {
   let files = process.argv.slice(2)
@@ -86,7 +126,9 @@ async function main() {
   console.log(`${DIM}Total agents: ${agents.length}${R}\n`)
 
   for (const game of allGames) {
-    injectVirtualSessionIds(agents, game);
+    // Inject virtual session IDs to handle restarts
+    injectVirtualSessionIds(agents, game)
+    
     if (game === 'PirateGame') {
       printMultiRoundGameSection(agents, game)
     } else {
@@ -94,32 +136,6 @@ async function main() {
     }
   }
 }
-
-
-function injectVirtualSessionIds(agents: AgentData[], gameName: string) {
-    agents.forEach(agent => {
-        const gameHistory = agent.history.filter(h => h.game === gameName);
-        
-        let baseOffset = 0;
-        let lastSessionId = -1;
-        let maxSessionInRun = 0;
-
-        gameHistory.forEach(h => {
-            if (h.session < lastSessionId) {
-                baseOffset += (maxSessionInRun + 1);
-                maxSessionInRun = 0; 
-            }
-
-            h.virtualSession = baseOffset + h.session;
-
-            lastSessionId = h.session;
-            if (h.session > maxSessionInRun) {
-                maxSessionInRun = h.session;
-            }
-        });
-    });
-}
-
 
 function printSimpleGameSection(agents: AgentData[], gameName: string) {
   const gameAgents = agents.map(a => ({
@@ -140,23 +156,28 @@ function printSimpleTimeline(agents: AgentData[], gameName: string) {
   console.log(`${B}📜 Move History Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
-  const allSessions = agents.flatMap(a => a.history.map(h => h.session));
-  const minSessions = Math.min(...allSessions);
-  const maxSessions = Math.max(...allSessions);
+  // Use virtualSession instead of session
+  const allVirtualSessions = agents.flatMap(a => 
+    a.history.map(h => h.virtualSession !== undefined ? h.virtualSession : h.session)
+  )
   
-  if (allSessions.length === 0) return
+  if (allVirtualSessions.length === 0) return
 
+  const minSession = Math.min(...allVirtualSessions)
+  const maxSession = Math.max(...allVirtualSessions)
+  
   let header = 'Agent'.padEnd(16) + '| '
-  for (let i = minSessions; i <= maxSessions; i++) header += `G${i}`.padEnd(5)
+  for (let i = minSession; i <= maxSession; i++) header += `G${i}`.padEnd(5)
   console.log(DIM + header + R)
   console.log(DIM + '─'.repeat(header.length) + R)
 
   for (const agent of agents) {
     let row = agent.name.padEnd(16) + '| '
     
-    for (let session = minSessions; session <= maxSessions; session++) {
-
-      const sessionMoves = agent.history.filter(h => h.virtualSession === session)   
+    for (let vSession = minSession; vSession <= maxSession; vSession++) {
+      const sessionMoves = agent.history.filter(h => 
+        (h.virtualSession !== undefined ? h.virtualSession : h.session) === vSession
+      )
 
       if (sessionMoves.length > 0) {
         const move = sessionMoves[sessionMoves.length - 1]
@@ -181,38 +202,49 @@ function printSimpleTimeline(agents: AgentData[], gameName: string) {
 }
 
 function printMultiRoundGameSection(agents: AgentData[], gameName: string) {
-  const Agents = agents.map(a => ({
+  const gameAgents = agents.map(a => ({
     ...a,
     history: a.history.filter(h => h.game === gameName)
   })).filter(a => a.history.length > 0)
 
-  if (Agents.length === 0) return
+  if (gameAgents.length === 0) return
 
   console.log(`\n${B}${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}`)
   console.log(`${B}${C}🏴‍☠️ PIRATE GAME${R}`)
   console.log(`${B}${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${R}\n`)
 
-  printMultiRoundTimeline(Agents)
+  printMultiRoundTimeline(gameAgents)
 }
 
 function printMultiRoundTimeline(agents: AgentData[]) {
   console.log(`${B}📜 Session-by-Session Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
-  const allSessions = agents.flatMap(a => a.history.map(h => h.virtualSession || 0));
-  const minSession = allSessions.length ? Math.min(...allSessions) : 0;
-  const maxSession = allSessions.length ? Math.max(...allSessions) : 0;
+  // Collect all virtual sessions across all agents
+  const allVirtualSessions = agents.flatMap(a => 
+    a.history.map(h => h.virtualSession !== undefined ? h.virtualSession : h.session)
+  )
+  
+  if (allVirtualSessions.length === 0) {
+    console.log(DIM + 'No data available' + R)
+    return
+  }
 
-  for (let session = minSession; session <= maxSession; session++) {
+  const uniqueSessions = [...new Set(allVirtualSessions)].sort((a, b) => a - b)
+  
+  // Process each virtual session
+  for (const vSession of uniqueSessions) {
     const sessionHistory = agents.flatMap(a => 
       a.history
-        .filter(h => h.virtualSession === session)
+        .filter(h => (h.virtualSession !== undefined ? h.virtualSession : h.session) === vSession)
         .map(h => ({ agent: a.name, ...h }))
     )
 
     if (sessionHistory.length === 0) continue
 
-    console.log(`\n${B}${C}🎮 SESSION ${session}${R}`)
+    // Find original session ID for display (from first entry)
+    
+    console.log(`\n${B}${C}🎮 SESSION ${vSession}${R}`)
     
     const rounds = [...new Set(sessionHistory.map(h => h.round))].sort((a, b) => a - b)
 
@@ -233,15 +265,12 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       if (eliminated) {
         resultStr = `${E}${eliminated.agent} ELIMINATED${R}`
       } else {
-        const roundContinue = roundHistory.find(h => h.result === 'ROUND_CONTINUE')
         const winner = roundHistory.find(h => h.result === 'WIN')
 
-      if (winner && winner.proposalAccepted) {
+        if (winner && winner.proposalAccepted) {
           resultStr = `${G}ACCEPTED${R}`
-        } else if (eliminated) {
-             resultStr = `${E}REJECTED (Elimination)${R}`
         } else if (winner === undefined && !eliminated) {
-             resultStr = `${Y}REJECTED → Next Round${R}`
+          resultStr = `${Y}REJECTED → Next Round${R}`
         } else {
           resultStr = `${DIM}PENDING${R}`
         }
@@ -250,13 +279,61 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       console.log(`  ${C}├─ Round ${round}${R}: Proposer=${B}${proposerName}${R} | ${voteStr} → ${resultStr}`)
     }
 
-    const winner = sessionHistory.find(h => h.result === 'WIN')
-    if (winner) {
-      const profit = winner.profit.toFixed(1)
-      console.log(`  ${G}└─ Winner: ${B}${winner.agent}${R} (+${profit} ALGO)${R}`)
-    } else {
-      console.log(`  ${DIM}└─ End of Session Log${R}`)
+    // RIEPILOGO FINALE - Mostra tutti i risultati
+    console.log(`  ${C}└─ Final Results:${R}`)
+    
+    // Group by result type
+    const winners = sessionHistory.filter(h => h.result === 'WIN' && h.profit > 0)
+    const neutrals = sessionHistory.filter(h => h.result === 'WIN' && h.profit === 0)
+    const losers = sessionHistory.filter(h => h.result === 'WIN' && h.profit < 0)
+    const eliminated = sessionHistory.filter(h => h.result === 'ELIMINATED')
+    const survivors = sessionHistory.filter(h => h.result === 'SURVIVED')
+    
+    // Deduplicate by agent name (take last entry for each agent)
+    const uniqueWinners = [...new Map(winners.map(h => [h.agent, h])).values()]
+      .sort((a, b) => b.profit - a.profit)
+    const uniqueNeutrals = [...new Map(neutrals.map(h => [h.agent, h])).values()]
+    const uniqueLosers = [...new Map(losers.map(h => [h.agent, h])).values()]
+      .sort((a, b) => a.profit - b.profit)
+    const uniqueEliminated = [...new Map(eliminated.map(h => [h.agent, h])).values()]
+    
+    // Display Winners (profit > 0)
+    if (uniqueWinners.length > 0) {
+      console.log(`     ${G}💰 Winners:${R}`)
+      uniqueWinners.forEach(h => {
+        const profitStr = h.profit.toFixed(1)
+        console.log(`        ${B}${h.agent}${R}: ${G}+${profitStr} ALGO${R}`)
+      })
     }
+    
+    // Display Break-even (profit = 0)
+    if (uniqueNeutrals.length > 0) {
+      console.log(`     ${Y}⚖️  Break-even:${R}`)
+      uniqueNeutrals.forEach(h => {
+        console.log(`        ${B}${h.agent}${R}: ${DIM}±0.0 ALGO${R}`)
+      })
+    }
+    
+    // Display Losers (profit < 0, but survived)
+    if (uniqueLosers.length > 0) {
+      console.log(`     ${Y}📉 Losses:${R}`)
+      uniqueLosers.forEach(h => {
+        const profitStr = h.profit.toFixed(1)
+        console.log(`        ${B}${h.agent}${R}: ${E}${profitStr} ALGO${R}`)
+      })
+    }
+    
+    // Display Eliminated (killed before final round)
+    if (uniqueEliminated.length > 0) {
+      console.log(`     ${E}💀 Eliminated:${R}`)
+      uniqueEliminated.forEach(h => {
+        const profitStr = h.profit.toFixed(1)
+        const roundInfo = h.roundEliminated ? ` (Round ${h.roundEliminated})` : ''
+        console.log(`        ${B}${h.agent}${R}: ${E}${profitStr} ALGO${R}${DIM}${roundInfo}${R}`)
+      })
+    }
+    
+    console.log('') // Empty line for spacing
   }
   console.log('')
 }
