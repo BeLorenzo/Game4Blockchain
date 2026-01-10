@@ -4,40 +4,55 @@
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Agent } from './Agent'
- import { StagHuntGame } from './games/StagHuntGame'
- import { WeeklyGame } from './games/WeeklyGame'
+import { StagHuntGame } from './games/StagHuntGame'
+import { WeeklyGame } from './games/WeeklyGame'
 import { GuessGame } from './games/GuessGame'
- import { PirateGame } from './games/PirateGame'
+import { PirateGame } from './games/PirateGame'
 import { IBaseGameAdapter } from './games/IBaseGameAdapter'
 import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
 
+/**
+ * Type Guard to check if a game supports multi-round logic (e.g., Pirate Game).
+ */
 function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
   return (game as IMultiRoundGameAdapter).playRound !== undefined;
 }
 
-
-// SIMULATION CONFIG
+// === SIMULATION CONFIGURATION ===
 const NUM_SESSIONS = 2
 const INITIAL_FUNDING = 100_000
 
-// GAME SELECTION
- //const game : IBaseGameAdapter = new StagHuntGame()
-  //const game : IBaseGameAdapter = new WeeklyGame()
-//const game : IBaseGameAdapter = new GuessGame()
- //const game : IBaseGameAdapter = new PirateGame()
+// === GAME SELECTION ===
+// Uncomment the game you wish to simulate
+// const game : IBaseGameAdapter = new StagHuntGame()
+// const game : IBaseGameAdapter = new WeeklyGame()
+const game : IBaseGameAdapter = new GuessGame()
+// const game : IBaseGameAdapter = new PirateGame()
 
-// MAIN
+/**
+ * Main Entry Point for the Simulation Framework.
+ * * Workflow:
+ * 1. Initializes the LocalNet Algorand client.
+ * 2. Creates AI Agents with distinct personality archetypes.
+ * 3. Funds agents with test ALGO.
+ * 4. Scans existing logs to resume session numbering if needed.
+ * 5. Deploys the selected Game Contract.
+ * 6. Runs the main Game Loop (Session Creation -> Play -> Resolve).
+ */
 async function main() {
   console.log(`Game: ${game.name}`)
   console.log(`Rounds to play: ${NUM_SESSIONS}\n`)
 
   const algorand = AlgorandClient.defaultLocalNet()
 
-  // AGENTS CREATION - Game-Agnostic Personalities
+  
+
+  // === AGENT INITIALIZATION ===
+  // Creating 7 agents with diverse Game Theory strategies
   const agents = [
     new Agent(
       algorand.account.random().account,
-      'Alpha', // THE CALCULATOR → Expected Value (EV) Maximizer
+      'Alpha', // THE CALCULATOR: EV Maximizer
       {
         personalityDescription: `
 You are an Expected Value (EV) Maximizer. You make decisions based purely on mathematical analysis.
@@ -76,7 +91,7 @@ STRATEGIC PRINCIPLES:
 
     new Agent(
       algorand.account.random().account,
-      'Beta', // THE PARANOID → Minimax (Minimize Maximum Loss)
+      'Beta', // THE PARANOID: Minimax Strategist
       {
         personalityDescription: `
 You are a Defensive Strategist focused on survival and loss prevention.
@@ -114,7 +129,7 @@ STRATEGIC PRINCIPLES:
 
     new Agent(
       algorand.account.random().account,
-      'Gamma', // THE GAMBLER → Volatility Hunter
+      'Gamma', // THE GAMBLER: Volatility Hunter
       {
         personalityDescription: `
 You are an Aggressive Strategist who chases maximum payouts through bold moves.
@@ -153,7 +168,7 @@ STRATEGIC PRINCIPLES:
 
     new Agent(
       algorand.account.random().account,
-      'Delta', // THE MIRROR → Tit-for-Tat Reciprocator
+      'Delta', // THE MIRROR: Tit-for-Tat Reciprocator
       {
         personalityDescription: `
 You play strict Tit-for-Tat reciprocity. You mirror the group's behavior back at them.
@@ -192,7 +207,7 @@ STRATEGIC PRINCIPLES:
 
     new Agent(
       algorand.account.random().account,
-      'Epsilon', // THE ALTRUIST → Group Welfare Maximizer
+      'Epsilon', // THE ALTRUIST: Group Welfare Maximizer
       {
         personalityDescription: `
 You are a Cooperative Strategist who prioritizes collective welfare over personal gain.
@@ -231,7 +246,7 @@ STRATEGIC PRINCIPLES:ch
 
     new Agent(
       algorand.account.random().account,
-      'Zeta', // THE FOLLOWER → Momentum Trader
+      'Zeta', // THE FOLLOWER: Momentum Trader
       {
         personalityDescription: `
 You are a Trend Follower who copies proven winners.
@@ -270,7 +285,7 @@ STRATEGIC PRINCIPLES:
 
     new Agent(
       algorand.account.random().account,
-      'Eta', // THE CONTRARIAN → Anti-Crowd Strategist
+      'Eta', // THE CONTRARIAN: Anti-Crowd Strategist
       {
         personalityDescription: `
 You are a Contrarian who finds value where others aren't looking.
@@ -326,12 +341,13 @@ STRATEGIC PRINCIPLES:
     }),
   )
 
+  // === SESSION RESUME LOGIC ===
+  // Check agent logs to see if we are continuing a previous simulation run
   let sessionFound = 0
   agents.forEach((a) => {
-    // Access private fullHistory property
+    // Access private fullHistory property via cast
     const history = (a as any).fullHistory
     if (history && history.length > 0) {
-      // Filter by current game name before finding last session
       const rawEntries = history.filter((h: any) => h.game === game.name)
       if (rawEntries.length > 0) {
         let distinctSessionsCount = 0
@@ -360,16 +376,15 @@ STRATEGIC PRINCIPLES:
       : `Starting fresh - no previous sessions found for ${game.name}`
   )
 
-  // Deploy
+  // === CONTRACT DEPLOYMENT ===
   const admin = agents[0]
   console.log('\n--- DEPLOYMENT ---')
   await game.deploy(admin)
 
-
   console.log(`\n--- STARTING ${NUM_SESSIONS} GAMES ---`)
 
-  // Game loop
-    for (let i = 0; i < NUM_SESSIONS; i++) {
+  // === MAIN GAME LOOP ===
+  for (let i = 0; i < NUM_SESSIONS; i++) {
     let sessionId: bigint | null = null;
     try {
         console.log(`${'='.repeat(60)}`)
@@ -377,6 +392,7 @@ STRATEGIC PRINCIPLES:
         console.log('='.repeat(60))
 
         if (isTurnBased(game)) {
+          // --- LOGIC FOR MULTI-ROUND GAMES (e.g., Pirate Game) ---
           
           await game.setup(agents, sessionId) 
           
@@ -399,17 +415,22 @@ STRATEGIC PRINCIPLES:
           console.log(`\n🎉 Session ${i+1} COMPLETED.\n`);
 
       } else {
+          // --- LOGIC FOR SIMPLE GAMES (e.g., RPS, StagHunt) ---
+          // Phase 1: Commit (Agents make secret moves)
           await game.commit(agents, sessionId, i); 
+          
+          // Phase 2: Reveal (Agents reveal moves)
           await game.reveal(agents, sessionId, i);
 
           try {
+            // Phase 3: Resolution & Claim
             await game.resolve(admin, sessionId, i);
             await game.claim(agents, sessionId, i);
             
             console.log(`\n🎉 Session ${i+1} COMPLETED.\n`);
           } catch (resolveError) {
-            console.error(` ❌ Failed during Resolution/Claim:`, resolveError);
-            // Qui non lanciamo throw se vogliamo contare la sessione come "failed" ma continuare col loop esterno
+            console.error(` ❌ Failed during Resolution/Claim:`, resolveError);
+            // We do not throw here to allow the simulation to proceed to the next session
           }
       } 
     } catch (e) {
@@ -417,6 +438,7 @@ STRATEGIC PRINCIPLES:
       console.error(e);
     }
   } 
+  
   console.log('\n' + '='.repeat(60))
   console.log('🏁 SIMULATION COMPLETE')
   console.log('='.repeat(60))

@@ -10,15 +10,16 @@ import { sha256 } from 'js-sha256';
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount';
 
 import { 
-    PirateGameClient, 
-    PirateGameFactory 
+  PirateGameClient, 
+  PirateGameFactory 
 } from '../../smart_contracts/artifacts/pirateGame/PirateGameClient';
 import { UI } from '../ui';
-import { start } from 'node:repl';
 
 const PHASES = ['Registration', 'Proposal', 'Vote Commit', 'Vote Reveal', 'Finished'];
 
-// Helper per inizializzare il client velocemente
+/**
+ * Helper to initialize the Pirate Game Client.
+ */
 const getClient = async (wallet: WalletManager) => {
   const appId = await getAppId(wallet, 'PIRATE');
   return new PirateGameClient({
@@ -28,7 +29,9 @@ const getClient = async (wallet: WalletManager) => {
   });
 };
 
-// Helper per chiedere il Session ID (usato ovunque)
+/**
+ * Helper to prompt the user for a Session ID.
+ */
 const askSessionId = async () => {
   const answers = await inquirer.prompt([{
     type: 'input', name: 'sessId', message: 'Enter SESSION ID:',
@@ -41,20 +44,24 @@ export const PirateGameModule: IGameModule = {
   id: 'PIRATE',
   name: '🏴‍☠️ Pirate Game',
 
-  // MENU PIATTO: Tutte le azioni visibili subito
+  // Flat Menu: All actions visible immediately
   getAvailableActions: (): GameAction[] => [
     { name: '🚀 Deploy Contract', value: 'deploy' },
     { name: '🆕 Create Session', value: 'create', separator: true },
-    { name: '✍️ Register (Join)', value: 'join' },
+    { name: '✍️  Register (Join)', value: 'join' },
     { name: '💰 Propose Distribution', value: 'propose' },
-    { name: '🗳️ Vote (Commit)', value: 'vote' },
+    { name: '🗳️  Vote (Commit)', value: 'vote' },
     { name: '🔓 Reveal Vote', value: 'revealVote' },
-    { name: '⚙️ Execute Round', value: 'execute' },
-    { name: '⏱️ Timeout AFK', value: 'timeout' },
+    { name: '⚙️  Execute Round', value: 'execute' },
+    { name: '⏱️  Timeout AFK', value: 'timeout' },
     { name: '💵 Claim Winnings', value: 'claim', separator: true },
     { name: '📊 Dashboard', value: 'status', separator: true },
   ],
 
+  /**
+   * Deploys the Pirate Game Factory contract.
+   * Initializes it and funds the MBR.
+   */
   deploy: async (wallet: WalletManager) => {
     console.log(chalk.yellow('🚀 Starting Deployment...'));    
     if (!wallet.account) return;
@@ -70,6 +77,8 @@ export const PirateGameModule: IGameModule = {
       if (['create', 'replace'].includes(result.operationPerformed)) {
         console.log(chalk.yellow('📝 Initializing...'));
         await appClient.send.initialize({ args: { gameType: 'PIRATE' } });
+        
+        // Fund the contract
         await wallet.algorand.send.payment({
           amount: AlgoAmount.Algos(1),
           sender: wallet.account.addr,
@@ -80,36 +89,26 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Deploy'); }
   },
 
+  /**
+   * Creates a new Pirate Game session.
+   * Defines the maximum number of pirates and round durations.
+   */
   create: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
       const answers = await inquirer.prompt([
         { type: 'input', name: 'participation', message: 'Fee (µAlgo)?', default: '1000000' },
         { type: 'input', name: 'maxPirates', message: 'Max Pirates (3-20)?', default: '5' },
-{
-          type: 'input',
-          name: 'startDelay',
-          message: 'Start delay (rounds)?',
-          default: '1',
-        },
-        {
-          type: 'input',
-          name: 'commit',
-          message: 'Commit duration (rounds)?',
-          default: '50',
-        },
-        {
-          type: 'input',
-          name: 'reveal',
-          message: 'Reveal duration (rounds)?',
-          default: '50',
-        },
+        { type: 'input', name: 'startDelay', message: 'Start delay (rounds)?', default: '1' },
+        { type: 'input', name: 'commit', message: 'Commit duration (rounds)?', default: '50' },
+        { type: 'input', name: 'reveal', message: 'Reveal duration (rounds)?', default: '50' },
       ]);
 
       const currentRound = await getCurrentRound(wallet);
-      const startAt = currentRound + answers.startDelay;
-      const endCommit = startAt + answers.commit
-      const endReveal = endCommit + answers.reveal
+      const startAt = currentRound + BigInt(answers.startDelay);
+      const endCommit = startAt + BigInt(answers.commit);
+      const endReveal = endCommit + BigInt(answers.reveal);
+      
       console.log(chalk.yellow('⏳ Calculating Cost...'));
       const mbrResult = await client.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true });
       
@@ -126,6 +125,10 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Create Session'); }
   },
 
+  /**
+   * Registers a player as a pirate in the session.
+   * First come, first served regarding seniority.
+   */
   join: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -149,12 +152,18 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Join'); }
   },
 
+  /**
+   * The current Senior Pirate proposes how to split the pot.
+   * The proposal is a byte array where each 8 bytes represents the amount for a specific pirate index.
+   */
   propose: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
       const sessionID = await askSessionId();
       const state = await client.state.box.gameState.value(sessionID);
       if (!state) throw new Error("State not found");
+
+      
 
       console.log(chalk.cyan(`\n💰 Pot: ${state.pot} µAlgo | Pirates: ${state.totalPirates}`));
       const distribution = Buffer.alloc(Number(state.totalPirates) * 8);
@@ -184,6 +193,10 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Propose'); }
   },
 
+  /**
+   * Pirates vote on the current proposal.
+   * Uses Commit-Reveal: Vote is hashed with a salt.
+   */
   vote: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -192,6 +205,8 @@ export const PirateGameModule: IGameModule = {
         type: 'list', name: 'voteChoice', message: 'Your vote:',
         choices: [{ name: '✅ YES', value: 1 }, { name: '❌ NO', value: 0 }],
       }]);
+
+      
 
       const salt = new Uint8Array(32);
       crypto.getRandomValues(salt);
@@ -217,6 +232,9 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Vote'); }
   },
 
+  /**
+   * Reveals the committed vote.
+   */
   revealVote: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -235,6 +253,12 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Reveal'); }
   },
 
+  /**
+   * Executes the round logic after all votes are revealed (or deadlines passed).
+   * Checks majority:
+   * - If passed: Game Ends, Proposal is accepted.
+   * - If failed: Proposer is eliminated, Next round starts.
+   */
   execute: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -249,6 +273,9 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Execute'); }
   },
 
+  /**
+   * Triggers a timeout if the current proposer is AFK or votes are stuck.
+   */
   timeout: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -262,6 +289,9 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Timeout'); }
   },
 
+  /**
+   * Claims winnings if the game is in the 'Finished' phase.
+   */
   claim: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -276,6 +306,9 @@ export const PirateGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Claim'); }
   },
 
+  /**
+   * Displays the game status, current phase, and deadlines.
+   */
   status: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -287,19 +320,20 @@ export const PirateGameModule: IGameModule = {
       
       if (totalSessions === 0) { console.log('No games.'); return; }
 
-      // Mostra le ultime 5 sessioni
+      // Show last 5 sessions
       for (let i = totalSessions - 1; i >= Math.max(0, totalSessions - 5); i--) {
         const sessionID = BigInt(i);
-const [config, state] = await Promise.all([
+        const [config, state] = await Promise.all([
              client.state.box.gameSessions.value(sessionID),
              client.state.box.gameState.value(sessionID)
         ]);
-if (!state || !config) continue;
+        if (!state || !config) continue;
 
         const phaseLabel = PHASES[Number(state.phase)] || 'Unknown';
         console.log(chalk.cyan(`🔹 ID: ${i} | Phase: ${phaseLabel} | Round: ${state.currentRound}`));
         console.log(chalk.gray(`   Alive: ${state.alivePirates}/${state.totalPirates} | Pot: ${state.pot}`));
-       if (state.phase === 0n) {
+        
+        if (state.phase === 0n) {
              console.log(chalk.yellow(`   Start Game: ${config.startAt} ${getRoundDiff(currentRound, config.startAt)}`));
         } else if (state.phase === 1n) {
              console.log(chalk.red(`   Deadline Proposal: ${config.endCommitAt} ${getRoundDiff(currentRound, config.endCommitAt)}`));

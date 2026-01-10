@@ -7,6 +7,10 @@ import * as path from 'path'
 import { askLLM, BaseDecisionSchema } from './llm'
 import { z } from "zod";
 
+/**
+ * Defines the static personality traits of an agent.
+ * These values (0.0 - 1.0) influence the prompt construction and decision-making logic.
+ */
 export interface PsychologicalProfile {
   personalityDescription: string
   riskTolerance: number
@@ -19,6 +23,10 @@ export interface PsychologicalProfile {
   curiosity: number
 }
 
+/**
+ * Tracks the dynamic emotional state of the agent.
+ * Changes based on game results (wins/losses).
+ */
 export interface AgentMentalState {
   optimism: number
   frustration: number
@@ -26,6 +34,9 @@ export interface AgentMentalState {
   streakCounter: number
 }
 
+/**
+ * Represents a single recorded game event.
+ */
 export interface Experience {
   game: string
   session: number
@@ -61,6 +72,13 @@ interface PendingDecision {
   timestamp: number
 }
 
+/**
+ * Represents an AI Agent capable of interacting with Algorand Smart Contracts.
+ * * Features:
+ * - **Persistence**: Saves/Loads history and learning data to JSON.
+ * - **Psychology**: Simulates emotions (frustration, optimism) that affect decision temperature.
+ * - **Strategy**: Implements "Exploit" (auto-pilot on winning moves) and "Emergency" (override personality on losing streaks) modes.
+ */
 export class Agent {
   account: Account
   name: string
@@ -73,6 +91,7 @@ export class Agent {
   private performanceStats: GameStatsMap = {}
   private filePath: string
   
+  // Temporary storage for a decision before the transaction confirms
   private pendingDecisions: PendingDecision[] = []
 
   constructor(account: Account, name: string, profile: PsychologicalProfile, model: string) {
@@ -88,6 +107,7 @@ export class Agent {
       streakCounter: 0,
     }
 
+    // Ensure data directory exists
     const dataDir = path.join(process.cwd(), 'simulation', 'data', 'agents')
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
     this.filePath = path.join(dataDir, `${this.name.replace(/\s+/g, '_')}.json`)
@@ -95,8 +115,12 @@ export class Agent {
     this.loadState() 
   }
 
+  /**
+   * Calculates the sampling temperature for the LLM.
+   * High frustration/loss leads to lower temperature (more deterministic/conservative behavior).
+   * High curiosity leads to higher temperature (more exploration).
+   */
   get dynamicTemperature(): number {
-    // Lower temperature when struggling (more deterministic)
     const baseTemp = 0.3 + this.profile.curiosity * 0.6
     if (this.mentalState.consecutiveLosses >= 5) {
       return Math.max(0.1, baseTemp - 0.3)
@@ -104,15 +128,19 @@ export class Agent {
     return baseTemp
   }
 
+  /**
+   * Returns a TransactionSigner compatible with AlgoKit/AlgoSDK.
+   */
   get signer(): TransactionSigner {
     return (txnGroup, indexes) => Promise.resolve(indexes.map((i) => txnGroup[i].signTxn(this.account.sk)))
   }
 
   /**
-   * Builds the complete prompt by combining agent context with game-specific rules
-   * @param gameName - Name of the game being played
-   * @param gamePrompt - Game rules, examples, and strategic hints (from game adapter)
-   * @param schema - Zod schema for validation
+   * Core decision-making loop.
+   * * Workflow:
+   * 1. **Exploit Check**: If a specific move has a high win rate & ROI, auto-play it (skip LLM).
+   * 2. **Emergency Check**: If on a losing streak, override personality with pure data analysis.
+   * 3. **Standard Play**: Consult LLM with full personality context.
    */
   async playRound<T extends z.ZodType<any>>(
     gameName: string, 
@@ -120,6 +148,9 @@ export class Agent {
     schema: T = BaseDecisionSchema as any
   ): Promise<z.infer<T>> {    
 
+    
+
+    // 1. Check for Auto-Exploit opportunities
     const exploitCheck = this.shouldExploit(gameName)
 
     if (exploitCheck.exploit && Math.random() < 0.3) {
@@ -141,17 +172,20 @@ export class Agent {
       }
     }
 
-    // Build full prompt with agent context + game rules
+    // 2. Build Standard Prompt
     let fullPrompt = this.buildFullPrompt(gameName, gamePrompt)
 
-    // Emergency override if struggling
+    // 3. Check for Emergency Override (Consecutive Losses)
     if (this.mentalState.consecutiveLosses >= 5) {
       console.log(`[${this.name}] 🚨 Emergency override mode (${this.mentalState.consecutiveLosses} losses)`)
       fullPrompt = this.buildEmergencyPrompt(gameName, fullPrompt)
+      
+      // Temporarily boost resilience/adaptability to simulate "survival mode"
       this.profile.resilience = Math.min(1.0, this.profile.resilience + 0.2)
       this.profile.adaptability = Math.min(1.0, this.profile.adaptability + 0.2)
     }
 
+    // 4. Query LLM
     const decision = await askLLM(fullPrompt, this.model, schema, {
       temperature: this.dynamicTemperature,
     })
@@ -168,7 +202,11 @@ export class Agent {
   }
 
   /**
-   * Constructs the full prompt by combining agent identity/context with game rules
+   * Constructs the full context for the LLM, including:
+   * - Personality Profile
+   * - Historical Performance (Lessons Learned)
+   * - Recent Moves
+   * - Current Mental State
    */
   private buildFullPrompt(gameName: string, gamePrompt: string): string {
     const personality = this.profile.personalityDescription
@@ -216,6 +254,10 @@ Respond ONLY with JSON: {"choice": <number>, "reasoning": "<your explanation>"}
 `.trim()
   }
 
+  /**
+   * Constructs a specific prompt that forces the LLM to ignore personality
+   * and focus purely on data/game-theory to break a losing streak.
+   */
   private buildEmergencyPrompt(game: string, originalPrompt: string): string {
     const stats = this.performanceStats[game]
     let prescription = ''
@@ -268,13 +310,16 @@ Choose the mathematically optimal play, not the one that "feels right".
 `
   }
 
+  /**
+   * Analyzes stats to see if a specific choice is statistically dominant (High Win Rate + High Profit).
+   */
   private shouldExploit(game: string): { exploit: boolean, choice?: number } {
     const stats = this.performanceStats[game]
     if (!stats) return { exploit: false }
 
     const candidates = Object.entries(stats)
       .map(([choice, data]) => ({ choice: Number(choice), ...data }))
-      .filter(s => s.timesChosen >= 2)    // Minimum sample size
+      .filter(s => s.timesChosen >= 2)     // Minimum sample size
       .filter(s => s.winRate >= 0.5)       // At least 50% win rate
       .filter(s => s.avgProfit > 10)       // Significant positive return
 
@@ -286,6 +331,9 @@ Choose the mathematically optimal play, not the one that "feels right".
     return { exploit: true, choice: best.choice }
   }
 
+  /**
+   * Generates a text summary of lessons learned from previous rounds of this game.
+   */
   public getLessonsLearned(game: string): string {
     const stats = this.performanceStats[game]
     if (!stats || Object.keys(stats).length === 0) {
@@ -347,7 +395,7 @@ Choose the mathematically optimal play, not the one that "feels right".
         let extra = ''
         if (h.role) extra += ` [${h.role}]`
         if (h.roundEliminated) extra += ` (eliminated R${h.roundEliminated})`
-        return `Session ${h.session}-R${h.round}: Choice ${h.choice} → ${profitStr} ALGO${extra}` // 🔧 FIX: "Game" → "Session"
+        return `Session ${h.session}-R${h.round}: Choice ${h.choice} → ${profitStr} ALGO${extra}`
       })
       .join('\n')
   }
@@ -368,6 +416,10 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
 `.trim()
   }
 
+  /**
+   * Finalizes the round by moving the pending decision to permanent history,
+   * updating stats, and saving state to disk.
+   */
   async finalizeRound(
     game: string, 
     result: string, 
@@ -448,6 +500,7 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
       m.consecutiveLosses++
       m.streakCounter = 0
 
+      // Check for stubbornness (repeating the same losing move)
       let isStubbornness = false
       if (this.fullHistory.length >= 2) {
         const prev = this.fullHistory[this.fullHistory.length - 2]
@@ -486,7 +539,7 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
         const data = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'))
         
         this.fullHistory = data.history || []
-        this.recentHistory = this.fullHistory.slice(-5) // Always derive from fullHistory
+        this.recentHistory = this.fullHistory.slice(-5)
         this.performanceStats = data.performanceStats || {}
         
         if (data.mentalState) {

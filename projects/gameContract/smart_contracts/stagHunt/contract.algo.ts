@@ -67,8 +67,6 @@ export class StagHunt extends GameContract {
   /**
    * Admin method to update game rules dynamically.
    * Only the contract creator can call this.
-   * @param newRefund New refund percentage for Hares (0-100).
-   * @param newThreshold New threshold percentage for Stags (0-100).
    */
   public updateGameRules(newRefund: uint64, newThreshold: uint64): void {
     assert(Txn.sender === Global.creatorAddress, 'Only creator can update rules')
@@ -113,7 +111,6 @@ export class StagHunt extends GameContract {
   /**
    * Reveals a player's move.
    * Updates the live counts of Stags and Hares.
-   * @param choice 0 for Hare, 1 for Stag.
    */
   public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
     assert(choice === 0 || choice === 1, 'Choice must be 0 (Hare) or 1 (Stag)')
@@ -127,77 +124,64 @@ export class StagHunt extends GameContract {
   }
 
   /**
-   * Resolves the session outcome based on the threshold.
-   * Handles financial logic: refunds, jackpot accumulation, or payout calculation.
-   * Must be called once after the reveal phase ends.
-   */
-  public resolveSession(sessionID: uint64): void {
-    // Ensure sufficient opcode budget for math and state updates
-    ensureBudget(2000)
-    assert(this.sessionExists(sessionID), 'Session does not exist')
-    
-    const config = clone(this.gameSessions(sessionID).value)
-    assert(Global.round > config.endRevealAt, 'Reveal phase not ended')
+ * Resolves the session outcome based on the threshold.
+ * Handles refunds, jackpot accumulation, and reward calculation.
+ * Must be called once after the reveal phase ends.
+ */
+public resolveSession(sessionID: uint64): void {
+  ensureBudget(2000)
+  assert(this.sessionExists(sessionID), 'Session does not exist')
+  
+  const config = clone(this.gameSessions(sessionID).value)
+  assert(Global.round > config.endRevealAt, 'Reveal phase not ended')
 
-    const stats = clone(this.stats(sessionID).value)
-    if (stats.resolved) return // Idempotency check
+  const stats = clone(this.stats(sessionID).value)
+  if (stats.resolved) return // Idempotent resolution
 
-    const currentThresholdPct = this.stagThresholdPercent.value
-    const currentRefundPct = this.hareRefundPercent.value
+  const currentThresholdPct = this.stagThresholdPercent.value
+  const currentRefundPct = this.hareRefundPercent.value
 
-    const totalRevealed: uint64 = stats.stags + stats.hares
-    const sessionBalance = this.getSessionBalance(sessionID)
+  const totalRevealed: uint64 = stats.stags + stats.hares
+  const sessionBalance = this.getSessionBalance(sessionID)
 
-    // Edge Case: No one revealed. Treat as total failure.
-    // All funds (ghost players) go to the Global Jackpot.
-    if (totalRevealed === 0) {
-        stats.resolved = true
-        stats.successful = false
-        this.globalJackpot.value += sessionBalance
-        this.stats(sessionID).value = clone(stats)
-        return
-    }
-
-    // 1. Check Threshold
-    // Logic: (Stags * 100) >= (Total * Threshold%)
-    const thresholdMet = (stats.stags * 100) >= (totalRevealed * currentThresholdPct)
-
-    // 2. Calculate Liabilities (Hare Refunds)
-    const hareRefundUnit: uint64 = (config.participation * currentRefundPct) / 100
-    const totalHareRefunds: uint64 = stats.hares * hareRefundUnit
-
-    assert(sessionBalance >= totalHareRefunds, 'Critical: Insolvency')
-
-    // 3. Calculate Net Pot
-    // This includes Stag deposits + Hare fees + Ghost player deposits
-    const netSessionPot: uint64 = sessionBalance - totalHareRefunds
-
-    if (thresholdMet && stats.stags > 0) {
-        // --- SUCCESS CASE (Coordination Achieved) ---
-        const jackpotAmount = this.globalJackpot.value
-        const totalDistributable: uint64 = netSessionPot + jackpotAmount
-
-        const share: uint64 = totalDistributable / stats.stags
-        const remainder: uint64 = totalDistributable % stats.stags
-
-        stats.successful = true
-        stats.rewardPerStag = share
-
-        // Reset Jackpot (keep only the indivisible dust)
-        this.globalJackpot.value = remainder
-
-    } else {
-        // --- FAILURE CASE (Coordination Failed) ---
-        // Stags lose everything. The entire Net Pot feeds the Global Jackpot.
-        this.globalJackpot.value += netSessionPot
-        
-        stats.successful = false
-        stats.rewardPerStag = 0
-    }
-
+  // Edge case: no revealed players → total failure, funds go to jackpot
+  if (totalRevealed === 0) {
     stats.resolved = true
+    stats.successful = false
+    this.globalJackpot.value += sessionBalance
     this.stats(sessionID).value = clone(stats)
+    return
   }
+
+  const thresholdMet = (stats.stags * 100) >= (totalRevealed * currentThresholdPct)
+
+  const hareRefundUnit: uint64 = (config.participation * currentRefundPct) / 100
+  const totalHareRefunds: uint64 = stats.hares * hareRefundUnit
+
+  assert(sessionBalance >= totalHareRefunds, 'Critical: Insolvency')
+
+  // Net pot after Hare refunds (includes ghost players)
+  const netSessionPot: uint64 = sessionBalance - totalHareRefunds
+
+  if (thresholdMet && stats.stags > 0) {
+    const jackpotAmount = this.globalJackpot.value
+    const totalDistributable: uint64 = netSessionPot + jackpotAmount
+
+    stats.rewardPerStag = totalDistributable / stats.stags
+    this.globalJackpot.value = totalDistributable % stats.stags
+
+    stats.successful = true
+  } else {
+    // Failed coordination: Stags lose everything
+    this.globalJackpot.value += netSessionPot
+    stats.successful = false
+    stats.rewardPerStag = 0
+  }
+
+  stats.resolved = true
+  this.stats(sessionID).value = clone(stats)
+}
+
 
   /**
    * Allows players to pull their winnings or refunds.
@@ -244,16 +228,15 @@ export class StagHunt extends GameContract {
     return payout
   }
 
-  /**
-   * Calculates the MBR for session creation.
-   * Allocates space for the Stats struct.
-   */
-  public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
-    if (command === 'newGame') {
-      // Box Stats: Key(8) + Struct(32 bytes for alignment)
-      const statsMBR = this.getBoxMBR(8, 32)
-      return statsMBR + super.getRequiredMBR('newGame')
-    }
-    return super.getRequiredMBR(command)
+/**
+ * Calculates the MBR required for session creation.
+ * Includes storage for the session statistics box.
+ */
+public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
+  if (command === 'newGame') {
+    const statsMBR = this.getBoxMBR(8, 32)
+    return statsMBR + super.getRequiredMBR('newGame')
   }
+  return super.getRequiredMBR(command)
+}
 }

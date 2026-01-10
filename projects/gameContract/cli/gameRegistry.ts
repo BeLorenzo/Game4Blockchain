@@ -10,7 +10,6 @@ export class GameRegistry {
 
   /**
    * Registers a new game module into the system.
-   * @param game The game module implementation.
    */
   public static register(game: IGameModule) {
     this.games.push(game);

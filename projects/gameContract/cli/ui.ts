@@ -5,33 +5,45 @@ import { GameRegistry } from './gameRegistry';
 import { IGameModule } from './interfaces';
 
 export const UI = {
+  /**
+   * Clears the console screen.
+   */
   clear: () => {
     console.clear();
   },
 
+  /**
+   * Prints a styled blue banner with the provided text.
+   */
   printTitle: (text: string) => {
     console.log(chalk.bgBlue.white.bold(`  ${text}  `));
-    console.log(''); 
+    console.log('');
   },
 
+  /**
+   * Prints a gray separator line to the console.
+   */
   separator: () => {
     console.log(chalk.gray('------------------------------------------------'));
   },
 
+  /**
+   * Prompts the user to select a game from the GameRegistry.
+   */
   selectGameType: async () => {
     const games = GameRegistry.getAll();
 
     const choices: any[] = games.map((g) => ({
-      name: g.name, 
-      value: g.id,  
+      name: g.name,
+      value: g.id,
     }));
 
     choices.push(new inquirer.Separator());
-    choices.push({ name: '❌ Exit CLI', value: 'exit' }); 
+    choices.push({ name: '❌ Exit CLI', value: 'exit' });
 
     const answer = await inquirer.prompt([
       {
-        type: 'list', 
+        type: 'list',
         name: 'gameId',
         message: 'What do you want to play today?',
         choices: choices,
@@ -43,16 +55,16 @@ export const UI = {
   },
 
   /**
-   * Dynamic action menu - builds menu from game's available actions
+   * Displays the main menu for a specific game module.
+   * Dynamically builds the list based on the module's available actions.
    */
   mainMenu: async (gameModule: IGameModule) => {
     console.log(chalk.cyan(`\n🎮 ${gameModule.name} - Actions`));
-    
+
     const actions = gameModule.getAvailableActions();
-    
-    // Build choices with separators
+
     const choices: any[] = [];
-    
+
     for (const action of actions) {
       if (action.separator) {
         choices.push(new inquirer.Separator());
@@ -62,8 +74,7 @@ export const UI = {
         value: action.value
       });
     }
-    
-    // Always add back option at the end
+
     choices.push(new inquirer.Separator());
     choices.push({ name: '🔙 Back to Game Selection', value: 'back' });
 
@@ -77,7 +88,7 @@ export const UI = {
         loop: false
       },
     ]);
-    
+
     return answer.action;
   },
 };

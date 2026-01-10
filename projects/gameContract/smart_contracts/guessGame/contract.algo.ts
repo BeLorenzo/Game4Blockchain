@@ -12,7 +12,7 @@ import {
   uint64,
 } from '@algorandfoundation/algorand-typescript'
 import { Address } from '@algorandfoundation/algorand-typescript/arc4'
-import { GameConfig, GameContract } from '../abstract_contract/contract.algo' 
+import { GameConfig, GameContract } from '../abstract_contract/contract.algo'
 
 /**
  * Statistics for a specific game session.
@@ -24,12 +24,13 @@ interface GameStats {
 
 /**
  * Implementation of the "Guess 2/3 of the Average" game.
- * * Game Mechanics:
- * Players choose a number between 0 and 100.
- * The system calculates the average of all choices.
- * The Target is defined as 2/3 of that average.
- * The winner is the player whose number is closest to the Target.
- * In case of a tie, the pot is split equally among the winners.
+ *
+ * Game Mechanics:
+ * - Players choose a number between 0 and 100.
+ * - The system calculates the average of all choices.
+ * - The Target is defined as 2/3 of that average.
+ * - The winner is the player whose number is closest to the Target.
+ * - In case of a tie, the pot is split equally among the winners.
  */
 export class GuessGame extends GameContract {
   /**
@@ -40,18 +41,15 @@ export class GuessGame extends GameContract {
 
   /**
    * Compressed frequency map storing player choices.
-   * Data Structure: A single byte blob of 808 bytes (101 uint64s).
-   * Index 'i' corresponds to the number chosen by players (0-100).
-   * The value at index 'i' (8 bytes) represents the count of players who chose 'i'.
+   * Structure: A single byte blob of 808 bytes (101 uint64s).
+   * Index 'i' (0-100) holds the count of players who chose 'i'.
    * Key: SessionID
    */
   frequency = BoxMap<uint64, bytes>({ keyPrefix: 'fr' })
 
   /**
    * Initializes a new game session and allocates storage for counters.
-   * @param config - The game configuration (timelines, fees).
-   * @param mbrPayment - Payment transaction to cover the Minimum Balance Requirement (MBR).
-   * @returns The unique session ID.
+   * Validates that the MBR payment covers the large frequency blob.
    */
   public createSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn): uint64 {
     const requiredMBR = this.getRequiredMBR('newGame')
@@ -59,7 +57,7 @@ export class GuessGame extends GameContract {
     assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
     assert(mbrPayment.amount >= requiredMBR, 'Insufficient MBR for session and counters')
 
-    const sessionID = super.create(config) 
+    const sessionID = super.create(config)
 
     this.stats(sessionID).value = { sum: 0, count: 0 }
 
@@ -78,9 +76,7 @@ export class GuessGame extends GameContract {
 
   /**
    * Reveals a player's move and updates global game statistics.
-   * @param sessionID - The session ID.
-   * @param choice - The player's chosen number (must be between 0 and 100).
-   * @param salt - The secret salt used during the commit phase.
+   * Choice must be between 0 and 100.
    */
   public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
     assert(choice >= 0 && choice <= 100, 'Choice must be between 0 and 100')
@@ -99,16 +95,14 @@ export class GuessGame extends GameContract {
     const box = this.frequency(sessionID)
     const currentCount = op.extractUint64(box.value, offset)
     const newCount: uint64 = currentCount + 1
-    
-    // Write only the updated 8 bytes back to storage (efficient)
+
+    // Write only the updated 8 bytes back to storage
     box.replace(offset, op.itob(newCount))
   }
 
   /**
    * Calculates the winner and distributes the prize using the Pull pattern.
-   * Uses `ensureBudget` to guarantee sufficient opcodes for the calculation loop.
-   * @param sessionID - The session ID.
-   * @returns The amount won by the caller.
+   * Uses ensureBudget to guarantee sufficient opcodes for the calculation loop.
    */
   public claimWinnings(sessionID: uint64): uint64 {
     ensureBudget(1400)
@@ -145,7 +139,8 @@ export class GuessGame extends GameContract {
 
   /**
    * Internal logic to determine if the caller is a winner and calculate their share.
-   * Logic:
+   *
+   * Algorithm:
    * 1. Calculate Target = (Sum * 2) / (Count * 3).
    * 2. Perform a radial search expanding from the Target to find the nearest chosen number(s).
    * 3. Verify if the caller's choice matches the winning distance.

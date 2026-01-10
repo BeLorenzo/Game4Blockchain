@@ -3,7 +3,7 @@
 > **🚧 Project in Active Development**
 
 > **A comprehensive blockchain gaming framework on Algorand**
-A secure blockchain gaming framework built on Algorand featuring anti-frontrunning games using commit-reveal pattern, interactive CLI, and AI-powered simulation system.
+A secure blockchain gaming modular framework built on Algorand featuring anti-frontrunning games using commit-reveal pattern, interactive CLI, and AI-powered simulation system.
 
 [![Language](https://img.shields.io/badge/language-TypeScript-blue)](https://www.typescriptlang.org/)
 [![Framework](https://img.shields.io/badge/framework-AlgoKit-black)](https://github.com/algorandfoundation/algokit-cli)

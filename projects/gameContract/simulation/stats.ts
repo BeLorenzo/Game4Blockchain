@@ -4,6 +4,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+/**
+ * Represents a single game event recorded in an agent's history.
+ */
 interface HistoryItem {
   game: string
   session: number
@@ -13,12 +16,15 @@ interface HistoryItem {
   profit: number
   reasoning: string
   timestamp: string
-  role?: string
-  proposalAccepted?: boolean
-  roundEliminated?: number
-  virtualSession?: number  // Added to handle simulation restarts
+  role?: string            // Specific to Pirate Game (Proposer/Voter)
+  proposalAccepted?: boolean // Specific to Pirate Game
+  roundEliminated?: number   // Specific to Pirate Game
+  virtualSession?: number    // Injected at runtime to handle simulation restarts
 }
 
+/**
+ * Represents the structure of an Agent's JSON log file.
+ */
 interface AgentData {
   name: string
   profile: {
@@ -33,23 +39,24 @@ interface AgentData {
   history: HistoryItem[]
 }
 
-const R = '\x1b[0m'
-const G = '\x1b[32m'
-const E = '\x1b[31m'
-const Y = '\x1b[33m'
-const B = '\x1b[1m'
-const C = '\x1b[36m'
-const DIM = '\x1b[2m'
+// ANSI Color Codes for Console Output
+const R = '\x1b[0m'   // Reset
+const G = '\x1b[32m'  // Green
+const E = '\x1b[31m'  // Error/Red
+const Y = '\x1b[33m'  // Yellow
+const B = '\x1b[1m'   // Bold
+const C = '\x1b[36m'  // Cyan
+const DIM = '\x1b[2m' // Dim
 
 const STAG_ICONS: Record<number, string> = { 1: '🦌', 0: '🐇' }
 const WEEKLY_ICONS: Record<number, string> = { 0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri', 5: 'Sat', 6: 'Sun' }
 
 /**
- * Inietta un virtualSession field in ogni history item per gestire i restart della simulazione.
- * Quando session torna a 0, incrementa un offset globale per mantenere l'ordine cronologico.
- * 
- * IMPORTANTE per PirateGame: Ci possono essere multiple entries con stesso session ma diversi round.
- * Dobbiamo rilevare il restart guardando se session DIMINUISCE mentre round è LOW (indica nuovo run).
+ * Injects a `virtualSession` field into history items to handle simulation restarts.
+ * * Context: When running batch simulations, the blockchain environment might reset, 
+ * causing session IDs to roll back to 0. This function detects these resets 
+ * (chronological drop in session ID) and applies a global offset to ensure 
+ * the visualization renders a linear timeline.
  */
 function injectVirtualSessionIds(agents: AgentData[], gameName: string) {
   agents.forEach(agent => {
@@ -66,12 +73,11 @@ function injectVirtualSessionIds(agents: AgentData[], gameName: string) {
       const isRoundReset = (h.session === lastSessionId && h.round < lastRound && h.round === 1)
       
       if (isSessionDecrease || isRoundReset) {
-        // This is a new simulation run
+        // A new simulation run has started; increment offset based on previous max
         baseOffset += (maxSessionInRun + 1)
         maxSessionInRun = 0
       }
 
-      // Assign virtual session ID
       h.virtualSession = baseOffset + h.session
 
       lastSessionId = h.session
@@ -84,8 +90,14 @@ function injectVirtualSessionIds(agents: AgentData[], gameName: string) {
   })
 }
 
+/**
+ * Main Entry Point.
+ * Reads agent JSON files and generates ASCII reports for played games.
+ */
 async function main() {
   let files = process.argv.slice(2)
+  
+  // Default to simulation directory if no files provided
   if (files.length === 0) {
     const defaultDir = path.join(process.cwd(), 'simulation', 'data', 'agents')
     if (fs.existsSync(defaultDir)) {
@@ -126,9 +138,9 @@ async function main() {
   console.log(`${DIM}Total agents: ${agents.length}${R}\n`)
 
   for (const game of allGames) {
-    // Inject virtual session IDs to handle restarts
     injectVirtualSessionIds(agents, game)
     
+    // PirateGame requires a complex multi-round view
     if (game === 'PirateGame') {
       printMultiRoundGameSection(agents, game)
     } else {
@@ -137,6 +149,9 @@ async function main() {
   }
 }
 
+/**
+ * Renders the section for single-round games (RPS, StagHunt, etc.).
+ */
 function printSimpleGameSection(agents: AgentData[], gameName: string) {
   const gameAgents = agents.map(a => ({
     ...a,
@@ -152,11 +167,13 @@ function printSimpleGameSection(agents: AgentData[], gameName: string) {
   printSimpleTimeline(gameAgents, gameName)
 }
 
+/**
+ * Renders a matrix timeline (Agents vs Sessions) for simple games.
+ */
 function printSimpleTimeline(agents: AgentData[], gameName: string) {
   console.log(`${B}📜 Move History Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
-  // Use virtualSession instead of session
   const allVirtualSessions = agents.flatMap(a => 
     a.history.map(h => h.virtualSession !== undefined ? h.virtualSession : h.session)
   )
@@ -183,6 +200,7 @@ function printSimpleTimeline(agents: AgentData[], gameName: string) {
         const move = sessionMoves[sessionMoves.length - 1]
         let symbol = String(move.choice)
 
+        // Apply icons if available
         if (gameName === 'StagHunt') symbol = STAG_ICONS[move.choice] || symbol
         if (gameName === 'WeeklyGame') symbol = WEEKLY_ICONS[move.choice] || symbol
 
@@ -201,6 +219,9 @@ function printSimpleTimeline(agents: AgentData[], gameName: string) {
   console.log('')
 }
 
+/**
+ * Renders the section for the Pirate Game.
+ */
 function printMultiRoundGameSection(agents: AgentData[], gameName: string) {
   const gameAgents = agents.map(a => ({
     ...a,
@@ -216,11 +237,14 @@ function printMultiRoundGameSection(agents: AgentData[], gameName: string) {
   printMultiRoundTimeline(gameAgents)
 }
 
+/**
+ * Renders a detailed, session-by-session breakdown for the Pirate Game.
+ * Displays rounds, proposers, voting results, and final profit distribution.
+ */
 function printMultiRoundTimeline(agents: AgentData[]) {
   console.log(`${B}📜 Session-by-Session Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
-  // Collect all virtual sessions across all agents
   const allVirtualSessions = agents.flatMap(a => 
     a.history.map(h => h.virtualSession !== undefined ? h.virtualSession : h.session)
   )
@@ -232,7 +256,6 @@ function printMultiRoundTimeline(agents: AgentData[]) {
 
   const uniqueSessions = [...new Set(allVirtualSessions)].sort((a, b) => a - b)
   
-  // Process each virtual session
   for (const vSession of uniqueSessions) {
     const sessionHistory = agents.flatMap(a => 
       a.history
@@ -242,12 +265,11 @@ function printMultiRoundTimeline(agents: AgentData[]) {
 
     if (sessionHistory.length === 0) continue
 
-    // Find original session ID for display (from first entry)
-    
     console.log(`\n${B}${C}🎮 SESSION ${vSession}${R}`)
     
     const rounds = [...new Set(sessionHistory.map(h => h.round))].sort((a, b) => a - b)
 
+    // 1. Print detailed round progression
     for (const round of rounds) {
       const roundHistory = sessionHistory.filter(h => h.round === round)
 
@@ -279,17 +301,16 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       console.log(`  ${C}├─ Round ${round}${R}: Proposer=${B}${proposerName}${R} | ${voteStr} → ${resultStr}`)
     }
 
-    // RIEPILOGO FINALE - Mostra tutti i risultati
+    // 2. Print Final Summary for the Session
     console.log(`  ${C}└─ Final Results:${R}`)
     
-    // Group by result type
+    // Categorize outcomes based on profit and status
     const winners = sessionHistory.filter(h => h.result === 'WIN' && h.profit > 0)
     const neutrals = sessionHistory.filter(h => h.result === 'WIN' && h.profit === 0)
     const losers = sessionHistory.filter(h => h.result === 'WIN' && h.profit < 0)
     const eliminated = sessionHistory.filter(h => h.result === 'ELIMINATED')
-    const survivors = sessionHistory.filter(h => h.result === 'SURVIVED')
     
-    // Deduplicate by agent name (take last entry for each agent)
+    // Deduplicate by agent name (taking the last state)
     const uniqueWinners = [...new Map(winners.map(h => [h.agent, h])).values()]
       .sort((a, b) => b.profit - a.profit)
     const uniqueNeutrals = [...new Map(neutrals.map(h => [h.agent, h])).values()]
@@ -297,7 +318,7 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       .sort((a, b) => a.profit - b.profit)
     const uniqueEliminated = [...new Map(eliminated.map(h => [h.agent, h])).values()]
     
-    // Display Winners (profit > 0)
+    // Display Winners (Positive Profit)
     if (uniqueWinners.length > 0) {
       console.log(`     ${G}💰 Winners:${R}`)
       uniqueWinners.forEach(h => {
@@ -306,7 +327,7 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       })
     }
     
-    // Display Break-even (profit = 0)
+    // Display Break-even (Zero Profit)
     if (uniqueNeutrals.length > 0) {
       console.log(`     ${Y}⚖️  Break-even:${R}`)
       uniqueNeutrals.forEach(h => {
@@ -314,7 +335,7 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       })
     }
     
-    // Display Losers (profit < 0, but survived)
+    // Display Losers (Negative Profit, but survived)
     if (uniqueLosers.length > 0) {
       console.log(`     ${Y}📉 Losses:${R}`)
       uniqueLosers.forEach(h => {
@@ -323,7 +344,7 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       })
     }
     
-    // Display Eliminated (killed before final round)
+    // Display Eliminated (Killed during game)
     if (uniqueEliminated.length > 0) {
       console.log(`     ${E}💀 Eliminated:${R}`)
       uniqueEliminated.forEach(h => {

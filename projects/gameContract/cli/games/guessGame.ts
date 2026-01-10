@@ -10,11 +10,14 @@ import { sha256 } from 'js-sha256';
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount';
 
 import { 
-    GuessGameClient, 
-    GuessGameFactory 
+  GuessGameClient, 
+  GuessGameFactory 
 } from '../../smart_contracts/artifacts/guessGame/GuessGameClient';
 import { UI } from '../ui';
 
+/**
+ * Helper to initialize the Guess Game Client.
+ */
 const getClient = async (wallet: WalletManager) => {
   const appId = await getAppId(wallet, 'GUESS');
   return new GuessGameClient({
@@ -24,6 +27,9 @@ const getClient = async (wallet: WalletManager) => {
   });
 };
 
+/**
+ * Helper to prompt the user for a Session ID.
+ */
 const askSessionId = async () => {
   const answers = await inquirer.prompt([{
     type: 'input', name: 'sessId', message: 'Enter SESSION ID:',
@@ -45,7 +51,10 @@ export const GuessGameModule: IGameModule = {
     { name: '💵 Claim Winnings', value: 'claim'},
   ],
 
-  // DEPLOY
+  /**
+   * Deploys the Guess Game Factory contract.
+   * Initializes it with the 'GUESS' type and funds the MBR.
+   */
   deploy: async (wallet: WalletManager) => {
     console.log(chalk.yellow('🚀 Starting Deployment...'));    
     if (!wallet.account) return;
@@ -73,6 +82,7 @@ export const GuessGameModule: IGameModule = {
         
         console.log(chalk.green('✅ Contract type: GUESS'));
 
+        // Fund MBR
         await wallet.algorand.send.payment({
           amount: AlgoAmount.Algos(1),
           sender: wallet.account.addr,
@@ -88,7 +98,10 @@ export const GuessGameModule: IGameModule = {
     }
   },
 
-  // CREATE
+  /**
+   * Creates a new game session.
+   * Calculates the specific MBR required for the large frequency blob (808 bytes).
+   */
   create: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -127,6 +140,7 @@ export const GuessGameModule: IGameModule = {
 
       console.log(chalk.yellow('⏳ Calculating MBR and Creating Session...'));
 
+      // Calculate MBR specifically for "newGame" command which includes the Stats and Frequency boxes
       const mbrResult = await client.send.getRequiredMbr({
         args: { command: 'newGame' },
         suppressLog: true,
@@ -154,7 +168,10 @@ export const GuessGameModule: IGameModule = {
     }
   },
 
-  // JOIN
+  /**
+   * Joins an existing game session.
+   * Prompts the user to pick a number between 0 and 100.
+   */
   join: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -174,6 +191,8 @@ export const GuessGameModule: IGameModule = {
       console.log(chalk.gray(`   3. Target = 2/3 × Average`));
       console.log(chalk.gray(`   4. Winner = Closest to target`));
 
+      
+
       const { choice } = await inquirer.prompt([
         {
           type: 'input',
@@ -190,7 +209,7 @@ export const GuessGameModule: IGameModule = {
 
       const choiceNum = parseInt(choice);
 
-      // Generate commit hash
+      // Generate commit hash with salt
       const salt = new Uint8Array(32);
       crypto.getRandomValues(salt);
       console.log(chalk.bgRed.white(` ⚠️  SECRET SALT: ${Buffer.from(salt).toString('hex')} (SAVE IT!) `));
@@ -221,7 +240,10 @@ export const GuessGameModule: IGameModule = {
     }
   },
 
-  // REVEAL
+  /**
+   * Reveals the move.
+   * Updates the global frequency counters on-chain.
+   */
   reveal: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -268,7 +290,10 @@ export const GuessGameModule: IGameModule = {
     }
   },
 
-  // STATUS
+  /**
+   * Displays the dashboard with game statistics.
+   * Shows the current Average and Target (calculated from revealed moves so far).
+   */
   status: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -313,6 +338,9 @@ export const GuessGameModule: IGameModule = {
         if (stats && stats.count > 0) {
           const average = Number(stats.sum) / Number(stats.count);
           const target = Math.floor((average * 2) / 3);
+          
+          
+          
           console.log(chalk.gray(`   Players: ${stats.count} | Sum: ${stats.sum}`));
           console.log(chalk.cyan(`   Average: ${average.toFixed(2)} | Target: ${target}`));
         }
@@ -326,26 +354,26 @@ export const GuessGameModule: IGameModule = {
     }
   },
 
-   claim: async (wallet: WalletManager) => {
+  /**
+   * Claims winnings.
+   * Uses high opcode budget to perform the calculation loop on-chain.
+   */
+  claim: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
       const sessionID = await askSessionId();
       console.log(chalk.yellow('💵 Claiming...'));
+      
       const result = await client.send.claimWinnings({
         args: { sessionId: sessionID },
         coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(4000),
       });
+      
       if (result.return === 0n) {
           console.log(chalk.red('💀 You did not win this round!'));
         } else {
           console.log(chalk.green(`🎉 Victory! Claimed ${result.return} µAlgo!`));
-        }    } catch (e: any) { handleAlgoError(e, 'Claim'); }
+        }    
+    } catch (e: any) { handleAlgoError(e, 'Claim'); }
   },
 };
-
-
-
-    
-       
-        
-      

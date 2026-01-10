@@ -28,7 +28,10 @@ export const RPSGameModule: IGameModule = {
     { name: '📊 Dashboard', value: 'status' },
   ],
 
-  //DEPLOY 
+  /**
+   * Deploys the Rock Paper Scissors Factory contract.
+   * Initializes it with the 'RPS' type and funds the MBR.
+   */
   deploy: async (wallet: WalletManager) => {
     console.log(chalk.yellow('🚀 Starting Deployment...'));    
     if (!wallet.account) return;
@@ -56,7 +59,7 @@ export const RPSGameModule: IGameModule = {
         
         console.log(chalk.green('✅ Contract type: RPS'));
 
-        // Fund MBR
+        // Fund MBR (Minimum Balance Requirement) for boxes
         await wallet.algorand.send.payment({
           amount: AlgoAmount.Algos(1),
           sender: wallet.account.addr,
@@ -72,7 +75,10 @@ export const RPSGameModule: IGameModule = {
     }
   },
 
-  // CREATE
+  /**
+   * Creates a new game session.
+   * Calculates the specific MBR required for the session and funds it.
+   */
   create: async (wallet: WalletManager) => {
     try {
         const appId = await getAppId(wallet, 'RPS'); 
@@ -82,38 +88,38 @@ export const RPSGameModule: IGameModule = {
             defaultSender: wallet.account!.addr,
         });
 
-    console.log(chalk.blue(`Connected to App ID: ${appId}`));
+        console.log(chalk.blue(`Connected to App ID: ${appId}`));
 
-    const answers = await inquirer.prompt([
+        const answers = await inquirer.prompt([
             { type: 'input', name: 'participation', message: 'Participation Fee (MicroAlgo)?', default: '1000000', validate: (i) => !isNaN(parseInt(i)) || 'Invalid number' },
-            { type: 'input', name: 'startDelay', message: 'Start delay (rounds) - Now is 1?', default: '1', validate: (i) => !isNaN(parseInt(i)) || 'Invalid number' },
+            { type: 'input', name: 'startDelay', message: 'Start delay (rounds)?', default: '1', validate: (i) => !isNaN(parseInt(i)) || 'Invalid number' },
             { type: 'input', name: 'duration', message: 'Commit duration (rounds)?', default: '10', validate: (i) => !isNaN(parseInt(i)) || 'Invalid number' },
             { type: 'input', name: 'reveal', message: 'Reveal duration (rounds)?', default: '10', validate: (i) => !isNaN(parseInt(i)) || 'Invalid number' },
         ]);
 
-    const currentRound = await getCurrentRound(wallet);
-    const startAt = currentRound + 1n + BigInt(answers.startDelay);
-    const endCommitAt = startAt + BigInt(answers.duration);
-    const endRevealAt = endCommitAt + BigInt(answers.reveal);
-    const participation = BigInt(answers.participation);
+        const currentRound = await getCurrentRound(wallet);
+        const startAt = currentRound + 1n + BigInt(answers.startDelay);
+        const endCommitAt = startAt + BigInt(answers.duration);
+        const endRevealAt = endCommitAt + BigInt(answers.reveal);
+        const participation = BigInt(answers.participation);
 
-    console.log(chalk.yellow('⏳ Calculating MBR and Creating Session...'));
+        console.log(chalk.yellow('⏳ Calculating MBR and Creating Session...'));
 
-    // 1. Dynamic MBR Check
+        // 1. Dynamic MBR Check
         const mbrResult = await client.send.getRequiredMbr({
             args: { command: 'newGame' },
             suppressLog: true,
         });
         const requiredMBR = mbrResult.return;
 
-        // 2. MBR Payment
+        // 2. MBR Payment Transaction
         const mbrPaymentTxn = await wallet.algorand.createTransaction.payment({
             sender: wallet.account!.addr,
             receiver: client.appAddress,
             amount: AlgoAmount.MicroAlgos(Number(requiredMBR)),
         });
 
-        // 3. Create Session
+        // 3. Create Session Call
         const result = await client.send.createSession({
             args: {
                 config: { startAt, endCommitAt, endRevealAt, participation },
@@ -130,8 +136,11 @@ export const RPSGameModule: IGameModule = {
     }
   },
 
-  // JOIN 
-join: async (wallet: WalletManager) => {
+  /**
+   * Joins an existing game session.
+   * Uses the Commit-Reveal scheme to hide the move.
+   */
+  join: async (wallet: WalletManager) => {
     try {
         const appId = await getAppId(wallet, 'RPS');
         const client = new RockPaperScissorsClient({
@@ -150,17 +159,19 @@ join: async (wallet: WalletManager) => {
 
         console.log(chalk.gray('🔎 Reading Session Config...'));
 
-        // 1. Read Box for Partecipation Fee
+        // 1. Read Box for Participation Fee
         const sessionConfig = await client.state.box.gameSessions.value(sessionID);
         if (!sessionConfig) throw new Error("session not found");
         const participationFee = sessionConfig.participation;
         console.log(chalk.cyan(`💰 Fee required: ${participationFee} µAlgo`));
 
-        // 2. MBR Check
+        // 2. MBR Check for Player Storage
         const mbrResult = await client.send.getRequiredMbr({ args: { command: 'join' }, suppressLog: true });
         const requiredMBR = mbrResult.return!;
 
-        // 3. Commit Hash
+        // 3. Commit Hash Generation
+        
+        
         const salt = new Uint8Array(32);
         crypto.getRandomValues(salt);
         console.log(chalk.bgRed.white(` ⚠️  SECRET SALT: ${Buffer.from(salt).toString('hex')} (SAVE IT!) `));
@@ -188,7 +199,10 @@ join: async (wallet: WalletManager) => {
     }
   },
 
-  // REVEAL 
+  /**
+   * Reveals the move.
+   * If both players reveal, the contract immediately determines the winner and sends the funds.
+   */
   reveal: async (wallet: WalletManager) => {
     try {
         const appId = await getAppId(wallet, 'RPS');
@@ -210,6 +224,7 @@ join: async (wallet: WalletManager) => {
 
         console.log(chalk.yellow(`🔓 Revealing...`));
 
+        // We enable inner transaction fee coverage because if this reveal ends the game, the contract sends a Payment
         const result = await client.send.revealMove({
             args: { sessionId, choice, salt },
             coverAppCallInnerTransactionFees: true,
@@ -219,7 +234,7 @@ join: async (wallet: WalletManager) => {
 
         console.log(chalk.green('✅ Reveal Successful!'));
 
-        // Check Winnings
+        // Check if the game finished in this transaction
         const innerTxns = result.confirmation['innerTxns'] || [];
         if (innerTxns.length === 0) {
             console.log(chalk.blue('ℹ️  You revealed first. Waiting for opponent...'));
@@ -231,7 +246,9 @@ join: async (wallet: WalletManager) => {
     }
   },
 
-  // TIMEOUT VICTORY
+  /**
+   * Claims a victory if the opponent fails to reveal their move within the Reveal Duration.
+   */
   timeoutVictory: async (wallet: WalletManager) => {
     try {
         const appId = await getAppId(wallet, 'RPS');
@@ -262,7 +279,9 @@ join: async (wallet: WalletManager) => {
     }
   },
 
-  // STATUS 
+  /**
+   * Displays the current status of recent game sessions.
+   */
   status: async (wallet: WalletManager) => {
     try {
         const appId = await getAppId(wallet, 'RPS');
@@ -277,6 +296,8 @@ join: async (wallet: WalletManager) => {
         console.log(chalk.white(`🌍 Current Round: ${chalk.bold(currentRound)}`));
         console.log(chalk.white(`🔢 Total Games: ${totalSessions}`));
         UI.separator();
+
+        
 
         if (totalSessions === 0) {
             console.log(chalk.yellow('   No games yet.'));

@@ -2,6 +2,9 @@ import { assert, BoxMap, bytes, clone, Global, gtxn, itxn, Txn, uint64 } from '@
 import { Address } from '@algorandfoundation/algorand-typescript/arc4'
 import { GameConfig, GameContract } from '../abstract_contract/contract.algo'
 
+/**
+ * Stores the number of players for each weekday.
+ */
 interface daysCount {
   lun: uint64
   mar: uint64
@@ -12,44 +15,54 @@ interface daysCount {
   dom: uint64
 }
 
+/**
+ * WeeklyGame contract.
+ *
+ * Players choose a weekday.
+ * The total pot is split across active days and then among players
+ * who selected the same day.
+ */
 export class WeeklyGame extends GameContract {
   /**
-   * Mappa che tiene il conteggio dei giocatori per ogni giorno (0-6) di ogni sessione.
-   * Key: SHA256(SessionID + DayIndex)
-   * Value: Numero di giocatori che hanno scelto quel giorno
+   * Weekday counters per session.
+   * Initialized at session creation time to reserve MBR.
    */
   days = BoxMap<uint64, daysCount>({ keyPrefix: 'dc' })
 
+  /**
+   * Creates a new session and initializes weekday counters.
+   */
   public createSession(config: GameConfig, mbrPayment: gtxn.PaymentTxn): uint64 {
-    // 1. Calcola MBR totale: MBR base sessione + MBR per le 7 box dei giorni
     const daysMBR = this.getRequiredMBR('newGame')
 
     assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
     assert(mbrPayment.amount >= daysMBR, 'Insufficient MBR for session and day counters')
 
-    // 2. Crea la sessione base
     const sessionID = super.create(config)
 
-    // 3. Inizializza le 7 box per i giorni (0-6) a 0
-    // Questo è fondamentale per riservare lo storage pagato dall'MBR
+    // Mandatory initialization to allocate paid box storage
     const init: daysCount = { lun: 0, mar: 0, mer: 0, gio: 0, ven: 0, sab: 0, dom: 0 }
     this.days(sessionID).value = clone(init)
 
     return sessionID
   }
 
+  /**
+   * Joins an existing session.
+   */
   public joinSession(sessionID: uint64, commit: bytes, payment: gtxn.PaymentTxn): void {
-    // Wrapper semplice del join padre
     super.join(sessionID, commit, payment)
   }
 
+  /**
+   * Reveals the committed move and updates weekday counters.
+   */
   public revealMove(sessionId: uint64, choice: uint64, salt: bytes): void {
-    // 2. Esegue logica di reveal standard (verifica hash e salva choice)
     super.reveal(sessionId, choice, salt)
 
     const dayBox = this.days(sessionId)
 
-    // opzionale: assicurati che esista
+    // Defensive check: counters must exist if session was initialized correctly
     const [current, exists] = clone(dayBox.maybe())
     assert(exists, 'Day counters not initialized')
 
@@ -79,43 +92,34 @@ export class WeeklyGame extends GameContract {
         assert(false, 'Invalid Day: must be between 0 and 6')
     }
 
-    // riscrivi il valore aggiornato nella box
     dayBox.value = clone(current)
   }
 
   /**
-   * Distribuisce la vincita al chiamante se eleggibile.
-   * Pattern: PULL
+   * Allows an eligible player to claim their winnings.
+   * Uses a pull-based payout pattern.
    */
   public claimWinnings(sessionID: uint64): uint64 {
     assert(this.sessionExists(sessionID), 'Session does not exist')
 
     const config = clone(this.gameSessions(sessionID).value)
-    const currentTime = Global.round
+    assert(Global.round > config.endRevealAt, 'Game is not finished yet')
 
-    // 1. Verifica Fase Temporale
-    assert(currentTime > config.endRevealAt, 'Game is not finished yet')
     const playerAddr = new Address(Txn.sender)
     const playerKey = this.getPlayerKey(sessionID, playerAddr)
 
-    // 2. Verifica Eleggibilità
-    // Se la box choice non esiste, o l'utente non ha rivelato o ha già reclamato
+    // Fails if the player did not reveal or already claimed
     assert(this.playerChoice(playerKey).exists, 'Player has not revealed or already claimed')
 
     const choice = this.playerChoice(playerKey).value
-
-    // 3. Calcolo Vincita
     const prizeAmount = this.calculatePlayerWin(sessionID, choice)
 
-    // Se prizeAmount è 0 (es. casi limite matematici), evitiamo transazioni vuote
+    // Prevent zero-value payouts and useless inner transactions
     assert(prizeAmount > 0, 'No winnings calculated')
 
-    // 4. Cleanup Utente (Anti-Replay)
-    // Cancellando la box choice, l'assert al punto 2 fallirà se richiamato.
-    // Inoltre recuperiamo MBR che rimane nel contratto (o rimborsabile se implementi reclaimMBR separato)
+    // Anti-replay: deleting the box makes this function callable only once
     this.playerChoice(playerKey).delete()
 
-    // 5. Invio Pagamento
     itxn
       .payment({
         receiver: playerAddr.native,
@@ -127,13 +131,13 @@ export class WeeklyGame extends GameContract {
     return prizeAmount
   }
 
+  /**
+   * Computes the winnings for a player based on their chosen weekday.
+   */
   private calculatePlayerWin(sessionID: uint64, playerChoice: uint64): uint64 {
     const totalPot = this.getSessionBalance(sessionID)
-
-    // recupero struct con i contatori per tutti i giorni
     const counters = clone(this.days(sessionID).value)
 
-    // 1. conta quanti giorni hanno almeno 1 giocatore
     let activeDaysCount: uint64 = 0
 
     if (counters.lun > 0) activeDaysCount += 1
@@ -146,10 +150,8 @@ export class WeeklyGame extends GameContract {
 
     if (activeDaysCount === 0) return 0
 
-    // 2. piatto per giorno attivo
     const potPerDay: uint64 = totalPot / activeDaysCount
 
-    // 3. numero di giocatori nel giorno scelto
     let playersInThatDay: uint64 = 0
     switch (playerChoice) {
       case 0:
@@ -174,23 +176,19 @@ export class WeeklyGame extends GameContract {
         playersInThatDay = counters.dom
         break
       default:
-        return 0 // o assert se la scelta deve essere valida
+        return 0
     }
 
-    if (playersInThatDay === 0) return 0
-
-    return potPerDay / playersInThatDay
+    return playersInThatDay === 0 ? 0 : potPerDay / playersInThatDay
   }
 
   /**
-   * Calcolo MBR specifico
+   * Returns the required MBR for the given command.
    */
   public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
     if (command === 'newGame') {
-      // Calcolo per le 7 Box dei contatori
       const singleBoxMBR = this.getBoxMBR(10, 56)
       const allDaysMBR: uint64 = singleBoxMBR * 7
-
       return allDaysMBR + super.getRequiredMBR('newGame')
     }
     return super.getRequiredMBR(command)

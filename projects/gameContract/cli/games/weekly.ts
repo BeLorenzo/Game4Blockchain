@@ -10,11 +10,14 @@ import algosdk from 'algosdk';
 import { sha256 } from 'js-sha256';
 
 import { 
-    WeeklyGameClient, 
-    WeeklyGameFactory 
+  WeeklyGameClient, 
+  WeeklyGameFactory 
 } from '../../smart_contracts/artifacts/weeklyGame/WeeklyGameClient';
 import { UI } from '../ui';
 
+/**
+ * Helper to initialize the Algokit Application Client.
+ */
 const getClient = async (wallet: WalletManager) => {
   const appId = await getAppId(wallet, 'WEEKLY');
   return new WeeklyGameClient({
@@ -24,9 +27,14 @@ const getClient = async (wallet: WalletManager) => {
   });
 };
 
+/**
+ * Helper to prompt the user for a Session ID.
+ */
 const askSessionId = async () => {
   const answers = await inquirer.prompt([{
-    type: 'input', name: 'sessId', message: 'Enter SESSION ID:',
+    type: 'input', 
+    name: 'sessId', 
+    message: 'Enter SESSION ID:',
     validate: (i) => !isNaN(parseInt(i)) || 'Invalid Number',
   }]);
   return BigInt(answers.sessId);
@@ -45,6 +53,10 @@ export const WeeklyGameModule: IGameModule = {
     { name: '💵 Claim Winnings', value: 'claim' },
   ],
 
+  /**
+   * Deploys the Weekly Game Factory contract and initializes it.
+   * Funds the contract with 1 ALGO to cover basic MBR.
+   */
   deploy: async (wallet: WalletManager) => {
     console.log(chalk.yellow('🚀 Starting Deployment...'));    
     if (!wallet.account) return;
@@ -67,6 +79,7 @@ export const WeeklyGameModule: IGameModule = {
         await appClient.send.initialize({ args: { gameType: 'WEEKLY' }, sender: wallet.account.addr });
         console.log(chalk.green('✅ Contract type: WEEKLY'));
 
+        // Fund contract for box storage MBR
         await wallet.algorand.send.payment({
           amount: AlgoAmount.Algos(1),
           sender: wallet.account.addr,
@@ -79,29 +92,18 @@ export const WeeklyGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Deploy'); }
   },
 
+  /**
+   * Creates a new session.
+   * Calculates the MBR required for the 7 counters (Mon-Sun) and funds it.
+   */
   create: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
       const answers = await inquirer.prompt([
         { type: 'input', name: 'participation', message: 'Ticket Price (MicroAlgo)?', default: '1000000' },
-        {
-          type: 'input',
-          name: 'startDelay',
-          message: 'Start delay (rounds)?',
-          default: '1',
-        },
-        {
-          type: 'input',
-          name: 'duration',
-          message: 'Commit duration (rounds)?',
-          default: '50',
-        },
-        {
-          type: 'input',
-          name: 'reveal',
-          message: 'Reveal duration (rounds)?',
-          default: '50',
-        },
+        { type: 'input', name: 'startDelay', message: 'Start delay (rounds)?', default: '1' },
+        { type: 'input', name: 'duration', message: 'Commit duration (rounds)?', default: '50' },
+        { type: 'input', name: 'reveal', message: 'Reveal duration (rounds)?', default: '50' },
       ]);
 
       const currentRound = await getCurrentRound(wallet);
@@ -111,6 +113,8 @@ export const WeeklyGameModule: IGameModule = {
       const participation = BigInt(answers.participation);
 
       console.log(chalk.yellow('⏳ Calculating MBR (includes 7 day-counters)...'));
+      
+      // Calculate MBR specifically for "newGame" command which includes the specific Weekly Game storage requirements
       const mbrResult = await client.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true });
       const requiredMBR = mbrResult.return;
 
@@ -133,6 +137,11 @@ export const WeeklyGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Create Session'); }
   },
 
+  /**
+   * Allows a player to buy a ticket by picking a day of the week.
+   * Uses a Commit-Reveal scheme: The choice is hashed with a secret salt locally,
+   * and only the hash is sent to the chain.
+   */
   join: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -152,10 +161,14 @@ export const WeeklyGameModule: IGameModule = {
         ]
       }]);
 
+      
+
+      // Generate a cryptographic salt to hide the choice
       const salt = new Uint8Array(32);
       crypto.getRandomValues(salt);
       console.log(chalk.bgRed.white(` ⚠️  SECRET SALT: ${Buffer.from(salt).toString('hex')} (SAVE IT!) `));
 
+      // Hash(Day + Salt)
       const choiceBytes = algosdk.encodeUint64(day);
       const combined = new Uint8Array([...choiceBytes, ...salt]);
       const hash = new Uint8Array(sha256.array(combined));
@@ -178,6 +191,11 @@ export const WeeklyGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Join Session'); }
   },
 
+  /**
+   * Reveals the player's choice. 
+   * The user must provide the original Day and the Secret Salt.
+   * The contract verifies: Hash(ProvidedDay + ProvidedSalt) === StoredCommit.
+   */
   reveal: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -208,6 +226,9 @@ export const WeeklyGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Reveal'); }
   },
 
+  /**
+   * Displays a dashboard of the last 5 sessions and their current states.
+   */
   status: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -250,15 +271,20 @@ export const WeeklyGameModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Status'); }
   },
 
+  /**
+   * Checks if the user won the lottery and claims the winnings.
+   */
   claim: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
       const sessionID = await askSessionId();
       console.log(chalk.yellow('💵 Checking for winnings...'));
       
+      // Use coverAppCallInnerTransactionFees to pay for the payout transaction from the user's wallet
       const result = await client.send.claimWinnings({
         args: { sessionId: sessionID },
-        coverAppCallInnerTransactionFees: true, maxFee: AlgoAmount.MicroAlgo(3000),
+        coverAppCallInnerTransactionFees: true, 
+        maxFee: AlgoAmount.MicroAlgo(3000),
       });
 
       if (result.return === 0n) {

@@ -5,8 +5,8 @@ import chalk from 'chalk';
 import { WalletManager } from './walletManager';
 
 /**
- * Validates that the contract at appId matches the expected game type.
- * Reads gameType from global state and compares.
+ * Validates that the deployed contract matches the expected game type.
+ * It inspects the Global State of the application to find the 'gameType' key.
  */
 export async function validateContractType(
   wallet: WalletManager,
@@ -17,12 +17,11 @@ export async function validateContractType(
     const appInfo = await wallet.algorand.client.algod.getApplicationByID(Number(appId)).do();
     const globalState = appInfo.params['globalState'] || [];
     
-    // Find gameType in global state
-    const gameTypeEntry = globalState.find(item => 
+    // Search for 'gameType' in global state
+    const gameTypeEntry = globalState.find((item: any) => 
       Buffer.from(item.key).toString('utf8') === 'gameType'
     );
     
-    // If gameType is missing, something went wrong during deploy
     if (!gameTypeEntry) {
       console.log(chalk.red('\n❌ CONTRACT NOT INITIALIZED!'));
       console.log(chalk.yellow('   This contract was deployed without calling initialize().'));
@@ -31,7 +30,6 @@ export async function validateContractType(
       return false;
     }
     
-    // Decode gameType value 
     const actualType = Buffer.from(gameTypeEntry.value.bytes).toString('utf8');
     
     if (actualType !== expectedType) {
@@ -52,11 +50,8 @@ export async function validateContractType(
 }
 
 /**
- * Prompts the user for an App ID and validates it exists and has correct type.
- * 
- * @param wallet - The wallet manager instance
- * @param expectedType - The expected game type (e.g., 'RPS', 'STAGHUNT')
- * @returns The validated App ID
+ * Prompts the user to input an App ID via CLI.
+ * Performs validation to ensure the App ID exists on the network and matches the expected game type.
  */
 export async function getAppId(wallet: WalletManager, expectedType: string): Promise<bigint> {
   const answer = await inquirer.prompt([{
@@ -67,7 +62,6 @@ export async function getAppId(wallet: WalletManager, expectedType: string): Pro
       if (isNaN(parseInt(input))) return 'Invalid Number';
       
       try {
-        // Check if app exists
         await wallet.algorand.client.algod.getApplicationByID(parseInt(input)).do();
         return true;
       } catch (e) {
@@ -78,7 +72,6 @@ export async function getAppId(wallet: WalletManager, expectedType: string): Pro
   
   const appId = BigInt(answer.manualAppId);
   
-  // Validate contract type
   const isValid = await validateContractType(wallet, appId, expectedType);
   if (!isValid) {
     console.log(chalk.yellow('Exiting... Please use the correct APP ID for this game.\n'));
@@ -89,7 +82,7 @@ export async function getAppId(wallet: WalletManager, expectedType: string): Pro
 }
 
 /**
- * Fetches the current round from the blockchain.
+ * Fetches the current block round from the blockchain.
  */
 export async function getCurrentRound(wallet: WalletManager): Promise<bigint> {
   const status = await wallet.algorand.client.algod.status().do();
@@ -97,7 +90,8 @@ export async function getCurrentRound(wallet: WalletManager): Promise<bigint> {
 }
 
 /**
- * Formats a visual difference between rounds (e.g. "5 rounds left").
+ * Formats the difference between the current round and a target round for display.
+ * Returns colored strings indicating if the target is in the future (green), present (yellow), or past (red).
  */
 export function getRoundDiff(current: bigint, target: bigint): string {
   const diff = target - current;
@@ -107,18 +101,16 @@ export function getRoundDiff(current: bigint, target: bigint): string {
 }
 
 /**
- * Error Handler.
- * Just extracts the clean message and shows it.
+ * Parses and displays Algorand SDK errors in a human-readable format.
+ * Attempts to extract specific assertion failure messages from the TEAL error stack.
  */
 export function handleAlgoError(e: any, context: string) {
-  // Get error message
   const msg = e.message || String(e);
   
-  // Try to extract just the assert message (most common case)
+  // Regex to extract the specific assert message from AVM errors
   const match = msg.match(/assert failed[^:]*:\s*(.+?)(?:\n|$)/i);
   const cleanMsg = match ? match[1].trim() : msg.split('\n')[0];
   
-  // Show it
   console.log(chalk.red(`\n❌ ${context} failed:`));
   console.log(chalk.yellow(`   ${cleanMsg}\n`));
 }

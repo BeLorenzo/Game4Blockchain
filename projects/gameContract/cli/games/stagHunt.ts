@@ -10,12 +10,15 @@ import algosdk from 'algosdk';
 import { sha256 } from 'js-sha256';
 
 import { 
-    StagHuntClient, 
-    StagHuntFactory 
+  StagHuntClient, 
+  StagHuntFactory 
 } from '../../smart_contracts/artifacts/stagHunt/StagHuntClient';
 import { UI } from '../ui';
 import { microAlgo } from '@algorandfoundation/algokit-utils';
 
+/**
+ * Helper to initialize the Stag Hunt Client.
+ */
 const getClient = async (wallet: WalletManager) => {
   const appId = await getAppId(wallet, 'STAGHUNT');
   return new StagHuntClient({
@@ -25,9 +28,14 @@ const getClient = async (wallet: WalletManager) => {
   });
 };
 
+/**
+ * Helper to prompt the user for a Session ID.
+ */
 const askSessionId = async () => {
   const answers = await inquirer.prompt([{
-    type: 'input', name: 'sessId', message: 'Enter SESSION ID:',
+    type: 'input', 
+    name: 'sessId', 
+    message: 'Enter SESSION ID:',
     validate: (i) => !isNaN(parseInt(i)) || 'Invalid Number',
   }]);
   return BigInt(answers.sessId);
@@ -47,6 +55,10 @@ export const StagHuntModule: IGameModule = {
     { name: '💵 Claim Winnings/Refund', value: 'claim' },
   ],
 
+  /**
+   * Deploys the Stag Hunt Factory contract.
+   * Initializes it with the 'STAGHUNT' type and funds the MBR.
+   */
   deploy: async (wallet: WalletManager) => {
     console.log(chalk.yellow('🚀 Starting Deployment...'));    
     if (!wallet.account) return;
@@ -81,6 +93,10 @@ export const StagHuntModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Deploy'); }
   },
 
+  /**
+   * Creates a new Stag Hunt session.
+   * Calculates the specific MBR required for the game logic (including the Global Jackpot contribution).
+   */
   create: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -140,6 +156,12 @@ export const StagHuntModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Create Session'); }
   },
 
+  /**
+   * Allows a player to join by committing to a strategy (Stag or Hare).
+   * * Game Theory Logic:
+   * - Stag (1): Requires coordination. High reward if enough players choose Stag.
+   * - Hare (0): Safe option. Returns the deposit (minus fees) regardless of others.
+   */
   join: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -149,6 +171,8 @@ export const StagHuntModule: IGameModule = {
       if (!sessionConfig) throw new Error('Session not found');
 
       console.log(chalk.cyan(`💰 Stake: ${sessionConfig.participation} µAlgo`));
+
+      
 
       const { choice } = await inquirer.prompt([{
         type: 'list', name: 'choice', message: 'Choose your strategy:', 
@@ -184,6 +208,9 @@ export const StagHuntModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Join Session'); }
   },
 
+  /**
+   * Reveals the player's strategy using the original choice and salt.
+   */
   reveal: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -210,6 +237,10 @@ export const StagHuntModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Reveal'); }
   },
 
+  /**
+   * Resolves the session outcome after the reveal phase.
+   * Determines if the "Stag Hunt" was successful based on the percentage of Stag Cooperators.
+   */
   resolve: async (wallet: WalletManager) => {
     try {
         const client = await getClient(wallet);
@@ -226,6 +257,9 @@ export const StagHuntModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Resolve'); }
   },
 
+  /**
+   * Displays the dashboard including the coordination status (Stags vs Hares).
+   */
   status: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);
@@ -270,7 +304,6 @@ export const StagHuntModule: IGameModule = {
             if(stats.resolved) console.log(chalk.white(`   Successful Hunt: ${stats.successful ? '✅ YES' : '❌ NO'}`));
         }
         
-        // MODIFICATO QUI PER MOSTRARE ENTRAMBI I DEADLINE
         console.log(chalk.gray(`   Commit: ${config.endCommitAt} ${getRoundDiff(currentRound, config.endCommitAt)}`));
         console.log(chalk.gray(`   Reveal: ${config.endRevealAt} ${getRoundDiff(currentRound, config.endRevealAt)}`));
         console.log('');
@@ -278,6 +311,9 @@ export const StagHuntModule: IGameModule = {
     } catch (e: any) { handleAlgoError(e, 'Status'); }
   },
 
+  /**
+   * Claims winnings (for Successful Stags) or Refunds (for Hares/Failed Stags).
+   */
   claim: async (wallet: WalletManager) => {
     try {
       const client = await getClient(wallet);

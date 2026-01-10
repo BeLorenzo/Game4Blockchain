@@ -6,7 +6,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-
+/**
+ * Manages the local wallet configuration and funding.
+ * Handles loading from environment variables or generating temporary accounts
+ * for testing purposes.
+ */
 export class WalletManager {
   public algorand: AlgorandClient;
   public account: algosdk.Account | null = null;
@@ -15,49 +19,68 @@ export class WalletManager {
     this.algorand = AlgorandClient.fromEnvironment();
   }
 
+  /**
+   * Initializes the primary wallet.
+   * Priority:
+   * 1. Loads 'MNEMONIC' from .env if available.
+   * 2. Generates a fresh random account if no mnemonic is found.
+   *
+   * Sets the signer for the AlgorandClient instance.
+   */
   public async initWallet() {
     console.log(chalk.cyan('🔄 Initializing Wallet...'));
     const envMnemonic = process.env.MNEMONIC;
+
     if (envMnemonic) {
       try {
+        // Restore account from mnemonic
         this.account = algosdk.mnemonicToSecretKey(envMnemonic);
         console.log(
-          chalk.green(`✅ Wallet caricato da .env: ${this.shortAddr(this.account.addr.toString())}`),
+          chalk.green(`✅ Wallet loaded from .env: ${this.shortAddr(this.account.addr.toString())}`),
         );
       } catch (e) {
-        console.log(chalk.red('❌ Mnemonica nel .env non valida! Controlla il file.'));
-        process.exit(1); 
+        console.log(chalk.red('❌ Invalid mnemonic in .env! Please check the file.'));
+        process.exit(1);
       }
     } else {
-      console.log(chalk.yellow('⚠️ Nessuna MNEMONIC trovata nel .env. Generazione account temporaneo...'));
+      // Generate temporary account
+      console.log(chalk.yellow('⚠️ No MNEMONIC found in .env. Generating temporary account...'));
       this.account = algosdk.generateAccount();
       console.log(
-        chalk.green(`✅ Wallet temporaneo creato: ${this.shortAddr(this.account.addr.toString())}`),
+        chalk.green(`✅ Temporary wallet created: ${this.shortAddr(this.account.addr.toString())}`),
       );
     }
 
+    // Register the account as the default signer for AlgoKit
     this.algorand.setSignerFromAccount(this.account);
 
     await this.ensureFunds();
     return this.account;
   }
 
+  /**
+   * Checks for funds and auto-dispenses ALGO if running on LocalNet.
+   * Ensures the account has at least 10 ALGO.
+   */
   public async ensureFunds() {
     if (!this.account) return;
 
     console.log(chalk.gray('💰 Checking funds...'));
 
-    // Auto-fund from KMD if LocalNet
+    // Auto-fund from KMD (Key Management Daemon) if connected to LocalNet
     await this.algorand.account.ensureFundedFromEnvironment(
-      this.account.addr, 
-      (10).algo(), 
+      this.account.addr,
+      (10).algo(),
     );
 
     const info = await this.algorand.client.algod.accountInformation(this.account.addr).do();
     console.log(chalk.gray(`💰 Current Balance: ${algosdk.microalgosToAlgos(Number(info.amount))} ALGO`));
-    console.log('\n')
-  } 
+    console.log('\n');
+  }
 
+  /**
+   * Helper utility to format addresses (e.g., AAAA...ZZZZ).
+   */
   public shortAddr(addr: string) {
     return `${addr.substring(0, 6)}...${addr.substring(addr.length - 6)}`;
   }
