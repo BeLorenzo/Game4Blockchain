@@ -3,7 +3,9 @@
 import { Agent } from "../Agent"
 
 /**
- * Base interface - common methods for ALL games
+ * Base Game Adapter Interface.
+ * Defines the standard lifecycle methods that all game implementations must support
+ * to be compatible with the Simulation Framework.
  */
 export interface  IBaseGameAdapter {
   /** Game identifier */
@@ -15,17 +17,23 @@ export interface  IBaseGameAdapter {
   /** Start a new game session */
   startSession(dealer: Agent): Promise<bigint>
 
-  /** 
-   * Commit phase: Each agent makes a hidden choice 
+  /** Phase 1: Commit.
+   * Agents calculate their move, hash it with a salt, and submit the hash to the chain.
    */
   commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void>
 
-  /** Reveal phase: Agents reveal their choices */
+  /** Phase 2: Reveal.
+   * Agents submit their original move and secret salt to verify their commitment.
+   */
   reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void>
 
-  /** Resolution phase (if needed by game) */
+  /** Phase 3: Resolution.
+   * Triggers the smart contract to calculate the winner/outcome based on revealed moves.
+   */
   resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void>
 
-  /** Claim phase: Distribute rewards and finalize */
+  /** * Phase 4: Claim.
+   * Agents interact with the contract to withdraw their winnings or refunds.
+   */
   claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void>
 }

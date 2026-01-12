@@ -2,20 +2,33 @@ import { Agent } from "../Agent";
 import { IBaseGameAdapter  } from "./IBaseGameAdapter";
 
 /**
- * Extended adapter for multi-round games with internal state management
- * (PirateGame, future negotiation games, etc.)
+ * Extended adapter for multi-round, stateful games.
+ * Used for games where a single blockchain session involves multiple iterations 
+ * of player interaction (e.g., Pirate Game eliminations, negotiation loops).
  */
 export interface IMultiRoundGameAdapter extends IBaseGameAdapter  {
 
-  //Setup iniziale per impostare stato partenza corretto
+/**
+   * Performs initial setup logic required before the first round begins.
+   * Useful for registering players, setting up local state, or funding specific accounts.
+   */
   setup(agents: Agent[], sessionId: bigint): Promise<void>
 
-  // Ti dice quanti round totali ci si aspetta 
+  /**
+   * Retrieves the maximum expected number of rounds for this session.
+   * Used by the simulation loop to bound the execution.
+   */ 
   getMaxTotalRounds(sessionId: bigint): Promise<number>; 
   
-  // Esegue UN singolo round o turno (chiamerà commit, reveal, resolve e claim qunado servono)
+  /**
+   * Executes a single internal round of the game.
+   * This method encapsulates the Commit -> Reveal -> Resolve logic for that specific turn.
+   */
   playRound(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<boolean>;
   
-  // Finalizza la sessione alla fine dei turni
+  /**
+   * Finalizes the game session after all rounds are completed or the game ends early.
+   * Handles final payouts, stats logging, and state cleanup.
+   */
   finalize(agents: Agent[], sessionId: bigint): Promise<void>;
 }

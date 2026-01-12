@@ -19,15 +19,15 @@ function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
 }
 
 // === SIMULATION CONFIGURATION ===
-const NUM_SESSIONS = 2
+const NUM_SESSIONS = 10
 const INITIAL_FUNDING = 100_000
 
 // === GAME SELECTION ===
 // Uncomment the game you wish to simulate
-// const game : IBaseGameAdapter = new StagHuntGame()
-// const game : IBaseGameAdapter = new WeeklyGame()
-const game : IBaseGameAdapter = new GuessGame()
-// const game : IBaseGameAdapter = new PirateGame()
+ //const game : IBaseGameAdapter = new StagHuntGame()
+ //const game : IBaseGameAdapter = new WeeklyGame()
+//const game : IBaseGameAdapter = new GuessGame()
+ const game : IBaseGameAdapter = new PirateGame()
 
 /**
  * Main Entry Point for the Simulation Framework.

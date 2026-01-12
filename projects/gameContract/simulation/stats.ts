@@ -307,7 +307,7 @@ function printMultiRoundTimeline(agents: AgentData[]) {
     // Categorize outcomes based on profit and status
     const winners = sessionHistory.filter(h => h.result === 'WIN' && h.profit > 0)
     const neutrals = sessionHistory.filter(h => h.result === 'WIN' && h.profit === 0)
-    const losers = sessionHistory.filter(h => h.result === 'WIN' && h.profit < 0)
+    const losers = sessionHistory.filter(h => h.result !== 'ELIMINATED' && h.profit < 0)
     const eliminated = sessionHistory.filter(h => h.result === 'ELIMINATED')
     
     // Deduplicate by agent name (taking the last state)

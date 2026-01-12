@@ -9,28 +9,55 @@ import { StagHuntClient, StagHuntFactory } from '../../smart_contracts/artifacts
 import { Agent } from '../Agent'
 import { IBaseGameAdapter } from './IBaseGameAdapter'
 
+/**
+ * Helper interface to store local player secrets (choice + salt)
+ * required for the Reveal phase.
+ */
 interface RoundSecret {
   choice: number
   salt: string
 }
 
+/**
+ * Adapter for the "Stag Hunt" Game (Coordination Game).
+ * * Game Mechanics:
+ * - Two Choices: Stag (1) or Hare (0).
+ * - Hare: Low risk, low reward (guaranteed small refund).
+ * - Stag: High risk, high reward (requires coordination).
+ * - Win Condition: Stag players win big ONLY if a certain % of players also chose Stag.
+ * * This class manages the simulation lifecycle: deploying, running rounds,
+ * managing the Commit-Reveal scheme, and handling agent interactions.
+ */
 export class StagHuntGame implements IBaseGameAdapter {
   readonly name = 'StagHunt'
 
+  // Tracks the cooperation rate from the previous round to help Agents learn.
   private lastCooperationRate: number | null = null
+  
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: StagHuntFactory | null = null
   private appClient: StagHuntClient | null = null
+  
+  // Fixed entry fee
   private participationAmount = AlgoAmount.Algos(10)
+  
+  // Local storage for commit secrets (Salt/Choice) mapped by Agent Address
   private roundSecrets: Map<string, RoundSecret> = new Map()
+  
+  // Cache for the current session's timeline configuration
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
+  // Hardcoded durations for simulation speed (in blocks)
   private durationParams = {
     warmUp: 3n,
     commitPhase: 15n,
     revealPhase: 10n,
   }
 
+  /**
+   * Deploys the StagHunt smart contract factory to the LocalNet.
+   * Funds the contract application account to cover Minimum Balance Requirements (MBR).
+   */
   async deploy(admin: Agent): Promise<bigint> {
     this.factory = this.algorand.client.getTypedAppFactory(StagHuntFactory, {
       defaultSender: admin.account.addr,
@@ -43,6 +70,7 @@ export class StagHuntGame implements IBaseGameAdapter {
       suppressLog:true
     })
 
+    // Fund the contract to ensure it has enough ALGO for MBR and opcodes
     await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(2))
 
     this.appClient = appClient
@@ -50,9 +78,14 @@ export class StagHuntGame implements IBaseGameAdapter {
     return BigInt(appClient.appId)
   }
 
+  /**
+   * Initializes a new game session on the blockchain.
+   * Calculates the specific timeline (Start, Commit Deadline, Reveal Deadline) based on the current block.
+   */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
+    // Fetch current block round to calculate deadlines
     const status = await this.algorand.client.algod.status().do()
     const currentRound = BigInt(status['lastRound'])
 
@@ -62,8 +95,10 @@ export class StagHuntGame implements IBaseGameAdapter {
 
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
+    // Query the contract to find out exactly how much MBR is needed for the storage boxes
     const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog:true })).return!
 
+    // Prepare the MBR payment transaction
     const mbrPayment = await this.algorand.createTransaction.payment({
       sender: dealer.account.addr,
       receiver: this.appClient.appAddress,
@@ -84,37 +119,55 @@ export class StagHuntGame implements IBaseGameAdapter {
       signer: dealer.signer,
       suppressLog:true
     })
+    
+    // The return value is the session ID. 
+    // Assuming the contract returns the ID of the created session here.
     const sessionId = Number(result.return) + 1
     console.log(`Session ${sessionId} created. Start: round ${startAt}`)
+    
+    // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
+  /**
+   * Commit.
+   * Iterates through all agents, asks them to make a decision (Stag vs Hare), 
+   * generates a cryptographic salt, hashes the move, and submits it to the chain.
+   */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log(`\n--- PHASE 1: COMMIT ---`)
 
+    // Fetch global state to inform agents about current Jackpot and Threshold
     const globalState = await this.appClient!.state.global.getAll()
     const jackpotAlgo = Number(globalState['globalJackpot'] || 0) / 1_000_000
     const threshold = Number(globalState['stagThresholdPercent'] || 51)
 
     for (const agent of agents) {
+      // 1. Construct the context for the LLM
       const prompt = this.buildGamePrompt(agent, sessionNumber, jackpotAlgo, threshold)
+      
+      // 2. Get decision from Agent
       const decision = await agent.playRound(this.name, prompt)
 
+      // 3. Sanitize Input: Ensure choice is 0 (Hare) or 1 (Stag)
       let safeChoice = decision.choice
       if (safeChoice !== 0 && safeChoice !== 1) {
         console.warn(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0 (Hare)`)
         safeChoice = 0
       }
 
+      // 4. Generate Secret Salt and Store Locally
       const salt = crypto.randomBytes(16).toString('hex')
       this.roundSecrets.set(agent.account.addr.toString(), {
         choice: safeChoice,
         salt: salt,
       })
 
+      // 5. Create SHA256 Hash (Choice + Salt)
       const hash = this.getHash(safeChoice, salt)
 
+      // 6. Submit Transaction (Commit Hash + Pay Entry Fee)
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
         receiver: this.appClient!.appAddress,
@@ -130,6 +183,11 @@ export class StagHuntGame implements IBaseGameAdapter {
     }
   }
 
+  /**
+   * Constructs the specific prompt for this game.
+   * Injects game rules, current session status, and historical trends 
+   * (Cooperation rate) to help the agent make an informed decision.
+   */
   private buildGamePrompt(agent: Agent, sessionNumber: number, jackpot: number, threshold: number): string {
     const gameRules = `
 GAME: Stag Hunt (Assurance Game)
@@ -154,6 +212,7 @@ Entry fee: 10 ALGO
 Global jackpot: ${jackpot.toFixed(1)} ALGO
 `.trim()
 
+    // Add historical context to help the agent assess group trust
     if (this.lastCooperationRate !== null) {
       const coopPct = (this.lastCooperationRate * 100).toFixed(0)
       const result = this.lastCooperationRate >= threshold / 100 ? 'THRESHOLD MET ✅' : 'THRESHOLD MISSED ❌'
@@ -162,6 +221,8 @@ ${coopPct}% of players chose Stag → ${result}`
     } else {
       situation += `\n\nThis is the first game - no historical data available.`
     }
+
+    
 
     const hint = `
 STRATEGIC CONSIDERATIONS:
@@ -186,10 +247,16 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 `.trim()
   }
 
+  /**
+   * Reveal.
+   * Waits for the commit phase to end, then submits the original choice and salt 
+   * for each agent to verify their commitment on-chain.
+   */
   async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 2: REVEAL ---`)
+    // Fast-forward chain to the reveal phase
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
     await Promise.all(
@@ -216,12 +283,19 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     )
   }
 
+  /**
+   * Resolution.
+   * Triggers the smart contract to calculate whether the Stag Threshold was met.
+   * Updates local stats (Cooperation Rate) for the next round's prompt.
+   */
   async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     console.log(`\n--- PHASE 3: RESOLUTION ---`)
+    // Fast-forward chain to the resolution phase
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
+    // Calculate cooperation rate locally for logging and history
     let stags = 0
     let totalRevealed = 0
 
@@ -238,6 +312,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     }
 
     try {
+      // Trigger the contract logic to payout or rollover the Jackpot
       await this.appClient!.send.resolveSession({
         args: { sessionId },
         sender: dealer.account.addr,
@@ -251,6 +326,11 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     }
   }
 
+  /**
+   * Claim & Feedback.
+   * Agents claim their winnings (or refunds for Hares).
+   * Updates each agent's memory with the round result.
+   */
   async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log('\n--- PHASE 4: CLAIM & FEEDBACK ---')
 
@@ -282,10 +362,15 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         }
       }
 
+      // Feedback loop: Update agent's memory with the result
       await agent.finalizeRound(this.name, outcome, netProfitAlgo, sessionNumber, 1)
     }
   }
 
+  /**
+   * Helper utility to generate the SHA256 Commit Hash.
+   * Matches the TEAL logic: SHA256(Uint64(choice) ++ Salt)
+   */
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -297,6 +382,10 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     )
   }
 
+  /**
+   * Utility to fast-forward LocalNet time.
+   * Sends 0-value spam transactions to force block production until the target round is reached.
+   */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
     const currentRound = BigInt(status['lastRound'])

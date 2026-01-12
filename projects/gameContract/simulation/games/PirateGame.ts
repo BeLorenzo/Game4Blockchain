@@ -11,6 +11,10 @@ import { BaseDecisionSchema } from '../llm'
 import {z} from "zod"
 import { IMultiRoundGameAdapter } from './IMultiRoundGameAdapter'
 
+/**
+ * Extended Zod Schema for Pirate Proposals.
+ * Requires a 'distribution' array containing the percentage/amount for each pirate.
+ */
 const PirateProposalSchema = BaseDecisionSchema.extend({
     distribution: z.array(z.coerce.number()) 
   });
@@ -20,14 +24,27 @@ interface RoundSecret {
   salt: string
 }
 
+/**
+ * Tracks the local state of a pirate during the simulation.
+ */
 interface PirateInfo {
   agent: Agent
-  seniorityIndex: number
+  seniorityIndex: number // 0 = Most Senior (First Proposer)
   alive: boolean
-  finalized: boolean
+  finalized: boolean     // True if the result has been recorded in agent history
   role?: 'proposer' | 'voter'
 }
 
+/**
+ * Adapter for the "Pirate Game" (Nash Equilibrium / Ultimatum Game variant).
+ * * Game Mechanics:
+ * 1. Pirates are ranked by seniority (0 to N).
+ * 2. The most senior pirate (Proposer) proposes a distribution of the pot.
+ * 3. All alive pirates vote (Yes/No).
+ * 4. If >= 50% vote Yes: Proposal passes, game ends, funds distributed.
+ * 5. If < 50% vote Yes: Proposer is eliminated (killed), pot stays, next senior becomes Proposer.
+ * * This class manages the complex multi-round state, proposal validation, and agent interactions.
+ */
 export class PirateGame implements IMultiRoundGameAdapter {
   readonly name = 'PirateGame'
   
@@ -49,10 +66,17 @@ export class PirateGame implements IMultiRoundGameAdapter {
     revealPhase: 50n,
   }
 
+  /**
+   * Returns the theoretical maximum number of rounds (eliminations) possible.
+   * In a worst-case scenario, N-1 pirates are eliminated, leaving 1 survivor.
+   */
   async getMaxTotalRounds(sessionId: bigint): Promise<number> {
     return this.pirates.length - 1
   }
 
+  /**
+   * Deploys the PirateGame factory contract.
+   */
   async deploy(admin: Agent): Promise<bigint> {
     this.factory = this.algorand.client.getTypedAppFactory(PirateGameFactory, {
       defaultSender: admin.account.addr,
@@ -72,9 +96,14 @@ export class PirateGame implements IMultiRoundGameAdapter {
     return BigInt(appClient.appId)
   }
 
+  /**
+   * Initializes the game session on-chain.
+   * Sets up the timeframe for the *first* round. Subsequent rounds are managed by the contract logic.
+   */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
+    // Reset local state
     this.pirates = []; 
     this.roundSecrets.clear();
     this.currentProposalDistribution = [];
@@ -113,10 +142,14 @@ export class PirateGame implements IMultiRoundGameAdapter {
     })
     const sessionId = Number(result.return) + 1
     console.log(`Session ${sessionId} created. Start: round ${startAt}`)
+    
+    // Note: We do not wait for startAt here, as Registration happens BEFORE startAt.
     return result.return!
-    //Non faccio il solito wait per gamestart. Prima del gameStart c'è registrazione
   }
 
+  /**
+   * Shuffles the agent list to ensure random assignment of Seniority Indices.
+   */
   private shuffleAgents(agents: Agent[]): Agent[] {
   const shuffled = [...agents]
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -127,7 +160,10 @@ export class PirateGame implements IMultiRoundGameAdapter {
   return shuffled
 }
 
-  //Usato per registrare 
+  /**
+   * Registers all agents into the session.
+   * Assigns seniority based on the shuffled order (Index 0 = Senior).
+   */
   async setup(agents: Agent[], sessionId: bigint): Promise<void> {
     agents = this.shuffleAgents(agents)
     const joinMbr = (await this.appClient!.send.getRequiredMbr({ args: { command: 'join' }, suppressLog:true })).return!
@@ -161,16 +197,16 @@ export class PirateGame implements IMultiRoundGameAdapter {
       })
       console.log(`[${agent.name}] Registered as Pirate #${i}`)
     }
+    // Now we wait for the actual game start time
     await this.waitUntilRound(this.sessionConfig!.startAt + 1n)
     console.log(`\n🏴‍☠️ Game Started! ${agents.length} pirates ready to negotiate...`)
   }
 
-/**
-   * PLAY ROUND: Execute one complete negotiation round
-   * Returns true if game should continue, false if finished
+  /**
+   * Executes a single negotiation round (Proposal -> Commit -> Reveal -> Execute).
    */
   async playRound(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<boolean> {
-    // Sync alive status from contract
+    // Sync alive status from contract (in case of previous eliminations)
     await this.syncPirateStatus(sessionId)
 
     const state = await this.appClient!.state.box.gameState.value(sessionId)
@@ -194,6 +230,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
     // === PHASE 1: PROPOSAL ===
     if (state.phase === 1n || (state.phase === 0n && roundNumber === 1)) {
         await this.handleProposalPhase(sessionId, state, roundNumber)
+        // Refresh config as timestamps might have updated
         config = await this.appClient!.state.box.gameSessions.value(sessionId)
 
     }
@@ -217,7 +254,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
     console.log(`\n⚙️  EXECUTING ROUND...`)
     await this.safeSend(() => this.appClient!.send.executeRound({
       args: { sessionId },
-      sender: agents[0].account.addr, // Use first agent as executor
+      sender: agents[0].account.addr, // Use first agent as executor (anyone can call)
       signer: agents[0].signer,
       coverAppCallInnerTransactionFees: true,
       maxFee: AlgoAmount.MicroAlgo(3000),
@@ -235,7 +272,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
   }
 
   /**
-   * FINALIZE: Record final results and cleanup
+   * FINALIZE: Cleanup method (mostly a placeholder for logging).
    */
   async finalize(agents: Agent[], sessionId: bigint): Promise<void> {
     const state = await this.appClient!.state.box.gameState.value(sessionId)
@@ -245,8 +282,9 @@ export class PirateGame implements IMultiRoundGameAdapter {
   }
 
 
-/**
-   * COMMIT PHASE: All alive pirates vote
+  /**
+   * COMMIT PHASE: All alive pirates vote on the current proposal.
+   * Proposer automatically votes YES. Others consult the LLM.
    */
   async commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     console.log(`\n🗳️  VOTE COMMIT PHASE`)
@@ -268,7 +306,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
 
       let vote = 0
 
-      // Auto-vote YES for proposer
+      // Auto-vote YES for proposer (Self-preservation)
       if (pirate.seniorityIndex === Number(state!.currentProposerIndex)) {
         console.log(`[${pirate.agent.name}] is Proposer → Auto-voting YES`)
         vote = 1
@@ -300,8 +338,8 @@ export class PirateGame implements IMultiRoundGameAdapter {
     }
   }
 
-/**
-   * REVEAL PHASE: Pirates reveal their votes
+  /**
+   * REVEAL PHASE: Pirates reveal their committed votes.
    */
   async reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     console.log(`\n🔓 VOTE REVEAL PHASE`)
@@ -327,29 +365,32 @@ export class PirateGame implements IMultiRoundGameAdapter {
     }
   }
 
-  //No op
+  // No explicit resolve call needed for this game logic
   async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
     return
   }
 
-async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
+  /**
+   * CLAIM PHASE: Distributes the pot if the game is over.
+   */
+  async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     console.log('\n--- PHASE 4: CLAIM WINNINGS (Payout) ---')
     
-    // 1. Recuperiamo la proposta finale dal box dello smart contract
+    // 1. Retrieve final proposal from contract
     const proposal = await this.appClient!.state.box.proposals.value(sessionId)
     if (!proposal) {
         console.log("⚠️ No proposal found. Nothing to claim.");
         return;
     }
 
-    // 2. Parsiamo la distribuzione finale (array di BigInt)
+    // 2. Parse final distribution (Array of BigInt)
     const state = await this.appClient!.state.box.gameState.value(sessionId)
     const finalAmounts = this.parseDistributionFromBytes(proposal.distribution, Number(state!.totalPirates));
 
     for (const pirate of this.pirates) {
       if (!pirate.alive) continue;
 
-      // 3. Controlliamo quanto gli spetta
+      // 3. Check entitlement
       const winnings = finalAmounts[pirate.seniorityIndex];
 
       if (winnings > 0n) {
@@ -363,13 +404,19 @@ async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<
           suppressLog:true
         }), `Claim ${pirate.agent.name}`);
       } else {
-        // Se ha 0, evitiamo la chiamata e l'errore
+        // Skip claim if 0 to avoid contract error
         console.log(`ℹ️ [${pirate.agent.name}] has 0 ALGO assigned. Skipping claim to avoid contract error.`);
       }
     }
   }
 
-  // PROMPTS
+  // === PROMPTS & PROPOSAL LOGIC ===
+
+  /**
+   * Constructs the prompt for the Proposer.
+   * Critical Logic: Maps the "local" array of ALIVE pirates to the "global" array required by the contract.
+   * Uses an error feedback loop if the LLM produces invalid distributions (wrong sum/length).
+   */
   private buildProposerPrompt(
   agent: Agent,
   state: any,
@@ -382,7 +429,7 @@ async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<
   const aliveCount = alivePirates.length;
   const votesNeeded = Math.ceil(aliveCount / 2);
   
-  // Trova l'indice locale (quello che l'LLM deve usare nell'array corto)
+  // Find local index for LLM instruction
   const localProposerIndex = alivePirates.findIndex(p => p.seniorityIndex === proposerIndex);
 
   const mappingString = alivePirates.map((p, i) => 
@@ -529,6 +576,10 @@ RESPONSE FORMAT (JSON ONLY):
     }
   }
 
+  /**
+   * Orchestrates the Proposal Phase using a retry loop for LLM failures.
+   * Maps LLM's short distribution array (alive pirates only) to the full contract array.
+   */
  private async handleProposalPhase(sessionId: bigint, state: any, roundNumber: number): Promise<void> {
     const proposerIndex = Number(state.currentProposerIndex)
     const proposer = this.pirates.find((p) => p.seniorityIndex === proposerIndex)
@@ -546,6 +597,8 @@ RESPONSE FORMAT (JSON ONLY):
     const alivePirates = this.pirates.filter(p => p.alive)
     const totalPot = Number(state.pot)
     const totalPirates = Number(state.totalPirates)
+
+    
 
     let attempts = 0
     const maxAttempts = 10
@@ -582,7 +635,7 @@ RESPONSE FORMAT (JSON ONLY):
           throw new Error("Total sum cannot be 0");
         } 
 
-        //Normalizzo per avere il 100%
+        // Normalize percentages to ensure they sum to exactly 100
         const normalizedPercentages = shortDist.map(pct => (pct / sum) * 100)
 
         let currentAllocated = 0
@@ -592,6 +645,7 @@ RESPONSE FORMAT (JSON ONLY):
           return amount
         })
 
+        // Give remainder (dust) to the proposer or first valid pirate
         const remainder = totalPot - currentAllocated
         if (remainder > 0) {
           const localProposerIdx = alivePirates.findIndex(p => p.seniorityIndex === proposerIndex)
@@ -603,13 +657,14 @@ RESPONSE FORMAT (JSON ONLY):
           }
         }
 
+        // Expand short array to full array (filling 0s for dead pirates)
         const fullDistMicroAlgos = this.expandDistribution(
           shortDistMicroAlgos, 
           totalPirates
         )
         const deadWithMoney = fullDistMicroAlgos.filter((amt: number, idx: number) => !this.pirates[idx].alive && amt > 0);
         if (deadWithMoney.length > 0) {
-          throw new Error(`Hai assegnato denaro a pirati morti. Gli indici dei pirati morti devono avere 0.`);
+          throw new Error(`Assigned money to dead pirates. Dead indices must be 0.`);
         }
 
         const totalAllocated = fullDistMicroAlgos.reduce((a, b) => a + b, 0)
@@ -637,7 +692,7 @@ CORRECTION PROTOCOL:
 3. Dead Pirates: Indices < ${proposerIndex} MUST be 0.
 Current Status: ${this.pirates.map(p => `#${p.seniorityIndex}:${p.alive?'Alive':'DEAD'}`).join(', ')}
 `.trim();
-console.warn(`[DEBUG] Proposta Pirate #${proposerIndex} respinta (Tentativo ${attempts}): ${e.message}`);
+console.warn(`[DEBUG] Proposal rejected (Attempt ${attempts}): ${e.message}`);
         if (attempts >= maxAttempts) {
           console.error("❌ Max attempts reached. Using fallback distribution.")
           response = { 
@@ -664,6 +719,7 @@ console.warn(`[DEBUG] Proposta Pirate #${proposerIndex} respinta (Tentativo ${at
       totalPirates
     )
 
+    // Log for visualization
     const fullPercentages = this.expandDistribution(response.distribution, Number(state.totalPirates));
     const distributionBuffer = this.parseDistributionFromLLM(
                 { ...response, distribution: fullPercentages }, 
@@ -794,26 +850,26 @@ console.warn(`[DEBUG] Proposta Pirate #${proposerIndex} respinta (Tentativo ${at
   let percentages = response.distribution
   console.log(`Percentages: [${response.distribution}]`)
 
-  // 1️⃣ Validazione base
+  // Validazione base
   if (!Array.isArray(percentages) || percentages.length !== totalPirates) {
     console.warn(`⚠️ Invalid or missing distribution. Using fallback.`)
     percentages = this.buildFallbackDistribution(totalPirates, proposerIndex)
   }
 
-  // 2️⃣ DEAD PIRATES → 0%
+  // DEAD PIRATES → 0%
   for (let i = 0; i < totalPirates; i++) {
     if (!this.pirates[i].alive) {
       percentages[i] = 0
     }
   }
 
-  // 3️⃣ Normalize to 100%
+  // Normalize to 100%
   const sum = percentages.reduce((a, b) => a + b, 0)
   if (sum <= 0) throw new Error("Invalid distribution sum")
 
   percentages = percentages.map(p => (p / sum) * 100)
 
-  // 4️⃣ Convert to microALGOs
+  // Convert to microALGOs
   const amounts: number[] = []
   percentages.forEach((pct, i) => {
     const amount = Math.floor((pct / 100) * pot)
@@ -821,7 +877,7 @@ console.warn(`[DEBUG] Proposta Pirate #${proposerIndex} respinta (Tentativo ${at
     buffer.writeBigUInt64BE(BigInt(amount), i * 8)
   })
 
-  // 5️⃣ Fix rounding → proposer
+  // Fix rounding → proposer
   const allocated = amounts.reduce((a, b) => a + b, 0)
   const remainder = pot - allocated
   if (remainder > 0) {
@@ -889,10 +945,4 @@ console.warn(`[DEBUG] Proposta Pirate #${proposerIndex} respinta (Tentativo ${at
       }
     }
   }
-
 }
-
-
-
-
-
