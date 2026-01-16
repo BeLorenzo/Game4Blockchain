@@ -1,46 +1,56 @@
-// src/components/GameCard.tsx
-import { ReactNode, useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 
 interface GameCardProps {
   title: string
-  description: string
   icon: string
+  description: string
   appId: string
   rules: string[]
   children: ReactNode
 }
 
-export const GameCard = ({ title, description, icon, appId, rules, children }: GameCardProps) => {
+export const GameCard: React.FC<GameCardProps> = ({ title, icon, description, appId, rules, children }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    // items-start impedisce l'allungamento forzato della card vicina
-    <div className="card bg-base-100 shadow-xl transition-all duration-300 self-start">
-      <div className="card-body p-6">
-        <div className="flex justify-between items-start cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+    <div className={`card bg-base-200 shadow-xl transition-all duration-300 border border-base-content/5 ${isOpen ? 'col-span-1 md:col-span-2' : ''}`}>
+      <div className="card-body p-5">
+        <div className="flex justify-between items-start">
           <div className="flex items-center gap-4">
-            <div className="text-4xl">{icon}</div>
+            <span className="text-4xl filter drop-shadow-md">{icon}</span>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="card-title text-2xl">{title}</h2>
-                <span className="text-[10px] opacity-40 font-mono">ID: {appId}</span>
-              </div>
-              <p className="text-sm text-gray-500">{description}</p>
+              <h2 className="card-title text-xl font-bold">{title}</h2>
+              <div className="badge badge-ghost badge-xs font-mono opacity-50">AppID: {appId}</div>
             </div>
           </div>
-          <button className="btn btn-ghost btn-circle btn-sm">{isOpen ? '−' : '+'}</button>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className={`btn btn-sm ${isOpen ? 'btn-neutral' : 'btn-ghost'}`}
+          >
+            {isOpen ? 'Chiudi Dashboard' : 'Apri Gioco'}
+          </button>
         </div>
 
+        <p className="text-sm mt-3 opacity-80 border-l-2 border-primary pl-3 italic">
+          {description}
+        </p>
+
         {isOpen && (
-          <div className="mt-6 border-t border-base-200 pt-4">
-            <div className="bg-base-200 rounded-lg p-3 mb-4 text-xs">
-              <h4 className="font-bold mb-1 uppercase opacity-50">Regole</h4>
-              <ul className="list-disc list-inside">
-                {rules.map((r, i) => (
-                  <li key={i}>{r}</li>
+          <div className="mt-6 animate-in fade-in slide-in-from-top-4 duration-500">
+            {/* Sezione Regole */}
+            <div className="bg-base-300/50 rounded-xl p-4 text-xs mb-6 border border-base-content/5">
+              <h3 className="font-bold mb-2 uppercase tracking-wide opacity-60">Regole del Gioco</h3>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {rules.map((rule, idx) => (
+                  <li key={idx} className="flex gap-2 items-start">
+                    <span className="text-primary">•</span> {rule}
+                  </li>
                 ))}
               </ul>
             </div>
+
+            {/* Qui viene iniettata la Dashboard specifica */}
+            <div className="divider text-xs font-mono opacity-50">CONSOLE DI GIOCO</div>
             {children}
           </div>
         )}

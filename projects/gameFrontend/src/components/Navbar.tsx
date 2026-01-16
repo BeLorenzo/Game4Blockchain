@@ -8,7 +8,7 @@ export const Navbar = () => {
   return (
     <div className="navbar bg-base-100 shadow-lg px-4 sticky top-0 z-50">
       <div className="flex-1">
-        <a className="btn btn-ghost normal-case text-xl text-primary font-bold">Game4Blockchain 🎮</a>
+        <a className="normal-case text-xl text-primary font-bold">Game4Blockchain 🎮</a>
       </div>
       <div className="flex-none">
         {activeAddress ? (
