@@ -1,12 +1,13 @@
+import { BlockchainStats } from './components/BlockchainStats'
 import { GameCard } from './components/GameCard'
 import { GuessGameManager } from './components/GuessGameManager'
 import { Hero } from './components/Hero'
 import { Navbar } from './components/Navbar'
-
-// ⚠️ INSERISCI QUI IL TUO APP ID ATTUALE
-const GUESS_GAME_APP_ID = '1001' // <--- CAMBIA QUESTO con quello della CLI
+import { config } from './config'
 
 function App() {
+  const { guessGame, rps, pirate } = config.games
+
   return (
     <div className="min-h-screen bg-base-300 flex flex-col font-sans">
       <Navbar />
@@ -14,52 +15,60 @@ function App() {
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
         <Hero />
 
-        {/* GRIGLIA A DUE COLONNE */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Punto 6: Statistiche Globali (Round, etc.) */}
+        <BlockchainStats />
+
+        {/* Punto 2: Griglia con items-start per evitare allineamenti forzati */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           {/* CARD 1: GUESS GAME */}
           <GameCard
-            title="Guess The Number"
-            icon="🧠"
-            appId={GUESS_GAME_APP_ID}
-            description="Indovina i 2/3 della media."
+            title={guessGame.name}
+            icon={guessGame.icon}
+            appId={guessGame.appId.toString()}
+            description="Indovina i 2/3 della media di tutti i partecipanti."
             rules={[
               'Scegli un numero tra 0 e 100.',
-              'Vince chi si avvicina ai 2/3 della media.',
-              'Fee: 1 ALGO.',
-              'Richiede fase di Commit e Reveal.',
+              'Vince chi si avvicina ai 2/3 della media calcolata.',
+              'Richiede una fase di Commit (segreto) e una di Reveal.',
+              'Deposito MBR richiesto per lo storage delle sessioni.',
             ]}
           >
-            {/* Injectiamo il manager specifico dentro la card generica */}
-            <GuessGameManager appId={GUESS_GAME_APP_ID} />
+            {guessGame.appId > 0n ? (
+              <GuessGameManager />
+            ) : (
+              <div className="alert alert-warning text-xs font-mono">⚠️ VITE_GUESSGAME_APP_ID mancante nel file .env</div>
+            )}
           </GameCard>
 
-          {/* CARD 2: RPS (Placeholder) */}
+          {/* CARD 2: RPS */}
           <GameCard
-            title="Sasso Carta Forbice"
-            icon="✂️"
-            appId="Coming Soon"
-            description="Il classico gioco a due giocatori."
-            rules={['Commit segreto della mossa.', 'Vincitore prende tutto.', 'Timeout automatico.']}
+            title={rps.name}
+            icon={rps.icon}
+            appId={rps.appId > 0n ? rps.appId.toString() : 'Coming Soon'}
+            description="Il classico gioco Sasso-Carta-Forbice on-chain."
+            rules={['Puntata minima variabile.', 'Reveal obbligatorio per non perdere la posta.']}
           >
-            <div className="text-center p-4 text-gray-500 italic">Contratto non ancora deployato.</div>
+            <div className="text-center p-4 text-gray-500 italic text-xs">
+              {rps.appId > 0n ? 'Manager in arrivo...' : 'Contratto non ancora configurato.'}
+            </div>
           </GameCard>
 
-          {/* CARD 3: Placeholder per layout */}
+          {/* CARD 3: PIRATE GAME */}
           <GameCard
-            title="Pirate Game"
-            icon="🏴‍☠️"
-            appId="Coming Soon"
-            description="Distribuzione tesoro democratica."
-            rules={['Regola 1', 'Regola 2']}
+            title={pirate.name}
+            icon={pirate.icon}
+            appId={pirate.appId > 0n ? pirate.appId.toString() : 'Coming Soon'}
+            description="Distribuzione democratica del tesoro tra pirati."
+            rules={['Votazione basata sulla gerarchia.', 'Il capitano propone, gli altri decidono.']}
           >
-            <div className="text-center p-4 text-gray-500 italic">Presto disponibile.</div>
+            <div className="text-center p-4 text-gray-500 italic text-xs">Presto disponibile.</div>
           </GameCard>
         </div>
       </main>
 
-      <footer className="footer footer-center p-4 bg-base-300 text-base-content text-xs opacity-50">
+      <footer className="footer footer-center p-4 bg-base-300 text-base-content text-[10px] opacity-40">
         <div>
-          <p>Game4Blockchain Prototype</p>
+          <p>© 2026 Game4Blockchain • Powered by Algorand</p>
         </div>
       </footer>
     </div>

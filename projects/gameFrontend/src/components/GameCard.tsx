@@ -1,53 +1,47 @@
+// src/components/GameCard.tsx
 import { ReactNode, useState } from 'react'
 
 interface GameCardProps {
   title: string
   description: string
-  icon: string // Emoji o icona
+  icon: string
   appId: string
   rules: string[]
-  children: ReactNode // Qui ci finisce la dashboard specifica del gioco
+  children: ReactNode
 }
 
 export const GameCard = ({ title, description, icon, appId, rules, children }: GameCardProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className={`card bg-base-100 shadow-xl border border-base-200 transition-all duration-300 ${isOpen ? 'row-span-2' : ''}`}>
+    // items-start impedisce l'allungamento forzato della card vicina
+    <div className="card bg-base-100 shadow-xl transition-all duration-300 self-start">
       <div className="card-body p-6">
-        {/* HEADER: Titolo e Descrizione */}
         <div className="flex justify-between items-start cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
           <div className="flex items-center gap-4">
             <div className="text-4xl">{icon}</div>
             <div>
-              <h2 className="card-title text-2xl">{title}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="card-title text-2xl">{title}</h2>
+                <span className="text-[10px] opacity-40 font-mono">ID: {appId}</span>
+              </div>
               <p className="text-sm text-gray-500">{description}</p>
             </div>
           </div>
-          <button className="btn btn-ghost btn-circle btn-sm">{isOpen ? '▲' : '▼'}</button>
+          <button className="btn btn-ghost btn-circle btn-sm">{isOpen ? '−' : '+'}</button>
         </div>
 
-        {/* CONTENUTO A SCOMPARSA */}
         {isOpen && (
-          <div className="mt-6 animate-fade-in">
-            <div className="divider my-2"></div>
-
-            {/* Sezione Regole e Info Tecniche (Piccole) */}
-            <div className="collapse collapse-plus bg-base-200 mb-4 rounded-lg">
-              <input type="checkbox" />
-              <div className="collapse-title text-sm font-medium text-gray-500">📜 Regole & Dettagli Tecnici (App ID: {appId})</div>
-              <div className="collapse-content text-xs text-gray-600">
-                <ul className="list-disc list-inside space-y-1 mb-2">
-                  {rules.map((rule, idx) => (
-                    <li key={idx}>{rule}</li>
-                  ))}
-                </ul>
-                <div className="badge badge-outline badge-xs opacity-50">App ID: {appId}</div>
-              </div>
+          <div className="mt-6 border-t border-base-200 pt-4">
+            <div className="bg-base-200 rounded-lg p-3 mb-4 text-xs">
+              <h4 className="font-bold mb-1 uppercase opacity-50">Regole</h4>
+              <ul className="list-disc list-inside">
+                {rules.map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
             </div>
-
-            {/* QUI C'È IL CUORE: Dashboard e Azioni specifiche del gioco */}
-            <div className="bg-base-200/50 rounded-xl p-4 border border-base-300">{children}</div>
+            {children}
           </div>
         )}
       </div>
