@@ -3,31 +3,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
+import { deploy } from '../smart_contracts/pirateGame/deploy-config'
 import { Agent } from './Agent'
-import { StagHuntGame } from './games/StagHuntGame'
-import { WeeklyGame } from './games/WeeklyGame'
-import { GuessGame } from './games/GuessGame'
-import { PirateGame } from './games/PirateGame'
 import { IBaseGameAdapter } from './games/IBaseGameAdapter'
 import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
-
+import { PirateGame } from './games/PirateGame'
 /**
  * Type Guard to check if a game supports multi-round logic (e.g., Pirate Game).
  */
 function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
-  return (game as IMultiRoundGameAdapter).playRound !== undefined;
+  return (game as IMultiRoundGameAdapter).playRound !== undefined
 }
 
 // === SIMULATION CONFIGURATION ===
-const NUM_SESSIONS = 10
+const NUM_SESSIONS = 2
 const INITIAL_FUNDING = 100_000
 
 // === GAME SELECTION ===
 // Uncomment the game you wish to simulate
- //const game : IBaseGameAdapter = new StagHuntGame()
- //const game : IBaseGameAdapter = new WeeklyGame()
-//const game : IBaseGameAdapter = new GuessGame()
- const game : IBaseGameAdapter = new PirateGame()
+//const game : IBaseGameAdapter = new StagHuntGame()
+//const game : IBaseGameAdapter = new WeeklyGame()
+//const game: IBaseGameAdapter = new GuessGame()
+const game: IBaseGameAdapter = new PirateGame()
 
 /**
  * Main Entry Point for the Simulation Framework.
@@ -44,8 +41,6 @@ async function main() {
   console.log(`Rounds to play: ${NUM_SESSIONS}\n`)
 
   const algorand = AlgorandClient.defaultLocalNet()
-
-  
 
   // === AGENT INITIALIZATION ===
   // Creating 7 agents with diverse Game Theory strategies
@@ -154,7 +149,7 @@ STRATEGIC PRINCIPLES:
 - Form alliances opportunistically, break them ruthlessly
 - "Bold" means strategic aggression, not reckless rule-breaking
 `.trim(),
-        riskTolerance: 0.8, 
+        riskTolerance: 0.8,
         trustInOthers: 0.5,
         wealthFocus: 0.8,
         fairnessFocus: 0.0,
@@ -275,7 +270,7 @@ STRATEGIC PRINCIPLES:
         trustInOthers: 0.5,
         wealthFocus: 0.9,
         fairnessFocus: 0.0,
-        patience: 0.2, 
+        patience: 0.2,
         adaptability: 1.0,
         resilience: 0.8,
         curiosity: 0.5,
@@ -355,17 +350,17 @@ STRATEGIC PRINCIPLES:
         let lastRound = -1
 
         rawEntries.forEach((entry: any) => {
-        const isNewSession = entry.sessionId !== lastSessionId || entry.round < lastRound;
+          const isNewSession = entry.sessionId !== lastSessionId || entry.round < lastRound
 
-        if (isNewSession) {
-          distinctSessionsCount++;
-          lastSessionId = entry.sessionId;
-        }
-        lastRound = entry.round;
-      });
+          if (isNewSession) {
+            distinctSessionsCount++
+            lastSessionId = entry.sessionId
+          }
+          lastRound = entry.round
+        })
         if (distinctSessionsCount > sessionFound) {
-          sessionFound = distinctSessionsCount;
-        }  
+          sessionFound = distinctSessionsCount
+        }
       }
     }
   })
@@ -373,72 +368,76 @@ STRATEGIC PRINCIPLES:
   console.log(
     sessionFound > 0
       ? `Found ${sessionFound} previous sessions for ${game.name}`
-      : `Starting fresh - no previous sessions found for ${game.name}`
+      : `Starting fresh - no previous sessions found for ${game.name}`,
   )
 
   // === CONTRACT DEPLOYMENT ===
   const admin = agents[0]
   console.log('\n--- DEPLOYMENT ---')
-  await game.deploy(admin)
+  const deployResult = await deploy()
+  const officialAppId = deployResult.appId
+  const officialAppClient = deployResult.appClient
+
+  ;(game as any).appId = officialAppId
+  ;(game as any).appClient = officialAppClient
 
   console.log(`\n--- STARTING ${NUM_SESSIONS} GAMES ---`)
 
   // === MAIN GAME LOOP ===
   for (let i = 0; i < NUM_SESSIONS; i++) {
-    let sessionId: bigint | null = null;
+    let sessionId: bigint | null = null
     try {
-        console.log(`${'='.repeat(60)}`)
-        sessionId = await game.startSession(admin)
-        console.log('='.repeat(60))
+      console.log(`${'='.repeat(60)}`)
+      sessionId = await game.startSession(admin)
+      console.log('='.repeat(60))
 
-        if (isTurnBased(game)) {
-          // --- LOGIC FOR MULTI-ROUND GAMES (e.g., Pirate Game) ---
-          
-          await game.setup(agents, sessionId) 
-          
-          const totalInternalRounds = await game.getMaxTotalRounds(sessionId);          
-          for (let r = 0; r < totalInternalRounds; r++) {
-              console.log(`  --- Internal Round ${r + 1}/${totalInternalRounds} ---`);
-              try {
-                  const isGameOver = await game.playRound(agents, sessionId, r+1);
-                  if (isGameOver) {
-                      console.log(`🏁 Game Over condition met at Round ${r + 1}`);
-                      break;
-                  }
-              } catch (roundError) {
-                  console.error(`❌ Round ${r + 1} crashed! Aborting.`);
-                  throw roundError; 
-              }
-          }
-          console.log(`Ending game...`);
-          await game.finalize(agents, sessionId);
-          console.log(`\n🎉 Session ${i+1} COMPLETED.\n`);
+      if (isTurnBased(game)) {
+        // --- LOGIC FOR MULTI-ROUND GAMES (e.g., Pirate Game) ---
 
-      } else {
-          // --- LOGIC FOR SIMPLE GAMES (e.g., RPS, StagHunt) ---
-          // Phase 1: Commit (Agents make secret moves)
-          await game.commit(agents, sessionId, i); 
-          
-          // Phase 2: Reveal (Agents reveal moves)
-          await game.reveal(agents, sessionId, i);
+        await game.setup(agents, sessionId)
 
+        const totalInternalRounds = await game.getMaxTotalRounds(sessionId)
+        for (let r = 0; r < totalInternalRounds; r++) {
+          console.log(`  --- Internal Round ${r + 1}/${totalInternalRounds} ---`)
           try {
-            // Phase 3: Resolution & Claim
-            await game.resolve(admin, sessionId, i);
-            await game.claim(agents, sessionId, i);
-            
-            console.log(`\n🎉 Session ${i+1} COMPLETED.\n`);
-          } catch (resolveError) {
-            console.error(` ❌ Failed during Resolution/Claim:`, resolveError);
-            // We do not throw here to allow the simulation to proceed to the next session
+            const isGameOver = await game.playRound(agents, sessionId, r + 1)
+            if (isGameOver) {
+              console.log(`🏁 Game Over condition met at Round ${r + 1}`)
+              break
+            }
+          } catch (roundError) {
+            console.error(`❌ Round ${r + 1} crashed! Aborting.`)
+            throw roundError
           }
-      } 
+        }
+        console.log(`Ending game...`)
+        await game.finalize(agents, sessionId)
+        console.log(`\n🎉 Session ${i + 1} COMPLETED.\n`)
+      } else {
+        // --- LOGIC FOR SIMPLE GAMES (e.g., RPS, StagHunt) ---
+        // Phase 1: Commit (Agents make secret moves)
+        await game.commit(agents, sessionId, i)
+
+        // Phase 2: Reveal (Agents reveal moves)
+        await game.reveal(agents, sessionId, i)
+
+        try {
+          // Phase 3: Resolution & Claim
+          await game.resolve(admin, sessionId, i)
+          await game.claim(agents, sessionId, i)
+
+          console.log(`\n🎉 Session ${i + 1} COMPLETED.\n`)
+        } catch (resolveError) {
+          console.error(` ❌ Failed during Resolution/Claim:`, resolveError)
+          // We do not throw here to allow the simulation to proceed to the next session
+        }
+      }
     } catch (e) {
-      console.error(`\nCRITICAL FAILURE in Session ${i}:`);
-      console.error(e);
+      console.error(`\nCRITICAL FAILURE in Session ${i}:`)
+      console.error(e)
     }
-  } 
-  
+  }
+
   console.log('\n' + '='.repeat(60))
   console.log('🏁 SIMULATION COMPLETE')
   console.log('='.repeat(60))

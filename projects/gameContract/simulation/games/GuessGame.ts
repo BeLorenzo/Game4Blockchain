@@ -9,7 +9,7 @@ import { Agent } from '../Agent'
 import { IBaseGameAdapter } from './IBaseGameAdapter'
 
 /**
- * Helper interface to store local player secrets (choice + salt) 
+ * Helper interface to store local player secrets (choice + salt)
  * required for the Reveal phase.
  */
 interface RoundSecret {
@@ -24,7 +24,7 @@ interface RoundSecret {
  * 2. The contract calculates the average of all choices.
  * 3. The Target is 2/3 of that average.
  * 4. The player closest to the Target wins the pot.
- * * This class manages the simulation lifecycle: deploying, running rounds, 
+ * * This class manages the simulation lifecycle: deploying, running rounds,
  * managing the Commit-Reveal scheme, and handling agent interactions.
  */
 export class GuessGame implements IBaseGameAdapter {
@@ -32,17 +32,17 @@ export class GuessGame implements IBaseGameAdapter {
 
   // Tracks historical data (Average and Target) to help Agents learn over time.
   private roundHistory: { avg: number; target: number }[] = []
-  
+
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: GuessGameFactory | null = null
   private appClient: GuessGameClient | null = null
-  
+
   // Fixed entry fee
   private participationAmount = AlgoAmount.Algos(10)
-  
+
   // Local storage for commit secrets (Salt/Choice) mapped by Agent Address
   private roundSecrets: Map<string, RoundSecret> = new Map()
-  
+
   // Cache for the current session's timeline configuration
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
@@ -51,30 +51,6 @@ export class GuessGame implements IBaseGameAdapter {
     warmUp: 3n,
     commitPhase: 15n,
     revealPhase: 10n,
-  }
-
-  /**
-   * Deploys the GuessGame smart contract factory to the LocalNet.
-   * Funds the contract application account to cover Minimum Balance Requirements (MBR).
-   */
-  async deploy(admin: Agent): Promise<bigint> {
-    this.factory = this.algorand.client.getTypedAppFactory(GuessGameFactory, {
-      defaultSender: admin.account.addr,
-      defaultSigner: admin.signer,
-    })
-
-    const { appClient } = await this.factory.deploy({
-      onUpdate: 'append',
-      onSchemaBreak: 'append',
-      suppressLog: true
-    })
-
-    // Fund the contract to ensure it has enough ALGO for MBR and opcodes
-    await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(5))
-
-    this.appClient = appClient
-    console.log(`${this.name} deployed. AppID: ${appClient.appId}`)
-    return BigInt(appClient.appId)
   }
 
   /**
@@ -95,7 +71,7 @@ export class GuessGame implements IBaseGameAdapter {
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
     // Query the contract to find out exactly how much MBR is needed for the storage boxes
-    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog:true })).return!
+    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true })).return!
 
     // Prepare the MBR payment transaction
     const mbrPayment = await this.algorand.createTransaction.payment({
@@ -116,12 +92,12 @@ export class GuessGame implements IBaseGameAdapter {
       },
       sender: dealer.account.addr,
       signer: dealer.signer,
-      suppressLog: true
+      suppressLog: true,
     })
-    
+
     const sessionId = Number(result.return) + 1
     console.log(`Session ${sessionId} created. Start: round ${startAt}`)
-    
+
     // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
     return result.return!
@@ -129,7 +105,7 @@ export class GuessGame implements IBaseGameAdapter {
 
   /**
    * Commit.
-   * Iterates through all agents, asks them to make a decision, 
+   * Iterates through all agents, asks them to make a decision,
    * generates a cryptographic salt, hashes the move, and submits it to the chain.
    */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
@@ -138,7 +114,7 @@ export class GuessGame implements IBaseGameAdapter {
     for (const agent of agents) {
       // 1. Construct the context for the LLM
       const prompt = this.buildGamePrompt(agent, sessionNumber)
-      
+
       // 2. Get decision from Agent
       const decision = await agent.playRound(this.name, prompt)
 
@@ -158,7 +134,7 @@ export class GuessGame implements IBaseGameAdapter {
         choice: safeChoice,
         salt,
       })
-      
+
       // 5. Create SHA256 Hash (Choice + Salt)
       const hash = this.getHash(safeChoice, salt)
 
@@ -173,14 +149,14 @@ export class GuessGame implements IBaseGameAdapter {
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
-        suppressLog: true
+        suppressLog: true,
       })
     }
   }
 
   /**
    * Constructs the specific prompt for this game.
-   * Injects game rules, current session status, and historical trends 
+   * Injects game rules, current session status, and historical trends
    * (Average and Target history) to help the agent make an informed decision.
    */
   private buildGamePrompt(agent: Agent, sessionNumber: number): string {
@@ -226,8 +202,6 @@ Entry fee: 10 ALGO
       }
     }
 
-    
-
     const hint = `
 1. Check your performanceStats for winning choices (avgProfit > 20, winRate > 0.5)
 2. If you have a proven winner: Play that choice ±5
@@ -254,7 +228,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 
   /**
    * Reveal.
-   * Waits for the commit phase to end, then submits the original choice and salt 
+   * Waits for the commit phase to end, then submits the original choice and salt
    * for each agent to verify their commitment on-chain.
    */
   async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
@@ -278,7 +252,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
             },
             sender: agent.account.addr,
             signer: agent.signer,
-            suppressLog: true
+            suppressLog: true,
           })
           console.log(`[${agent.name}] Revealed: ${secret.choice}`)
         } catch (e) {
@@ -290,7 +264,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 
   /**
    * Resolve.
-   * In this specific game, resolution happens implicitly during the Claim phase, 
+   * In this specific game, resolution happens implicitly during the Claim phase,
    * so this method is empty.
    */
   async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
@@ -299,7 +273,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 
   /**
    * Claim.
-   * Waits for the game to end, calculates local stats for reporting, 
+   * Waits for the game to end, calculates local stats for reporting,
    * and triggers the claim transaction for each agent to receive payouts.
    */
   async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
@@ -336,8 +310,8 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
           sender: agent.account.addr,
           signer: agent.signer,
           coverAppCallInnerTransactionFees: true, // Crucial: cover inner payment fees
-          maxFee: AlgoAmount.MicroAlgos(5_000),   // High budget for complex calculation
-          suppressLog: true
+          maxFee: AlgoAmount.MicroAlgos(5_000), // High budget for complex calculation
+          suppressLog: true,
         })
 
         const payoutMicro = Number(result.return!)
@@ -350,7 +324,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
       } catch (e: any) {
         outcome = 'LOSS'
         console.log(`${agent.name}: \x1b[31mLOSS\x1b[0m`)
-    }
+      }
       // Feedback loop: Update agent's memory with the result
       await agent.finalizeRound(this.name, outcome, netProfitAlgo, sessionNumber, 1)
     }
@@ -392,7 +366,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
         amount: AlgoAmount.MicroAlgos(0),
         signer: spammer.signer,
         note: `spam-${i}-${Date.now()}`,
-        suppressLog: true
+        suppressLog: true,
       })
     }
   }

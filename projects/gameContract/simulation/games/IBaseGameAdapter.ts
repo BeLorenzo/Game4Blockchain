@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Agent } from "../Agent"
+import { Agent } from '../Agent'
 
 /**
  * Base Game Adapter Interface.
  * Defines the standard lifecycle methods that all game implementations must support
  * to be compatible with the Simulation Framework.
  */
-export interface  IBaseGameAdapter {
+export interface IBaseGameAdapter {
   /** Game identifier */
   readonly name: string
-
-  /** Deploy smart contract */
-  deploy(admin: Agent): Promise<bigint>
 
   /** Start a new game session */
   startSession(dealer: Agent): Promise<bigint>

@@ -6,6 +6,9 @@
     },
     {
       "path": "projects/gameContract"
+    },
+    {
+      "path": "projects/gameFrontend"
     }
   ],
   "settings": {

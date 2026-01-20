@@ -32,17 +32,17 @@ export class WeeklyGame implements IBaseGameAdapter {
 
   // Tracks vote distribution from the previous round to help Agents learn.
   private lastRoundVotes: Record<string, number> | null = null
-  
+
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: WeeklyGameFactory | null = null
   private appClient: WeeklyGameClient | null = null
-  
+
   // Fixed entry fee
   private participationAmount = AlgoAmount.Algos(10)
-  
+
   // Local storage for commit secrets (Salt/Choice) mapped by Agent Address
   private roundSecrets: Map<string, RoundSecret> = new Map()
-  
+
   // Cache for the current session's timeline configuration
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
@@ -54,30 +54,6 @@ export class WeeklyGame implements IBaseGameAdapter {
   }
 
   private dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-
-  /**
-   * Deploys the WeeklyGame smart contract factory to the LocalNet.
-   * Funds the contract application account to cover Minimum Balance Requirements (MBR).
-   */
-  async deploy(admin: Agent): Promise<bigint> {
-    this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
-      defaultSender: admin.account.addr,
-      defaultSigner: admin.signer,
-    })
-
-    const { appClient } = await this.factory.deploy({
-      onUpdate: 'append',
-      onSchemaBreak: 'append',
-      suppressLog:true
-    })
-
-    // Fund the contract to ensure it has enough ALGO for MBR and opcodes
-    await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(2))
-
-    this.appClient = appClient
-    console.log(`${this.name} deployed. AppID: ${appClient.appId}`)
-    return BigInt(appClient.appId)
-  }
 
   /**
    * Initializes a new game session on the blockchain.
@@ -97,7 +73,7 @@ export class WeeklyGame implements IBaseGameAdapter {
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
     // Query the contract to find out exactly how much MBR is needed for the storage boxes
-    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog:true })).return!
+    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true })).return!
 
     // Prepare the MBR payment transaction
     const mbrPayment = await this.algorand.createTransaction.payment({
@@ -118,12 +94,12 @@ export class WeeklyGame implements IBaseGameAdapter {
       },
       sender: dealer.account.addr,
       signer: dealer.signer,
-      suppressLog:true
+      suppressLog: true,
     })
-    
+
     const sessionId = Number(result.return) + 1
     console.log(`Session ${sessionId} created. Start: round ${startAt}`)
-    
+
     // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
     return result.return!
@@ -131,7 +107,7 @@ export class WeeklyGame implements IBaseGameAdapter {
 
   /**
    * Commit.
-   * Iterates through all agents, asks them to make a decision (Day of Week), 
+   * Iterates through all agents, asks them to make a decision (Day of Week),
    * generates a cryptographic salt, hashes the move, and submits it to the chain.
    */
   async commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
@@ -140,7 +116,7 @@ export class WeeklyGame implements IBaseGameAdapter {
     for (const agent of agents) {
       // 1. Construct the context for the LLM
       const prompt = this.buildGamePrompt(agent, roundNumber)
-      
+
       // 2. Get decision from Agent
       const decision = await agent.playRound(this.name, prompt)
 
@@ -169,14 +145,14 @@ export class WeeklyGame implements IBaseGameAdapter {
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
-        suppressLog:true
+        suppressLog: true,
       })
     }
   }
 
   /**
    * Constructs the specific prompt for this game.
-   * Injects game rules, current session status, and historical trends 
+   * Injects game rules, current session status, and historical trends
    * (Vote distribution) to help the agent make an informed decision.
    */
   private buildGamePrompt(agent: Agent, roundNumber: number): string {
@@ -237,8 +213,6 @@ Entry fee: 10 ALGO
       }
     }
 
-    
-
     const hint = `
 STRATEGIC CONSIDERATIONS:
 - This is a minority game - you want FEWER competitors on your day
@@ -265,7 +239,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Reveal.
-   * Waits for the commit phase to end, then submits the original choice and salt 
+   * Waits for the commit phase to end, then submits the original choice and salt
    * for each agent to verify their commitment on-chain.
    */
   async reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
@@ -289,7 +263,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
             },
             sender: agent.account.addr,
             signer: agent.signer,
-            suppressLog:true
+            suppressLog: true,
           })
           console.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`)
         } catch (e) {
@@ -301,7 +275,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Resolve.
-   * In this specific game, resolution happens implicitly during the Claim phase, 
+   * In this specific game, resolution happens implicitly during the Claim phase,
    * so this method is empty.
    */
   async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
@@ -310,7 +284,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Claim.
-   * Waits for the game to end, calculates local stats for reporting, 
+   * Waits for the game to end, calculates local stats for reporting,
    * and triggers the claim transaction for each agent to receive payouts.
    */
   async claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
@@ -347,7 +321,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
           signer: agent.signer,
           coverAppCallInnerTransactionFees: true, // Crucial: cover inner payment fees
           maxFee: AlgoAmount.MicroAlgos(3_000),
-          suppressLog:true
+          suppressLog: true,
         })
 
         const payoutMicro = Number(result.return!)
@@ -405,7 +379,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         amount: AlgoAmount.MicroAlgos(0),
         signer: spammer.signer,
         note: `spam-${i}-${Date.now()}`,
-        suppressLog:true
+        suppressLog: true,
       })
     }
   }

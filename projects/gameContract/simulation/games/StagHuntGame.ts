@@ -33,17 +33,17 @@ export class StagHuntGame implements IBaseGameAdapter {
 
   // Tracks the cooperation rate from the previous round to help Agents learn.
   private lastCooperationRate: number | null = null
-  
+
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: StagHuntFactory | null = null
   private appClient: StagHuntClient | null = null
-  
+
   // Fixed entry fee
   private participationAmount = AlgoAmount.Algos(10)
-  
+
   // Local storage for commit secrets (Salt/Choice) mapped by Agent Address
   private roundSecrets: Map<string, RoundSecret> = new Map()
-  
+
   // Cache for the current session's timeline configuration
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
@@ -52,30 +52,6 @@ export class StagHuntGame implements IBaseGameAdapter {
     warmUp: 3n,
     commitPhase: 15n,
     revealPhase: 10n,
-  }
-
-  /**
-   * Deploys the StagHunt smart contract factory to the LocalNet.
-   * Funds the contract application account to cover Minimum Balance Requirements (MBR).
-   */
-  async deploy(admin: Agent): Promise<bigint> {
-    this.factory = this.algorand.client.getTypedAppFactory(StagHuntFactory, {
-      defaultSender: admin.account.addr,
-      defaultSigner: admin.signer,
-    })
-
-    const { appClient } = await this.factory.deploy({
-      onUpdate: 'append',
-      onSchemaBreak: 'append',
-      suppressLog:true
-    })
-
-    // Fund the contract to ensure it has enough ALGO for MBR and opcodes
-    await this.algorand.account.ensureFundedFromEnvironment(appClient.appAddress, AlgoAmount.Algos(2))
-
-    this.appClient = appClient
-    console.log(`${this.name} deployed. AppID: ${appClient.appId}`)
-    return BigInt(appClient.appId)
   }
 
   /**
@@ -96,7 +72,7 @@ export class StagHuntGame implements IBaseGameAdapter {
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
     // Query the contract to find out exactly how much MBR is needed for the storage boxes
-    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog:true })).return!
+    const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true })).return!
 
     // Prepare the MBR payment transaction
     const mbrPayment = await this.algorand.createTransaction.payment({
@@ -117,14 +93,14 @@ export class StagHuntGame implements IBaseGameAdapter {
       },
       sender: dealer.account.addr,
       signer: dealer.signer,
-      suppressLog:true
+      suppressLog: true,
     })
-    
-    // The return value is the session ID. 
+
+    // The return value is the session ID.
     // Assuming the contract returns the ID of the created session here.
     const sessionId = Number(result.return) + 1
     console.log(`Session ${sessionId} created. Start: round ${startAt}`)
-    
+
     // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
     return result.return!
@@ -132,7 +108,7 @@ export class StagHuntGame implements IBaseGameAdapter {
 
   /**
    * Commit.
-   * Iterates through all agents, asks them to make a decision (Stag vs Hare), 
+   * Iterates through all agents, asks them to make a decision (Stag vs Hare),
    * generates a cryptographic salt, hashes the move, and submits it to the chain.
    */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
@@ -146,7 +122,7 @@ export class StagHuntGame implements IBaseGameAdapter {
     for (const agent of agents) {
       // 1. Construct the context for the LLM
       const prompt = this.buildGamePrompt(agent, sessionNumber, jackpotAlgo, threshold)
-      
+
       // 2. Get decision from Agent
       const decision = await agent.playRound(this.name, prompt)
 
@@ -178,14 +154,14 @@ export class StagHuntGame implements IBaseGameAdapter {
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
-        suppressLog:true
+        suppressLog: true,
       })
     }
   }
 
   /**
    * Constructs the specific prompt for this game.
-   * Injects game rules, current session status, and historical trends 
+   * Injects game rules, current session status, and historical trends
    * (Cooperation rate) to help the agent make an informed decision.
    */
   private buildGamePrompt(agent: Agent, sessionNumber: number, jackpot: number, threshold: number): string {
@@ -222,8 +198,6 @@ ${coopPct}% of players chose Stag → ${result}`
       situation += `\n\nThis is the first game - no historical data available.`
     }
 
-    
-
     const hint = `
 STRATEGIC CONSIDERATIONS:
 - Hare gives -2 ALGO (safe but guaranteed small loss)
@@ -249,7 +223,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 
   /**
    * Reveal.
-   * Waits for the commit phase to end, then submits the original choice and salt 
+   * Waits for the commit phase to end, then submits the original choice and salt
    * for each agent to verify their commitment on-chain.
    */
   async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
@@ -273,7 +247,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
             },
             sender: agent.account.addr,
             signer: agent.signer,
-            suppressLog:true
+            suppressLog: true,
           })
           console.log(`[${agent.name}] Revealed: ${secret.choice === 1 ? 'STAG' : 'HARE'}`)
         } catch (e) {
@@ -319,7 +293,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         signer: dealer.signer,
         coverAppCallInnerTransactionFees: true,
         maxFee: AlgoAmount.MicroAlgos(5_000),
-        suppressLog:true
+        suppressLog: true,
       })
     } catch (e) {
       console.error('Resolution error:', e)
@@ -345,7 +319,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
           signer: agent.signer,
           coverAppCallInnerTransactionFees: true,
           maxFee: AlgoAmount.MicroAlgos(3_000),
-          suppressLog:true
+          suppressLog: true,
         })
 
         const payoutMicro = Number(result.return!)
@@ -403,7 +377,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         amount: AlgoAmount.MicroAlgos(0),
         signer: spammer.signer,
         note: `spam-${i}-${Date.now()}`,
-        suppressLog: true
+        suppressLog: true,
       })
     }
   }
