@@ -213,7 +213,7 @@ export const useGuessGame = () => {
   const createSession = async (fee: number, startDelay: number, commitLen: number, revealLen: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connetti il wallet.')
+      if (!activeAddress) throw new Error('Connect your wallet.')
       const client = getClient()
       const algorand = client.algorand
       const status = await algorand.client.algod.status().do()
@@ -237,7 +237,7 @@ export const useGuessGame = () => {
         sender: activeAddress,
       })
 
-      showAlert(`Sessione creata!`, 'success')
+      showAlert('Game session created successfully!', 'success')
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -249,7 +249,7 @@ export const useGuessGame = () => {
   const joinSession = async (sessionId: number, guess: number, participationFee: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connetti il wallet.')
+      if (!activeAddress) throw new Error('Connect your wallet.')
       const client = getClient()
       const salt = new Uint8Array(16)
       crypto.getRandomValues(salt)
@@ -279,7 +279,7 @@ export const useGuessGame = () => {
       const key = getStorageKey(sessionId)
       if (key) localStorage.setItem(key, JSON.stringify(secretData))
 
-      showAlert('Puntata registrata!', 'success')
+      showAlert('Guess committed successfully!', 'success')
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -291,10 +291,10 @@ export const useGuessGame = () => {
   const revealMove = async (sessionId: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connetti il wallet.')
+      if (!activeAddress) throw new Error('Connect your wallet.')
       const key = getStorageKey(sessionId)
       const stored = key ? localStorage.getItem(key) : null
-      if (!stored) throw new Error('Dati locali persi.')
+      if (!stored) throw new Error('Local game data lost.')
 
       const data = JSON.parse(stored)
       const client = getClient()
@@ -311,7 +311,7 @@ export const useGuessGame = () => {
       data.hasRevealed = true
       if (key) localStorage.setItem(key, JSON.stringify(data))
 
-      showAlert('Reveal effettuato!', 'success')
+      showAlert('Move revealed successfully!', 'success')
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -323,7 +323,7 @@ export const useGuessGame = () => {
   const claimWinnings = async (sessionId: number, entryFee: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connetti il wallet.')
+      if (!activeAddress) throw new Error('Connect your wallet.')
       const client = getClient()
 
       const result = await client.send.claimWinnings({
@@ -336,15 +336,15 @@ export const useGuessGame = () => {
       const wonAmount = Number(result.return) / 1e6 - entryFee
       saveClaimResult(sessionId, wonAmount)
 
-      if (wonAmount >= 0) showAlert(`Hai vinto ${wonAmount} ALGO!`, 'success')
-      else showAlert('Non hai vinto, ma hai recuperato lo storage.', 'info')
+      if (wonAmount >= 0) showAlert(`You won ${wonAmount} ALGO!`, 'success')
+      else showAlert('Storage fee reclaimed.', 'info')
 
       refreshData()
     } catch (e: any) {
       const errorMsg = e.message || JSON.stringify(e)
       if (errorMsg.includes('You did not win') || errorMsg.includes('logic eval error')) {
         saveClaimResult(sessionId, -entryFee)
-        showAlert('Peccato! Non hai vinto.', 'info')
+        showAlert('Better luck next time!', 'info')
         refreshData()
       } else {
         showAlert(e.message, 'error')

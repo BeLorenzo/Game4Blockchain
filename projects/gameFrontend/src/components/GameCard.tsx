@@ -13,7 +13,9 @@ export const GameCard: React.FC<GameCardProps> = ({ title, icon, description, ap
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className={`card bg-base-200 shadow-xl transition-all duration-300 border border-base-content/5 ${isOpen ? 'col-span-1 md:col-span-2' : ''}`}>
+    <div
+      className={`card bg-base-200 shadow-xl transition-all duration-300 border border-base-content/5 ${isOpen ? 'col-span-1 md:col-span-2' : ''}`}
+    >
       <div className="card-body p-5">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-4">
@@ -23,17 +25,12 @@ export const GameCard: React.FC<GameCardProps> = ({ title, icon, description, ap
               <div className="badge badge-ghost badge-xs font-mono opacity-50">AppID: {appId}</div>
             </div>
           </div>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`btn btn-sm ${isOpen ? 'btn-neutral' : 'btn-ghost'}`}
-          >
+          <button onClick={() => setIsOpen(!isOpen)} className={`btn btn-sm ${isOpen ? 'btn-neutral' : 'btn-ghost'}`}>
             {isOpen ? 'Chiudi Dashboard' : 'Apri Gioco'}
           </button>
         </div>
 
-        <p className="text-sm mt-3 opacity-80 border-l-2 border-primary pl-3 italic">
-          {description}
-        </p>
+        <p className="text-sm mt-3 opacity-80 border-l-2 border-primary pl-3 italic">{description}</p>
 
         {isOpen && (
           <div className="mt-6 animate-in fade-in slide-in-from-top-4 duration-500">

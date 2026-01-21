@@ -1,3 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Outfit:wght@400;500;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  /* Usiamo Outfit come font principale, più moderno e geometrico */
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at 50% 0%, #111827 0%, #050505 100%);
+  min-height: 100vh;
+  color: #E5E7EB;
+  /* Rendiamo il font leggermente più spesso di base per leggibilità */
+  font-weight: 500;
+}
+
+/* Stile per i numeri */
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbar stilizzata */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0E17;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F2937;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #40E0D0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
