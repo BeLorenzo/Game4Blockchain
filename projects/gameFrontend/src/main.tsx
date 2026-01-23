@@ -1,19 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { NetworkId, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import './index.css'
+import './styles/main.css'
+import { NetworkId, WalletManager, WalletProvider, WalletId } from '@txnlab/use-wallet-react'
+import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
-// Configurazione forzata con 'as any' per evitare blocchi TS inutili
+const algodConfig = getAlgodConfigFromViteEnvironment()
+
+// CONFIGURAZIONE "FORZATA" (Quella che funzionava a te)
 const walletManager = new WalletManager({
-  wallets: [WalletId.KMD, WalletId.DEFLY, WalletId.PERA, WalletId.KIBISIS, WalletId.EXODUS],
+  wallets: [
+    WalletId.DEFLY,
+    WalletId.PERA,
+    WalletId.KMD,
+  ],
   network: NetworkId.LOCALNET,
   algod: {
-    token: 'a'.repeat(64),
-    baseServer: 'http://localhost',
-    port: 4001,
+    token: algodConfig.token as string,
+    baseServer: algodConfig.server,
+    port: String(algodConfig.port),
   },
+  options: {
+    resetNetwork: true,
+  }
 } as any)
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

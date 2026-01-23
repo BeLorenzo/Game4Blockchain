@@ -1,63 +1,92 @@
-// src/components/Home.tsx
-import { useWallet } from '@txnlab/use-wallet-react'
-import React, { useState } from 'react'
-import ConnectWallet from './components/ConnectWallet'
-import Transact from './components/Transact'
+import { useState } from 'react'
+import { Navbar } from './components/Navbar'
+import { Hero } from './components/Hero'
+import { BlockchainStats } from './components/BlockchainStats'
+import { GameCard } from './components/GameCard'
+import { GuessGameDashboard } from './components/games/GuessGame/Dashboard'
+import { config } from './config'
+import { RPSDashboard } from './components/games/RPS/Dashboard'
 
-interface HomeProps {}
+export const Home = () => {
+  const { guessGame, rps, pirate } = config.games
 
-const Home: React.FC<HomeProps> = () => {
-  const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
-  const [openDemoModal, setOpenDemoModal] = useState<boolean>(false)
-  const { activeAddress } = useWallet()
+  // Gestisce quale gioco è aperto
+  const [expandedGameId, setExpandedGameId] = useState<string | null>(null)
 
-  const toggleWalletModal = () => {
-    setOpenWalletModal(!openWalletModal)
-  }
-
-  const toggleDemoModal = () => {
-    setOpenDemoModal(!openDemoModal)
+  const handleToggle = (id: string) => {
+    // Se clicco sullo stesso già aperto, chiudo (null). Altrimenti apro il nuovo.
+    setExpandedGameId(prev => prev === id ? null : id)
   }
 
   return (
-    <div className="hero min-h-screen bg-teal-400">
-      <div className="hero-content text-center rounded-lg p-6 max-w-md bg-white mx-auto">
-        <div className="max-w-md">
-          <h1 className="text-4xl">
-            Welcome to <div className="font-bold">AlgoKit 🙂</div>
-          </h1>
-          <p className="py-6">
-            This starter has been generated using official AlgoKit React template. Refer to the resource below for next steps.
-          </p>
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
 
-          <div className="grid">
-            <a
-              data-test-id="getting-started"
-              className="btn btn-primary m-2"
-              target="_blank"
-              href="https://github.com/algorandfoundation/algokit-cli"
+      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full space-y-12">
+        <Hero />
+        <BlockchainStats />
+
+        {/* GRIGLIA REATTIVA */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start transition-all duration-300">
+
+          {/* GUESS GAME */}
+          <div className={`${expandedGameId === 'guess' ? 'lg:col-span-2 order-1' : 'order-1'}`}>
+            <GameCard
+              id="guess"
+              title={guessGame.name}
+              icon={guessGame.icon}
+              description="Guess 2/3 of the average of all participants."
+              rules={['Choose a number (0-100).', 'Winner is closest to 2/3 of average.', 'Phases: Commit (Secret) -> Reveal.']}
+              isActive={guessGame.appId > 0n}
+              missingEnvText="VITE_GUESSGAME_APP_ID"
+              isOpen={expandedGameId === 'guess'}
+              onToggle={() => handleToggle('guess')}
             >
-              Getting started
-            </a>
-
-            <div className="divider" />
-            <button data-test-id="connect-wallet" className="btn m-2" onClick={toggleWalletModal}>
-              Wallet Connection
-            </button>
-
-            {activeAddress && (
-              <button data-test-id="transactions-demo" className="btn m-2" onClick={toggleDemoModal}>
-                Transactions Demo
-              </button>
-            )}
+              <GuessGameDashboard />
+            </GameCard>
           </div>
 
-          <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
-          <Transact openModal={openDemoModal} setModalState={setOpenDemoModal} />
-        </div>
+          {/* RPS */}
+      <div className={`${expandedGameId === 'rps' ? 'lg:col-span-2 order-2' : 'order-2'}`}>
+        <GameCard
+          id="rps"
+          title={rps.name}
+          icon={rps.icon}
+          description="Rock Paper Scissors on-chain."
+          rules={['Choose: Rock, Paper or Scissors.', 'Pay the wager to create a fight.', 'Winner takes all (Standard rules).']}
+          // ATTENZIONE: Assicurati che l'App ID sia > 0 nel config, o metti true per testare la grafica
+          isActive={rps.appId > 0n || true}
+          missingEnvText="VITE_RPS_APP_ID"
+          // Rimuoviamo il coming soon
+          isComingSoon={false}
+          isOpen={expandedGameId === 'rps'}
+          onToggle={() => handleToggle('rps')}
+        >
+          {/* Ecco il nostro nuovo componente! */}
+          <RPSDashboard />
+        </GameCard>
       </div>
+
+          {/* PIRATE (Coming Soon) */}
+          <div className={`${expandedGameId === 'pirate' ? 'lg:col-span-2 order-3' : 'order-3'}`}>
+            <GameCard
+              id="pirate"
+              title={pirate.name}
+              icon={pirate.icon}
+              description="Democratic treasure distribution."
+              rules={['Captain proposes split.', 'Crew votes.', 'Mutiny possible.']}
+              isActive={false}
+              isComingSoon={true}
+              isOpen={expandedGameId === 'pirate'}
+              onToggle={() => handleToggle('pirate')}
+            />
+          </div>
+        </div>
+      </main>
+
+      <footer className="footer footer-center p-8 border-t border-white/5 bg-black text-gray-600 text-xs font-mono">
+        <div><p>© 2026 Game4Blockchain • Powered by Algorand</p></div>
+      </footer>
     </div>
   )
 }
-
-export default Home

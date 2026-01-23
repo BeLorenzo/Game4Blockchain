@@ -2,37 +2,56 @@ import React from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
 
 export const KmdSwitcher = () => {
-  const { activeWallet, activeAddress, wallets } = useWallet()
+  const { wallets } = useWallet()
 
-  // Trova il wallet KMD tra quelli disponibili
-  const kmdWallet = wallets?.find(w => w.id === 'kmd')
+  // Trova il wallet KMD tra quelli attivi
+  const kmdWallet = wallets?.find((w) => w.id === 'kmd')
 
-  // Mostra solo se siamo connessi al provider KMD
-  if (!activeWallet || activeWallet.id !== 'kmd' || !kmdWallet) {
-    return null
+  // Se non c'è KMD (es. sei in Mainnet/Testnet o non hai avviato LocalNet), non mostrare nulla
+  if (!kmdWallet) return null
+
+  // Se non è connesso, mostriamo un bottone discreto per connetterlo
+  if (!kmdWallet.isConnected) {
+    return (
+      <button className="btn btn-xs btn-outline btn-warning font-mono" onClick={() => kmdWallet.connect()}>
+        🔌 CONNECT KMD
+      </button>
+    )
   }
 
   return (
-    <div className="flex flex-col items-end mr-2">
-      <span className="text-[10px] font-bold opacity-50 uppercase tracking-wider">
-        SIMULAZIONE LOCALE
-      </span>
-      <select
-        className="select select-bordered select-xs w-40 font-mono text-xs"
-        // FIX ERRORE TYPE: Se activeAddress è null, usiamo stringa vuota
-        value={activeAddress || ''}
-        onChange={(e) => {
-            if (e.target.value) {
-                kmdWallet.setActiveAccount(e.target.value)
-            }
-        }}
+    <div className="dropdown dropdown-end">
+      <div
+        tabIndex={0}
+        role="button"
+        className="btn btn-sm bg-black border border-warning/50 text-warning hover:bg-warning/10 font-mono text-[10px]"
       >
-        {kmdWallet.accounts.map((account, index) => (
-          <option key={account.address} value={account.address}>
-            Player {index + 1} ({account.address.slice(0, 3)}..{account.address.slice(-3)})
-          </option>
+        <span className="w-2 h-2 rounded-full bg-warning animate-pulse mr-1"></span>
+        DEV: KMD SWITCH
+      </div>
+      <ul
+        tabIndex={0}
+        className="dropdown-content z-[1] menu p-2 shadow-2xl bg-black border border-white/10 rounded-box w-64 mt-1 max-h-80 overflow-y-auto"
+      >
+        <li className="menu-title text-xs text-gray-500 uppercase font-bold text-center">Select Dev Account</li>
+        {kmdWallet.accounts.map((account) => (
+          <li key={account.address}>
+            <button
+              className={`text-[10px] font-mono py-2 ${
+                kmdWallet.activeAccount?.address === account.address
+                  ? 'active bg-warning text-black font-bold'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => kmdWallet.setActiveAccount(account.address)}
+            >
+              <div className="flex flex-col gap-0.5 text-left w-full overflow-hidden">
+                <span>{account.name || 'Account'}</span>
+                <span className="opacity-50 truncate">{account.address}</span>
+              </div>
+            </button>
+          </li>
         ))}
-      </select>
+      </ul>
     </div>
   )
 }

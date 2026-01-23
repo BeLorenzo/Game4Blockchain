@@ -1,5 +1,3 @@
-/* eslint-disable no-empty */
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useCallback } from 'react'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
@@ -10,14 +8,17 @@ import { config } from '../config'
 import { useAlert } from '../context/AlertContext'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 
+// Utility: SHA-256 for Commit/Reveal
 async function sha256(data: Uint8Array): Promise<Uint8Array> {
   const hashBuffer = await crypto.subtle.digest('SHA-256', data as unknown as ArrayBuffer)
   return new Uint8Array(hashBuffer)
 }
 
+export type GamePhase = 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
+
 export type GameSession = {
   id: number
-  phase: 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
+  phase: GamePhase
   fee: number
   playersCount: number
   totalPot: number
@@ -42,11 +43,9 @@ export const useGuessGame = () => {
 
   const [loading, setLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
-
   const [activeSessions, setActiveSessions] = useState<GameSession[]>([])
   const [historySessions, setHistorySessions] = useState<GameSession[]>([])
   const [mySessions, setMySessions] = useState<GameSession[]>([])
-
   const [mbrs, setMbrs] = useState({ create: 0, join: 0 })
 
   const appId = config.games.guessGame.appId
@@ -65,12 +64,9 @@ export const useGuessGame = () => {
     return new GuessGameClient({ algorand, appId })
   }, [transactionSigner, appId])
 
-  // Helper per notificare aggiornamenti stats
-  const notifyStorageUpdate = () => {
-    window.dispatchEvent(new Event('game-storage-update'))
-  }
+  const notifyStorageUpdate = () => window.dispatchEvent(new Event('game-storage-update'))
 
-  // --- FETCH DATA ---
+  // --- DATA FETCHING ---
   const refreshData = useCallback(async () => {
     if (!appId || appId === 0n) return
 
@@ -78,7 +74,7 @@ export const useGuessGame = () => {
       const client = getClient()
       const algorand = client.algorand
 
-      // 1. MBR
+      // 1. Calculate MBR only once
       if (mbrs.create === 0) {
         try {
           const composer = client.newGroup()
@@ -86,7 +82,6 @@ export const useGuessGame = () => {
           composer.getRequiredMbr({ args: { command: 'newGame' }, sender: simulatorSender })
           composer.getRequiredMbr({ args: { command: 'join' }, sender: simulatorSender })
           const result = await composer.simulate({ allowUnnamedResources: true })
-
           if (result.returns[0] !== undefined && result.returns[1] !== undefined) {
             setMbrs({
               create: Number(result.returns[0]) / 1e6,
@@ -94,11 +89,11 @@ export const useGuessGame = () => {
             })
           }
         } catch (e) {
-          console.warn('MBR warning', e)
+          console.warn('MBR simulation failed', e)
         }
       }
 
-      // 2. Fetch Massivo
+      // 2. Bulk Fetch from Box Storage
       const boxSessions = await client.state.box.gameSessions.getMap()
       const boxStats = await client.state.box.stats.getMap()
       const boxBalances = await client.state.box.sessionBalances.getMap()
@@ -117,23 +112,21 @@ export const useGuessGame = () => {
         const endCommit = Number(conf.endCommitAt)
         const endReveal = Number(conf.endRevealAt)
         const fee = Number(conf.participation) / 1e6
-
         const totalPot = balance ? Number(balance) / 1e6 : 0
-        let playersCount = 0
 
-        if (stats && Number(stats.count) > 0) {
-          playersCount = Number(stats.count)
-        } else if (fee > 0) {
-          playersCount = Math.floor(totalPot / fee)
-        }
+        let playersCount = 0
+        if (stats && Number(stats.count) > 0) playersCount = Number(stats.count)
+        else if (fee > 0) playersCount = Math.floor(totalPot / fee)
 
         const sum = stats ? Number(stats.sum) : 0
 
+        // Determine Phase
         let phase: GameSession['phase'] = 'ENDED'
         if (currentRound < start) phase = 'WAITING'
         else if (currentRound <= endCommit) phase = 'COMMIT'
         else if (currentRound <= endReveal) phase = 'REVEAL'
 
+        // Local Storage State
         const myKey = activeAddress ? `guess_${appId}_${activeAddress}_${id}` : null
         const localJson = myKey ? localStorage.getItem(myKey) : null
         let myGuess: number | null = null
@@ -147,26 +140,20 @@ export const useGuessGame = () => {
             hasRevealed = !!parsed.hasRevealed
             claimResult = parsed.claimResult || null
           } catch {
-            /* ignore */
+            /* parse error */
           }
         }
 
         const hasPlayed = !!localJson
 
-        // --- GESTIONE TIMEOUT SCONFITTA ---
+        // Handle Timeout Logic (Local Check)
         if (hasPlayed && !hasRevealed && !claimResult && currentRound > endReveal) {
-          claimResult = {
-            amount: -fee,
-            timestamp: Date.now(),
-            isTimeout: true,
-          }
+          claimResult = { amount: -fee, timestamp: Date.now(), isTimeout: true }
           if (myKey && localJson) {
-            try {
-              const updateData = JSON.parse(localJson)
-              updateData.claimResult = claimResult
-              localStorage.setItem(myKey, JSON.stringify(updateData))
-              notifyStorageUpdate() // Notifica Navbar
-            } catch {}
+            const updateData = JSON.parse(localJson)
+            updateData.claimResult = claimResult
+            localStorage.setItem(myKey, JSON.stringify(updateData))
+            notifyStorageUpdate()
           }
         }
 
@@ -218,6 +205,7 @@ export const useGuessGame = () => {
       const algorand = client.algorand
       const status = await algorand.client.algod.status().do()
       const currentRound = BigInt(status['lastRound'])
+
       const startAt = currentRound + BigInt(startDelay)
       const endCommitAt = startAt + BigInt(commitLen)
       const endRevealAt = endCommitAt + BigInt(revealLen)
@@ -254,6 +242,7 @@ export const useGuessGame = () => {
       const salt = new Uint8Array(16)
       crypto.getRandomValues(salt)
       const guessBytes = algosdk.encodeUint64(guess)
+
       const buffer = new Uint8Array(guessBytes.length + salt.length)
       buffer.set(guessBytes)
       buffer.set(salt, guessBytes.length)
@@ -334,7 +323,17 @@ export const useGuessGame = () => {
       })
 
       const wonAmount = Number(result.return) / 1e6 - entryFee
-      saveClaimResult(sessionId, wonAmount)
+      const key = getStorageKey(sessionId)
+
+      if (key) {
+        const stored = localStorage.getItem(key)
+        if (stored) {
+          const data = JSON.parse(stored)
+          data.claimResult = { amount: wonAmount, timestamp: Date.now() }
+          localStorage.setItem(key, JSON.stringify(data))
+          notifyStorageUpdate()
+        }
+      }
 
       if (wonAmount >= 0) showAlert(`You won ${wonAmount} ALGO!`, 'success')
       else showAlert('Storage fee reclaimed.', 'info')
@@ -343,7 +342,17 @@ export const useGuessGame = () => {
     } catch (e: any) {
       const errorMsg = e.message || JSON.stringify(e)
       if (errorMsg.includes('You did not win') || errorMsg.includes('logic eval error')) {
-        saveClaimResult(sessionId, -entryFee)
+        // Handle logic error as a "Loss" update locally
+        const key = getStorageKey(sessionId)
+        if (key) {
+          const stored = localStorage.getItem(key)
+          if (stored) {
+            const data = JSON.parse(stored)
+            data.claimResult = { amount: -entryFee, timestamp: Date.now() }
+            localStorage.setItem(key, JSON.stringify(data))
+            notifyStorageUpdate()
+          }
+        }
         showAlert('Better luck next time!', 'info')
         refreshData()
       } else {
@@ -351,19 +360,6 @@ export const useGuessGame = () => {
       }
     } finally {
       setLoading(false)
-    }
-  }
-
-  const saveClaimResult = (sessionId: number, amount: number) => {
-    const key = getStorageKey(sessionId)
-    if (key) {
-      const stored = localStorage.getItem(key)
-      if (stored) {
-        const data = JSON.parse(stored)
-        data.claimResult = { amount: amount, timestamp: Date.now() }
-        localStorage.setItem(key, JSON.stringify(data))
-        notifyStorageUpdate() // NOTIFICA LA NAVBAR
-      }
     }
   }
 
