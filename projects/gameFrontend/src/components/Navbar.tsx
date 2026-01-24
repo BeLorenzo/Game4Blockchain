@@ -5,7 +5,7 @@ import { usePlayerStats } from '../hooks/usePlayerStats'
 
 export const Navbar = () => {
   const { activeAddress } = useWallet()
-  const { totalProfit } = usePlayerStats(activeAddress)
+  const { totalProfit } = usePlayerStats(activeAddress || undefined)
 
   return (
     <div className="navbar bg-black/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-50 px-4 md:px-8">

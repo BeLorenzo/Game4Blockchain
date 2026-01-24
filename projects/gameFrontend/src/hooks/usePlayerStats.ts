@@ -1,54 +1,59 @@
-/* eslint-disable no-console */
-import { useState, useEffect } from 'react'
-import { config } from '../config'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect, useCallback } from 'react'
 
-export const usePlayerStats = (activeAddress: string | null) => {
+/**
+ * Game Registry - Quando aggiungi un nuovo gioco, aggiungilo qui
+ */
+export const GAME_PREFIXES = ['guess_', 'rps_', 'weekly_'] as const
+
+/**
+ * Hook per calcolare il profitto totale del player
+ * Scansiona il localStorage e somma tutti i claim results
+ */
+export const usePlayerStats = (address: string | undefined) => {
   const [totalProfit, setTotalProfit] = useState(0)
 
-  const calculateStats = () => {
-    if (!activeAddress) {
+  const calculateStats = useCallback(() => {
+    if (!address) {
       setTotalProfit(0)
       return
     }
 
-    let sum = 0
-    const prefix = `guess_${config.games.guessGame.appId}_${activeAddress}_`
+    let profit = 0
 
-    // Itera su tutte le chiavi del local storage
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
-      if (key && key.startsWith(prefix)) {
-        try {
-          const item = localStorage.getItem(key)
-          if (item) {
-            const data = JSON.parse(item)
-            if (data.claimResult && typeof data.claimResult.amount === 'number') {
-              sum += data.claimResult.amount
-            }
-          }
-        } catch (e) {
-          console.warn('Error parsing game data', e)
+      if (!key) continue
+
+      // Verifica che sia una chiave di gioco dell'address connesso
+      const isGameKey = GAME_PREFIXES.some(prefix => key.startsWith(prefix))
+      if (!isGameKey || !key.includes(address)) continue
+
+      try {
+        const data = JSON.parse(localStorage.getItem(key) || '{}')
+        if (data.claimResult?.amount !== undefined) {
+          profit += data.claimResult.amount
         }
+      } catch (e) {
+        console.warn('Error parsing game data:', key, e)
       }
     }
-    setTotalProfit(sum)
-  }
+
+    setTotalProfit(profit)
+  }, [address])
 
   useEffect(() => {
     calculateStats()
 
-    // Ascolta evento custom (lanciato da useGuessGame)
     const handleUpdate = () => calculateStats()
     window.addEventListener('game-storage-update', handleUpdate)
-
-    // Ascolta anche storage events (se cambiano da altri tab)
     window.addEventListener('storage', handleUpdate)
 
     return () => {
       window.removeEventListener('game-storage-update', handleUpdate)
       window.removeEventListener('storage', handleUpdate)
     }
-  }, [activeAddress])
+  }, [calculateStats])
 
   return { totalProfit }
 }

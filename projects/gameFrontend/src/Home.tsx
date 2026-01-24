@@ -4,88 +4,118 @@ import { Hero } from './components/Hero'
 import { BlockchainStats } from './components/BlockchainStats'
 import { GameCard } from './components/GameCard'
 import { GuessGameDashboard } from './components/games/GuessGame/Dashboard'
-import { config } from './config'
 import { RPSDashboard } from './components/games/RPS/Dashboard'
+import { WeeklyGameDashboard } from './components/games/WeeklyGame/Dashboard'
+import { StagHuntDashboard } from './components/games/StagHunt/Dashboard'
+import { config } from './config'
+
+/**
+ * 🎮 GAME REGISTRY
+ *
+ * Per aggiungere un nuovo gioco:
+ * 1. Import il Dashboard component
+ * 2. Aggiungi entry in questo array
+ * 3. Done! Zero modifiche al resto del codice 🎉
+ */
+const GAMES = [
+  {
+    id: 'guess',
+    config: config.games.guessGame,
+    component: GuessGameDashboard,
+    description: 'Guess 2/3 of the average.',
+    rules: [
+      'Choose a number (0-100).',
+      'Winner is closest to 2/3 of average.',
+      'Standard phases.',
+    ],
+    envVarName: 'VITE_GUESSGAME_APP_ID',
+  },
+  {
+    id: 'rps',
+    config: config.games.rps,
+    component: RPSDashboard,
+    description: 'Rock Paper Scissors Arena.',
+    rules: [
+      'Create a table or join one.',
+      'Rock > Scissors > Paper.',
+      'Winner takes the pot.',
+    ],
+    envVarName: 'VITE_RPS_APP_ID',
+  },
+  {
+    id: 'weekly',
+    config: config.games.weeklyGame,
+    component: WeeklyGameDashboard,
+    description: 'Decentralized Weekly Lottery.',
+    rules: [
+      'Buy a ticket to enter the pool.',
+      'Winner selected randomly on-chain.',
+      'Pot rolls over if no winner.',
+    ],
+    envVarName: 'VITE_WEEKLYGAME_APP_ID',
+  },
+  {
+    id: 'staghunt',
+    config: config.games.stagHunt,
+    component: StagHuntDashboard,
+    description: 'Coordination game - Hare or Stag?',
+    rules: [
+      'Choose Hare (safe refund) or Stag (risky).',
+      'Stags win big if threshold is met.',
+      'Failed rounds feed Global Jackpot.',
+    ],
+    envVarName: 'VITE_STAGHUNT_APP_ID',
+  },
+]
 
 export const Home = () => {
-  const { guessGame, rps, pirate } = config.games
-
-  // Gestisce quale gioco è aperto
   const [expandedGameId, setExpandedGameId] = useState<string | null>(null)
 
   const handleToggle = (id: string) => {
-    // Se clicco sullo stesso già aperto, chiudo (null). Altrimenti apro il nuovo.
-    setExpandedGameId(prev => prev === id ? null : id)
+    setExpandedGameId((prev) => (prev === id ? null : id))
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full space-y-12">
         <Hero />
         <BlockchainStats />
 
-        {/* GRIGLIA REATTIVA */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start transition-all duration-300">
+          {GAMES.map((game, index) => {
+            const GameComponent = game.component
+            const isExpanded = expandedGameId === game.id
 
-          {/* GUESS GAME */}
-          <div className={`${expandedGameId === 'guess' ? 'lg:col-span-2 order-1' : 'order-1'}`}>
-            <GameCard
-              id="guess"
-              title={guessGame.name}
-              icon={guessGame.icon}
-              description="Guess 2/3 of the average of all participants."
-              rules={['Choose a number (0-100).', 'Winner is closest to 2/3 of average.', 'Phases: Commit (Secret) -> Reveal.']}
-              isActive={guessGame.appId > 0n}
-              missingEnvText="VITE_GUESSGAME_APP_ID"
-              isOpen={expandedGameId === 'guess'}
-              onToggle={() => handleToggle('guess')}
-            >
-              <GuessGameDashboard />
-            </GameCard>
-          </div>
-
-          {/* RPS */}
-      <div className={`${expandedGameId === 'rps' ? 'lg:col-span-2 order-2' : 'order-2'}`}>
-        <GameCard
-          id="rps"
-          title={rps.name}
-          icon={rps.icon}
-          description="Rock Paper Scissors on-chain."
-          rules={['Choose: Rock, Paper or Scissors.', 'Pay the wager to create a fight.', 'Winner takes all (Standard rules).']}
-          // ATTENZIONE: Assicurati che l'App ID sia > 0 nel config, o metti true per testare la grafica
-          isActive={rps.appId > 0n || true}
-          missingEnvText="VITE_RPS_APP_ID"
-          // Rimuoviamo il coming soon
-          isComingSoon={false}
-          isOpen={expandedGameId === 'rps'}
-          onToggle={() => handleToggle('rps')}
-        >
-          {/* Ecco il nostro nuovo componente! */}
-          <RPSDashboard />
-        </GameCard>
-      </div>
-
-          {/* PIRATE (Coming Soon) */}
-          <div className={`${expandedGameId === 'pirate' ? 'lg:col-span-2 order-3' : 'order-3'}`}>
-            <GameCard
-              id="pirate"
-              title={pirate.name}
-              icon={pirate.icon}
-              description="Democratic treasure distribution."
-              rules={['Captain proposes split.', 'Crew votes.', 'Mutiny possible.']}
-              isActive={false}
-              isComingSoon={true}
-              isOpen={expandedGameId === 'pirate'}
-              onToggle={() => handleToggle('pirate')}
-            />
-          </div>
+            return (
+              <div
+                key={game.id}
+                className={`${isExpanded ? 'lg:col-span-2' : ''}`}
+                style={{ order: index + 1 }}
+              >
+                <GameCard
+                  id={game.id}
+                  title={game.config.name}
+                  icon={game.config.icon}
+                  appId={game.config.appId}
+                  description={game.description}
+                  rules={game.rules}
+                  isActive={game.config.appId > 0n}
+                  missingEnvText={game.envVarName}
+                  isOpen={isExpanded}
+                  onToggle={() => handleToggle(game.id)}
+                >
+                  <GameComponent />
+                </GameCard>
+              </div>
+            )
+          })}
         </div>
       </main>
-
       <footer className="footer footer-center p-8 border-t border-white/5 bg-black text-gray-600 text-xs font-mono">
-        <div><p>© 2026 Game4Blockchain • Powered by Algorand</p></div>
+        <div>
+          <p>© 2026 Game4Blockchain • Powered by Algorand</p>
+        </div>
       </footer>
     </div>
   )

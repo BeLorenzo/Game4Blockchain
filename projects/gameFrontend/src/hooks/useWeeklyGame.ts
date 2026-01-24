@@ -3,60 +3,53 @@ import { useState, useEffect, useCallback } from 'react'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
-import { GuessGameClient } from '../contracts/GuessGame'
+import { WeeklyGameClient } from '../contracts/WeeklyGame'
 import { config } from '../config'
 import { useAlert } from '../context/AlertContext'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { createCommit, getPhase, handleTimeout, notifyUpdate } from './gameUtils'
 
-export type GamePhase = 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
+export type WeeklyPhase = 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
 
-export type GameSession = {
+export type WeeklySession = {
   id: number
-  phase: GamePhase
+  phase: WeeklyPhase
   fee: number
   playersCount: number
   totalPot: number
+  canJoin: boolean
   canReveal: boolean
   canClaim: boolean
   hasPlayed: boolean
   hasRevealed: boolean
-  claimResult?: { amount: number; timestamp: number; isTimeout?: boolean } | null
-  myGuess?: number | null
-  gameStats: {
-    sum: number
-    count: number
-    average: number
-    target: number
-  }
+  myDay?: number | null
+  claimResult?: { amount: number; timestamp: number; isTimeout?: boolean } | null // ✅ AGGIUNTO isTimeout
+  dayCounts: number[]
   rounds: { start: number; endCommit: number; endReveal: number; current: number }
 }
 
-export const useGuessGame = () => {
+export const useWeeklyGame = () => {
   const { activeAddress, transactionSigner } = useWallet()
   const { showAlert } = useAlert()
 
   const [loading, setLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
-  const [activeSessions, setActiveSessions] = useState<GameSession[]>([])
-  const [historySessions, setHistorySessions] = useState<GameSession[]>([])
-  const [mySessions, setMySessions] = useState<GameSession[]>([])
+  const [activeSessions, setActiveSessions] = useState<WeeklySession[]>([])
+  const [historySessions, setHistorySessions] = useState<WeeklySession[]>([])
+  const [mySessions, setMySessions] = useState<WeeklySession[]>([])
   const [mbrs, setMbrs] = useState({ create: 0, join: 0 })
 
-  const appId = config.games.guessGame.appId
+  const appId = config.games.weeklyGame.appId
 
   const getStorageKey = useCallback(
-    (sessionId: number) => {
-      if (!activeAddress) return null
-      return `guess_${appId}_${activeAddress}_${sessionId}`
-    },
+    (sessionId: number) => activeAddress ? `weekly_${appId}_${activeAddress}_${sessionId}` : null,
     [activeAddress, appId],
   )
 
   const getClient = useCallback(() => {
     const algorand = AlgorandClient.fromConfig({ algodConfig: config.algodConfig })
     algorand.setDefaultSigner(transactionSigner)
-    return new GuessGameClient({ algorand, appId })
+    return new WeeklyGameClient({ algorand, appId })
   }, [transactionSigner, appId])
 
   // --- DATA FETCHING ---
@@ -67,7 +60,6 @@ export const useGuessGame = () => {
       const client = getClient()
       const algorand = client.algorand
 
-      // 1. Calculate MBR only once
       if (mbrs.create === 0) {
         try {
           const composer = client.newGroup()
@@ -82,24 +74,28 @@ export const useGuessGame = () => {
             })
           }
         } catch (e) {
-          console.warn('MBR simulation failed', e)
+          console.warn('Weekly MBR sim failed', e)
         }
       }
 
-      // 2. Bulk Fetch from Box Storage
       const boxSessions = await client.state.box.gameSessions.getMap()
-      const boxStats = await client.state.box.stats.getMap()
       const boxBalances = await client.state.box.sessionBalances.getMap()
+      const boxDays = await client.state.box.days.getMap()
 
       const status = await algorand.client.algod.status().do()
       const currentRound = Number(status['lastRound'])
 
-      const allSessions: GameSession[] = []
+      const allSessions: WeeklySession[] = []
 
       for (const [key, conf] of boxSessions.entries()) {
         const id = Number(key)
-        const stats = boxStats.get(key)
         const balance = boxBalances.get(key)
+        const dayObj = boxDays.get(key)
+
+        const dayCounts = dayObj ? [
+          Number(dayObj.lun), Number(dayObj.mar), Number(dayObj.mer), Number(dayObj.gio),
+          Number(dayObj.ven), Number(dayObj.sab), Number(dayObj.dom)
+        ] : [0, 0, 0, 0, 0, 0, 0]
 
         const start = Number(conf.startAt)
         const endCommit = Number(conf.endCommitAt)
@@ -107,36 +103,33 @@ export const useGuessGame = () => {
         const fee = Number(conf.participation) / 1e6
         const totalPot = balance ? Number(balance) / 1e6 : 0
 
-        let playersCount = 0
-        if (stats && Number(stats.count) > 0) playersCount = Number(stats.count)
-        else if (fee > 0) playersCount = Math.floor(totalPot / fee)
-
-        const sum = stats ? Number(stats.sum) : 0
+        const revealedCount = dayCounts.reduce((a, b) => a + b, 0)
+        let playersCount = revealedCount
+        if (currentRound <= endCommit && fee > 0) {
+          playersCount = Math.floor(totalPot / fee)
+        }
 
         // Usa utility per calcolare fase
         const phase = getPhase(currentRound, start, endCommit, endReveal)
 
-        // Local Storage State
         const myKey = getStorageKey(id)
         const localJson = myKey ? localStorage.getItem(myKey) : null
-        let myGuess: number | null = null
+        let myDay: number | null = null
         let hasRevealed = false
         let claimResult = null
 
         if (localJson) {
           try {
             const parsed = JSON.parse(localJson)
-            myGuess = Number(parsed.guess)
+            myDay = parsed.day
             hasRevealed = !!parsed.hasRevealed
             claimResult = parsed.claimResult || null
-          } catch {
-            /* parse error */
-          }
+          } catch {}
         }
 
         const hasPlayed = !!localJson
 
-        // Gestione timeout usando utility
+        // ✅ AGGIUNTO: Gestione timeout usando utility
         claimResult = handleTimeout(
           myKey,
           fee,
@@ -147,30 +140,15 @@ export const useGuessGame = () => {
           endReveal
         )
 
+        const canJoin = phase === 'COMMIT' && !hasPlayed && !!activeAddress
         const canReveal = phase === 'REVEAL' && hasPlayed && !hasRevealed
         const canClaim = (phase === 'ENDED' || currentRound > endReveal) && hasRevealed && !claimResult
 
-        let average = 0
-        let target = 0
-        if (playersCount > 0 && phase !== 'COMMIT' && phase !== 'WAITING') {
-          average = sum / playersCount
-          target = (average * 2) / 3
-        }
-
         allSessions.push({
-          id,
-          phase,
-          fee,
-          playersCount,
-          totalPot,
-          canReveal,
-          canClaim,
-          hasPlayed,
-          hasRevealed,
-          claimResult,
-          myGuess,
-          gameStats: { sum, count: playersCount, average, target },
-          rounds: { start, endCommit, endReveal, current: currentRound },
+          id, phase, fee, playersCount, totalPot,
+          canJoin, canReveal, canClaim, hasPlayed, hasRevealed, myDay, claimResult,
+          dayCounts,
+          rounds: { start, endCommit, endReveal, current: currentRound }
         })
       }
 
@@ -178,8 +156,9 @@ export const useGuessGame = () => {
       setActiveSessions(sorted.filter((s) => s.phase !== 'ENDED'))
       setHistorySessions(sorted.filter((s) => s.phase === 'ENDED'))
       setMySessions(sorted.filter((s) => s.hasPlayed))
+
     } catch (e: any) {
-      console.error('Fetch error:', e)
+      console.error('Weekly Fetch error:', e)
     } finally {
       setIsInitializing(false)
     }
@@ -190,32 +169,30 @@ export const useGuessGame = () => {
   const createSession = async (fee: number, startDelay: number, commitLen: number, revealLen: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connect your wallet.')
+      if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
       const algorand = client.algorand
       const status = await algorand.client.algod.status().do()
       const currentRound = BigInt(status['lastRound'])
-
       const startAt = currentRound + BigInt(startDelay)
       const endCommitAt = startAt + BigInt(commitLen)
       const endRevealAt = endCommitAt + BigInt(revealLen)
-      const participationFee = algosdk.algosToMicroalgos(fee)
-
       const payment = await algorand.createTransaction.payment({
         sender: activeAddress,
         receiver: client.appAddress,
-        amount: AlgoAmount.MicroAlgo(algosdk.algosToMicroalgos(mbrs.create)),
+        amount: AlgoAmount.Algos(mbrs.create)
       })
 
       await client.send.createSession({
         args: {
-          config: { startAt, endCommitAt, endRevealAt, participation: BigInt(participationFee) },
-          mbrPayment: { txn: payment, signer: transactionSigner },
+          config: { startAt, endCommitAt, endRevealAt, participation: BigInt(AlgoAmount.Algos(fee).microAlgos) },
+          mbrPayment: { txn: payment, signer: transactionSigner }
         },
         sender: activeAddress,
+        populateAppCallResources: true
       })
 
-      showAlert('Game session created successfully!', 'success')
+      showAlert('Weekly Session Created', 'success')
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -224,36 +201,41 @@ export const useGuessGame = () => {
     }
   }
 
-  const joinSession = async (sessionId: number, guess: number, participationFee: number) => {
+  const joinSession = async (sessionId: number, fee: number, day: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connect your wallet.')
+      // Validazione input
+      if (day === undefined || day === null || isNaN(day)) {
+        throw new Error('Please select a valid day.')
+      }
+      if (day < 0 || day > 6) {
+        throw new Error('Invalid Day: Must be between 0 (MON) and 6 (SUN).')
+      }
+
+      if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
+      const algorand = client.algorand
 
       // Usa utility per commit
-      const { commitHash, salt } = await createCommit(guess, 16)
-      const feeMicro = Math.round(participationFee * 1e6)
+      const { commitHash, salt } = await createCommit(day, 32)
 
-      const payment = await client.algorand.createTransaction.payment({
+      const feePayment = await algorand.createTransaction.payment({
         sender: activeAddress,
         receiver: client.appAddress,
-        amount: AlgoAmount.MicroAlgo(feeMicro),
+        amount: AlgoAmount.Algos(fee)
       })
 
       await client.send.joinSession({
-        args: {
-          sessionId: BigInt(sessionId),
-          commit: commitHash,
-          payment: { txn: payment, signer: transactionSigner },
-        },
+        args: { sessionId: BigInt(sessionId), commit: commitHash, payment: { txn: feePayment, signer: transactionSigner } },
         sender: activeAddress,
+        populateAppCallResources: true
       })
 
-      const secretData = { guess, salt: Array.from(salt), hasRevealed: false }
       const key = getStorageKey(sessionId)
-      if (key) localStorage.setItem(key, JSON.stringify(secretData))
+      if (key) localStorage.setItem(key, JSON.stringify({ day, salt: Array.from(salt), hasRevealed: false }))
 
-      showAlert('Guess committed successfully!', 'success')
+      notifyUpdate()
+      showAlert('Ticket Bought!', 'success')
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -265,27 +247,23 @@ export const useGuessGame = () => {
   const revealMove = async (sessionId: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connect your wallet.')
+      if (!activeAddress) throw new Error('Connect wallet')
       const key = getStorageKey(sessionId)
       const stored = key ? localStorage.getItem(key) : null
-      if (!stored) throw new Error('Local game data lost.')
-
-      const data = JSON.parse(stored)
+      if (!stored) throw new Error('No local data')
+      const { day, salt } = JSON.parse(stored)
       const client = getClient()
 
       await client.send.revealMove({
-        args: {
-          sessionId: BigInt(sessionId),
-          choice: BigInt(data.guess),
-          salt: new Uint8Array(data.salt),
-        },
+        args: { sessionId: BigInt(sessionId), choice: BigInt(day), salt: new Uint8Array(salt) },
         sender: activeAddress,
+        populateAppCallResources: true
       })
 
-      data.hasRevealed = true
-      if (key) localStorage.setItem(key, JSON.stringify(data))
-
-      showAlert('Move revealed successfully!', 'success')
+      const update = JSON.parse(stored)
+      update.hasRevealed = true
+      localStorage.setItem(key!, JSON.stringify(update))
+      showAlert('Day Revealed!', 'success')
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -294,54 +272,35 @@ export const useGuessGame = () => {
     }
   }
 
-  const claimWinnings = async (sessionId: number, entryFee: number) => {
+  const claimWinnings = async (sessionId: number, fee: number) => {
     setLoading(true)
     try {
-      if (!activeAddress) throw new Error('Connect your wallet.')
+      if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
 
       const result = await client.send.claimWinnings({
         args: { sessionId: BigInt(sessionId) },
         sender: activeAddress,
-        coverAppCallInnerTransactionFees: true,
-        maxFee: AlgoAmount.MicroAlgo(6000),
+        populateAppCallResources: true
       })
 
-      const wonAmount = Number(result.return) / 1e6 - entryFee
-      const key = getStorageKey(sessionId)
+      const grossPayout = Number(result.return) / 1e6
+      const netProfit = grossPayout - fee
 
+      const key = getStorageKey(sessionId)
       if (key) {
-        const stored = localStorage.getItem(key)
-        if (stored) {
-          const data = JSON.parse(stored)
-          data.claimResult = { amount: wonAmount, timestamp: Date.now() }
-          localStorage.setItem(key, JSON.stringify(data))
-          notifyUpdate()
-        }
+        const stored = JSON.parse(localStorage.getItem(key) || '{}')
+        stored.claimResult = { amount: netProfit, timestamp: Date.now() }
+        localStorage.setItem(key, JSON.stringify(stored))
+        notifyUpdate()
       }
 
-      if (wonAmount >= 0) showAlert(`You won ${wonAmount} ALGO!`, 'success')
-      else showAlert('Storage fee reclaimed.', 'info')
+      if (grossPayout > 0) showAlert(`You Won ${grossPayout} A (Net: ${netProfit})!`, 'success')
+      else showAlert('No winnings.', 'info')
 
       refreshData()
     } catch (e: any) {
-      const errorMsg = e.message || JSON.stringify(e)
-      if (errorMsg.includes('You did not win') || errorMsg.includes('logic eval error')) {
-        const key = getStorageKey(sessionId)
-        if (key) {
-          const stored = localStorage.getItem(key)
-          if (stored) {
-            const data = JSON.parse(stored)
-            data.claimResult = { amount: -entryFee, timestamp: Date.now() }
-            localStorage.setItem(key, JSON.stringify(data))
-            notifyUpdate()
-          }
-        }
-        showAlert('Better luck next time!', 'error')
-        refreshData()
-      } else {
-        showAlert(e.message, 'error')
-      }
+      showAlert(e.message, 'error')
     } finally {
       setLoading(false)
     }
@@ -349,8 +308,8 @@ export const useGuessGame = () => {
 
   useEffect(() => {
     refreshData()
-    const interval = setInterval(refreshData, 5000)
-    return () => clearInterval(interval)
+    const i = setInterval(refreshData, 5000)
+    return () => clearInterval(i)
   }, [refreshData, activeAddress])
 
   return {
@@ -363,6 +322,6 @@ export const useGuessGame = () => {
     createSession,
     joinSession,
     revealMove,
-    claimWinnings,
+    claimWinnings
   }
 }

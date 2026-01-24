@@ -7,12 +7,7 @@ import { RockPaperScissorsClient } from '../contracts/RockPaperScissors'
 import { config } from '../config'
 import { useAlert } from '../context/AlertContext'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
-
-// Utility: SHA-256 for Commit/Reveal
-async function sha256(data: Uint8Array): Promise<Uint8Array> {
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data as unknown as ArrayBuffer)
-  return new Uint8Array(hashBuffer)
-}
+import { createCommit, getPhase, handleTimeout, notifyUpdate } from './gameUtils'
 
 export type RPSPhase = 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
 
@@ -21,6 +16,7 @@ export type RPSSession = {
   phase: RPSPhase
   fee: number
   totalPot: number
+  playersCount: number
   player1: string
   player2: string
   canJoin: boolean
@@ -28,7 +24,8 @@ export type RPSSession = {
   canClaim: boolean
   hasPlayed: boolean
   hasRevealed: boolean
-  myMove?: number | null // 0=Rock, 1=Paper, 2=Scissors
+  myMove?: number | null
+  claimResult?: { amount: number; timestamp: number; isTimeout?: boolean } | null
   rounds: { start: number; endCommit: number; endReveal: number; current: number }
 }
 
@@ -37,19 +34,16 @@ export const useRPS = () => {
   const { showAlert } = useAlert()
 
   const [loading, setLoading] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
   const [activeSessions, setActiveSessions] = useState<RPSSession[]>([])
   const [historySessions, setHistorySessions] = useState<RPSSession[]>([])
-  // Costi MBR (Minimum Balance Requirement) calcolati dinamicamente
+  const [mySessions, setMySessions] = useState<RPSSession[]>([])
   const [mbrs, setMbrs] = useState({ create: 0, join: 0 })
 
   const appId = config.games.rps.appId
 
-  // Genera chiave univoca per salvare il segreto nel LocalStorage
   const getStorageKey = useCallback(
-    (sessionId: number) => {
-      if (!activeAddress) return null
-      return `rps_${appId}_${activeAddress}_${sessionId}`
-    },
+    (sessionId: number) => activeAddress ? `rps_${appId}_${activeAddress}_${sessionId}` : null,
     [activeAddress, appId],
   )
 
@@ -59,7 +53,7 @@ export const useRPS = () => {
     return new RockPaperScissorsClient({ algorand, appId })
   }, [transactionSigner, appId])
 
-  // --- 1. DATA FETCHING & MBR SIMULATION ---
+  // --- DATA FETCHING ---
   const refreshData = useCallback(async () => {
     if (!appId || appId === 0n) return
 
@@ -67,45 +61,35 @@ export const useRPS = () => {
       const client = getClient()
       const algorand = client.algorand
 
-      // A. Simula i costi MBR (solo se non li abbiamo già)
+      // 1. MBR Calculation
       if (mbrs.create === 0) {
         try {
           const composer = client.newGroup()
           const simulatorSender = activeAddress ?? client.appAddress
-
           composer.getRequiredMbr({ args: { command: 'newGame' }, sender: simulatorSender })
           composer.getRequiredMbr({ args: { command: 'join' }, sender: simulatorSender })
-
           const result = await composer.simulate({ allowUnnamedResources: true })
-
           if (result.returns[0] !== undefined && result.returns[1] !== undefined) {
-            setMbrs({
-              create: Number(result.returns[0]) / 1e6,
-              join: Number(result.returns[1]) / 1e6,
-            })
+            setMbrs({ create: Number(result.returns[0]) / 1e6, join: Number(result.returns[1]) / 1e6 })
           }
         } catch (e) {
-          console.warn('RPS MBR simulation failed (wallet might be disconnected)', e)
+          console.warn('RPS MBR sim failed', e)
         }
       }
 
-      // B. Scarica tutto lo stato dai Box
-      const boxSessions = await client.state.box.gameSessions.getMap()
-      const boxPlayers = await client.state.box.sessionPlayers.getMap()
-      const boxBalances = await client.state.box.sessionBalances.getMap()
-      const boxFinished = await client.state.box.gameFinished.getMap()
-
+      // 2. Bulk Fetch
+      const boxSessionsMap = await client.state.box.gameSessions.getMap()
+      const boxPlayersMap = await client.state.box.sessionPlayers.getMap()
+      const boxBalancesMap = await client.state.box.sessionBalances.getMap()
       const status = await algorand.client.algod.status().do()
       const currentRound = Number(status['lastRound'])
 
       const allSessions: RPSSession[] = []
 
-      // C. Costruisci la lista delle sessioni
-      for (const [key, conf] of boxSessions.entries()) {
+      for (const [key, conf] of boxSessionsMap.entries()) {
         const id = Number(key)
-        const players = boxPlayers.get(key)
-        const balance = boxBalances.get(key)
-        const isFinished = boxFinished.get(key) === 1n
+        const players = boxPlayersMap.get(key)
+        const balance = boxBalancesMap.get(key)
 
         const start = Number(conf.startAt)
         const endCommit = Number(conf.endCommitAt)
@@ -113,62 +97,59 @@ export const useRPS = () => {
         const fee = Number(conf.participation) / 1e6
         const totalPot = balance ? Number(balance) / 1e6 : 0
 
-        // Decodifica indirizzi giocatori
         const p1 = players?.p1 ? algosdk.encodeAddress(algosdk.decodeAddress(players.p1).publicKey) : ''
         const p2 = players?.p2 ? algosdk.encodeAddress(algosdk.decodeAddress(players.p2).publicKey) : ''
 
-        // Zero Address Check (Indica slot libero)
-        const zeroAddr = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ'
-        const isP1Empty = p1 === zeroAddr
-        const isP2Empty = p2 === zeroAddr
+        const isP1Empty = p1 === 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ'
+        const isP2Empty = p2 === 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ'
 
-        // Determina Fase
-        let phase: RPSPhase = 'ENDED'
-        if (isFinished) phase = 'ENDED'
-        else if (currentRound < start) phase = 'WAITING'
-        else if (currentRound <= endCommit) phase = 'COMMIT'
-        else if (currentRound <= endReveal) phase = 'REVEAL'
-        else phase = 'ENDED' // Timeout
+        let playersCount = 0
+        if (!isP1Empty) playersCount++
+        if (!isP2Empty) playersCount++
 
-        // Recupera stato locale (Mossa segreta)
+        // Usa utility per calcolare fase
+        const phase = getPhase(currentRound, start, endCommit, endReveal)
+
+        // Local Storage
         const myKey = getStorageKey(id)
         const localJson = myKey ? localStorage.getItem(myKey) : null
         let myMove: number | null = null
         let hasRevealed = false
+        let claimResult = null
 
         if (localJson) {
-          const parsed = JSON.parse(localJson)
-          myMove = parsed.move
-          hasRevealed = !!parsed.hasRevealed
+          try {
+            const parsed = JSON.parse(localJson)
+            myMove = parsed.move
+            hasRevealed = !!parsed.hasRevealed
+            claimResult = parsed.claimResult || null
+          } catch {}
         }
 
         const isPlayer1 = activeAddress === p1
         const isPlayer2 = activeAddress === p2
         const hasPlayed = isPlayer1 || isPlayer2
 
-        // LOGICA PER I BOTTONI
-        // Puoi unirti se siamo in fase COMMIT, c'è uno slot libero, e non sei già dentro
-        const canJoin = phase === 'COMMIT' && (isP1Empty || isP2Empty) && !hasPlayed && activeAddress !== undefined
-
-        // Puoi rivelare se sei un giocatore, siamo in REVEAL, e non hai ancora fatto
-        const canReveal = phase === 'REVEAL' && hasPlayed && !hasRevealed
-
-        // Puoi reclamare (timeout) se il tempo è scaduto e la partita non è finita ufficialmente
-        const canClaim = currentRound > endReveal && !isFinished && hasPlayed
-
-        allSessions.push({
-          id,
-          phase,
+        // ✅ AGGIUNTO: Gestione timeout usando utility
+        claimResult = handleTimeout(
+          myKey,
           fee,
-          totalPot,
-          player1: isP1Empty ? 'Waiting...' : p1,
-          player2: isP2Empty ? 'Waiting...' : p2,
-          canJoin,
-          canReveal,
-          canClaim,
           hasPlayed,
           hasRevealed,
-          myMove,
+          claimResult,
+          currentRound,
+          endReveal
+        )
+
+        const canJoin = phase === 'COMMIT' && (isP1Empty || isP2Empty) && !hasPlayed && activeAddress !== undefined
+        const canReveal = phase === 'REVEAL' && hasPlayed && !hasRevealed
+        const canClaim = hasPlayed && !claimResult && (phase === 'ENDED' || currentRound > endReveal) && hasRevealed
+
+        allSessions.push({
+          id, phase, fee, totalPot, playersCount,
+          player1: isP1Empty ? 'Waiting...' : p1,
+          player2: isP2Empty ? 'Waiting...' : p2,
+          canJoin, canReveal, canClaim, hasPlayed, hasRevealed, myMove, claimResult,
           rounds: { start, endCommit, endReveal, current: currentRound },
         })
       }
@@ -176,21 +157,23 @@ export const useRPS = () => {
       const sorted = allSessions.sort((a, b) => b.id - a.id)
       setActiveSessions(sorted.filter((s) => s.phase !== 'ENDED'))
       setHistorySessions(sorted.filter((s) => s.phase === 'ENDED'))
+      setMySessions(sorted.filter((s) => s.hasPlayed))
 
     } catch (e: any) {
       console.error('RPS Fetch error:', e)
+    } finally {
+      setIsInitializing(false)
     }
   }, [appId, activeAddress, getClient, mbrs.create, getStorageKey])
 
+  // --- ACTIONS ---
 
-  // --- 2. ACTION: CREATE SESSION (Config Only) ---
   const createSession = async (fee: number, startDelay: number, commitLen: number, revealLen: number) => {
     setLoading(true)
     try {
       if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
       const algorand = client.algorand
-
       const status = await algorand.client.algod.status().do()
       const currentRound = BigInt(status['lastRound'])
 
@@ -199,147 +182,97 @@ export const useRPS = () => {
       const endRevealAt = endCommitAt + BigInt(revealLen)
       const participationAmount = AlgoAmount.Algos(fee)
 
-      // Pagamento MBR per creare la sessione
-      const mbrPaymentCreate = await algorand.createTransaction.payment({
+      const mbrPayment = await algorand.createTransaction.payment({
         sender: activeAddress,
         receiver: client.appAddress,
-        amount: AlgoAmount.Algos(mbrs.create),
+        amount: AlgoAmount.Algos(mbrs.create)
       })
 
       await client.send.createSession({
         args: {
-          config: {
-              startAt,
-              endCommitAt,
-              endRevealAt,
-              participation: BigInt(participationAmount.microAlgos)
-          },
-          mbrPayment: { txn: mbrPaymentCreate, signer: transactionSigner }
+          config: { startAt, endCommitAt, endRevealAt, participation: BigInt(participationAmount.microAlgos) },
+          mbrPayment: { txn: mbrPayment, signer: transactionSigner }
         },
-        sender: activeAddress, // Sender obbligatorio
+        sender: activeAddress,
         populateAppCallResources: true
       })
 
-      showAlert('Session initialized! Now you can join.', 'success')
+      showAlert('RPS Session created!', 'success')
       refreshData()
     } catch (e: any) {
-      console.error(e)
       showAlert(e.message, 'error')
     } finally {
       setLoading(false)
     }
   }
 
-  // --- 3. ACTION: JOIN SESSION (Commit Move) ---
-  const joinSession = async (sessionId: number, betAmount: number, move: number) => {
+  const joinSession = async (sessionId: number, move: number, fee: number) => {
     setLoading(true)
     try {
       if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
       const algorand = client.algorand
 
-      // 1. Prepara il Commit (Hash di Mossa + Salt)
-      const salt = new Uint8Array(32)
-      crypto.getRandomValues(salt)
-      const moveBytes = algosdk.encodeUint64(move)
-      const buffer = new Uint8Array(moveBytes.length + salt.length)
-      buffer.set(moveBytes)
-      buffer.set(salt, moveBytes.length)
-      const commitHash = await sha256(buffer)
+      // Usa utility per commit
+      const { commitHash, salt } = await createCommit(move, 32)
 
-      // 2. Pagamenti (MBR Player + Puntata)
-      const mbrPaymentJoin = await algorand.createTransaction.payment({
+      const mbrPayment = await algorand.createTransaction.payment({
         sender: activeAddress,
         receiver: client.appAddress,
-        amount: AlgoAmount.Algos(mbrs.join),
+        amount: AlgoAmount.Algos(mbrs.join)
       })
-
       const betPayment = await algorand.createTransaction.payment({
         sender: activeAddress,
         receiver: client.appAddress,
-        amount: AlgoAmount.Algos(betAmount),
+        amount: AlgoAmount.Algos(fee)
       })
 
-      // 3. Invia Transazione
       await client.send.joinSession({
         args: {
-            sessionId: BigInt(sessionId),
-            commit: commitHash,
-            payment: { txn: betPayment, signer: transactionSigner },
-            mbrPayment: { txn: mbrPaymentJoin, signer: transactionSigner }
+          sessionId: BigInt(sessionId),
+          commit: commitHash,
+          payment: { txn: betPayment, signer: transactionSigner },
+          mbrPayment: { txn: mbrPayment, signer: transactionSigner }
         },
-        sender: activeAddress, // Sender obbligatorio
+        sender: activeAddress,
         populateAppCallResources: true
       })
 
-      // 4. Salva il segreto nel LocalStorage (CRUCIALE per il Reveal)
       const secretData = { move, salt: Array.from(salt), hasRevealed: false }
       const key = getStorageKey(sessionId)
       if (key) localStorage.setItem(key, JSON.stringify(secretData))
 
-      showAlert('Joined successfully! Don\'t lose this browser session.', 'success')
+      notifyUpdate()
+      showAlert('Joined Battle!', 'success')
       refreshData()
     } catch (e: any) {
-      console.error(e)
       showAlert(e.message, 'error')
     } finally {
       setLoading(false)
     }
   }
 
-  // --- 4. ACTION: REVEAL MOVE ---
   const revealMove = async (sessionId: number) => {
     setLoading(true)
     try {
       if (!activeAddress) throw new Error('Connect wallet')
-
-      // Recupera segreto
       const key = getStorageKey(sessionId)
       const stored = key ? localStorage.getItem(key) : null
-      if (!stored) throw new Error('Secret not found on this device! Cannot reveal.')
-
+      if (!stored) throw new Error('Local data lost.')
       const { move, salt } = JSON.parse(stored)
       const client = getClient()
 
       await client.send.revealMove({
-        args: {
-            sessionId: BigInt(sessionId),
-            choice: BigInt(move),
-            salt: new Uint8Array(salt)
-        },
-        sender: activeAddress, // Sender obbligatorio
-        populateAppCallResources: true
-      })
-
-      // Aggiorna flag locale
-      const updateData = JSON.parse(stored)
-      updateData.hasRevealed = true
-      if (key) localStorage.setItem(key, JSON.stringify(updateData))
-
-      showAlert('Move revealed!', 'success')
-      refreshData()
-    } catch (e: any) {
-      console.error(e)
-      showAlert(e.message, 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // --- 5. ACTION: CLAIM TIMEOUT (Opzionale ma utile) ---
-  const claimTimeout = async (sessionId: number) => {
-    setLoading(true)
-    try {
-      if (!activeAddress) throw new Error('Connect wallet')
-      const client = getClient()
-
-      await client.send.claimTimeoutVictory({
-        args: { sessionId: BigInt(sessionId) },
+        args: { sessionId: BigInt(sessionId), choice: BigInt(move), salt: new Uint8Array(salt) },
         sender: activeAddress,
         populateAppCallResources: true
       })
 
-      showAlert('Timeout claimed!', 'success')
+      const updateData = JSON.parse(stored)
+      updateData.hasRevealed = true
+      if (key) localStorage.setItem(key, JSON.stringify(updateData))
+
+      showAlert('Move Revealed!', 'success')
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -348,21 +281,74 @@ export const useRPS = () => {
     }
   }
 
-  // Polling automatico
+  const claimWinnings = async (sessionId: number, entryFee: number) => {
+    setLoading(true)
+    try {
+      if (!activeAddress) throw new Error('Connect your wallet.')
+      const client = getClient()
+
+      const result = await client.send.claimWinnings({
+        args: { sessionId: BigInt(sessionId) },
+        sender: activeAddress,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(6000),
+      })
+
+      const wonAmount = Number(result.return) / 1e6 - entryFee
+      const key = getStorageKey(sessionId)
+
+      if (key) {
+        const stored = localStorage.getItem(key)
+        if (stored) {
+          const data = JSON.parse(stored)
+          data.claimResult = { amount: wonAmount, timestamp: Date.now() }
+          localStorage.setItem(key, JSON.stringify(data))
+          notifyUpdate()
+        }
+      }
+
+      if (wonAmount >= 0) showAlert(`You won ${wonAmount} ALGO!`, 'success')
+
+      refreshData()
+    } catch (e: any) {
+      const errorMsg = e.message || JSON.stringify(e)
+      if (errorMsg.includes('You did not win') || errorMsg.includes('logic eval error')) {
+        const key = getStorageKey(sessionId)
+        if (key) {
+          const stored = localStorage.getItem(key)
+          if (stored) {
+            const data = JSON.parse(stored)
+            data.claimResult = { amount: -entryFee, timestamp: Date.now() }
+            localStorage.setItem(key, JSON.stringify(data))
+            notifyUpdate()
+          }
+        }
+        showAlert('Better luck next time!', 'error')
+        refreshData()
+      } else {
+        showAlert(e.message, 'error')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     refreshData()
-    const interval = setInterval(refreshData, 5000)
-    return () => clearInterval(interval)
+    const i = setInterval(refreshData, 5000)
+    return () => clearInterval(i)
   }, [refreshData, activeAddress])
 
   return {
-    loading,
     activeSessions,
     historySessions,
+    mySessions,
+    mbrs,
+    loading,
+    isInitializing,
     createSession,
     joinSession,
     revealMove,
-    claimTimeout,
-    mbrs
+    claimWinnings
   }
 }

@@ -3,13 +3,12 @@ import React, { ReactNode } from 'react'
 interface BaseSessionCardProps {
   id: number
   isEnded: boolean
-  isWinner?: boolean // Optional: adds specific glow
+  isWinner?: boolean
   borderColorClass?: string
   children: ReactNode
 }
 
 export const BaseSessionCard: React.FC<BaseSessionCardProps> = ({ id, isEnded, borderColorClass = 'border-white/5', children }) => {
-  // Logic for background colors (Dark Grey for ended, Darker Grey for active)
   const cardBg = isEnded ? 'bg-[#0F0F0F]' : 'bg-[#151515]'
 
   return (
@@ -22,7 +21,6 @@ export const BaseSessionCard: React.FC<BaseSessionCardProps> = ({ id, isEnded, b
   )
 }
 
-// Subcomponents for structure
 export const SessionCardHeader = ({ children }: { children: ReactNode }) => <div className="collapse-title p-5 pr-12">{children}</div>
 
 export const SessionCardBody = ({ isEnded, children }: { isEnded: boolean; children: ReactNode }) => (
