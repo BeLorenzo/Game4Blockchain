@@ -8,6 +8,7 @@ import { RPSDashboard } from './components/games/RPS/Dashboard'
 import { WeeklyGameDashboard } from './components/games/WeeklyGame/Dashboard'
 import { StagHuntDashboard } from './components/games/StagHunt/Dashboard'
 import { config } from './config'
+import { PirateGameDashboard } from './components/games/PirateGame/Dashboard'
 
 /**
  * 🎮 GAME REGISTRY
@@ -65,6 +66,16 @@ const GAMES = [
       'Failed rounds feed Global Jackpot.',
     ],
     envVarName: 'VITE_STAGHUNT_APP_ID',
+  },
+    {
+    id: 'pirate',
+    config: config.games.pirate,
+    component: PirateGameDashboard,
+    description: 'Sequential Bargaining Game',
+    rules: [
+      'Si va nel puzzo',
+    ],
+    envVarName: 'VITE_PIRATE_APP_ID',
   },
 ]
 

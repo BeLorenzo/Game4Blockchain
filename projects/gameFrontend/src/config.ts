@@ -18,13 +18,11 @@ export const config = {
       name: 'Rock Paper Scissors',
       icon: '✂️',
     },
-    // Sostituisce o affianca "Pirate" (decidi tu se tenere Pirate o no, qui l'ho lasciato per sicurezza)
     pirate: {
       appId: import.meta.env.VITE_PIRATE_APP_ID ? BigInt(import.meta.env.VITE_PIRATE_APP_ID) : 0n,
       name: 'Pirate Game',
       icon: '🏴‍☠️',
     },
-    // NUOVO GIOCO AGGIUNTO
     weeklyGame: {
       appId: import.meta.env.VITE_WEEKLYGAME_APP_ID ? BigInt(import.meta.env.VITE_WEEKLYGAME_APP_ID) : 0n,
       name: 'Weekly Lottery',

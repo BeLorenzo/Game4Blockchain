@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, ReactNode } from 'react'
+import React, { useState } from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
 import { usePlayerStats } from '../../hooks/usePlayerStats'
 import { GameDashboardLayout } from './GameDashboardLayout'
@@ -7,9 +7,6 @@ import { GameStats } from './GameStats'
 import { GameFilters } from './GameFilters'
 import { CreateSessionForm } from './CreateSessionForm'
 
-/**
- * Generic Session Interface
- */
 export interface BaseGameSession {
   id: number
   phase: 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
@@ -28,9 +25,6 @@ export interface BaseGameSession {
   claimResult?: any
 }
 
-/**
- * Generic Hook Return Type
- */
 export interface BaseGameHook<T extends BaseGameSession> {
   activeSessions: T[]
   historySessions: T[]
@@ -44,12 +38,8 @@ export interface BaseGameHook<T extends BaseGameSession> {
   claimWinnings: (id: number, fee: number) => void
 }
 
-/**
- * Props per il componente GenericGameDashboard
- */
 interface GenericGameDashboardProps<T extends BaseGameSession> {
   useGameHook: () => BaseGameHook<T>
-
   SessionItemComponent: React.ComponentType<{
     session: T
     loading: boolean
@@ -58,28 +48,18 @@ interface GenericGameDashboardProps<T extends BaseGameSession> {
     onClaim: () => void
     [key: string]: any
   }>
-
   defaultConfig?: {
     fee: number
     start: number
     commit: number
     reveal: number
   }
-
   emptyStateConfig?: {
     icon: string
     message: string
   }
 }
 
-/**
- * Generic Game Dashboard
- * Gestisce tutta la logica comune a tutti i giochi:
- * - Tabs (active/history/mine)
- * - Filtri per fase
- * - Creazione sessione
- * - Rendering sessioni
- */
 export function GenericGameDashboard<T extends BaseGameSession>({
   useGameHook,
   SessionItemComponent,
@@ -99,16 +79,13 @@ export function GenericGameDashboard<T extends BaseGameSession>({
     claimWinnings,
   } = useGameHook()
 
-  // Wallet e stats
   const { activeAddress } = useWallet()
   const { totalProfit } = usePlayerStats(activeAddress || undefined)
 
-  // State comune
   const [activeTab, setActiveTab] = useState<'active' | 'history' | 'mine'>('active')
   const [phaseFilter, setPhaseFilter] = useState<'ALL' | 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'>('ALL')
   const [newConfig, setNewConfig] = useState(defaultConfig)
 
-  // Logica di filtraggio
   const getDisplaySessions = (): T[] => {
     let list: T[] = []
     if (activeTab === 'active') list = activeSessions
@@ -118,7 +95,6 @@ export function GenericGameDashboard<T extends BaseGameSession>({
     if (phaseFilter !== 'ALL') {
       list = list.filter((s) => s.phase === phaseFilter)
     }
-
     return list
   }
 
@@ -127,11 +103,7 @@ export function GenericGameDashboard<T extends BaseGameSession>({
   return (
     <GameDashboardLayout
       title="Create New Game"
-      stats={
-        activeAddress && (
-          <GameStats totalProfit={totalProfit} mbr={mbrs.create} />
-        )
-      }
+      stats={activeAddress && <GameStats totalProfit={totalProfit} mbr={mbrs.create} />}
       filters={
         <GameFilters
           activeTab={activeTab}
@@ -145,12 +117,7 @@ export function GenericGameDashboard<T extends BaseGameSession>({
           config={newConfig}
           setConfig={setNewConfig}
           onCreate={() =>
-            createSession(
-              newConfig.fee,
-              newConfig.start,
-              newConfig.commit,
-              newConfig.reveal,
-            )
+            createSession(newConfig.fee, newConfig.start, newConfig.commit, newConfig.reveal)
           }
           loading={loading}
           disabled={loading || !activeAddress || mbrs.create === 0}
@@ -164,26 +131,31 @@ export function GenericGameDashboard<T extends BaseGameSession>({
         </div>
       )}
 
-      {/* Session List */}
-      {!isInitializing &&
-        sessions.map((session) => (
-          <SessionItemComponent
-            key={session.id}
-            session={session}
-            loading={loading}
-            onJoin={(...args) => joinSession(...args)}
-            onReveal={() => revealMove(session.id)}
-            onClaim={() => claimWinnings(session.id, session.fee)}
-          />
-        ))}
+      {/* FIX SCROLL: Altezza dinamica ma generosa */}
+      {!isInitializing && (
+        <div
+            className="flex-1 overflow-y-auto pr-2 space-y-4 pb-20 custom-scrollbar h-[calc(100vh-220px)] min-h-[500px]"
+        >
+            {sessions.map((session) => (
+              <SessionItemComponent
+                key={session.id}
+                session={session}
+                loading={loading}
+                onJoin={(...args) => joinSession(...args)}
+                onReveal={() => revealMove(session.id)}
+                onClaim={() => claimWinnings(session.id, session.fee)}
+              />
+            ))}
 
-      {/* Empty State */}
-      {!isInitializing && sessions.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-24 opacity-40 border-2 border-dashed border-white/10 rounded-2xl bg-white/5">
-          <div className="text-4xl mb-2">{emptyStateConfig.icon}</div>
-          <div className="font-mono text-lg font-bold tracking-widest uppercase">
-            {emptyStateConfig.message}
-          </div>
+            {/* Empty State all'interno dello scroll se vuoto */}
+            {sessions.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-24 opacity-40 border-2 border-dashed border-white/10 rounded-2xl bg-white/5">
+                  <div className="text-4xl mb-2">{emptyStateConfig.icon}</div>
+                  <div className="font-mono text-lg font-bold tracking-widest uppercase">
+                    {emptyStateConfig.message}
+                  </div>
+                </div>
+            )}
         </div>
       )}
     </GameDashboardLayout>

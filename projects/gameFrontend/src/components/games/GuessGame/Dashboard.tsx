@@ -11,7 +11,6 @@ import { DigitalInput } from '../../common/DigitalInput'
  */
 const GuessSessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) => {
   const [input, setInput] = useState('')
-  const { isEnded, isRevealPhase } = useSessionState(session)
 
   return (
     <GenericSessionItem
