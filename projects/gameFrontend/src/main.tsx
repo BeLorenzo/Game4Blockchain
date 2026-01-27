@@ -7,7 +7,6 @@ import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClient
 
 const algodConfig = getAlgodConfigFromViteEnvironment()
 
-// CONFIGURAZIONE "FORZATA" (Quella che funzionava a te)
 const walletManager = new WalletManager({
   wallets: [
     WalletId.DEFLY,
