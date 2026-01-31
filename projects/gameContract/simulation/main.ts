@@ -18,7 +18,7 @@ function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
 // === SIMULATION CONFIGURATION ===
 const NUM_SESSIONS = 5
 const INITIAL_FUNDING = 100_000
-const MODEL = 'qwen3:8b'
+const MODEL = 'hermes3'
 // === GAME SELECTION ===
 // Uncomment the game you wish to simulate
 //const game : IBaseGameAdapter = new StagHuntGame()

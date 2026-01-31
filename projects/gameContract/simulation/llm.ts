@@ -36,9 +36,18 @@ export async function askLLM<T extends z.ZodTypeAny>(
   try {
     const response = await ollama.chat({
       model: model,
-      messages: [{ role: 'user', content: prompt }],
-      options: { temperature: options?.temperature ?? 0.7 },
-      format: 'json', 
+      messages: [
+    { 
+      role: 'system', 
+      content: 'You are an intelligent agent running in a simulation. You output ONLY valid JSON. You do not explain, you do not apologize, you just output the data.' 
+    },
+    { role: 'user', content: prompt }
+  ],
+      options: {
+    temperature: options?.temperature ?? 0.4,    
+    num_ctx: 8192,       
+    num_predict: 500,    
+  },
     });
 
     raw = response.message.content.trim();
