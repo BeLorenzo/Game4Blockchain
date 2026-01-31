@@ -1,33 +1,22 @@
 import algosdk from 'algosdk'
 import { createCommit } from '../gameUtils'
 
-// ============================================================================
-// PIRATE SPECIFIC ENCODING (Mancante nel tuo file)
-// ============================================================================
-
 /**
  * Converte l'array di distribuzione (numeri) in un Uint8Array (BigEndian Uint64)
- * CRUCIALE: Il contratto vuole un byte array unico, non un array di uint64.
  */
 export const encodeDistribution = (distribution: number[]): Uint8Array => {
   const buffer = new Uint8Array(distribution.length * 8)
   const view = new DataView(buffer.buffer)
   
   distribution.forEach((amount, index) => {
-    // Scriviamo BigInt a 64bit in Big Endian
     view.setBigUint64(index * 8, BigInt(amount), false) 
   })
   
   return buffer
 }
 
-// ============================================================================
-// BOX DECODING HELPERS
-// ============================================================================
-
 /**
  * Genera la chiave per leggere i Box specifici di un pirata
- * Logic: SHA256(itob(sessionID) + decodingAddress(playerAddr))
  */
 export const getPirateBoxKey = async (sessionId: number, address: string): Promise<Uint8Array> => {
   const sessionBytes = algosdk.bigIntToBytes(sessionId, 8)
@@ -36,8 +25,6 @@ export const getPirateBoxKey = async (sessionId: number, address: string): Promi
   const combined = new Uint8Array(sessionBytes.length + addressBytes.length)
   combined.set(sessionBytes)
   combined.set(addressBytes, sessionBytes.length)
-  
-  // Utilizziamo l'API nativa del browser (async)
   const hashBuffer = await crypto.subtle.digest('SHA-256', combined)
   return new Uint8Array(hashBuffer)
 }
@@ -58,16 +45,23 @@ export const decodePirateList = (rawList: Uint8Array | undefined): string[] => {
   return addresses
 }
 
-// ============================================================================
-// EXPORT WRAPPERS
-// ============================================================================
-
 /**
- * Wrapper per creare il commit del voto usando la tua util esistente.
- * Il voto è 0 o 1, quindi value: number va benissimo.
+ * Wrapper per creare il commit del voto usando la util esistente.
  */
 export const createVoteCommit = async (vote: 0 | 1) => {
-  // Riutilizziamo la tua funzione createCommit esistente
-  // Nota: la tua funzione è async, quindi dobbiamo attenderla
   return await createCommit(vote)
+}
+
+export const decodeDistribution = (data: Uint8Array | undefined): number[] => {
+  if (!data) return []
+  const result: number[] = []
+  
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength)
+  
+  for (let i = 0; i < data.byteLength; i += 8) {
+    // Leggiamo 8 byte alla volta
+    const valMicro = view.getBigUint64(i, false) 
+    result.push(Number(valMicro) / 1e6)
+  }
+  return result
 }

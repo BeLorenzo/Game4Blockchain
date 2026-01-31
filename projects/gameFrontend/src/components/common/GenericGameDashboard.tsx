@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
-import { usePlayerStats } from '../../hooks/usePlayerStats'
+import { useGameSpecificProfit, usePlayerStats } from '../../hooks/usePlayerStats'
 import { GameDashboardLayout } from './GameDashboardLayout'
 import { GameStats } from './GameStats'
 import { GameFilters } from './GameFilters'
@@ -39,7 +39,7 @@ export interface BaseGameHook<T extends BaseGameSession> {
 }
 
 interface GenericGameDashboardProps<T extends BaseGameSession> {
-  useGameHook: () => BaseGameHook<T>
+  useGameHook: () => BaseGameHook<T> & { [key: string]: any }
   SessionItemComponent: React.ComponentType<{
     session: T
     loading: boolean
@@ -58,13 +58,18 @@ interface GenericGameDashboardProps<T extends BaseGameSession> {
     icon: string
     message: string
   }
+  gamePrefix: string
+  appId: number | bigint
+  renderHeader?: (hookData: any) => React.ReactNode
 }
 
 export function GenericGameDashboard<T extends BaseGameSession>({
   useGameHook,
   SessionItemComponent,
-  defaultConfig = { fee: 1, start: 5, commit: 50, reveal: 50 },
+  defaultConfig = { fee: 1, start: 1, commit: 5, reveal: 5 },
   emptyStateConfig = { icon: '🔭', message: 'No sessions found' },
+  gamePrefix, 
+  appId,    
 }: GenericGameDashboardProps<T>) {
   const {
     activeSessions,
@@ -77,10 +82,10 @@ export function GenericGameDashboard<T extends BaseGameSession>({
     joinSession,
     revealMove,
     claimWinnings,
+    ...hookRest
   } = useGameHook()
-
   const { activeAddress } = useWallet()
-  const { totalProfit } = usePlayerStats(activeAddress || undefined)
+  const totalProfit = useGameSpecificProfit(gamePrefix, appId).profit
 
   const [activeTab, setActiveTab] = useState<'active' | 'history' | 'mine'>('active')
   const [phaseFilter, setPhaseFilter] = useState<'ALL' | 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'>('ALL')
@@ -131,10 +136,9 @@ export function GenericGameDashboard<T extends BaseGameSession>({
         </div>
       )}
 
-      {/* FIX SCROLL: Altezza dinamica ma generosa */}
       {!isInitializing && (
         <div
-            className="flex-1 overflow-y-auto pr-2 space-y-4 pb-20 custom-scrollbar h-[calc(100vh-220px)] min-h-[500px]"
+            className="flex-1 overflow-y-auto pr-2 space-y-4 pb-20 custom-scrollbar h-[75vh] min-h-[650px]"
         >
             {sessions.map((session) => (
               <SessionItemComponent
@@ -144,10 +148,10 @@ export function GenericGameDashboard<T extends BaseGameSession>({
                 onJoin={(...args) => joinSession(...args)}
                 onReveal={() => revealMove(session.id)}
                 onClaim={() => claimWinnings(session.id, session.fee)}
+                {...hookRest}
               />
             ))}
 
-            {/* Empty State all'interno dello scroll se vuoto */}
             {sessions.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-24 opacity-40 border-2 border-dashed border-white/10 rounded-2xl bg-white/5">
                   <div className="text-4xl mb-2">{emptyStateConfig.icon}</div>

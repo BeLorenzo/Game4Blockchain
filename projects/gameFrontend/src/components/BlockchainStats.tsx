@@ -1,6 +1,7 @@
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { useEffect, useState } from 'react'
 import { config } from '../config'
+import { GAME_PREFIXES } from '../hooks/usePlayerStats' 
 
 export const BlockchainStats = () => {
   const [stats, setStats] = useState({
@@ -23,7 +24,7 @@ export const BlockchainStats = () => {
 
   useEffect(() => {
     fetchStats()
-    const interval = setInterval(fetchStats, 2000) // Aggiorna ogni 2 secondi
+    const interval = setInterval(fetchStats, 2000) 
     return () => clearInterval(interval)
   }, [])
 
@@ -36,12 +37,12 @@ export const BlockchainStats = () => {
 
       <div className="bg-base-100 p-4 rounded-2xl shadow-sm border border-white/5 flex flex-col items-center">
         <span className="text-[10px] font-bold uppercase opacity-40 tracking-widest">Giochi Disponibili</span>
-        <span className="text-2xl font-bold">3</span>
+        <span className="text-2xl font-bold">{GAME_PREFIXES.length}</span>
       </div>
 
       <div className="bg-base-100 p-4 rounded-2xl shadow-sm border border-white/5 flex flex-col items-center">
         <span className="text-[10px] font-bold uppercase opacity-40 tracking-widest">Rete Attiva</span>
-        <span className="text-2xl font-bold text-success uppercase text-sm mt-2">{stats.network}</span>
+        <span className="text-2xl font-bold text-success uppercase mt-2">{stats.network}</span>
       </div>
     </div>
   )

@@ -93,7 +93,7 @@ export class GameContract extends Contract {
    * Initializes a new game session and reserves storage.
    */
   protected create(config: GameConfig): uint64 {
-    assert(config.startAt <= config.endCommitAt, 'Invalid timeline: start must be before commit end')
+    assert(config.startAt < config.endCommitAt, 'Invalid timeline: start must be before commit end')
     assert(config.endCommitAt < config.endRevealAt, 'Invalid timeline: commit end must be before reveal end')
     assert(config.startAt >= Global.round, 'Invalid start time: cannot start in the past')
 

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
-import { useStagHunt, StagHuntSession } from '../../../hooks/useStagHunt'
+import { useStagHunt } from '../../../hooks/useStagHunt'
 import { GenericGameDashboard } from '../../common/GenericGameDashboard'
 import { GenericSessionItem } from '../../common/GenericSessionItem'
+import { config } from '../../../config'
 
 const CHOICES = [
   { id: 0, label: 'HARE', icon: '🐰', color: 'text-yellow-400', border: 'border-yellow-500/50', desc: 'Safe Choice' },
@@ -12,8 +13,14 @@ const CHOICES = [
 /**
  * StagHunt Session Item
  */
-const StagHuntSessionItem = ({ session, loading, onJoin, onReveal, onClaim, onResolve }: any) => {
+const StagHuntSessionItem = ({ session, loading, onJoin, onReveal, onClaim, resolveSession }: any) => {
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null)
+
+  const resolveBadge = session.canResolve && !session.gameStats?.resolved ? (
+    <div className="badge badge-warning badge-outline badge-lg font-bold animate-pulse shadow-lg bg-yellow-500/10">
+      RESOLVE AVAILABLE
+    </div>
+  ) : null
 
   const getChoiceLabel = (choice?: number | null) => {
     if (choice === undefined || choice === null) return '???'
@@ -28,9 +35,8 @@ const StagHuntSessionItem = ({ session, loading, onJoin, onReveal, onClaim, onRe
       onClaim={onClaim}
       getMyValueLabel={(s) => getChoiceLabel(s.myChoice)}
       phaseTextOverride={session.phase === 'ACTIVE' ? 'OPEN' : undefined}
-
+      customBadges={resolveBadge}
       renderGameStats={(s) => {
-        // Logica per il Global Jackpot:
         const showJackpot = s.globalJackpot >= 0
         const showStats = s.gameStats.stags > 0 || s.gameStats.hares > 0
         const isEnded = s.phase === 'ENDED'
@@ -47,7 +53,7 @@ const StagHuntSessionItem = ({ session, loading, onJoin, onReveal, onClaim, onRe
                   {Number(s.globalJackpot).toFixed(2)} <span className="text-sm">ALGO</span>
                 </div>
                 <div className="text-[9px] text-gray-500 mt-1 italic">
-                   This pool grows whenever a Hunt fails!
+                    This pool grows whenever a Hunt fails!
                 </div>
               </div>
             )}
@@ -95,7 +101,7 @@ const StagHuntSessionItem = ({ session, loading, onJoin, onReveal, onClaim, onRe
             {/* Resolve Button */}
             {session.canResolve && !s.gameStats.resolved && (
               <button
-                onClick={() => onResolve(s.id)}
+                onClick={() => resolveSession(s.id)}
                 disabled={loading}
                 className="btn btn-warning btn-block font-black tracking-widest shadow-[0_0_15px_rgba(250,204,21,0.2)]"
               >
@@ -107,25 +113,26 @@ const StagHuntSessionItem = ({ session, loading, onJoin, onReveal, onClaim, onRe
       }}
 
       renderJoinControls={(s, loading) => (
-        <div className="flex flex-col items-center gap-6 mt-4">
-          <div className="grid grid-cols-2 gap-4 w-full max-w-md mx-auto">
+        <div className="w-full flex flex-col items-center justify-center gap-4 mt-6">
+          
+          <div className="grid grid-cols-2 gap-4 w-full max-w-md">
             {CHOICES.map((choice) => (
               <button
                 key={choice.id}
                 onClick={() => setSelectedChoice(choice.id)}
-                className={`group flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-300 ${
+                className={`group flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 ${
                   selectedChoice === choice.id
                     ? `${choice.border} bg-white/10 scale-105 shadow-[0_0_25px_rgba(255,255,255,0.1)]`
                     : 'border-white/5 bg-transparent hover:border-white/20'
                 }`}
               >
-                <span className={`text-5xl mb-3 transition-transform duration-300 group-hover:scale-110 ${selectedChoice === choice.id ? 'filter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]' : ''}`}>
+                <span className={`text-4xl mb-2 transition-transform duration-300 group-hover:scale-110 ${selectedChoice === choice.id ? 'filter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]' : ''}`}>
                   {choice.icon}
                 </span>
-                <span className={`text-sm font-black tracking-widest ${selectedChoice === choice.id ? 'text-white' : 'text-gray-500'}`}>
+                <span className={`text-xs font-black tracking-widest ${selectedChoice === choice.id ? 'text-white' : 'text-gray-500'}`}>
                   {choice.label}
                 </span>
-                <span className="text-[9px] text-gray-600 mt-1 uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-[8px] text-gray-600 mt-1 uppercase font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                   {choice.desc}
                 </span>
               </button>
@@ -140,7 +147,7 @@ const StagHuntSessionItem = ({ session, loading, onJoin, onReveal, onClaim, onRe
               }
             }}
             disabled={selectedChoice === null || loading}
-            className="btn btn-primary btn-wide font-black text-black tracking-[0.2em] shadow-[0_0_20px_rgba(64,224,208,0.4)]"
+            className="btn btn-primary w-full max-w-md font-black text-black tracking-[0.2em] shadow-[0_0_20px_rgba(64,224,208,0.4)] h-12"
           >
             {loading ? <span className="loading loading-ring"></span> : `CONFIRM HUNT`}
           </button>
@@ -155,7 +162,8 @@ export const StagHuntDashboard = () => {
     <GenericGameDashboard
       useGameHook={useStagHunt}
       SessionItemComponent={StagHuntSessionItem}
-      defaultConfig={{ fee: 1, start: 3, commit: 10, reveal: 10 }}
+      gamePrefix="stag"
+      appId={config.games.stagHunt.appId}
       emptyStateConfig={{ icon: '🔭', message: 'No sessions found' }}
     />
   )

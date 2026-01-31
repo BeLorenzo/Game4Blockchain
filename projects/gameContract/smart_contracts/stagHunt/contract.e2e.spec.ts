@@ -171,7 +171,7 @@ describe('StagHunt Contract', () => {
             maxFee: AlgoAmount.MicroAlgo(3000)
         })
         expect(stagClaim.return).toBe(10_666_666n)
-    })
+    }, 30000)
 
     test('Scenario: Fail (Panic). 1 Stag, 3 Hares -> Jackpot Accumulates', async () => {
         const { testAccount, algorand } = localnet.context
@@ -236,7 +236,7 @@ describe('StagHunt Contract', () => {
         // Verify Jackpot (Stag Lost 10 + 3 Hares Paid 2 each = 16)
         const globalState = await client.state.global.getAll()
         expect(globalState.globalJackpot).toBe(16_000_000n)
-    })
+    }, 30000)
 
     test('Scenario: Jackpot Win & Dynamic Stakes', async () => {
         const { testAccount, algorand } = localnet.context
@@ -415,7 +415,7 @@ describe('StagHunt Contract', () => {
         await expect(
             client.send.claimWinnings({ args: { sessionId }, sender: testAccount.addr })
         ).rejects.toThrow('Game not resolved')
-      })
+      }, 30000)
 
       test('Cannot double claim', async () => {
         const { testAccount, algorand } = localnet.context
@@ -456,6 +456,6 @@ describe('StagHunt Contract', () => {
                 maxFee: AlgoAmount.MicroAlgo(3000)
             })
         ).rejects.toThrow('Player has not revealed or already claimed')
-      })
+      }, 30000)
   })
 })

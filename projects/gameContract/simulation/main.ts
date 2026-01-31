@@ -16,9 +16,9 @@ function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
 }
 
 // === SIMULATION CONFIGURATION ===
-const NUM_SESSIONS = 2
+const NUM_SESSIONS = 5
 const INITIAL_FUNDING = 100_000
-
+const MODEL = 'qwen3:8b'
 // === GAME SELECTION ===
 // Uncomment the game you wish to simulate
 //const game : IBaseGameAdapter = new StagHuntGame()
@@ -81,7 +81,7 @@ STRATEGIC PRINCIPLES:
         resilience: 1.0,
         curiosity: 1.0,
       },
-      'llama3:latest',
+      MODEL,
     ),
 
     new Agent(
@@ -119,7 +119,7 @@ STRATEGIC PRINCIPLES:
         resilience: 0.1,
         curiosity: 0.0,
       },
-      'llama3:latest',
+      MODEL,
     ),
 
     new Agent(
@@ -158,7 +158,7 @@ STRATEGIC PRINCIPLES:
         resilience: 1.0,
         curiosity: 0.8,
       },
-      'llama3:latest',
+      MODEL,
     ),
 
     new Agent(
@@ -197,7 +197,7 @@ STRATEGIC PRINCIPLES:
         resilience: 0.5,
         curiosity: 0.1,
       },
-      'llama3:latest',
+      MODEL,
     ),
 
     new Agent(
@@ -236,7 +236,7 @@ STRATEGIC PRINCIPLES:ch
         resilience: 0.2,
         curiosity: 0.4,
       },
-      'llama3:latest',
+      MODEL,
     ),
 
     new Agent(
@@ -275,7 +275,7 @@ STRATEGIC PRINCIPLES:
         resilience: 0.8,
         curiosity: 0.5,
       },
-      'llama3:latest',
+      MODEL,
     ),
 
     new Agent(
@@ -315,7 +315,7 @@ STRATEGIC PRINCIPLES:
         resilience: 0.9,
         curiosity: 0.9,
       },
-      'llama3:latest',
+      MODEL,
     ),
   ]
 

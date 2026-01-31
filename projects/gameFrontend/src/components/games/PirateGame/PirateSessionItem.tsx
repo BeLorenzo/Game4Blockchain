@@ -1,15 +1,73 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
-import { PirateGameSession } from '../../../hooks/Pirate/types' // Types corretti
 import { BaseSessionCard, SessionCardHeader, SessionCardBody } from '../../common/BaseSessionCard'
-import { PirateCrewList } from './PirateCrewList'
-import { ProposalStatus } from './ProposalStatus'
-import { PirateActionPanel } from './PirateActionPannel'
+import { PirateGameSession } from '../../../hooks/Pirate/types'
+
 import { GameStateBanner } from './GameStateBanner'
+import { ProposalStatus } from './ProposalStatus'
+import { PirateCrewList } from './PirateCrewList'
+import { PirateActionPanel } from './PirateActionPannel'
+
+const PirateResultBanner = ({ session }: { session: PirateGameSession }) => {
+  if (!session.myPirateInfo || !session.claimResult) return null
+  
+  const { amount, isTimeout } = session.claimResult
+  const displayAmount = Math.abs(amount)
+
+  // Configurazione Dinamica Testi e Colori
+  let title = ''
+  let subtitle = ''
+  let amountSign = ''
+  let gradientClass = ''
+  let textClass = ''
+  let borderClass = ''
+
+  if (amount > 0) {
+      // VITTORIA
+      title = '🏆 VICTORY!'
+      subtitle = 'NET PROFIT'
+      amountSign = '+'
+      gradientClass = 'bg-gradient-to-br from-green-900 to-black'
+      textClass = 'text-green-400'
+      borderClass = 'border-green-500'
+  } else if (amount === 0) {
+      // RIMBORSO / PAREGGIO
+      title = isTimeout ? '💸 REFUNDED' : '⚓ NO LOSS'
+      subtitle = isTimeout ? 'FULL FEE RETURNED' : 'BROKE EVEN'
+      amountSign = isTimeout ? '+' : ''
+      gradientClass = 'bg-gradient-to-br from-yellow-900 to-black'
+      textClass = 'text-yellow-400'
+      borderClass = 'border-yellow-500'
+  } else {
+      // SCONFITTA
+      title = '☠️ YOU LOST' 
+      subtitle = 'BETTER LUCK NEXT TIME' 
+      amountSign = '-'
+      gradientClass = 'bg-gradient-to-br from-red-900 to-black'
+      textClass = 'text-red-400'
+      borderClass = 'border-red-500'
+  }
+
+  const finalAmountDisplay = (amount === 0 && isTimeout) ? session.fee : displayAmount
+
+  return (
+    <div className="mt-4 mb-4">
+        <div className={`p-5 rounded-xl w-full text-center font-black uppercase tracking-widest shadow-2xl transform transition-all hover:scale-[1.01] relative z-20 opacity-100 border ${gradientClass} ${borderClass} ${textClass}`}>
+             <div className="flex flex-col items-center gap-1">
+                <span className={`text-lg mb-1 ${amount < 0 ? 'text-red-500' : ''}`}>{title}</span>
+                
+                <span className="text-4xl font-mono text-white text-shadow-sm">
+                    {amountSign}{finalAmountDisplay.toFixed(2)} ALGO
+                </span>
+                
+                <span className={`text-[10px] opacity-70 mt-1 ${amount < 0 ? 'text-red-300' : ''}`}>{subtitle}</span>
+            </div>
+        </div>
+    </div>
+  )
+}
 
 interface PirateSessionItemProps {
   session: PirateGameSession
-  myAddress: string
   loading: boolean
   actions: {
     register: () => void
@@ -22,115 +80,130 @@ interface PirateSessionItemProps {
   }
 }
 
-export const PirateSessionItem: React.FC<PirateSessionItemProps> = ({ session, myAddress, loading, actions }) => {
-  
-  // Helpers Colori Fase
-  const getPhaseStyle = (p: string) => {
-    switch(p) {
-      case 'REGISTRATION': return 'bg-blue-600/20 text-blue-400 border-blue-500/50'
-      case 'PROPOSAL': return 'bg-purple-600/20 text-purple-400 border-purple-500/50 animate-pulse'
-      case 'VOTE_COMMIT': return 'bg-yellow-600/20 text-yellow-400 border-yellow-500/50'
-      case 'VOTE_REVEAL': return 'bg-orange-600/20 text-orange-400 border-orange-500/50'
-      case 'FINISHED': return 'bg-green-600/20 text-green-400 border-green-500/50'
-      default: return 'bg-gray-700 text-gray-300'
-    }
+export const PirateSessionItem: React.FC<PirateSessionItemProps> = ({ session, loading, actions }) => {
+  const isEnded = session.phase === 'ENDED'
+  const isRefundAvailable = session.phase === 'ENDED' && 
+                            session.pirates.length < 3 && 
+                            !!session.myPirateInfo && 
+                            !session.myPirateInfo.claimed
+
+  let borderColor = 'border-white/5'
+  let phaseColor = 'badge-ghost' 
+
+  if (session.phase === 'PROPOSAL') {
+      borderColor = 'border-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.3)]'
+      phaseColor = 'badge-secondary bg-purple-500 text-black border-purple-500'
+  } else if (session.phase === 'VOTE_COMMIT') {
+      borderColor = 'border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]'
+      phaseColor = 'badge-warning bg-yellow-500 text-black border-yellow-500'
+  } else if (session.phase === 'VOTE_REVEAL') {
+      borderColor = 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+      phaseColor = 'badge-info bg-blue-500 text-black border-blue-500'
+  } else if (session.canExecute) {
+      borderColor = 'border-red-500 animate-pulse'
+  }
+
+  if (isRefundAvailable) {
+      borderColor = 'border-yellow-500 animate-pulse shadow-[0_0_20px_rgba(234,179,8,0.4)]'
+  }
+
+  const getRoundLabel = () => {
+    if (session.phase === 'REGISTRATION') return `End Registration: ${session.rounds.endPhase}`
+    if (session.phase === 'PROPOSAL') return `End Proposal: ${session.rounds.endPhase}`
+    if (session.phase === 'VOTE_COMMIT') return `End Commit: ${session.rounds.endPhase}`
+    if (session.phase === 'VOTE_REVEAL') return `End Reveal: ${session.rounds.endPhase}`
+    return 'Game Ended'
   }
 
   return (
-    <BaseSessionCard 
-      id={session.id} 
-      isEnded={session.phase === 'FINISHED'} 
-      borderColorClass={session.canClaim ? 'border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.2)]' : 'border-white/10'}
-    >
+    <BaseSessionCard id={session.id} isEnded={isEnded} borderColorClass={borderColor}>
       
-      {/* --- HEADER --- */}
       <SessionCardHeader>
-        <div className="flex justify-between items-center w-full">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl font-black font-mono text-white/20">#{session.id}</span>
-            <div className={`badge badge-lg font-bold border ${getPhaseStyle(session.phase)}`}>
-              {session.phase.replace('_', ' ')}
-            </div>
-            {/* Round Counter (Mostra il round di gioco, non il blocco) */}
-            <div className="hidden sm:flex text-[10px] font-mono text-gray-500 bg-black/30 px-2 py-1 rounded border border-white/5 items-center gap-1">
-                <span>ROUND:</span> 
-                <span className="text-white font-bold">{session.gameRound}</span>
-            </div>
-          </div>
-          
-          <div className="text-right">
-            <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">BOOTY (POT)</div>
-            <div className="text-2xl font-black text-primary drop-shadow-[0_0_8px_rgba(64,224,208,0.5)]">
-              {session.totalPot.toFixed(2)} <span className="text-sm">ALGO</span>
-            </div>
-          </div>
+        <div className="flex justify-between items-start mb-2">
+           <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-3">
+                 <span className="font-mono text-xl font-black text-white/40">#{session.id}</span>
+                 <div className={`badge ${phaseColor} font-bold uppercase tracking-wider`}>
+                    {session.phase.replace('_', ' ')}
+                 </div>
+                {isRefundAvailable && (
+                    <div className="badge badge-warning badge-outline font-black animate-pulse bg-yellow-500/10 shadow-lg">
+                        💸 REFUND AVAILABLE
+                    </div>
+                 )}
+
+                 {/* Badge EXECUTE (Per Timeout, No Proposal o Reveal Scaduto) */}
+                 {session.canExecute && (
+                    <div className="badge badge-error badge-outline font-black animate-pulse bg-red-500/10 shadow-[0_0_15px_red] border-red-500 text-red-500">
+                        ☠️ EXECUTE AVAILABLE
+                    </div>
+                 )}
+              </div>
+              <div className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mt-1">
+                  Current Round: <span className="text-white font-bold">{session.rounds.current}</span>
+                  <span className="mx-2">•</span>
+                  {getRoundLabel()}
+              </div>
+           </div>
+           
+           <div className="text-right">
+              <div className="font-black text-2xl text-yellow-500 drop-shadow-md">
+                  {session.totalPot.toFixed(1)} <span className="text-[10px] text-yellow-700">GOLD</span>
+              </div>
+              <div className="text-[10px] font-bold text-gray-500 uppercase">
+                  Alive: {session.alivePiratesCount} / {session.pirates.length}
+              </div>
+           </div>
         </div>
+        
+        {!isEnded && (
+            <progress 
+                className={`progress w-full h-1 mt-2 ${session.phase === 'VOTE_REVEAL' ? 'progress-info' : session.phase === 'PROPOSAL' ? 'progress-secondary' : 'progress-warning'}`} 
+                value={Math.max(0, session.rounds.current - session.rounds.start)} 
+                max={session.rounds.endPhase - session.rounds.start}
+            ></progress>
+        )}
       </SessionCardHeader>
 
-      {/* --- BODY --- */}
-      <SessionCardBody isEnded={session.phase === 'FINISHED'}>
+      <SessionCardBody isEnded={isEnded}>
         
+        {/* 1. Messaggi Globali */}
         <GameStateBanner session={session} />
-        
-        {/* 1. Pirate List */}
-        <div className="mb-6">
-          <div className="flex justify-between items-end mb-2">
-            <h5 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                The Crew ({session.alivePiratesCount} Alive)
-            </h5>
-            <span className="text-[10px] font-mono text-gray-600">
-                Entry Fee: <span className="text-white">{session.fee} A</span>
-            </span>
-          </div>
-          <PirateCrewList 
-            pirates={session.pirates} 
-            myAddress={myAddress}
-            currentProposerIndex={session.currentProposerIndex} 
-          />
-        </div>
 
-        {/* 2. Proposal Visualization */}
-        {/* Mostriamo la proposta se esiste (Fase Vote, Reveal o Finished) */}
-        {(session.currentProposal || session.phase === 'FINISHED') && (
-          <div className="mb-6">
-             <ProposalStatus 
-               proposal={session.currentProposal} 
-               pirates={session.pirates}
-               aliveCount={session.alivePiratesCount}
-             />
-          </div>
+        {/* 2. Risultato Personale */}
+        <PirateResultBanner session={session} />
+
+        {/* 3. Proposta (se attiva) */}
+        {session.currentProposal && (
+            <div className="mb-6">
+                <ProposalStatus 
+                    proposal={session.currentProposal} 
+                    pirates={session.pirates} 
+                    aliveCount={session.alivePiratesCount} 
+                    myAddress={session.myPirateInfo?.address} 
+                    phase={session.phase}
+                />
+            </div>
         )}
 
-        {/* 3. ACTIONS PANEL (Nuovo) */}
-        {/* Usiamo una key che include fase e round per forzare il re-render pulito dei form quando cambia turno */}
-        <div className="border-t border-white/5 pt-6 mt-4">
-            <PirateActionPanel 
-                session={session} 
-                loading={loading} 
-                actions={actions}
-                key={`${session.id}-${session.phase}-${session.gameRound}`}
-            />
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">The Crew</h4>
+                <PirateCrewList 
+                    pirates={session.pirates} 
+                    myAddress={session.myPirateInfo?.address} 
+                    currentProposerIndex={session.currentProposerIndex} 
+                />
+            </div>
 
-        {/* Footer Info: Timing & Blocks */}
-        <div className="mt-4 flex justify-between text-[10px] uppercase font-mono text-gray-600 border-t border-white/5 pt-2">
-           <div className="flex gap-4">
-             <span>Block: <span className="text-gray-400">{session.rounds.current}</span></span>
-             {session.rounds.endPhase > 0 && session.phase !== 'FINISHED' && (
-                <span>
-                    Deadline: <span className={session.rounds.current > session.rounds.endPhase ? 'text-red-500 font-bold' : 'text-gray-400'}>
-                        {session.rounds.endPhase}
-                    </span>
-                </span>
-             )}
-           </div>
-           {session.myPirateInfo && (
-               <span className={session.myPirateInfo.alive ? 'text-blue-500' : 'text-red-500'}>
-                   {session.myPirateInfo.alive ? 'STATUS: ALIVE' : 'STATUS: ELIMINATED'}
-               </span>
-           )}
+            <div className="flex flex-col justify-end">
+                <PirateActionPanel 
+                    session={session} 
+                    loading={loading} 
+                    actions={actions} 
+                />
+            </div>
         </div>
-
       </SessionCardBody>
     </BaseSessionCard>
   )

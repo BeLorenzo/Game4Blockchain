@@ -8,6 +8,15 @@
 
 // --- Tipi di Dati Memorizzati ---
 
+export interface StoredGameData {
+  claimResult: {
+    amount: number
+    timestamp: number
+    isTimeout?: boolean
+    isWin?: boolean
+  }
+}
+
 export interface StoredVoteData {
   vote: 0 | 1
   salt: number[] // Importante: salviamo come array di numeri per serializzazione JSON
@@ -153,22 +162,29 @@ export const PirateStorage = {
     appId: number, 
     address: string, 
     sessionId: number, 
-    amount: number
+    amount: number,
+    isTimeout: boolean = false
   ) => {
     if (typeof window === 'undefined') return
     
-    const data: StoredClaimData = {
-      amount,
-      isWin: amount > 0,
-      timestamp: Date.now()
+    // Struttura specifica richiesta da usePlayerStats
+    const data: StoredGameData = {
+      claimResult: {
+        amount,
+        timestamp: Date.now(),
+        isTimeout,
+        isWin: amount > 0
+      }
     }
     
     const key = getClaimKey(appId, address, sessionId)
     localStorage.setItem(key, JSON.stringify(data))
+
+    window.dispatchEvent(new Event('game-storage-update'))
   },
 
   /** Recupera info sul claim */
-  getClaim: (appId: number, address: string, sessionId: number): StoredClaimData | null => {
+getClaim: (appId: number, address: string, sessionId: number): StoredGameData['claimResult'] | null => {
     if (typeof window === 'undefined') return null
     
     const key = getClaimKey(appId, address, sessionId)
@@ -176,31 +192,15 @@ export const PirateStorage = {
     
     if (!item) return null
     try {
-      return JSON.parse(item) as StoredClaimData
+      const parsed = JSON.parse(item)
+      return parsed.claimResult || null
     } catch {
       return null
     }
   },
-
-  // UTILITY GENERICA
   
-  /** Pulisce tutti i dati di una sessione specifica (utile per debug o reset) */
-  clearSessionData: (appId: number, address: string, sessionId: number) => {
-    if (typeof window === 'undefined') return
-    
-    const baseKey = getBaseKey(appId, address, sessionId)
-    // Nota: localStorage non ha un "deleteByPrefix", quindi iteriamo o cancelliamo chiavi note
-    // Per sicurezza cancelliamo le note principali:
-    localStorage.removeItem(getRegistrationKey(appId, address, sessionId))
-    localStorage.removeItem(getClaimKey(appId, address, sessionId))
-    
-    // Per i round è complicato senza iterare tutto lo storage, 
-    // ma in produzione di solito si lasciano scadere o si usa un clear mirato.
-    // Qui un approccio semplice iterativo:
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith(baseKey)) {
-        localStorage.removeItem(key)
-      }
-    })
+  hasResult: (appId: number, address: string, sessionId: number): boolean => {
+      const key = getClaimKey(appId, address, sessionId)
+      return !!localStorage.getItem(key)
   }
 }

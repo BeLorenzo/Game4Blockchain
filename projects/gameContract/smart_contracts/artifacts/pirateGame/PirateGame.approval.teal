@@ -4,22 +4,22 @@
 // @algorandfoundation/algorand-typescript/arc4/index.d.ts::Contract.approvalProgram() -> uint64:
 main:
     intcblock 1 0 8 32 320
-    bytecblock "pir" "gs" "gst" "prp" "gameType" "newGame" "pls" 0x151f7c75 "join" "sessionIDCounter" 0x001a 0x068101 "sbal" "commitVote" "pcom"
+    bytecblock "pir" "gs" "gst" "" "prp" "gameType" "newGame" "pls" 0x151f7c75 "join" "sessionIDCounter" 0x001a 0x068101 "sbal" "commitVote" "pcom"
     txn ApplicationID
     bnz main_after_if_else@2
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
-    bytec 4 // "gameType"
-    pushbytes ""
+    bytec 5 // "gameType"
+    bytec_3 // ""
     app_global_put
-    // smart_contracts/abstract_contract/contract.algo.ts:57
+    // smart_contracts/abstract_contract/contract.algo.ts:49
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
-    bytec 9 // "sessionIDCounter"
+    bytec 10 // "sessionIDCounter"
     intc_1 // 0
     app_global_put
 
 main_after_if_else@2:
-    // smart_contracts/pirateGame/contract.algo.ts:55
+    // smart_contracts/pirateGame/contract.algo.ts:52
     // export class PirateGame extends GameContract {
     txn NumAppArgs
     bz main___algots__.defaultCreate@20
@@ -34,7 +34,7 @@ main_after_if_else@2:
     err
 
 main___algots__.defaultCreate@20:
-    // smart_contracts/pirateGame/contract.algo.ts:55
+    // smart_contracts/pirateGame/contract.algo.ts:52
     // export class PirateGame extends GameContract {
     txn OnCompletion
     !
@@ -63,9 +63,9 @@ ensure_budget_while_top@1:
     itxn_field TypeEnum
     pushint 5 // DeleteApplication
     itxn_field OnCompletion
-    bytec 11 // 0x068101
+    bytec 12 // 0x068101
     itxn_field ApprovalProgram
-    bytec 11 // 0x068101
+    bytec 12 // 0x068101
     itxn_field ClearStateProgram
     frame_dig -1
     switch ensure_budget_switch_case_0@3 ensure_budget_switch_case_1@4
@@ -90,12 +90,11 @@ ensure_budget_after_while@6:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.createSession[routing]() -> void:
 createSession:
-    // smart_contracts/pirateGame/contract.algo.ts:61-66
+    // smart_contracts/pirateGame/contract.algo.ts:62-66
     // public createSession(
     //   config: GameConfig,
     //   mbrPayment: gtxn.PaymentTxn,
     //   maxPirates: uint64,
-    //   //roundDuration: uint64
     // ): uint64 {
     txna ApplicationArgs 1
     dup
@@ -134,7 +133,7 @@ createSession_bool_merge@5:
     // smart_contracts/pirateGame/contract.algo.ts:67
     // assert(maxPirates >= 3 && maxPirates <= 20, 'Pirates must be between 3 and 20')
     assert // Pirates must be between 3 and 20
-    // smart_contracts/pirateGame/contract.algo.ts:69
+    // smart_contracts/pirateGame/contract.algo.ts:68
     // assert(config.participation >= 1_000_000, 'Minimum participation is 1 ALGO')
     dig 2
     dup
@@ -143,11 +142,11 @@ createSession_bool_merge@5:
     pushint 1000000 // 1000000
     >=
     assert // Minimum participation is 1 ALGO
-    // smart_contracts/pirateGame/contract.algo.ts:71
+    // smart_contracts/pirateGame/contract.algo.ts:70
     // const requiredMBR = this.getRequiredMBR('newGame')
-    bytec 5 // "newGame"
+    bytec 6 // "newGame"
     callsub smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR
-    // smart_contracts/pirateGame/contract.algo.ts:72
+    // smart_contracts/pirateGame/contract.algo.ts:71
     // assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
     dig 3
     dup
@@ -155,13 +154,13 @@ createSession_bool_merge@5:
     global CurrentApplicationAddress
     ==
     assert // MBR payment receiver must be contract
-    // smart_contracts/pirateGame/contract.algo.ts:73
+    // smart_contracts/pirateGame/contract.algo.ts:72
     // assert(mbrPayment.amount >= requiredMBR, 'Insufficient MBR')
     gtxns Amount
     <=
     assert // Insufficient MBR
-    // smart_contracts/abstract_contract/contract.algo.ts:106
-    // assert(config.startAt <= config.endCommitAt, 'Invalid timeline: start must be before commit end')
+    // smart_contracts/abstract_contract/contract.algo.ts:96
+    // assert(config.startAt < config.endCommitAt, 'Invalid timeline: start must be before commit end')
     dup
     intc_1 // 0
     extract_uint64
@@ -169,9 +168,9 @@ createSession_bool_merge@5:
     intc_2 // 8
     extract_uint64
     dup2
-    <=
+    <
     assert // Invalid timeline: start must be before commit end
-    // smart_contracts/abstract_contract/contract.algo.ts:107
+    // smart_contracts/abstract_contract/contract.algo.ts:97
     // assert(config.endCommitAt < config.endRevealAt, 'Invalid timeline: commit end must be before reveal end')
     dig 2
     pushint 16 // 16
@@ -179,68 +178,68 @@ createSession_bool_merge@5:
     dup2
     <
     assert // Invalid timeline: commit end must be before reveal end
-    // smart_contracts/abstract_contract/contract.algo.ts:108
+    // smart_contracts/abstract_contract/contract.algo.ts:98
     // assert(config.startAt >= Global.round, 'Invalid start time: cannot start in the past')
     dig 2
     global Round
     >=
     assert // Invalid start time: cannot start in the past
-    // smart_contracts/abstract_contract/contract.algo.ts:110
+    // smart_contracts/abstract_contract/contract.algo.ts:100
     // const sessionID = this.sessionIDCounter.value
     intc_1 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:57
+    // smart_contracts/abstract_contract/contract.algo.ts:49
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
-    bytec 9 // "sessionIDCounter"
-    // smart_contracts/abstract_contract/contract.algo.ts:110
+    bytec 10 // "sessionIDCounter"
+    // smart_contracts/abstract_contract/contract.algo.ts:100
     // const sessionID = this.sessionIDCounter.value
     app_global_get_ex
     assert // check GlobalState exists
-    // smart_contracts/abstract_contract/contract.algo.ts:112
+    // smart_contracts/abstract_contract/contract.algo.ts:102
     // this.gameSessions(sessionID).value = clone(config)
     dup
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:112
+    // smart_contracts/abstract_contract/contract.algo.ts:102
     // this.gameSessions(sessionID).value = clone(config)
     uncover 6
     box_put
-    // smart_contracts/abstract_contract/contract.algo.ts:81
+    // smart_contracts/abstract_contract/contract.algo.ts:73
     // sessionBalances = BoxMap<uint64, uint64>({ keyPrefix: 'sbal' })
-    bytec 12 // "sbal"
+    bytec 13 // "sbal"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:113
+    // smart_contracts/abstract_contract/contract.algo.ts:103
     // this.sessionBalances(sessionID).value = 0
     intc_1 // 0
     itob
     box_put
-    // smart_contracts/abstract_contract/contract.algo.ts:114
+    // smart_contracts/abstract_contract/contract.algo.ts:104
     // this.sessionIDCounter.value = sessionID + 1
     swap
     intc_0 // 1
     +
-    // smart_contracts/abstract_contract/contract.algo.ts:57
+    // smart_contracts/abstract_contract/contract.algo.ts:49
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
-    bytec 9 // "sessionIDCounter"
-    // smart_contracts/abstract_contract/contract.algo.ts:114
+    bytec 10 // "sessionIDCounter"
+    // smart_contracts/abstract_contract/contract.algo.ts:104
     // this.sessionIDCounter.value = sessionID + 1
     swap
     app_global_put
-    // smart_contracts/pirateGame/contract.algo.ts:77
-    // const commitDuration : uint64 = config.endCommitAt - config.startAt
+    // smart_contracts/pirateGame/contract.algo.ts:76
+    // const commitDuration: uint64 = config.endCommitAt - config.startAt
     dig 2
     uncover 4
     -
-    // smart_contracts/pirateGame/contract.algo.ts:78
-    // const revealDuration : uint64 = config.endRevealAt - config.endCommitAt
+    // smart_contracts/pirateGame/contract.algo.ts:77
+    // const revealDuration: uint64 = config.endRevealAt - config.endCommitAt
     uncover 2
     uncover 3
     -
-    // smart_contracts/pirateGame/contract.algo.ts:80-92
+    // smart_contracts/pirateGame/contract.algo.ts:79-88
     // this.gameState(sessionID).value = {
     //   phase: 0,
     //   currentRound: 0,
@@ -248,9 +247,6 @@ createSession_bool_merge@5:
     //   alivePirates: 0,
     //   currentProposerIndex: 0,
     //   pot: 0,
-    //   //proposalDeadline: config.startAt + roundDuration,
-    //   //voteDeadline: config.startAt + roundDuration * 2,
-    //   //revealDeadline: config.startAt + roundDuration * 3,
     //   commitDuration: commitDuration,
     //   revealDuration: revealDuration
     // }
@@ -262,12 +258,12 @@ createSession_bool_merge@5:
     swap
     itob
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
     dig 2
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:80-92
+    // smart_contracts/pirateGame/contract.algo.ts:79-88
     // this.gameState(sessionID).value = {
     //   phase: 0,
     //   currentRound: 0,
@@ -275,40 +271,36 @@ createSession_bool_merge@5:
     //   alivePirates: 0,
     //   currentProposerIndex: 0,
     //   pot: 0,
-    //   //proposalDeadline: config.startAt + roundDuration,
-    //   //voteDeadline: config.startAt + roundDuration * 2,
-    //   //revealDeadline: config.startAt + roundDuration * 3,
     //   commitDuration: commitDuration,
     //   revealDuration: revealDuration
     // }
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:94
+    // smart_contracts/pirateGame/contract.algo.ts:90
     // this.pirateList(sessionID).value = bzero(maxPirates * 32)
     dig 1
     intc_3 // 32
     *
     bzero
-    // smart_contracts/pirateGame/contract.algo.ts:58
+    // smart_contracts/pirateGame/contract.algo.ts:55
     // pirateList = BoxMap<uint64, bytes>({ keyPrefix: 'pls' })
-    bytec 6 // "pls"
+    bytec 7 // "pls"
     dig 2
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:94
+    // smart_contracts/pirateGame/contract.algo.ts:90
     // this.pirateList(sessionID).value = bzero(maxPirates * 32)
     dup
     box_del
     pop
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:61-66
+    // smart_contracts/pirateGame/contract.algo.ts:62-66
     // public createSession(
     //   config: GameConfig,
     //   mbrPayment: gtxn.PaymentTxn,
     //   maxPirates: uint64,
-    //   //roundDuration: uint64
     // ): uint64 {
-    bytec 7 // 0x151f7c75
+    bytec 8 // 0x151f7c75
     swap
     concat
     log
@@ -347,16 +339,16 @@ registerPirate:
     intc_0 // pay
     ==
     assert // transaction type is pay
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     uncover 2
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     dup
     box_len
@@ -364,7 +356,7 @@ registerPirate:
     // smart_contracts/pirateGame/contract.algo.ts:99
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
     dig 2
@@ -406,13 +398,13 @@ registerPirate:
     // smart_contracts/pirateGame/contract.algo.ts:108
     // const pirateAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     dig 5
     dig 1
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
@@ -426,7 +418,7 @@ registerPirate:
     assert // Already registered
     // smart_contracts/pirateGame/contract.algo.ts:113
     // const requiredMBR = this.getRequiredMBR('join')
-    bytec 8 // "join"
+    bytec 9 // "join"
     callsub smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR
     // smart_contracts/pirateGame/contract.algo.ts:114
     // assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
@@ -441,13 +433,13 @@ registerPirate:
     gtxns Amount
     <=
     assert // Insufficient MBR for pirate registration
-    // smart_contracts/pirateGame/contract.algo.ts:58
+    // smart_contracts/pirateGame/contract.algo.ts:55
     // pirateList = BoxMap<uint64, bytes>({ keyPrefix: 'pls' })
-    bytec 6 // "pls"
+    bytec 7 // "pls"
     dig 7
     concat
     // smart_contracts/pirateGame/contract.algo.ts:117
-    // const maxPirates : uint64 = this.pirateList(sessionID).value.length / 32
+    // const maxPirates: uint64 = this.pirateList(sessionID).value.length / 32
     dup
     box_get
     assert // Box must have value
@@ -459,25 +451,25 @@ registerPirate:
     dig 4
     >
     assert // Game is full
-    // smart_contracts/abstract_contract/contract.algo.ts:238
+    // smart_contracts/abstract_contract/contract.algo.ts:222
     // assert(this.gameSessions(sessionID).exists, 'Session does not exist')
     dig 6
     box_len
     bury 1
     assert // Session does not exist
-    // smart_contracts/abstract_contract/contract.algo.ts:240
+    // smart_contracts/abstract_contract/contract.algo.ts:224
     // const config = clone(this.gameSessions(sessionID).value)
     uncover 6
     box_get
     pop
-    // smart_contracts/abstract_contract/contract.algo.ts:241
+    // smart_contracts/abstract_contract/contract.algo.ts:225
     // assert(payment.receiver === Global.currentApplicationAddress, 'Payment must go to contract')
     dig 8
     gtxns Receiver
     global CurrentApplicationAddress
     ==
     assert // Payment must go to contract
-    // smart_contracts/abstract_contract/contract.algo.ts:242
+    // smart_contracts/abstract_contract/contract.algo.ts:226
     // assert(payment.amount === config.participation, 'Incorrect participation fee')
     uncover 8
     gtxns Amount
@@ -487,12 +479,12 @@ registerPirate:
     dig 1
     ==
     assert // Incorrect participation fee
-    // smart_contracts/abstract_contract/contract.algo.ts:81
+    // smart_contracts/abstract_contract/contract.algo.ts:73
     // sessionBalances = BoxMap<uint64, uint64>({ keyPrefix: 'sbal' })
-    bytec 12 // "sbal"
+    bytec 13 // "sbal"
     uncover 8
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:245
+    // smart_contracts/abstract_contract/contract.algo.ts:229
     // this.sessionBalances(sessionID).value += payment.amount
     dup
     box_get
@@ -502,7 +494,7 @@ registerPirate:
     +
     itob
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:125-130
+    // smart_contracts/pirateGame/contract.algo.ts:124-129
     // this.pirates(pirateKey).value = {
     //   pirateAddress: pirateAddr,
     //   seniorityIndex: seniorityIndex,
@@ -519,18 +511,18 @@ registerPirate:
     uncover 3
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:133
-    // const offset : uint64 = seniorityIndex * 32
+    // smart_contracts/pirateGame/contract.algo.ts:132
+    // const offset: uint64 = seniorityIndex * 32
     dig 3
     intc_3 // 32
     *
-    // smart_contracts/pirateGame/contract.algo.ts:134
+    // smart_contracts/pirateGame/contract.algo.ts:133
     // listBox.replace(offset, pirateAddr.bytes)
     uncover 2
     swap
     uncover 3
     box_replace
-    // smart_contracts/pirateGame/contract.algo.ts:136
+    // smart_contracts/pirateGame/contract.algo.ts:135
     // state.totalPirates += 1
     swap
     intc_0 // 1
@@ -539,7 +531,7 @@ registerPirate:
     uncover 2
     swap
     replace2 16
-    // smart_contracts/pirateGame/contract.algo.ts:137
+    // smart_contracts/pirateGame/contract.algo.ts:136
     // state.alivePirates += 1
     dup
     pushint 24 // 24
@@ -548,7 +540,7 @@ registerPirate:
     +
     itob
     replace2 24
-    // smart_contracts/pirateGame/contract.algo.ts:138
+    // smart_contracts/pirateGame/contract.algo.ts:137
     // state.pot += payment.amount
     dup
     pushint 40 // 40
@@ -557,7 +549,7 @@ registerPirate:
     +
     itob
     replace2 40
-    // smart_contracts/pirateGame/contract.algo.ts:139
+    // smart_contracts/pirateGame/contract.algo.ts:138
     // this.gameState(sessionID).value = clone(state)
     box_put
     // smart_contracts/pirateGame/contract.algo.ts:98
@@ -568,9 +560,9 @@ registerPirate:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.proposeDistribution[routing]() -> void:
 proposeDistribution:
-    pushbytes ""
+    bytec_3 // ""
     dupn 4
-    // smart_contracts/pirateGame/contract.algo.ts:142
+    // smart_contracts/pirateGame/contract.algo.ts:145
     // public proposeDistribution(sessionID: uint64, distribution: bytes): void {
     txna ApplicationArgs 1
     dup
@@ -591,36 +583,36 @@ proposeDistribution:
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
     extract 2 0
     swap
-    // smart_contracts/pirateGame/contract.algo.ts:143
+    // smart_contracts/pirateGame/contract.algo.ts:146
     // ensureBudget(1000)
     pushint 1000 // 1000
     intc_1 // 0
     callsub ensure_budget
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     itob
     dup
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     dup
     box_len
     bury 1
-    // smart_contracts/pirateGame/contract.algo.ts:144
+    // smart_contracts/pirateGame/contract.algo.ts:147
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
     dig 2
     concat
     dup
     cover 3
-    // smart_contracts/pirateGame/contract.algo.ts:146
+    // smart_contracts/pirateGame/contract.algo.ts:149
     // const state = clone(this.gameState(sessionID).value)
     box_get
     swap
@@ -628,11 +620,11 @@ proposeDistribution:
     cover 4
     cover 4
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:147
+    // smart_contracts/pirateGame/contract.algo.ts:150
     // const config = clone(this.gameSessions(sessionID).value)
     box_get
     pop
-    // smart_contracts/pirateGame/contract.algo.ts:151
+    // smart_contracts/pirateGame/contract.algo.ts:152
     // assert(Global.round >= config.startAt, 'Game not started yet')
     global Round
     swap
@@ -640,31 +632,31 @@ proposeDistribution:
     extract_uint64
     >=
     assert // Game not started yet
-    // smart_contracts/pirateGame/contract.algo.ts:153
+    // smart_contracts/pirateGame/contract.algo.ts:154
     // const pirateAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
     dup
     cover 2
-    // smart_contracts/pirateGame/contract.algo.ts:155
+    // smart_contracts/pirateGame/contract.algo.ts:156
     // assert(this.pirates(pirateKey).exists, 'Not registered')
     box_len
     bury 1
     assert // Not registered
-    // smart_contracts/pirateGame/contract.algo.ts:157
+    // smart_contracts/pirateGame/contract.algo.ts:158
     // if (state.phase === 0) {
     intc_1 // 0
     extract_uint64
     bnz proposeDistribution_after_if_else@3
-    // smart_contracts/pirateGame/contract.algo.ts:158
+    // smart_contracts/pirateGame/contract.algo.ts:159
     // assert(state.totalPirates >= 3, 'Not enough pirates to start')
     dig 1
     dup
@@ -673,7 +665,7 @@ proposeDistribution:
     pushint 3 // 3
     >=
     assert // Not enough pirates to start
-    // smart_contracts/pirateGame/contract.algo.ts:159
+    // smart_contracts/pirateGame/contract.algo.ts:160
     // state.phase = 1
     intc_0 // 1
     itob
@@ -681,7 +673,7 @@ proposeDistribution:
     bury 2
 
 proposeDistribution_after_if_else@3:
-    // smart_contracts/pirateGame/contract.algo.ts:161
+    // smart_contracts/pirateGame/contract.algo.ts:162
     // assert(state.phase === 1, 'Not in proposal phase')
     dig 1
     dup
@@ -690,18 +682,18 @@ proposeDistribution_after_if_else@3:
     intc_0 // 1
     ==
     assert // Not in proposal phase
-    // smart_contracts/pirateGame/contract.algo.ts:163
+    // smart_contracts/pirateGame/contract.algo.ts:164
     // const pirate = clone(this.pirates(pirateKey).value)
     dig 1
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:164
+    // smart_contracts/pirateGame/contract.algo.ts:165
     // assert(pirate.alive, 'You are eliminated')
     dup
     intc 4 // 320
     getbit
     assert // You are eliminated
-    // smart_contracts/pirateGame/contract.algo.ts:165
+    // smart_contracts/pirateGame/contract.algo.ts:166
     // assert(pirate.seniorityIndex === state.currentProposerIndex, 'Not your turn to propose')
     intc_3 // 32
     extract_uint64
@@ -712,15 +704,15 @@ proposeDistribution_after_if_else@3:
     bury 10
     ==
     assert // Not your turn to propose
-    // smart_contracts/pirateGame/contract.algo.ts:167
-    // const expectedLength : uint64 = state.totalPirates * 8
+    // smart_contracts/pirateGame/contract.algo.ts:168
+    // const expectedLength: uint64 = state.totalPirates * 8
     pushint 16 // 16
     extract_uint64
     dup
     bury 7
     intc_2 // 8
     *
-    // smart_contracts/pirateGame/contract.algo.ts:168
+    // smart_contracts/pirateGame/contract.algo.ts:169
     // assert(distribution.length === expectedLength, 'Invalid distribution length')
     dig 5
     len
@@ -728,23 +720,23 @@ proposeDistribution_after_if_else@3:
     bury 11
     ==
     assert // Invalid distribution length
-    // smart_contracts/pirateGame/contract.algo.ts:170
+    // smart_contracts/pirateGame/contract.algo.ts:171
     // let totalProposed: uint64 = 0
     intc_1 // 0
     bury 8
-    // smart_contracts/pirateGame/contract.algo.ts:171
+    // smart_contracts/pirateGame/contract.algo.ts:172
     // for (let i: uint64 = 0; i < state.totalPirates; i++) {
     intc_1 // 0
     bury 10
 
 proposeDistribution_while_top@4:
-    // smart_contracts/pirateGame/contract.algo.ts:171
+    // smart_contracts/pirateGame/contract.algo.ts:172
     // for (let i: uint64 = 0; i < state.totalPirates; i++) {
     dig 9
     dig 6
     <
     bz proposeDistribution_after_while@6
-    // smart_contracts/pirateGame/contract.algo.ts:172
+    // smart_contracts/pirateGame/contract.algo.ts:173
     // const share = extractUint64(distribution, i * 8)
     dig 9
     dup
@@ -753,12 +745,12 @@ proposeDistribution_while_top@4:
     dig 6
     swap
     extract_uint64
-    // smart_contracts/pirateGame/contract.algo.ts:173
+    // smart_contracts/pirateGame/contract.algo.ts:174
     // totalProposed += share
     dig 9
     +
     bury 9
-    // smart_contracts/pirateGame/contract.algo.ts:171
+    // smart_contracts/pirateGame/contract.algo.ts:172
     // for (let i: uint64 = 0; i < state.totalPirates; i++) {
     intc_0 // 1
     +
@@ -766,7 +758,7 @@ proposeDistribution_while_top@4:
     b proposeDistribution_while_top@4
 
 proposeDistribution_after_while@6:
-    // smart_contracts/pirateGame/contract.algo.ts:175
+    // smart_contracts/pirateGame/contract.algo.ts:176
     // assert(totalProposed === state.pot, 'Distribution must sum to pot')
     dig 1
     dup
@@ -775,7 +767,7 @@ proposeDistribution_after_while@6:
     dig 9
     ==
     assert // Distribution must sum to pot
-    // smart_contracts/pirateGame/contract.algo.ts:177-182
+    // smart_contracts/pirateGame/contract.algo.ts:178-183
     // this.proposals(sessionID).value = {
     //   proposer: state.currentProposerIndex,
     //   distribution: distribution,
@@ -790,12 +782,12 @@ proposeDistribution_after_while@6:
     dig 7
     concat
     swap
-    bytec 10 // 0x001a
+    bytec 11 // 0x001a
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:180
+    // smart_contracts/pirateGame/contract.algo.ts:181
     // votesFor: 0,
     intc_1 // 0
-    // smart_contracts/pirateGame/contract.algo.ts:177-182
+    // smart_contracts/pirateGame/contract.algo.ts:178-183
     // this.proposals(sessionID).value = {
     //   proposer: state.currentProposerIndex,
     //   distribution: distribution,
@@ -810,12 +802,12 @@ proposeDistribution_after_while@6:
     concat
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:59
+    // smart_contracts/pirateGame/contract.algo.ts:56
     // proposals = BoxMap<uint64, Proposal>({ keyPrefix: 'prp' })
-    bytec_3 // "prp"
+    bytec 4 // "prp"
     dig 6
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:177-182
+    // smart_contracts/pirateGame/contract.algo.ts:178-183
     // this.proposals(sessionID).value = {
     //   proposer: state.currentProposerIndex,
     //   distribution: distribution,
@@ -827,17 +819,17 @@ proposeDistribution_after_while@6:
     pop
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:184
+    // smart_contracts/pirateGame/contract.algo.ts:185
     // state.phase = 2
     pushint 2 // 2
     itob
     replace2 0
-    // smart_contracts/pirateGame/contract.algo.ts:185
+    // smart_contracts/pirateGame/contract.algo.ts:186
     // this.gameState(sessionID).value = clone(state)
     dig 3
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:142
+    // smart_contracts/pirateGame/contract.algo.ts:145
     // public proposeDistribution(sessionID: uint64, distribution: bytes): void {
     intc_0 // 1
     return
@@ -845,7 +837,7 @@ proposeDistribution_after_while@6:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.commitVote[routing]() -> void:
 commitVote:
-    // smart_contracts/pirateGame/contract.algo.ts:188
+    // smart_contracts/pirateGame/contract.algo.ts:192
     // public commitVote(sessionID: uint64, voteHash: bytes, mbrPayment: gtxn.PaymentTxn): void {
     txna ApplicationArgs 1
     dup
@@ -873,39 +865,39 @@ commitVote:
     intc_0 // pay
     ==
     assert // transaction type is pay
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     uncover 2
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     dup
     box_len
     bury 1
-    // smart_contracts/pirateGame/contract.algo.ts:189
+    // smart_contracts/pirateGame/contract.algo.ts:193
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
     dig 2
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:190
+    // smart_contracts/pirateGame/contract.algo.ts:194
     // const state = clone(this.gameState(sessionID).value)
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:191
+    // smart_contracts/pirateGame/contract.algo.ts:195
     // const config = clone(this.gameSessions(sessionID).value)
     swap
     box_get
     pop
     swap
-    // smart_contracts/pirateGame/contract.algo.ts:193
+    // smart_contracts/pirateGame/contract.algo.ts:197
     // assert(state.phase === 2, 'Not in voting phase')
     dup
     intc_1 // 0
@@ -913,7 +905,7 @@ commitVote:
     pushint 2 // 2
     ==
     assert // Not in voting phase
-    // smart_contracts/pirateGame/contract.algo.ts:194
+    // smart_contracts/pirateGame/contract.algo.ts:198
     // assert(Global.round <= config.endCommitAt, 'Voting deadline passed')
     global Round
     uncover 2
@@ -921,86 +913,86 @@ commitVote:
     extract_uint64
     <=
     assert // Voting deadline passed
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     dig 1
-    // smart_contracts/pirateGame/contract.algo.ts:196
+    // smart_contracts/pirateGame/contract.algo.ts:200
     // const pirateAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:198
+    // smart_contracts/pirateGame/contract.algo.ts:202
     // assert(this.pirates(pirateKey).exists, 'Not registered')
     dup
     box_len
     bury 1
     assert // Not registered
-    // smart_contracts/pirateGame/contract.algo.ts:199
+    // smart_contracts/pirateGame/contract.algo.ts:203
     // const pirate = clone(this.pirates(pirateKey).value)
     box_get
     pop
-    // smart_contracts/pirateGame/contract.algo.ts:200
+    // smart_contracts/pirateGame/contract.algo.ts:204
     // assert(pirate.alive, 'You are eliminated')
     intc 4 // 320
     getbit
     assert // You are eliminated
-    // smart_contracts/pirateGame/contract.algo.ts:202
+    // smart_contracts/pirateGame/contract.algo.ts:206
     // const requiredMBR = this.getRequiredMBR('commitVote')
-    bytec 13 // "commitVote"
+    bytec 14 // "commitVote"
     callsub smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR
-    // smart_contracts/pirateGame/contract.algo.ts:203
+    // smart_contracts/pirateGame/contract.algo.ts:207
     // assert(mbrPayment.receiver === Global.currentApplicationAddress, 'MBR payment receiver must be contract')
     dig 3
     gtxns Receiver
     global CurrentApplicationAddress
     ==
     assert // MBR payment receiver must be contract
-    // smart_contracts/pirateGame/contract.algo.ts:204
+    // smart_contracts/pirateGame/contract.algo.ts:208
     // assert(mbrPayment.amount >= requiredMBR, 'Insufficient MBR for vote commit')
     uncover 3
     gtxns Amount
     <=
     assert // Insufficient MBR for vote commit
-    // smart_contracts/pirateGame/contract.algo.ts:206
+    // smart_contracts/pirateGame/contract.algo.ts:210
     // super.commitInRound(sessionID, state.currentRound, voteHash)
     extract 8 8
-    // smart_contracts/abstract_contract/contract.algo.ts:253
+    // smart_contracts/abstract_contract/contract.algo.ts:237
     // const key = this.getRoundCommitKey(sessionID, round, new Address(Txn.sender))
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:278
+    // smart_contracts/abstract_contract/contract.algo.ts:262
     // return sha256(itob(sessionID).concat(itob(round)).concat(player.bytes))
     cover 2
     concat
     swap
     concat
     sha256
-    // smart_contracts/abstract_contract/contract.algo.ts:64
+    // smart_contracts/abstract_contract/contract.algo.ts:56
     // playerCommit = BoxMap<bytes, bytes>({ keyPrefix: 'pcom' })
-    bytec 14 // "pcom"
+    bytec 15 // "pcom"
     swap
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:254
+    // smart_contracts/abstract_contract/contract.algo.ts:238
     // assert(!this.playerCommit(key).exists, 'Already committed this round')
     dup
     box_len
     bury 1
     !
     assert // Already committed this round
-    // smart_contracts/abstract_contract/contract.algo.ts:255
+    // smart_contracts/abstract_contract/contract.algo.ts:239
     // this.playerCommit(key).value = commit
     dup
     box_del
     pop
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:188
+    // smart_contracts/pirateGame/contract.algo.ts:192
     // public commitVote(sessionID: uint64, voteHash: bytes, mbrPayment: gtxn.PaymentTxn): void {
     intc_0 // 1
     return
@@ -1010,9 +1002,9 @@ commitVote:
 revealVote:
     intc_1 // 0
     dupn 2
-    pushbytes ""
+    bytec_3 // ""
     dup
-    // smart_contracts/pirateGame/contract.algo.ts:209
+    // smart_contracts/pirateGame/contract.algo.ts:217
     // public revealVote(sessionID: uint64, vote: uint64, salt: bytes): void {
     txna ApplicationArgs 1
     dup
@@ -1042,27 +1034,27 @@ revealVote:
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
     extract 2 0
     cover 2
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     swap
     itob
     dup
     cover 2
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     swap
     concat
     dup
     cover 2
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     box_len
     bury 1
-    // smart_contracts/pirateGame/contract.algo.ts:210
+    // smart_contracts/pirateGame/contract.algo.ts:218
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/pirateGame/contract.algo.ts:211
+    // smart_contracts/pirateGame/contract.algo.ts:219
     // assert(vote === 0 || vote === 1, 'Vote must be 0 or 1')
     bz revealVote_bool_true@3
     dig 3
@@ -1074,17 +1066,17 @@ revealVote_bool_true@3:
     intc_0 // 1
 
 revealVote_bool_merge@5:
-    // smart_contracts/pirateGame/contract.algo.ts:211
+    // smart_contracts/pirateGame/contract.algo.ts:219
     // assert(vote === 0 || vote === 1, 'Vote must be 0 or 1')
     assert // Vote must be 0 or 1
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
     dig 2
     concat
     dup
     bury 10
-    // smart_contracts/pirateGame/contract.algo.ts:213
+    // smart_contracts/pirateGame/contract.algo.ts:221
     // const state = clone(this.gameState(sessionID).value)
     box_get
     swap
@@ -1092,12 +1084,12 @@ revealVote_bool_merge@5:
     cover 2
     bury 9
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:214
+    // smart_contracts/pirateGame/contract.algo.ts:222
     // const config = clone(this.gameSessions(sessionID).value)
     dig 1
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:215
+    // smart_contracts/pirateGame/contract.algo.ts:223
     // assert(Global.round > config.endCommitAt, 'Voting still open')
     global Round
     dig 1
@@ -1105,7 +1097,7 @@ revealVote_bool_merge@5:
     extract_uint64
     >
     assert // Voting still open
-    // smart_contracts/pirateGame/contract.algo.ts:216
+    // smart_contracts/pirateGame/contract.algo.ts:224
     // assert(Global.round <= config.endRevealAt, 'Reveal deadline passed')
     global Round
     swap
@@ -1113,7 +1105,7 @@ revealVote_bool_merge@5:
     extract_uint64
     <=
     assert // Reveal deadline passed
-    // smart_contracts/pirateGame/contract.algo.ts:217
+    // smart_contracts/pirateGame/contract.algo.ts:225
     // assert(state.phase === 2 || state.phase === 3, 'Not in reveal phase')
     intc_1 // 0
     extract_uint64
@@ -1133,41 +1125,41 @@ revealVote_bool_true@7:
     intc_0 // 1
 
 revealVote_bool_merge@9:
-    // smart_contracts/pirateGame/contract.algo.ts:217
+    // smart_contracts/pirateGame/contract.algo.ts:225
     // assert(state.phase === 2 || state.phase === 3, 'Not in reveal phase')
     assert // Not in reveal phase
-    // smart_contracts/pirateGame/contract.algo.ts:219
+    // smart_contracts/pirateGame/contract.algo.ts:227
     // const pirateAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     dig 2
     dup
     uncover 2
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:221
+    // smart_contracts/pirateGame/contract.algo.ts:229
     // const pirate = clone(this.pirates(pirateKey).value)
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:222
+    // smart_contracts/pirateGame/contract.algo.ts:230
     // assert(pirate.alive, 'You are eliminated')
     intc 4 // 320
     getbit
     assert // You are eliminated
-    // smart_contracts/pirateGame/contract.algo.ts:224
+    // smart_contracts/pirateGame/contract.algo.ts:232
     // super.revealInRound(sessionID, state.currentRound, vote, salt)
     dig 7
     extract 8 8
-    // smart_contracts/abstract_contract/contract.algo.ts:263
+    // smart_contracts/abstract_contract/contract.algo.ts:247
     // const key = this.getRoundCommitKey(sessionID, round, new Address(Txn.sender))
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:278
+    // smart_contracts/abstract_contract/contract.algo.ts:262
     // return sha256(itob(sessionID).concat(itob(round)).concat(player.bytes))
     dig 2
     uncover 2
@@ -1175,23 +1167,23 @@ revealVote_bool_merge@9:
     swap
     concat
     sha256
-    // smart_contracts/abstract_contract/contract.algo.ts:64
+    // smart_contracts/abstract_contract/contract.algo.ts:56
     // playerCommit = BoxMap<bytes, bytes>({ keyPrefix: 'pcom' })
-    bytec 14 // "pcom"
+    bytec 15 // "pcom"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:264
+    // smart_contracts/abstract_contract/contract.algo.ts:248
     // assert(this.playerCommit(key).exists, 'No commit for this round')
     dup
     box_len
     bury 1
     assert // No commit for this round
-    // smart_contracts/abstract_contract/contract.algo.ts:266
+    // smart_contracts/abstract_contract/contract.algo.ts:250
     // const storedCommit = this.playerCommit(key).value
     dup
     box_get
     pop
-    // smart_contracts/abstract_contract/contract.algo.ts:267
+    // smart_contracts/abstract_contract/contract.algo.ts:251
     // const computedCommit = sha256(itob(choice).concat(salt))
     dig 7
     dup
@@ -1201,43 +1193,43 @@ revealVote_bool_merge@9:
     dig 9
     concat
     sha256
-    // smart_contracts/abstract_contract/contract.algo.ts:268
+    // smart_contracts/abstract_contract/contract.algo.ts:252
     // assert(computedCommit === storedCommit, 'Invalid reveal: hash mismatch')
     uncover 2
     ==
     assert // Invalid reveal: hash mismatch
-    // smart_contracts/abstract_contract/contract.algo.ts:71
+    // smart_contracts/abstract_contract/contract.algo.ts:63
     // playerChoice = BoxMap<bytes, uint64>({ keyPrefix: 'pcho' })
     pushbytes "pcho"
     uncover 3
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:270
+    // smart_contracts/abstract_contract/contract.algo.ts:254
     // this.playerChoice(key).value = choice
     swap
     box_put
-    // smart_contracts/abstract_contract/contract.algo.ts:271
+    // smart_contracts/abstract_contract/contract.algo.ts:255
     // this.playerCommit(key).delete()
     box_del
     pop
-    // smart_contracts/pirateGame/contract.algo.ts:59
+    // smart_contracts/pirateGame/contract.algo.ts:56
     // proposals = BoxMap<uint64, Proposal>({ keyPrefix: 'prp' })
-    bytec_3 // "prp"
+    bytec 4 // "prp"
     uncover 2
     concat
     dup
     bury 10
-    // smart_contracts/pirateGame/contract.algo.ts:226
+    // smart_contracts/pirateGame/contract.algo.ts:234
     // const proposal = clone(this.proposals(sessionID).value)
     box_get
     swap
     cover 2
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:227
+    // smart_contracts/pirateGame/contract.algo.ts:235
     // if (vote === 1) {
     intc_0 // 1
     ==
     bz revealVote_else_body@11
-    // smart_contracts/pirateGame/contract.algo.ts:228
+    // smart_contracts/pirateGame/contract.algo.ts:236
     // proposal.votesFor += 1
     dig 8
     pushint 10 // 10
@@ -1250,7 +1242,7 @@ revealVote_bool_merge@9:
     replace2 10
 
 revealVote_after_if_else@12:
-    // smart_contracts/pirateGame/contract.algo.ts:232
+    // smart_contracts/pirateGame/contract.algo.ts:240
     // this.proposals(sessionID).value = clone(proposal)
     dig 8
     dup
@@ -1258,15 +1250,15 @@ revealVote_after_if_else@12:
     pop
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:234
+    // smart_contracts/pirateGame/contract.algo.ts:242
     // if (state.phase === 2) {
     dig 5
     bz revealVote_after_if_else@14
-    // smart_contracts/pirateGame/contract.algo.ts:235
+    // smart_contracts/pirateGame/contract.algo.ts:243
     // state.phase = 3
     pushint 3 // 3
     itob
-    // smart_contracts/pirateGame/contract.algo.ts:235-236
+    // smart_contracts/pirateGame/contract.algo.ts:243-244
     // state.phase = 3
     // this.gameState(sessionID).value = clone(state)
     dig 9
@@ -1275,13 +1267,13 @@ revealVote_after_if_else@12:
     box_replace
 
 revealVote_after_if_else@14:
-    // smart_contracts/pirateGame/contract.algo.ts:209
+    // smart_contracts/pirateGame/contract.algo.ts:217
     // public revealVote(sessionID: uint64, vote: uint64, salt: bytes): void {
     intc_0 // 1
     return
 
 revealVote_else_body@11:
-    // smart_contracts/pirateGame/contract.algo.ts:230
+    // smart_contracts/pirateGame/contract.algo.ts:238
     // proposal.votesAgainst += 1
     dig 8
     pushint 18 // 18
@@ -1305,7 +1297,9 @@ revealVote_bool_false@4:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.executeRound[routing]() -> void:
 executeRound:
-    // smart_contracts/pirateGame/contract.algo.ts:244
+    intc_1 // 0
+    bytec_3 // ""
+    // smart_contracts/pirateGame/contract.algo.ts:253
     // public executeRound(sessionID: uint64): void {
     txna ApplicationArgs 1
     dup
@@ -1315,147 +1309,169 @@ executeRound:
     assert // invalid number of bytes for arc4.uint64
     btoi
     dup
-    // smart_contracts/pirateGame/contract.algo.ts:245
+    // smart_contracts/pirateGame/contract.algo.ts:254
     // ensureBudget(2000)
     pushint 2000 // 2000
     intc_1 // 0
     callsub ensure_budget
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    dup
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     dig 1
     concat
     dup
     cover 2
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     dup
     box_len
     bury 1
-    // smart_contracts/pirateGame/contract.algo.ts:246
+    // smart_contracts/pirateGame/contract.algo.ts:255
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
-    dig 2
+    uncover 2
     concat
     dup
-    cover 3
-    // smart_contracts/pirateGame/contract.algo.ts:248
+    cover 2
+    // smart_contracts/pirateGame/contract.algo.ts:257
     // const state = clone(this.gameState(sessionID).value)
     box_get
     swap
     dup
     cover 2
-    cover 4
+    cover 3
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:249
+    // smart_contracts/pirateGame/contract.algo.ts:258
     // const config = clone(this.gameSessions(sessionID).value)
     swap
     box_get
     pop
-    dup
-    cover 2
-    cover 3
-    // smart_contracts/pirateGame/contract.algo.ts:251
-    // assert(state.phase === 3, 'Not in execution phase')
-    dup
+    swap
+    // smart_contracts/pirateGame/contract.algo.ts:260
+    // assert(state.phase === 3 || state.phase === 2, 'Not in execution phase')
     intc_1 // 0
     extract_uint64
+    dup
     pushint 3 // 3
     ==
+    bnz executeRound_bool_true@3
+    dup
+    pushint 2 // 2
+    ==
+    bz executeRound_bool_false@4
+
+executeRound_bool_true@3:
+    intc_0 // 1
+
+executeRound_bool_merge@5:
+    // smart_contracts/pirateGame/contract.algo.ts:260
+    // assert(state.phase === 3 || state.phase === 2, 'Not in execution phase')
     assert // Not in execution phase
-    // smart_contracts/pirateGame/contract.algo.ts:252
+    // smart_contracts/pirateGame/contract.algo.ts:261
     // assert(Global.round > config.endRevealAt, 'Reveal phase not ended')
     global Round
-    uncover 2
+    dig 2
     pushint 16 // 16
     extract_uint64
     >
     assert // Reveal phase not ended
-    // smart_contracts/pirateGame/contract.algo.ts:59
+    // smart_contracts/pirateGame/contract.algo.ts:56
     // proposals = BoxMap<uint64, Proposal>({ keyPrefix: 'prp' })
-    bytec_3 // "prp"
-    uncover 2
+    bytec 4 // "prp"
+    dig 6
     concat
     dup
-    uncover 2
-    // smart_contracts/pirateGame/contract.algo.ts:255
+    bury 10
+    // smart_contracts/pirateGame/contract.algo.ts:264
     // const totalVotes = state.alivePirates
+    dig 3
     pushint 24 // 24
     extract_uint64
     dup
-    uncover 2
-    // smart_contracts/pirateGame/contract.algo.ts:256
+    cover 2
+    bury 10
+    // smart_contracts/pirateGame/contract.algo.ts:265
     // const votesFor = proposal.votesFor
     pushint 10 // 10
     intc_2 // 8
     box_extract
     btoi
-    // smart_contracts/pirateGame/contract.algo.ts:259
-    // const passThreshold : uint64 = (totalVotes + 1 ) / 2
+    // smart_contracts/pirateGame/contract.algo.ts:268
+    // const passThreshold: uint64 = (totalVotes + 1) / 2
     swap
     intc_0 // 1
     +
     pushint 2 // 2
     /
-    // smart_contracts/pirateGame/contract.algo.ts:260
+    // smart_contracts/pirateGame/contract.algo.ts:269
     // const proposalPasses = votesFor >= passThreshold
     >=
-    // smart_contracts/pirateGame/contract.algo.ts:262
+    // smart_contracts/pirateGame/contract.algo.ts:271
     // if (proposalPasses) {
-    bz executeRound_else_body@3
-    // smart_contracts/pirateGame/contract.algo.ts:263
+    bz executeRound_else_body@7
+    // smart_contracts/pirateGame/contract.algo.ts:272
     // state.phase = 4
     pushint 4 // 4
     itob
-    // smart_contracts/pirateGame/contract.algo.ts:263-264
+    dig 3
+    dig 1
+    replace2 0
+    bury 4
+    // smart_contracts/pirateGame/contract.algo.ts:272-273
     // state.phase = 4
     // this.gameState(sessionID).value = clone(state)
-    dig 5
+    dig 4
     intc_1 // 0
     uncover 2
     box_replace
 
-executeRound_after_if_else@7:
-    // smart_contracts/pirateGame/contract.algo.ts:244
+executeRound_after_if_else@11:
+    // smart_contracts/pirateGame/contract.algo.ts:320
+    // this.gameState(sessionID).value = clone(state)
+    dig 3
+    dig 3
+    box_put
+    // smart_contracts/pirateGame/contract.algo.ts:253
     // public executeRound(sessionID: uint64): void {
     intc_0 // 1
     return
 
-executeRound_else_body@3:
-    // smart_contracts/pirateGame/contract.algo.ts:267
+executeRound_else_body@7:
+    // smart_contracts/pirateGame/contract.algo.ts:276
     // this.eliminatePirate(sessionID, state.currentProposerIndex)
-    dig 3
+    dig 2
     dup
     intc_3 // 32
     extract_uint64
     dig 8
     swap
     callsub eliminatePirate
-    // smart_contracts/pirateGame/contract.algo.ts:268
+    // smart_contracts/pirateGame/contract.algo.ts:277
     // state.alivePirates -= 1
-    dig 1
+    dig 8
     intc_0 // 1
     -
     itob
     replace2 24
     dup
-    bury 5
-    // smart_contracts/pirateGame/contract.algo.ts:271
+    bury 4
+    // smart_contracts/pirateGame/contract.algo.ts:280
     // if (state.alivePirates === 1) {
     pushint 24 // 24
     extract_uint64
     intc_0 // 1
     ==
-    bz executeRound_else_body@5
-    // smart_contracts/pirateGame/contract.algo.ts:272
+    bz executeRound_else_body@9
+    // smart_contracts/pirateGame/contract.algo.ts:281
     // const survivorIndex = this.findNextAlivePirate(sessionID, 0, state.totalPirates)
-    dig 3
+    dig 2
     dup
     pushint 16 // 16
     extract_uint64
@@ -1463,50 +1479,50 @@ executeRound_else_body@3:
     intc_1 // 0
     dig 2
     callsub findNextAlivePirate
-    // smart_contracts/pirateGame/contract.algo.ts:274
-    // const totalSize : uint64 = state.totalPirates * 8
+    // smart_contracts/pirateGame/contract.algo.ts:283
+    // const totalSize: uint64 = state.totalPirates * 8
     swap
     intc_2 // 8
     *
-    // smart_contracts/pirateGame/contract.algo.ts:275
-    // const survivorOffset : uint64 = survivorIndex * 8
+    // smart_contracts/pirateGame/contract.algo.ts:284
+    // const survivorOffset: uint64 = survivorIndex * 8
     dig 1
     intc_2 // 8
     *
-    // smart_contracts/pirateGame/contract.algo.ts:276
+    // smart_contracts/pirateGame/contract.algo.ts:285
     // const survivorShare = itob(state.pot)
     dig 3
     extract 40 8
-    // smart_contracts/pirateGame/contract.algo.ts:278
+    // smart_contracts/pirateGame/contract.algo.ts:287
     // const before = bzero(survivorOffset)
     dig 1
     bzero
-    // smart_contracts/pirateGame/contract.algo.ts:279
-    // const afterOffset : uint64 = survivorOffset + 8
+    // smart_contracts/pirateGame/contract.algo.ts:288
+    // const afterOffset: uint64 = survivorOffset + 8
     uncover 2
     intc_2 // 8
     +
-    // smart_contracts/pirateGame/contract.algo.ts:280
-    // const afterSize : uint64 = totalSize - afterOffset
+    // smart_contracts/pirateGame/contract.algo.ts:289
+    // const afterSize: uint64 = totalSize - afterOffset
     uncover 3
     swap
     -
-    // smart_contracts/pirateGame/contract.algo.ts:281
+    // smart_contracts/pirateGame/contract.algo.ts:290
     // const after = bzero(afterSize)
     bzero
-    // smart_contracts/pirateGame/contract.algo.ts:283
+    // smart_contracts/pirateGame/contract.algo.ts:292
     // const distribution = before.concat(survivorShare).concat(after)
     swap
     uncover 2
     concat
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:285-290
+    // smart_contracts/pirateGame/contract.algo.ts:294-299
     // this.proposals(sessionID).value = {
-    //      proposer: survivorIndex,
-    //      distribution: distribution,
-    //      votesFor: 1,
-    //      votesAgainst: 0
+    //   proposer: survivorIndex,
+    //   distribution: distribution,
+    //   votesFor: 1,
+    //   votesAgainst: 0
     // }
     swap
     itob
@@ -1517,64 +1533,59 @@ executeRound_else_body@3:
     uncover 2
     concat
     swap
-    bytec 10 // 0x001a
+    bytec 11 // 0x001a
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:288
+    // smart_contracts/pirateGame/contract.algo.ts:297
     // votesFor: 1,
     intc_0 // 1
-    // smart_contracts/pirateGame/contract.algo.ts:285-290
+    // smart_contracts/pirateGame/contract.algo.ts:294-299
     // this.proposals(sessionID).value = {
-    //      proposer: survivorIndex,
-    //      distribution: distribution,
-    //      votesFor: 1,
-    //      votesAgainst: 0
+    //   proposer: survivorIndex,
+    //   distribution: distribution,
+    //   votesFor: 1,
+    //   votesAgainst: 0
     // }
     itob
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:289
+    // smart_contracts/pirateGame/contract.algo.ts:298
     // votesAgainst: 0
     intc_1 // 0
-    // smart_contracts/pirateGame/contract.algo.ts:285-290
+    // smart_contracts/pirateGame/contract.algo.ts:294-299
     // this.proposals(sessionID).value = {
-    //      proposer: survivorIndex,
-    //      distribution: distribution,
-    //      votesFor: 1,
-    //      votesAgainst: 0
+    //   proposer: survivorIndex,
+    //   distribution: distribution,
+    //   votesFor: 1,
+    //   votesAgainst: 0
     // }
     itob
     concat
     swap
     concat
-    dig 3
+    dig 10
     dup
     box_del
     pop
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:292
+    // smart_contracts/pirateGame/contract.algo.ts:301
     // state.phase = 4 // Game Over
     pushint 4 // 4
     itob
     replace2 0
-    bury 4
+    bury 3
 
-executeRound_after_if_else@6:
-    // smart_contracts/pirateGame/contract.algo.ts:309
+executeRound_after_if_else@10:
+    // smart_contracts/pirateGame/contract.algo.ts:318
     // this.gameSessions(sessionID).value = clone(config)
-    dig 5
-    dig 3
-    box_put
-    // smart_contracts/pirateGame/contract.algo.ts:310
-    // this.gameState(sessionID).value = clone(state)    }
     dig 4
-    dig 4
+    dig 2
     box_put
-    b executeRound_after_if_else@7
+    b executeRound_after_if_else@11
 
-executeRound_else_body@5:
-    // smart_contracts/pirateGame/contract.algo.ts:295
+executeRound_else_body@9:
+    // smart_contracts/pirateGame/contract.algo.ts:304
     // state.currentProposerIndex = this.findNextAlivePirate(sessionID, state.currentProposerIndex + 1, state.totalPirates)
-    dig 3
+    dig 2
     dup
     intc_3 // 32
     extract_uint64
@@ -1588,7 +1599,7 @@ executeRound_else_body@5:
     callsub findNextAlivePirate
     itob
     replace2 32
-    // smart_contracts/pirateGame/contract.algo.ts:296
+    // smart_contracts/pirateGame/contract.algo.ts:305
     // state.currentRound += 1
     dup
     intc_2 // 8
@@ -1597,54 +1608,58 @@ executeRound_else_body@5:
     +
     itob
     replace2 8
-    // smart_contracts/pirateGame/contract.algo.ts:297
+    // smart_contracts/pirateGame/contract.algo.ts:306
     // state.phase = 1
     intc_0 // 1
     itob
     replace2 0
     dup
-    bury 5
-    // smart_contracts/pirateGame/contract.algo.ts:299
+    bury 4
+    // smart_contracts/pirateGame/contract.algo.ts:308
     // const now = Global.round
     global Round
-    // smart_contracts/pirateGame/contract.algo.ts:301
-    // const newEndCommitAt : uint64 = newStartAt + state.commitDuration
+    // smart_contracts/pirateGame/contract.algo.ts:310
+    // const newEndCommitAt: uint64 = newStartAt + state.commitDuration
     dig 1
     pushint 48 // 48
     extract_uint64
     dig 1
     +
-    // smart_contracts/pirateGame/contract.algo.ts:302
-    // const newEndRevealAt : uint64 = newEndCommitAt + state.revealDuration
+    // smart_contracts/pirateGame/contract.algo.ts:311
+    // const newEndRevealAt: uint64 = newEndCommitAt + state.revealDuration
     uncover 2
     pushint 56 // 56
     extract_uint64
     dig 1
     +
-    // smart_contracts/pirateGame/contract.algo.ts:304
+    // smart_contracts/pirateGame/contract.algo.ts:313
     // config.startAt = newStartAt
     uncover 2
     itob
-    dig 5
+    dig 4
     swap
     replace2 0
-    // smart_contracts/pirateGame/contract.algo.ts:305
+    // smart_contracts/pirateGame/contract.algo.ts:314
     // config.endCommitAt = newEndCommitAt
     uncover 2
     itob
     replace2 8
-    // smart_contracts/pirateGame/contract.algo.ts:306
+    // smart_contracts/pirateGame/contract.algo.ts:315
     // config.endRevealAt = newEndRevealAt
     swap
     itob
     replace2 16
-    bury 3
-    b executeRound_after_if_else@6
+    bury 2
+    b executeRound_after_if_else@10
+
+executeRound_bool_false@4:
+    intc_1 // 0
+    b executeRound_bool_merge@5
 
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.claimWinnings[routing]() -> void:
 claimWinnings:
-    // smart_contracts/pirateGame/contract.algo.ts:317
+    // smart_contracts/pirateGame/contract.algo.ts:326
     // public claimWinnings(sessionID: uint64): uint64 {
     txna ApplicationArgs 1
     dup
@@ -1653,85 +1668,88 @@ claimWinnings:
     ==
     assert // invalid number of bytes for arc4.uint64
     btoi
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     itob
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     dig 1
     concat
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     box_len
     bury 1
-    // smart_contracts/pirateGame/contract.algo.ts:318
+    // smart_contracts/pirateGame/contract.algo.ts:327
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
     dig 1
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:320
+    // smart_contracts/pirateGame/contract.algo.ts:329
     // const state = clone(this.gameState(sessionID).value)
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:321
+    // smart_contracts/pirateGame/contract.algo.ts:330
     // assert(state.phase === 4, 'Game not finished')
     intc_1 // 0
     extract_uint64
     pushint 4 // 4
     ==
     assert // Game not finished
-    // smart_contracts/pirateGame/contract.algo.ts:323
+    // smart_contracts/pirateGame/contract.algo.ts:332
     // const pirateAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    dup
+    cover 2
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
-    dup2
+    dig 1
+    swap
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:325
+    // smart_contracts/pirateGame/contract.algo.ts:334
     // assert(this.pirates(pirateKey).exists, 'Not a pirate')
     dup
     box_len
     bury 1
     assert // Not a pirate
-    // smart_contracts/pirateGame/contract.algo.ts:327
+    // smart_contracts/pirateGame/contract.algo.ts:336
     // const pirate = clone(this.pirates(pirateKey).value)
     dup
     box_get
     pop
-    // smart_contracts/pirateGame/contract.algo.ts:328
+    // smart_contracts/pirateGame/contract.algo.ts:337
     // assert(!pirate.claimed, 'Already claimed') // Anti-replay
     dup
     pushint 321 // 321
     getbit
     !
     assert // Already claimed
-    // smart_contracts/pirateGame/contract.algo.ts:59
+    // smart_contracts/pirateGame/contract.algo.ts:56
     // proposals = BoxMap<uint64, Proposal>({ keyPrefix: 'prp' })
-    bytec_3 // "prp"
-    uncover 4
+    bytec 4 // "prp"
+    uncover 3
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:330
+    // smart_contracts/pirateGame/contract.algo.ts:339
     // const winningProposal = clone(this.proposals(sessionID).value)
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:332
-    // const shareOffset : uint64 = pirate.seniorityIndex * 8
+    // smart_contracts/pirateGame/contract.algo.ts:341
+    // const shareOffset: uint64 = pirate.seniorityIndex * 8
     swap
     intc_3 // 32
     extract_uint64
     intc_2 // 8
     *
-    // smart_contracts/pirateGame/contract.algo.ts:333
+    // smart_contracts/pirateGame/contract.algo.ts:342
     // const share = extractUint64(winningProposal.distribution, shareOffset)
     dig 1
     intc_2 // 8
@@ -1744,11 +1762,9 @@ claimWinnings:
     extract 2 0
     swap
     extract_uint64
-    // smart_contracts/pirateGame/contract.algo.ts:335
-    // assert(share > 0, 'No winnings for you')
     dup
-    assert // No winnings for you
-    // smart_contracts/pirateGame/contract.algo.ts:337-338
+    cover 2
+    // smart_contracts/pirateGame/contract.algo.ts:344-345
     // pirate.claimed = true
     // this.pirates(pirateKey).value = clone(pirate)
     dig 1
@@ -1756,10 +1772,10 @@ claimWinnings:
     intc_0 // 1
     box_extract
     intc_0 // 1
-    // smart_contracts/pirateGame/contract.algo.ts:337
+    // smart_contracts/pirateGame/contract.algo.ts:344
     // pirate.claimed = true
     dup
-    // smart_contracts/pirateGame/contract.algo.ts:337-338
+    // smart_contracts/pirateGame/contract.algo.ts:344-345
     // pirate.claimed = true
     // this.pirates(pirateKey).value = clone(pirate)
     setbit
@@ -1767,7 +1783,14 @@ claimWinnings:
     pushint 40 // 40
     uncover 2
     box_replace
-    // smart_contracts/pirateGame/contract.algo.ts:340-346
+    // smart_contracts/pirateGame/contract.algo.ts:346
+    // assert(share > 0, 'No winnings for you')
+    dup
+    assert // No winnings for you
+    // smart_contracts/pirateGame/contract.algo.ts:348
+    // if (share > 0) {
+    bz claimWinnings_after_if_else@4
+    // smart_contracts/pirateGame/contract.algo.ts:349-355
     // itxn
     //   .payment({
     //     receiver: pirateAddr.native,
@@ -1778,9 +1801,9 @@ claimWinnings:
     itxn_begin
     dup
     itxn_field Amount
-    swap
+    dig 1
     itxn_field Receiver
-    // smart_contracts/pirateGame/contract.algo.ts:340-345
+    // smart_contracts/pirateGame/contract.algo.ts:349-354
     // itxn
     //   .payment({
     //     receiver: pirateAddr.native,
@@ -1789,11 +1812,11 @@ claimWinnings:
     //   })
     intc_0 // 1
     itxn_field TypeEnum
-    // smart_contracts/pirateGame/contract.algo.ts:344
+    // smart_contracts/pirateGame/contract.algo.ts:353
     // fee: 0,
     intc_1 // 0
     itxn_field Fee
-    // smart_contracts/pirateGame/contract.algo.ts:340-346
+    // smart_contracts/pirateGame/contract.algo.ts:349-355
     // itxn
     //   .payment({
     //     receiver: pirateAddr.native,
@@ -1802,10 +1825,13 @@ claimWinnings:
     //   })
     //   .submit()
     itxn_submit
-    // smart_contracts/pirateGame/contract.algo.ts:317
+
+claimWinnings_after_if_else@4:
+    // smart_contracts/pirateGame/contract.algo.ts:326
     // public claimWinnings(sessionID: uint64): uint64 {
+    dup
     itob
-    bytec 7 // 0x151f7c75
+    bytec 8 // 0x151f7c75
     swap
     concat
     log
@@ -1815,7 +1841,7 @@ claimWinnings:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR[routing]() -> void:
 getRequiredMBR:
-    // smart_contracts/pirateGame/contract.algo.ts:384
+    // smart_contracts/pirateGame/contract.algo.ts:404
     // public getRequiredMBR(command: 'newGame' | 'join' | 'commitVote'): uint64 {
     txna ApplicationArgs 1
     dup
@@ -1830,7 +1856,7 @@ getRequiredMBR:
     extract 2 0
     callsub smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR
     itob
-    bytec 7 // 0x151f7c75
+    bytec 8 // 0x151f7c75
     swap
     concat
     log
@@ -1840,7 +1866,7 @@ getRequiredMBR:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.timeOut[routing]() -> void:
 timeOut:
-    // smart_contracts/pirateGame/contract.algo.ts:411
+    // smart_contracts/pirateGame/contract.algo.ts:436
     // public timeOut(sessionID: uint64): void {
     txna ApplicationArgs 1
     dup
@@ -1850,38 +1876,38 @@ timeOut:
     assert // invalid number of bytes for arc4.uint64
     btoi
     dup
-    // smart_contracts/pirateGame/contract.algo.ts:412
+    // smart_contracts/pirateGame/contract.algo.ts:437
     // ensureBudget(2000)
     pushint 2000 // 2000
     intc_1 // 0
     callsub ensure_budget
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     itob
     dup
-    // smart_contracts/abstract_contract/contract.algo.ts:76
+    // smart_contracts/abstract_contract/contract.algo.ts:68
     // gameSessions = BoxMap<uint64, GameConfig>({ keyPrefix: 'gs' })
     bytec_1 // "gs"
     dig 1
     concat
     dup
     cover 2
-    // smart_contracts/abstract_contract/contract.algo.ts:222
+    // smart_contracts/abstract_contract/contract.algo.ts:206
     // return this.gameSessions(sessionID).exists
     dup
     box_len
     bury 1
-    // smart_contracts/pirateGame/contract.algo.ts:413
+    // smart_contracts/pirateGame/contract.algo.ts:438
     // assert(this.sessionExists(sessionID), 'Session does not exist')
     assert // Session does not exist
-    // smart_contracts/pirateGame/contract.algo.ts:56
+    // smart_contracts/pirateGame/contract.algo.ts:53
     // gameState = BoxMap<uint64, GameState>({ keyPrefix: 'gst' })
     bytec_2 // "gst"
     uncover 2
     concat
     dup
     cover 2
-    // smart_contracts/pirateGame/contract.algo.ts:415
+    // smart_contracts/pirateGame/contract.algo.ts:440
     // const state = clone(this.gameState(sessionID).value)
     box_get
     swap
@@ -1889,13 +1915,13 @@ timeOut:
     cover 2
     cover 3
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:416
+    // smart_contracts/pirateGame/contract.algo.ts:441
     // const config = clone(this.gameSessions(sessionID).value)
     swap
     box_get
     pop
     swap
-    // smart_contracts/pirateGame/contract.algo.ts:418
+    // smart_contracts/pirateGame/contract.algo.ts:443
     // const canPlay = state.totalPirates >= 3
     dup
     pushint 16 // 16
@@ -1903,7 +1929,7 @@ timeOut:
     pushint 3 // 3
     >=
     swap
-    // smart_contracts/pirateGame/contract.algo.ts:420
+    // smart_contracts/pirateGame/contract.algo.ts:445
     // if (state.phase === 0 && !canPlay) {
     intc_1 // 0
     extract_uint64
@@ -1913,7 +1939,7 @@ timeOut:
     bnz timeOut_after_if_else@5
     dig 2
     bnz timeOut_after_if_else@5
-    // smart_contracts/pirateGame/contract.algo.ts:421
+    // smart_contracts/pirateGame/contract.algo.ts:446
     // assert(Global.round >= config.startAt, 'Registration still active')
     global Round
     dig 4
@@ -1923,38 +1949,38 @@ timeOut:
     extract_uint64
     >=
     assert // Registration still active
-    // smart_contracts/pirateGame/contract.algo.ts:423
+    // smart_contracts/pirateGame/contract.algo.ts:448
     // const pirateAddr = new Address(Txn.sender)
     txn Sender
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     dig 9
     dig 1
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:425
+    // smart_contracts/pirateGame/contract.algo.ts:450
     // assert(this.pirates(pirateKey).exists, 'Not a registered pirate')
     dup
     box_len
     bury 1
     assert // Not a registered pirate
-    // smart_contracts/pirateGame/contract.algo.ts:426
+    // smart_contracts/pirateGame/contract.algo.ts:451
     // const pirate = clone(this.pirates(pirateKey).value)
     dup
     box_get
     pop
-    // smart_contracts/pirateGame/contract.algo.ts:427
+    // smart_contracts/pirateGame/contract.algo.ts:452
     // assert(!pirate.claimed, 'Already refunded')
     pushint 321 // 321
     getbit
     !
     assert // Already refunded
-    // smart_contracts/pirateGame/contract.algo.ts:429-430
+    // smart_contracts/pirateGame/contract.algo.ts:454-455
     // pirate.claimed = true
     // this.pirates(pirateKey).value = clone(pirate)
     dup
@@ -1962,58 +1988,58 @@ timeOut:
     intc_0 // 1
     box_extract
     intc_0 // 1
-    // smart_contracts/pirateGame/contract.algo.ts:429
+    // smart_contracts/pirateGame/contract.algo.ts:454
     // pirate.claimed = true
     dup
-    // smart_contracts/pirateGame/contract.algo.ts:429-430
+    // smart_contracts/pirateGame/contract.algo.ts:454-455
     // pirate.claimed = true
     // this.pirates(pirateKey).value = clone(pirate)
     setbit
     pushint 40 // 40
     swap
     box_replace
-    // smart_contracts/pirateGame/contract.algo.ts:432-436
+    // smart_contracts/pirateGame/contract.algo.ts:457-461
     // itxn.payment({
-    //     receiver: pirateAddr.native,
-    //     amount: config.participation,
-    //     fee: 0
+    //   receiver: pirateAddr.native,
+    //   amount: config.participation,
+    //   fee: 0
     // }).submit()
     itxn_begin
-    // smart_contracts/pirateGame/contract.algo.ts:434
+    // smart_contracts/pirateGame/contract.algo.ts:459
     // amount: config.participation,
     swap
     pushint 24 // 24
     extract_uint64
     itxn_field Amount
     itxn_field Receiver
-    // smart_contracts/pirateGame/contract.algo.ts:432-436
+    // smart_contracts/pirateGame/contract.algo.ts:457-461
     // itxn.payment({
-    //     receiver: pirateAddr.native,
-    //     amount: config.participation,
-    //     fee: 0
+    //   receiver: pirateAddr.native,
+    //   amount: config.participation,
+    //   fee: 0
     // }).submit()
     intc_0 // 1
     itxn_field TypeEnum
-    // smart_contracts/pirateGame/contract.algo.ts:435
+    // smart_contracts/pirateGame/contract.algo.ts:460
     // fee: 0
     intc_1 // 0
     itxn_field Fee
-    // smart_contracts/pirateGame/contract.algo.ts:432-436
+    // smart_contracts/pirateGame/contract.algo.ts:457-461
     // itxn.payment({
-    //     receiver: pirateAddr.native,
-    //     amount: config.participation,
-    //     fee: 0
+    //   receiver: pirateAddr.native,
+    //   amount: config.participation,
+    //   fee: 0
     // }).submit()
     itxn_submit
 
 timeOut_after_inlined_smart_contracts/pirateGame/contract.algo.ts::PirateGame.timeOut@13:
-    // smart_contracts/pirateGame/contract.algo.ts:411
+    // smart_contracts/pirateGame/contract.algo.ts:436
     // public timeOut(sessionID: uint64): void {
     intc_0 // 1
     return
 
 timeOut_after_if_else@5:
-    // smart_contracts/pirateGame/contract.algo.ts:441
+    // smart_contracts/pirateGame/contract.algo.ts:465
     // if (state.phase === 1 || (state.phase === 0 && canPlay)) {
     dig 1
     intc_0 // 1
@@ -2025,7 +2051,7 @@ timeOut_after_if_else@5:
     assert // Nothing to unlock in this phase
 
 timeOut_if_body@8:
-    // smart_contracts/pirateGame/contract.algo.ts:443
+    // smart_contracts/pirateGame/contract.algo.ts:467
     // assert(Global.round > config.endCommitAt, 'Proposal deadline not passed yet')
     global Round
     dig 4
@@ -2033,7 +2059,7 @@ timeOut_if_body@8:
     extract_uint64
     >
     assert // Proposal deadline not passed yet
-    // smart_contracts/pirateGame/contract.algo.ts:445
+    // smart_contracts/pirateGame/contract.algo.ts:469
     // this.eliminatePirate(sessionID, state.currentProposerIndex)
     dig 4
     dup
@@ -2042,7 +2068,7 @@ timeOut_if_body@8:
     dig 10
     swap
     callsub eliminatePirate
-    // smart_contracts/pirateGame/contract.algo.ts:446
+    // smart_contracts/pirateGame/contract.algo.ts:470
     // state.alivePirates -= 1
     dup
     pushint 24 // 24
@@ -2053,14 +2079,14 @@ timeOut_if_body@8:
     replace2 24
     dup
     bury 6
-    // smart_contracts/pirateGame/contract.algo.ts:448
+    // smart_contracts/pirateGame/contract.algo.ts:472
     // if (state.alivePirates === 1) {
     pushint 24 // 24
     extract_uint64
     intc_0 // 1
     ==
     bz timeOut_else_body@10
-    // smart_contracts/pirateGame/contract.algo.ts:449
+    // smart_contracts/pirateGame/contract.algo.ts:473
     // const survivorIndex = this.findNextAlivePirate(sessionID, 0, state.totalPirates)
     dig 4
     dup
@@ -2070,50 +2096,50 @@ timeOut_if_body@8:
     intc_1 // 0
     dig 2
     callsub findNextAlivePirate
-    // smart_contracts/pirateGame/contract.algo.ts:450
-    // const totalSize : uint64 = state.totalPirates * 8
+    // smart_contracts/pirateGame/contract.algo.ts:474
+    // const totalSize: uint64 = state.totalPirates * 8
     swap
     intc_2 // 8
     *
-    // smart_contracts/pirateGame/contract.algo.ts:451
-    // const survivorOffset : uint64 = survivorIndex * 8
+    // smart_contracts/pirateGame/contract.algo.ts:475
+    // const survivorOffset: uint64 = survivorIndex * 8
     dig 1
     intc_2 // 8
     *
-    // smart_contracts/pirateGame/contract.algo.ts:452
+    // smart_contracts/pirateGame/contract.algo.ts:476
     // const survivorShare = itob(state.pot)
     dig 3
     extract 40 8
-    // smart_contracts/pirateGame/contract.algo.ts:454
+    // smart_contracts/pirateGame/contract.algo.ts:478
     // const before = bzero(survivorOffset)
     dig 1
     bzero
-    // smart_contracts/pirateGame/contract.algo.ts:455
-    // const afterOffset : uint64 = survivorOffset + 8
+    // smart_contracts/pirateGame/contract.algo.ts:479
+    // const afterOffset: uint64 = survivorOffset + 8
     uncover 2
     intc_2 // 8
     +
-    // smart_contracts/pirateGame/contract.algo.ts:456
-    // const afterSize : uint64 = totalSize - afterOffset
+    // smart_contracts/pirateGame/contract.algo.ts:480
+    // const afterSize: uint64 = totalSize - afterOffset
     uncover 3
     swap
     -
-    // smart_contracts/pirateGame/contract.algo.ts:457
+    // smart_contracts/pirateGame/contract.algo.ts:481
     // const after = bzero(afterSize)
     bzero
-    // smart_contracts/pirateGame/contract.algo.ts:459
+    // smart_contracts/pirateGame/contract.algo.ts:483
     // const distribution = before.concat(survivorShare).concat(after)
     swap
     uncover 2
     concat
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:461-466
+    // smart_contracts/pirateGame/contract.algo.ts:485-490
     // this.proposals(sessionID).value = {
-    //      proposer: survivorIndex,
-    //      distribution: distribution,
-    //      votesFor: 1,
-    //      votesAgainst: 0
+    //   proposer: survivorIndex,
+    //   distribution: distribution,
+    //   votesFor: 1,
+    //   votesAgainst: 0
     // }
     swap
     itob
@@ -2124,52 +2150,52 @@ timeOut_if_body@8:
     uncover 2
     concat
     swap
-    bytec 10 // 0x001a
+    bytec 11 // 0x001a
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:464
+    // smart_contracts/pirateGame/contract.algo.ts:488
     // votesFor: 1,
     intc_0 // 1
-    // smart_contracts/pirateGame/contract.algo.ts:461-466
+    // smart_contracts/pirateGame/contract.algo.ts:485-490
     // this.proposals(sessionID).value = {
-    //      proposer: survivorIndex,
-    //      distribution: distribution,
-    //      votesFor: 1,
-    //      votesAgainst: 0
+    //   proposer: survivorIndex,
+    //   distribution: distribution,
+    //   votesFor: 1,
+    //   votesAgainst: 0
     // }
     itob
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:465
+    // smart_contracts/pirateGame/contract.algo.ts:489
     // votesAgainst: 0
     intc_1 // 0
-    // smart_contracts/pirateGame/contract.algo.ts:461-466
+    // smart_contracts/pirateGame/contract.algo.ts:485-490
     // this.proposals(sessionID).value = {
-    //      proposer: survivorIndex,
-    //      distribution: distribution,
-    //      votesFor: 1,
-    //      votesAgainst: 0
+    //   proposer: survivorIndex,
+    //   distribution: distribution,
+    //   votesFor: 1,
+    //   votesAgainst: 0
     // }
     itob
     concat
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:59
+    // smart_contracts/pirateGame/contract.algo.ts:56
     // proposals = BoxMap<uint64, Proposal>({ keyPrefix: 'prp' })
-    bytec_3 // "prp"
+    bytec 4 // "prp"
     dig 10
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:461-466
+    // smart_contracts/pirateGame/contract.algo.ts:485-490
     // this.proposals(sessionID).value = {
-    //      proposer: survivorIndex,
-    //      distribution: distribution,
-    //      votesFor: 1,
-    //      votesAgainst: 0
+    //   proposer: survivorIndex,
+    //   distribution: distribution,
+    //   votesFor: 1,
+    //   votesAgainst: 0
     // }
     dup
     box_del
     pop
     swap
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:467
+    // smart_contracts/pirateGame/contract.algo.ts:491
     // state.phase = 4 // Finished
     pushint 4 // 4
     itob
@@ -2177,17 +2203,17 @@ timeOut_if_body@8:
     bury 5
 
 timeOut_after_if_else@11:
-    // smart_contracts/pirateGame/contract.algo.ts:486
+    // smart_contracts/pirateGame/contract.algo.ts:510
     // this.gameState(sessionID).value = clone(state)
     dig 5
     dig 5
     box_put
-    // smart_contracts/pirateGame/contract.algo.ts:411
+    // smart_contracts/pirateGame/contract.algo.ts:436
     // public timeOut(sessionID: uint64): void {
     b timeOut_after_inlined_smart_contracts/pirateGame/contract.algo.ts::PirateGame.timeOut@13
 
 timeOut_else_body@10:
-    // smart_contracts/pirateGame/contract.algo.ts:469
+    // smart_contracts/pirateGame/contract.algo.ts:493
     // state.currentProposerIndex = this.findNextAlivePirate(sessionID, state.currentProposerIndex + 1, state.totalPirates)
     dig 4
     dup
@@ -2203,7 +2229,7 @@ timeOut_else_body@10:
     callsub findNextAlivePirate
     itob
     replace2 32
-    // smart_contracts/pirateGame/contract.algo.ts:470
+    // smart_contracts/pirateGame/contract.algo.ts:494
     // state.currentRound += 1
     dup
     intc_2 // 8
@@ -2212,48 +2238,48 @@ timeOut_else_body@10:
     +
     itob
     replace2 8
-    // smart_contracts/pirateGame/contract.algo.ts:472
+    // smart_contracts/pirateGame/contract.algo.ts:496
     // state.phase = 1
     intc_0 // 1
     itob
     replace2 0
     dup
     bury 6
-    // smart_contracts/pirateGame/contract.algo.ts:474
+    // smart_contracts/pirateGame/contract.algo.ts:498
     // const now = Global.round
     global Round
-    // smart_contracts/pirateGame/contract.algo.ts:476
-    // const newEndCommitAt : uint64 = newStartAt + state.commitDuration
+    // smart_contracts/pirateGame/contract.algo.ts:500
+    // const newEndCommitAt: uint64 = newStartAt + state.commitDuration
     dig 1
     pushint 48 // 48
     extract_uint64
     dig 1
     +
-    // smart_contracts/pirateGame/contract.algo.ts:477
-    // const newEndRevealAt : uint64 = newEndCommitAt + state.revealDuration
+    // smart_contracts/pirateGame/contract.algo.ts:501
+    // const newEndRevealAt: uint64 = newEndCommitAt + state.revealDuration
     uncover 2
     pushint 56 // 56
     extract_uint64
     dig 1
     +
-    // smart_contracts/pirateGame/contract.algo.ts:479
+    // smart_contracts/pirateGame/contract.algo.ts:503
     // config.startAt = newStartAt
     uncover 2
     itob
     dig 6
     swap
     replace2 0
-    // smart_contracts/pirateGame/contract.algo.ts:480
+    // smart_contracts/pirateGame/contract.algo.ts:504
     // config.endCommitAt = newEndCommitAt
     uncover 2
     itob
     replace2 8
-    // smart_contracts/pirateGame/contract.algo.ts:481
+    // smart_contracts/pirateGame/contract.algo.ts:505
     // config.endRevealAt = newEndRevealAt
     swap
     itob
     replace2 16
-    // smart_contracts/pirateGame/contract.algo.ts:483
+    // smart_contracts/pirateGame/contract.algo.ts:507
     // this.gameSessions(sessionID).value = clone(config)
     dig 7
     swap
@@ -2263,17 +2289,17 @@ timeOut_else_body@10:
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.getGameType[routing]() -> void:
 getGameType:
-    // smart_contracts/abstract_contract/contract.algo.ts:88
+    // smart_contracts/abstract_contract/contract.algo.ts:79
     // return this.gameType.value
     intc_1 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
-    bytec 4 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:88
+    bytec 5 // "gameType"
+    // smart_contracts/abstract_contract/contract.algo.ts:79
     // return this.gameType.value
     app_global_get_ex
     assert // check GlobalState exists
-    // smart_contracts/abstract_contract/contract.algo.ts:87
+    // smart_contracts/abstract_contract/contract.algo.ts:78
     // public getGameType(): bytes {
     dup
     len
@@ -2281,7 +2307,7 @@ getGameType:
     extract 6 2
     swap
     concat
-    bytec 7 // 0x151f7c75
+    bytec 8 // 0x151f7c75
     swap
     concat
     log
@@ -2291,7 +2317,7 @@ getGameType:
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.initialize[routing]() -> void:
 initialize:
-    // smart_contracts/abstract_contract/contract.algo.ts:92
+    // smart_contracts/abstract_contract/contract.algo.ts:86
     // public initialize(gameType: string): void {
     txna ApplicationArgs 1
     dup
@@ -2304,33 +2330,33 @@ initialize:
     ==
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
     extract 2 0
-    // smart_contracts/abstract_contract/contract.algo.ts:93
+    // smart_contracts/abstract_contract/contract.algo.ts:87
     // assert(this.gameType.value.length === 0, 'Contract already initialized')
     intc_1 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
-    bytec 4 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:93
+    bytec 5 // "gameType"
+    // smart_contracts/abstract_contract/contract.algo.ts:87
     // assert(this.gameType.value.length === 0, 'Contract already initialized')
     app_global_get_ex
     assert // check GlobalState exists
     len
     !
     assert // Contract already initialized
-    // smart_contracts/abstract_contract/contract.algo.ts:94
+    // smart_contracts/abstract_contract/contract.algo.ts:88
     // assert(Txn.sender === Global.creatorAddress, 'Only creator can initialize')
     txn Sender
     global CreatorAddress
     ==
     assert // Only creator can initialize
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
-    bytec 4 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:95
+    bytec 5 // "gameType"
+    // smart_contracts/abstract_contract/contract.algo.ts:89
     // this.gameType.value = Bytes(gameType)
     swap
     app_global_put
-    // smart_contracts/abstract_contract/contract.algo.ts:92
+    // smart_contracts/abstract_contract/contract.algo.ts:86
     // public initialize(gameType: string): void {
     intc_0 // 1
     return
@@ -2338,41 +2364,41 @@ initialize:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.eliminatePirate(sessionID: uint64, seniorityIndex: uint64) -> void:
 eliminatePirate:
-    // smart_contracts/pirateGame/contract.algo.ts:351
+    // smart_contracts/pirateGame/contract.algo.ts:364
     // private eliminatePirate(sessionID: uint64, seniorityIndex: uint64): void {
     proto 2 0
-    // smart_contracts/pirateGame/contract.algo.ts:352
+    // smart_contracts/pirateGame/contract.algo.ts:365
     // const listBytes = this.pirateList(sessionID).value
     frame_dig -2
     itob
-    // smart_contracts/pirateGame/contract.algo.ts:58
+    // smart_contracts/pirateGame/contract.algo.ts:55
     // pirateList = BoxMap<uint64, bytes>({ keyPrefix: 'pls' })
-    bytec 6 // "pls"
+    bytec 7 // "pls"
     dig 1
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:352
+    // smart_contracts/pirateGame/contract.algo.ts:365
     // const listBytes = this.pirateList(sessionID).value
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:353
-    // const offset : uint64 = seniorityIndex * 32
+    // smart_contracts/pirateGame/contract.algo.ts:366
+    // const offset: uint64 = seniorityIndex * 32
     frame_dig -1
     intc_3 // 32
     *
-    // smart_contracts/pirateGame/contract.algo.ts:354
+    // smart_contracts/pirateGame/contract.algo.ts:367
     // const addrBytes = op.extract(listBytes, offset, 32)
     intc_3 // 32
     extract3
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:358-360
+    // smart_contracts/pirateGame/contract.algo.ts:371-373
     // const pirate = clone(this.pirates(pirateKey).value)
     // pirate.alive = false
     // this.pirates(pirateKey).value = clone(pirate)
@@ -2381,10 +2407,10 @@ eliminatePirate:
     intc_0 // 1
     box_extract
     intc_1 // 0
-    // smart_contracts/pirateGame/contract.algo.ts:359
+    // smart_contracts/pirateGame/contract.algo.ts:372
     // pirate.alive = false
     dup
-    // smart_contracts/pirateGame/contract.algo.ts:358-360
+    // smart_contracts/pirateGame/contract.algo.ts:371-373
     // const pirate = clone(this.pirates(pirateKey).value)
     // pirate.alive = false
     // this.pirates(pirateKey).value = clone(pirate)
@@ -2397,60 +2423,60 @@ eliminatePirate:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.findNextAlivePirate(sessionID: uint64, startIndex: uint64, totalPirates: uint64) -> uint64:
 findNextAlivePirate:
-    // smart_contracts/pirateGame/contract.algo.ts:363
+    // smart_contracts/pirateGame/contract.algo.ts:380
     // private findNextAlivePirate(sessionID: uint64, startIndex: uint64, totalPirates: uint64): uint64 {
     proto 3 1
-    pushbytes ""
-    // smart_contracts/pirateGame/contract.algo.ts:364
+    bytec_3 // ""
+    // smart_contracts/pirateGame/contract.algo.ts:381
     // const listBytes = this.pirateList(sessionID).value
     frame_dig -3
     itob
     dup
-    // smart_contracts/pirateGame/contract.algo.ts:58
+    // smart_contracts/pirateGame/contract.algo.ts:55
     // pirateList = BoxMap<uint64, bytes>({ keyPrefix: 'pls' })
-    bytec 6 // "pls"
+    bytec 7 // "pls"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:364
+    // smart_contracts/pirateGame/contract.algo.ts:381
     // const listBytes = this.pirateList(sessionID).value
     box_get
     assert // Box must have value
     frame_dig -2
 
 findNextAlivePirate_while_top@1:
-    // smart_contracts/pirateGame/contract.algo.ts:365
+    // smart_contracts/pirateGame/contract.algo.ts:382
     // for (let i: uint64 = startIndex; i < totalPirates; i++) {
     frame_dig 3
     frame_dig -1
     <
     bz findNextAlivePirate_after_while@5
-    // smart_contracts/pirateGame/contract.algo.ts:366
-    // const offset : uint64 = i * 32
+    // smart_contracts/pirateGame/contract.algo.ts:383
+    // const offset: uint64 = i * 32
     frame_dig 3
     intc_3 // 32
     *
-    // smart_contracts/pirateGame/contract.algo.ts:367
+    // smart_contracts/pirateGame/contract.algo.ts:384
     // const addrBytes = op.extract(listBytes, offset, 32)
     frame_dig 2
     swap
     intc_3 // 32
     extract3
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     frame_dig 1
     swap
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:370
+    // smart_contracts/pirateGame/contract.algo.ts:387
     // const pirate = clone(this.pirates(pirateKey).value)
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:371
+    // smart_contracts/pirateGame/contract.algo.ts:388
     // if (pirate.alive) return i
     intc 4 // 320
     getbit
@@ -2460,7 +2486,7 @@ findNextAlivePirate_while_top@1:
     retsub
 
 findNextAlivePirate_after_if_else@4:
-    // smart_contracts/pirateGame/contract.algo.ts:365
+    // smart_contracts/pirateGame/contract.algo.ts:382
     // for (let i: uint64 = startIndex; i < totalPirates; i++) {
     frame_dig 3
     intc_0 // 1
@@ -2469,45 +2495,45 @@ findNextAlivePirate_after_if_else@4:
     b findNextAlivePirate_while_top@1
 
 findNextAlivePirate_after_while@5:
-    // smart_contracts/pirateGame/contract.algo.ts:373
+    // smart_contracts/pirateGame/contract.algo.ts:390
     // for (let i: uint64 = 0; i < startIndex; i++) {
     intc_1 // 0
     frame_bury 0
 
 findNextAlivePirate_while_top@6:
-    // smart_contracts/pirateGame/contract.algo.ts:373
+    // smart_contracts/pirateGame/contract.algo.ts:390
     // for (let i: uint64 = 0; i < startIndex; i++) {
     frame_dig 0
     dup
     frame_dig -2
     <
     assert // No alive pirate found
-    // smart_contracts/pirateGame/contract.algo.ts:374
-    // const offset : uint64 = i * 32
+    // smart_contracts/pirateGame/contract.algo.ts:391
+    // const offset: uint64 = i * 32
     intc_3 // 32
     *
-    // smart_contracts/pirateGame/contract.algo.ts:375
+    // smart_contracts/pirateGame/contract.algo.ts:392
     // const addrBytes = op.extract(listBytes, offset, 32)
     frame_dig 2
     swap
     intc_3 // 32
     extract3
-    // smart_contracts/abstract_contract/contract.algo.ts:230
+    // smart_contracts/abstract_contract/contract.algo.ts:214
     // return sha256(itob(sessionID).concat(player.bytes))
     frame_dig 1
     swap
     concat
     sha256
-    // smart_contracts/pirateGame/contract.algo.ts:57
+    // smart_contracts/pirateGame/contract.algo.ts:54
     // pirates = BoxMap<bytes, Pirate>({ keyPrefix: 'pir' })
     bytec_0 // "pir"
     swap
     concat
-    // smart_contracts/pirateGame/contract.algo.ts:378
+    // smart_contracts/pirateGame/contract.algo.ts:395
     // const pirate = clone(this.pirates(pirateKey).value)
     box_get
     assert // Box must have value
-    // smart_contracts/pirateGame/contract.algo.ts:379
+    // smart_contracts/pirateGame/contract.algo.ts:396
     // if (pirate.alive) return i
     intc 4 // 320
     getbit
@@ -2515,7 +2541,7 @@ findNextAlivePirate_while_top@6:
     retsub
 
 findNextAlivePirate_after_if_else@9:
-    // smart_contracts/pirateGame/contract.algo.ts:373
+    // smart_contracts/pirateGame/contract.algo.ts:390
     // for (let i: uint64 = 0; i < startIndex; i++) {
     frame_dig 0
     intc_0 // 1
@@ -2526,79 +2552,79 @@ findNextAlivePirate_after_if_else@9:
 
 // smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR(command: bytes) -> uint64:
 smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR:
-    // smart_contracts/pirateGame/contract.algo.ts:384
+    // smart_contracts/pirateGame/contract.algo.ts:404
     // public getRequiredMBR(command: 'newGame' | 'join' | 'commitVote'): uint64 {
     proto 1 1
-    // smart_contracts/pirateGame/contract.algo.ts:385
+    // smart_contracts/pirateGame/contract.algo.ts:405
     // if (command === 'newGame') {
     frame_dig -1
-    bytec 5 // "newGame"
+    bytec 6 // "newGame"
     ==
     bz smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR_else_body@2
-    // smart_contracts/pirateGame/contract.algo.ts:391
+    // smart_contracts/pirateGame/contract.algo.ts:411
     // const parentMBR = super.getRequiredMBR('newGame')
-    bytec 5 // "newGame"
+    bytec 6 // "newGame"
     callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR
-    // smart_contracts/pirateGame/contract.algo.ts:392
+    // smart_contracts/pirateGame/contract.algo.ts:412
     // return gameStateMBR + pirateListMBR + proposalsMBR + parentMBR
     pushint 379100 // 379100
     +
     retsub
 
 smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR_else_body@2:
-    // smart_contracts/pirateGame/contract.algo.ts:394
+    // smart_contracts/pirateGame/contract.algo.ts:414
     // else if (command === 'join') {
     frame_dig -1
-    bytec 8 // "join"
+    bytec 9 // "join"
     ==
     bz smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR_else_body@4
-    // smart_contracts/abstract_contract/contract.algo.ts:181
+    // smart_contracts/abstract_contract/contract.algo.ts:165
     // return 2500 + 400 * (keySize + valueSize)
     pushint 33300 // 33300
-    // smart_contracts/pirateGame/contract.algo.ts:403
+    // smart_contracts/pirateGame/contract.algo.ts:423
     // return super.getBoxMBR(35, 42)
     retsub
 
 smart_contracts/pirateGame/contract.algo.ts::PirateGame.getRequiredMBR_else_body@4:
-    // smart_contracts/pirateGame/contract.algo.ts:405
+    // smart_contracts/pirateGame/contract.algo.ts:425
     // else if (command === 'commitVote') {
     frame_dig -1
-    bytec 13 // "commitVote"
+    bytec 14 // "commitVote"
     ==
     assert // Invalid command
-    // smart_contracts/pirateGame/contract.algo.ts:406
+    // smart_contracts/pirateGame/contract.algo.ts:426
     // return super.getRequiredMBR('join')
-    bytec 8 // "join"
+    bytec 9 // "join"
     callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR
     retsub
 
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR(command: bytes) -> uint64:
 smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR:
-    // smart_contracts/abstract_contract/contract.algo.ts:187
+    // smart_contracts/abstract_contract/contract.algo.ts:171
     // protected getRequiredMBR(command: 'newGame' | 'join'): uint64 {
     proto 1 1
-    // smart_contracts/abstract_contract/contract.algo.ts:188
+    // smart_contracts/abstract_contract/contract.algo.ts:172
     // if (command === 'newGame') {
     frame_dig -1
-    bytec 5 // "newGame"
+    bytec 6 // "newGame"
     ==
     bz smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2
-    // smart_contracts/abstract_contract/contract.algo.ts:193
+    // smart_contracts/abstract_contract/contract.algo.ts:177
     // return configMBR + balanceMBR
-    pushint 42600 // 42600
+    pushint 29800 // 29800
     retsub
 
 smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2:
-    // smart_contracts/abstract_contract/contract.algo.ts:194
+    // smart_contracts/abstract_contract/contract.algo.ts:178
     // } else if (command === 'join') {
     frame_dig -1
-    bytec 8 // "join"
+    bytec 9 // "join"
     ==
     assert // Command not supported
-    // smart_contracts/abstract_contract/contract.algo.ts:181
+    // smart_contracts/abstract_contract/contract.algo.ts:165
     // return 2500 + 400 * (keySize + valueSize)
     pushint 29700 // 29700
-    // smart_contracts/abstract_contract/contract.algo.ts:196
+    // smart_contracts/abstract_contract/contract.algo.ts:180
     // return this.getBoxMBR(36, 32)
     retsub

@@ -1,6 +1,6 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import { useState } from 'react'
-import { createPortal } from 'react-dom' // <--- IMPORTANTE
+import { createPortal } from 'react-dom' 
 import { ellipseAddress } from '../utils/ellipseAddress'
 
 export const ConnectWallet = () => {
@@ -12,7 +12,6 @@ export const ConnectWallet = () => {
     setIsOpen(false)
   }
 
-  // Contenuto della Modale (estratto per pulizia)
   const modalContent = (
     <dialog className={`modal modal-bottom sm:modal-middle ${isOpen ? 'modal-open' : ''}`} style={{ zIndex: 99999 }}>
       <div className="modal-box bg-[#111] border border-white/10 rounded-xl relative shadow-[0_0_50px_rgba(0,0,0,0.8)]">
@@ -30,7 +29,7 @@ export const ConnectWallet = () => {
 
         <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto">
           {wallets
-            ?.filter((w) => w.id !== 'kmd') // Nascondiamo KMD (lo usiamo dallo switcher)
+            ?.filter((w) => w.id !== 'kmd') 
             .map((wallet) => (
             <button
               key={wallet.id}
@@ -72,7 +71,6 @@ export const ConnectWallet = () => {
         </p>
       </div>
 
-      {/* Backdrop che chiude al click */}
       <div className="modal-backdrop bg-black/80 backdrop-blur-sm" onClick={() => setIsOpen(false)}></div>
     </dialog>
   )
@@ -106,7 +104,6 @@ export const ConnectWallet = () => {
         CONNECT WALLET
       </button>
 
-      {/* MAGIA: Sposta la modale fuori dalla Navbar, direttamente nel Body */}
       {isOpen && createPortal(modalContent, document.body)}
     </>
   )

@@ -22,12 +22,6 @@ export class RockPaperScissors extends GameContract {
   sessionPlayers = BoxMap<uint64, SessionPlayers>({ keyPrefix: 'spl' })
 
   /**
-   * Tracks whether the game has finished to prevent double payouts.
-   * 0 = Active, 1 = Finished
-   */
-  gameFinished = BoxMap<uint64, uint64>({ keyPrefix: 'gfn' })
-
-  /**
    * Creates a new RPS session.
    * Ensures MBR covers storage for player slots and game status.
    */
@@ -44,7 +38,6 @@ export class RockPaperScissors extends GameContract {
       p1: new Address(zeroAddress),
       p2: new Address(zeroAddress),
     }
-    this.gameFinished(sessionID).value = 0
 
     return sessionID
   }
@@ -55,7 +48,6 @@ export class RockPaperScissors extends GameContract {
    */
   public joinSession(sessionID: uint64, commit: bytes, payment: gtxn.PaymentTxn, mbrPayment: gtxn.PaymentTxn): void {
     assert(this.sessionExists(sessionID), 'Session does not exist')
-    assert(!this.gameFinished(sessionID).value, 'Game already finished')
 
     const players = clone(this.sessionPlayers(sessionID).value)
     const senderAddress = new Address(Txn.sender)
@@ -87,109 +79,121 @@ export class RockPaperScissors extends GameContract {
    */
   public revealMove(sessionID: uint64, choice: uint64, salt: bytes): void {
     assert(choice < Uint64(3), 'Invalid choice: must be 0, 1, or 2')
-    assert(!this.gameFinished(sessionID).value, 'Game already finished')
 
     super.reveal(sessionID, choice, salt)
+  }
+    
+  /**
+   * Allows an eligible player to claim their winnings.
+   * Uses a pull-based payout pattern.
+   */
+public claimWinnings(sessionID: uint64): uint64 {
+  assert(this.sessionExists(sessionID), 'Session does not exist')
 
-    const players = clone(this.sessionPlayers(sessionID).value)
-    const zeroAddress = new Address(Global.zeroAddress)
+  const config = clone(this.gameSessions(sessionID).value)
+  assert(Global.round > config.endRevealAt, "Game is not finished")
 
-    if (players.p2.native === zeroAddress.native) {
-      this.distributePrize(new Address(Txn.sender), this.getSessionBalance(sessionID))
-      this.gameFinished(sessionID).value = 1
-      return
-    }
+  const sender = new Address(Txn.sender)
+  
+  const playerKey = this.getPlayerKey(sessionID, sender)
+  assert(this.playerChoice(playerKey).exists, 'Player has not revealed or already claimed')
+  
+  let myChoice = this.playerChoice(playerKey).value
+  assert(myChoice <= 2, "Winnings already claimed")
 
-    if (players.p1.native !== zeroAddress.native && players.p2.native !== zeroAddress.native) {
-      const key1 = super.getPlayerKey(sessionID, players.p1)
-      const key2 = super.getPlayerKey(sessionID, players.p2)
+  const players = clone(this.sessionPlayers(sessionID).value)
 
-      if (this.playerChoice(key1).exists && this.playerChoice(key2).exists) {
-        this.determineWinner(sessionID)
+  const oppKey = this.getPlayerKey(
+    sessionID,
+    sender.native === players.p1.native ? players.p2 : players.p1
+  )
+
+  const oppHasChoice = this.playerChoice(oppKey).exists
+  let oppChoice: uint64 = 4
+  let oppClaimed = false
+
+  if (oppHasChoice) {
+    const rawOppChoice = this.playerChoice(oppKey).value
+    if (rawOppChoice >= 10) {
+        oppChoice = rawOppChoice - 10
+        oppClaimed = true
+      } else {
+        oppChoice = rawOppChoice
       }
-    }
   }
 
-  /**
-   * Claims victory in case the opponent fails to reveal within the allowed time.
-   * Transfers the full session balance to the player who revealed, or calls normal winner calculation if both revealed.
-   */
-  public claimTimeoutVictory(sessionID: uint64): void {
-    assert(!this.gameFinished(sessionID).value, 'Game already finished')
-    assert(this.sessionExists(sessionID), 'Session does not exist')
+  const currentBalance = this.getSessionBalance(sessionID)
 
-    const config = clone(this.gameSessions(sessionID).value)
-    assert(Global.round > config.endRevealAt, 'Reveal phase not yet ended')
+  if (oppChoice === 4) {
+        this.payAndClean(sender, currentBalance, playerKey)
+        return currentBalance
+    }
+  
+  const isDraw = (myChoice === oppChoice)
+  const prizeAmount = this.calculateLogic(myChoice, oppChoice, currentBalance)
+  
+  if (prizeAmount > 0) {
+        
+        // Se è un pareggio e l'avversario ha già riscattato, 
+        // il "prizeAmount" calcolato su currentBalance (che è dimezzato) è corretto?
+        // Se lui ha riscattato, ha lasciato lì la mia metà. Quindi prendo TUTTO quello che resta.
+        const finalPayout = (isDraw && oppClaimed) ? currentBalance : prizeAmount
 
-    const players = clone(this.sessionPlayers(sessionID).value)
-    const zeroAddress = new Address(Global.zeroAddress)
-
-    assert(players.p2.native !== zeroAddress.native, 'Not enough players for timeout logic')
-
-    const key1 = super.getPlayerKey(sessionID, players.p1)
-    const key2 = super.getPlayerKey(sessionID, players.p2)
-
-    const p1Revealed = this.playerChoice(key1).exists
-    const p2Revealed = this.playerChoice(key2).exists
-
-    const totalPot = this.getSessionBalance(sessionID)
-
-    if (p1Revealed && !p2Revealed) {
-      this.distributePrize(players.p1, totalPot)
-    } else if (!p1Revealed && p2Revealed) {
-      this.distributePrize(players.p2, totalPot)
+        // Eseguiamo il pagamento
+        itxn.payment({
+          receiver: sender.native,
+          amount: finalPayout,
+          fee: 0,
+        }).submit()
     } else {
-      this.determineWinner(sessionID)
-      return
+       // Ho perso. Non ricevo nulla.
     }
-    this.gameFinished(sessionID).value = 1
-  }
 
-  /**
-   * Determines the winner and distributes the pot.
-   * Marks the game as finished.
-   */
-  private determineWinner(sessionID: uint64): void {
-    assert(!this.gameFinished(sessionID).value, 'Prize already distributed')
-
-    const players = clone(this.sessionPlayers(sessionID).value)
-    const choice1: uint64 = this.getPlayerChoice(sessionID, players.p1)
-    const choice2: uint64 = this.getPlayerChoice(sessionID, players.p2)
-    const balance: uint64 = this.getSessionBalance(sessionID)
-
-    const ROCK = 0
-    const PAPER = 1
-    const SCISSORS = 2
-
-    if (choice1 === choice2) {
-      const half: uint64 = balance / 2
-      this.distributePrize(players.p1, half)
-      this.distributePrize(players.p2, half)
-    } else if (
-      (choice1 === ROCK && choice2 === SCISSORS) ||
-      (choice1 === PAPER && choice2 === ROCK) ||
-      (choice1 === SCISSORS && choice2 === PAPER)
-    ) {
-      this.distributePrize(players.p1, balance)
+  if (oppClaimed || oppChoice === 4) {
+        // Siamo gli ultimi a uscire, spegni la luce (Delete both boxes)
+        this.playerChoice(playerKey).delete()
+        if (oppHasChoice) this.playerChoice(oppKey).delete()
     } else {
-      this.distributePrize(players.p2, balance)
+        // L'avversario deve ancora verificare il risultato, lascio la mia scelta visibile ma marcata
+        this.playerChoice(playerKey).value = myChoice + 10
     }
 
-    this.gameFinished(sessionID).value = 1
+    return prizeAmount
   }
 
-  /**
-   * Sends a prize to a player via Inner Transaction.
-   */
-  private distributePrize(winner: Address, amount: uint64): void {
-    itxn
-      .payment({
-        receiver: winner.native,
-        amount,
+  private payAndClean(receiver: Address, amount: uint64, keyToDelete: bytes): void {
+      itxn.payment({
+        receiver: receiver.native,
+        amount: amount,
         fee: 0,
-      })
-      .submit()
+      }).submit()
+      this.playerChoice(keyToDelete).delete()
   }
+
+  /**
+   * Helper to determine RPS result and return the payout amount for the caller.
+   */
+private calculateLogic(
+  choice1: uint64,
+  choice2: uint64,
+  totalPot: uint64
+): uint64 {
+
+  const ROCK = 0
+  const PAPER = 1
+  const SCISSORS = 2
+
+  if (choice1 === choice2) {
+    return totalPot / 2
+  }
+
+  const p1Wins =
+    (choice1 === ROCK && choice2 === SCISSORS) ||
+    (choice1 === PAPER && choice2 === ROCK) ||
+    (choice1 === SCISSORS && choice2 === PAPER)
+
+  return (p1Wins) ? totalPot : 0
+}
 
   /**
    * Calculates the MBR required for this game type.
@@ -198,9 +202,8 @@ export class RockPaperScissors extends GameContract {
   public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
     if (command === 'newGame') {
       const playersMBR: uint64 = super.getBoxMBR(11, 64)
-      const stateMBR: uint64 = super.getBoxMBR(11, 8)
 
-      return playersMBR + stateMBR + super.getRequiredMBR('newGame')
+      return playersMBR + super.getRequiredMBR('newGame')
     } else if (command === 'join') {
       return super.getRequiredMBR('join')
     } else {

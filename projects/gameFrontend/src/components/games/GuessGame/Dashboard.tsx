@@ -4,6 +4,7 @@ import { useGuessGame, GameSession } from '../../../hooks/useGuessGame'
 import { GenericGameDashboard } from '../../common/GenericGameDashboard'
 import { GenericSessionItem, useSessionState } from '../../common/GenericSessionItem'
 import { DigitalInput } from '../../common/DigitalInput'
+import { config } from '../../../config'
 
 /**
  * GuessGame Session Item
@@ -94,7 +95,8 @@ export const GuessGameDashboard = () => {
     <GenericGameDashboard
       useGameHook={useGuessGame}
       SessionItemComponent={GuessSessionItem}
-      defaultConfig={{ fee: 1, start: 5, commit: 50, reveal: 50 }}
+      gamePrefix="guess"
+      appId={config.games.guessGame.appId}
       emptyStateConfig={{ icon: '🔭', message: 'No sessions found' }}
     />
   )

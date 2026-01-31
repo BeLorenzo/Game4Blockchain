@@ -7,10 +7,6 @@
 
 import algosdk from 'algosdk'
 
-// ============================================================================
-// CRYPTO UTILITIES
-// ============================================================================
-
 /**
  * SHA-256 hash per commit/reveal pattern
  */
@@ -36,10 +32,6 @@ export async function createCommit(value: number, saltLength = 32) {
   return { commitHash, salt }
 }
 
-// ============================================================================
-// PHASE CALCULATION
-// ============================================================================
-
 /**
  * Calcola la fase corrente di una sessione
  */
@@ -54,10 +46,6 @@ export function getPhase(
   if (currentRound <= endRevealAt) return 'REVEAL'
   return 'ENDED'
 }
-
-// ============================================================================
-// TIMEOUT HANDLING
-// ============================================================================
 
 /**
  * Gestisce il timeout per chi ha committato ma non ha fatto reveal
@@ -101,10 +89,6 @@ export function handleTimeout(
 
   return timeoutResult
 }
-
-// ============================================================================
-// STORAGE NOTIFICATIONS
-// ============================================================================
 
 /**
  * Notifica aggiornamento storage (per usePlayerStats)

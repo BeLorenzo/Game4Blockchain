@@ -1,154 +1,102 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
-
-// --- Imports Componenti Generici ---
-import { GameDashboardLayout } from '../../common/GameDashboardLayout'
-import { GameFilters, GamePhaseFilter } from '../../common/GameFilters'
-import { GameStats } from '../../common/GameStats'
-
-// --- Imports Componenti Specifici Pirate ---
-import { PirateSessionItem } from './PirateSessionItem'
-import { PirateCreateSessionForm, CreateSessionParams } from './PirateCreateSessionsForm'
-
-// --- Import Hook & Types ---
 import { usePirateGame } from '../../../hooks/Pirate/usePirateGame'
-import { PirateGameSession } from '../../../hooks/Pirate/types'
+import { GameDashboardLayout } from '../../common/GameDashboardLayout'
+import { GameStats } from '../../common/GameStats'
+import { GameFilters, GamePhaseFilter } from '../../common/GameFilters'
+import { CreatePirateSessionForm } from './CreatePirateSessionsForm'
+import { PirateSessionItem } from './PirateSessionItem'
+import { config } from '../../../config'
+import { useGameSpecificProfit } from '../../../hooks/usePlayerStats'
 
 export const PirateGameDashboard = () => {
+  const { 
+    activeSessions, 
+    historySessions, 
+    mySessions, 
+    mbrs, 
+    loading, 
+    isInitializing,
+    actions 
+  } = usePirateGame()
+
   const { activeAddress } = useWallet()
-  
-  // Stato UI
   const [activeTab, setActiveTab] = useState<'active' | 'history' | 'mine'>('active')
   const [phaseFilter, setPhaseFilter] = useState<GamePhaseFilter>('ALL')
-  
-  // HOOK: Recupera la lista delle sessioni
-  const { sessions, loading, actions } = usePirateGame()
 
-  // HANDLER: Creazione Sessione
-  const handleCreate = async (params: CreateSessionParams) => {
-    await actions.create(
-      params.fee,
-      params.maxPirates,
-      params.regDuration,
-      params.commitDuration,
-      params.revealDuration
-    )
+
+  const profit = useGameSpecificProfit('pirate', config.games.pirate.appId).profit
+
+
+
+  // Logica filtri
+  const getDisplaySessions = () => {
+    let list = activeTab === 'active' ? activeSessions : 
+               activeTab === 'history' ? historySessions : mySessions
+    
+    if (phaseFilter !== 'ALL') {
+      list = list.filter(s => s.phase === phaseFilter)
+    }
+    return list
   }
 
-  // --- LOGICA FILTRI ---
-  const filteredSessions = sessions.filter((session: PirateGameSession) => {
-    // 1. Filtro Fase (Dropdown)
-    if (phaseFilter !== 'ALL') {
-      let matches = false
-      if (phaseFilter === 'WAITING' && session.phase === 'REGISTRATION') matches = true
-      if (phaseFilter === 'COMMIT' && (session.phase === 'PROPOSAL' || session.phase === 'VOTE_COMMIT')) matches = true
-      if (phaseFilter === 'REVEAL' && session.phase === 'VOTE_REVEAL') matches = true
-      if (phaseFilter === 'ENDED' && session.phase === 'FINISHED') matches = true
-      
-      if (!matches) return false
-    }
-
-    // 2. Filtro Tab (Active / History / Mine)
-    switch (activeTab) {
-      case 'active':
-        return session.phase !== 'FINISHED'
-      case 'history':
-        return session.phase === 'FINISHED'
-      case 'mine':
-        return !!session.myPirateInfo
-      default:
-        return true
-    }
-  })
-
-  // --- CALCOLO STATS ---
-  const myTotalProfit = sessions.reduce((acc, s) => {
-      // Se ho vinto (claimed)
-      if (s.myPirateInfo?.claimed) return acc + (s.totalPot - s.fee)
-      // Se ho solo partecipato (spesa)
-      if (s.myPirateInfo) return acc - s.fee
-      return acc
-  }, 0)
-
-  // Recuperiamo il blocco corrente (fallback a 0 se nessuna sessione)
-  const currentBlock = sessions.length > 0 ? sessions[0].rounds.current : 0
+  const sessions = getDisplaySessions()
 
   return (
     <GameDashboardLayout
-      title="PIRATE GAME"
-      
-      // Statistiche
-      stats={
-        activeAddress && (
-          <GameStats 
-            totalProfit={myTotalProfit} 
-            mbr={0.379} 
-          />
-        )
-      }
-
-      // Sezione Creazione
-      createGameSection={
-        <PirateCreateSessionForm 
-          currentRound={currentBlock}
-          onCreate={handleCreate}
-          isLoading={loading}
-        />
-      }
-
-      // Filtri
+      title="Create New Game"
+      stats={activeAddress && <div className="flex gap-2"><GameStats totalProfit={profit} mbr={mbrs.create} /></div>} // TODO: Add real stats if needed
       filters={
-        <GameFilters 
-          activeTab={activeTab} 
+        <GameFilters
+          activeTab={activeTab}
           setActiveTab={setActiveTab}
-          phaseFilter={phaseFilter} 
+          phaseFilter={phaseFilter}
           setPhaseFilter={setPhaseFilter}
         />
       }
+      createGameSection={
+        <CreatePirateSessionForm
+          onCreate={(cfg) => actions.createSession(cfg.fee, cfg.maxPirates, cfg.regDuration, cfg.commitDuration, cfg.revealDuration)}
+          loading={loading}
+          disabled={loading || !activeAddress}
+        />
+      }
     >
-      <div className="pb-20 space-y-4 min-h-[300px]">
-        
-        {/* Loading */}
-        {loading && sessions.length === 0 && (
-           <div className="flex justify-center py-20">
-             <span className="loading loading-bars loading-lg text-primary"></span>
-           </div>
-        )}
+      {isInitializing && (
+        <div className="flex justify-center py-20">
+          <span className="loading loading-bars loading-lg text-primary scale-150"></span>
+        </div>
+      )}
 
-        {/* LISTA SESSIONI */}
-        {filteredSessions.map((session) => (
-            <PirateSessionItem 
-                key={session.id}
-                session={session}
-                myAddress={activeAddress || ''}
-                loading={loading}
-                // LEGARE LE AZIONI ALL'ID DELLA SESSIONE CORRENTE
-                actions={{
-                    register: () => actions.register(session.id, session.fee),
-                    propose: (dist) => actions.propose(session.id, dist, session.totalPot),
-                    vote: (vote) => actions.vote(session.id, vote, session.gameRound),
-                    reveal: () => actions.reveal(session.id, session.gameRound),
-                    execute: () => actions.execute(session.id),
-                    claim: () => actions.claim(session.id),
-                    timeout: () => actions.timeout(session.id)
-                }}
-            />
-        ))}
-
-        {/* Empty State */}
-        {!loading && filteredSessions.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 opacity-40 border-2 border-dashed border-white/10 rounded-2xl bg-white/5">
-            <div className="text-4xl mb-3">🔭</div>
-            <div className="font-mono text-lg font-bold tracking-widest uppercase">
-              No voyages found
-            </div>
-            <div className="text-xs text-gray-500 font-mono mt-1">
-              Start a new game or check filters
-            </div>
-          </div>
-        )}
-      </div>
+      {!isInitializing && (
+        <div className="flex-1 overflow-y-auto pr-2 space-y-4 pb-20 custom-scrollbar h-[75vh] min-h-[650px]">
+          {sessions.map(session => (
+            <PirateSessionItem
+  key={session.id}
+  session={session}
+  loading={loading}
+  actions={{
+    register: () => actions.registerPirate(session.id, session.fee),
+    propose: (dist) => actions.proposeDistribution(session.id, dist, session.totalPot),
+    
+    vote: (vote) => actions.commitVote(session.id, vote, session.gameRound),
+    reveal: () => actions.revealVote(session.id, session.gameRound),
+    
+    execute: () => actions.executeRound(session.id),
+    claim: () => actions.claimWinnings(session.id, session.fee),
+    timeout: () => actions.handleTimeout(session.id)
+  }}
+/>
+          ))}
+           
+          {sessions.length === 0 && (
+             <div className="flex flex-col items-center justify-center py-24 opacity-40 border-2 border-dashed border-white/10 rounded-2xl bg-white/5">
+                <div className="text-4xl mb-2">🏴‍☠️</div>
+                <div className="font-mono text-lg font-bold tracking-widest uppercase">No Pirates found</div>
+             </div>
+          )}
+        </div>
+      )}
     </GameDashboardLayout>
   )
 }

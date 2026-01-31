@@ -605,7 +605,7 @@ describe('RockPaperScissors Contract', () => {
       const joinResult = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return
       expect(joinResult).toBe(expectedJoinMBR)
 
-      const expectedNewGameMBR = BigInt(calcMBR(12, 64) + calcMBR(10, 8) + calcMBR(11, 64) + calcMBR(11, 8))
+      const expectedNewGameMBR = BigInt(calcMBR(10, 32) + calcMBR(12, 8) + calcMBR(11, 64))
 
       const newGameResult = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return
 
@@ -952,7 +952,18 @@ describe('RockPaperScissors Contract', () => {
         maxFee: AlgoAmount.MicroAlgo(3000),
       })
 
-      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
+      while ((await algod.status().do()).lastRound < params.endRevealAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+    const win = await client.send.claimWinnings({
+      args: { sessionId },
+      sender: testAccount.addr,
+      coverAppCallInnerTransactionFees: true,
+      maxFee:AlgoAmount.MicroAlgo(3000)
+    })
+
+      expect(win.return).toBe(200_000n)
       // P1 should win (Paper beats Rock)
     })
 
@@ -1044,8 +1055,18 @@ describe('RockPaperScissors Contract', () => {
         maxFee: AlgoAmount.MicroAlgo(3000),
       })
 
-      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
-      // P1 should win (Scissors beats Paper)
+            while ((await algod.status().do()).lastRound < params.endRevealAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+    const win = await client.send.claimWinnings({
+      args: { sessionId },
+      sender: testAccount.addr,
+      coverAppCallInnerTransactionFees: true,
+      maxFee:AlgoAmount.MicroAlgo(3000)
+    })
+
+      expect(win.return).toBe(200_000n)
     })
 
     test('Scissors vs Rock -> P2 wins and gets full prize', async () => {
@@ -1136,8 +1157,18 @@ describe('RockPaperScissors Contract', () => {
         maxFee: AlgoAmount.MicroAlgo(3000),
       })
 
-      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
-      // P2 should win (Rock beats Scissors)
+            while ((await algod.status().do()).lastRound < params.endRevealAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+    const win = await client.send.claimWinnings({
+      args: { sessionId },
+      sender: p2.addr,
+      coverAppCallInnerTransactionFees: true,
+      maxFee:AlgoAmount.MicroAlgo(3000)
+    })
+
+      expect(win.return).toBe(200_000n)
     })
 
     test('Scissors vs Scissors -> tie and prize is split equally', async () => {
@@ -1227,8 +1258,18 @@ describe('RockPaperScissors Contract', () => {
         maxFee: AlgoAmount.MicroAlgo(3000),
       })
 
-      expect(await client.state.box.gameFinished.value(sessionId)).toBe(1n)
-      // Both players should get half the prize (tie)
+            while ((await algod.status().do()).lastRound < params.endRevealAt) {
+        ;(await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
+      }
+
+    const win = await client.send.claimWinnings({
+      args: { sessionId },
+      sender: testAccount.addr,
+      coverAppCallInnerTransactionFees: true,
+      maxFee:AlgoAmount.MicroAlgo(3000)
+    })
+
+      expect(win.return).toBe(100_000n)
     })
   })
 
@@ -1299,7 +1340,7 @@ describe('Timeout Victory Logic', () => {
 
     const p1BalanceBefore  = Number((await algorand.account.getInformation(testAccount.addr)).balance)
 
-    await client.send.claimTimeoutVictory({
+    await client.send.claimWinnings({
       args: { sessionId },
       sender: testAccount.addr,
       coverAppCallInnerTransactionFees: true,
@@ -1346,68 +1387,13 @@ describe('Timeout Victory Logic', () => {
     })
 
     await expect(
-        client.send.claimTimeoutVictory({
+        client.send.claimWinnings({
             args: { sessionId },
             sender: testAccount.addr
         })
     ).rejects.toThrow() 
   }, 60_000)
 
-  test('Case 3: Success - Player 2 (Loser) calls timeout method, but Player 1 (Revealer) gets the money', async () => {
-    const { testAccount, algorand, algod } = localnet.context
-    const { client } = await deploy(testAccount)
-    
-    const fee = 1_000_000
-    const params = await createGameParams(0, 5, 5, fee)
-
-    const newGameMbr = (await client.send.getRequiredMbr({ args: { command: 'newGame' } })).return!
-    const createRes = await client.send.createSession({
-        args: { config: params, mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(newGameMbr) }) },
-        sender: testAccount.addr,
-    })
-    const sessionId = createRes.return!
-    const joinMbr = (await client.send.getRequiredMbr({ args: { command: 'join' } })).return!
-    
-    await waitForRound(params.startAt, client, algod)
-    
-    await client.send.joinSession({
-       args: { sessionId, commit: getHash(0, 'saltP1'), payment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }), mbrPayment: await algorand.createTransaction.payment({ sender: testAccount.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) }) },
-       sender: testAccount.addr
-    })
-    
-    const player2 = algorand.account.random()
-    await algorand.account.ensureFundedFromEnvironment(player2, AlgoAmount.Algos(5))
-    await client.send.joinSession({
-       args: { sessionId, commit: getHash(1, 'saltP2'), payment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(fee) }), mbrPayment: await algorand.createTransaction.payment({ sender: player2.addr, receiver: client.appAddress, amount: AlgoAmount.MicroAlgos(joinMbr) }) },
-       sender: player2.addr, signer: player2.signer
-    })
-
-    await waitForRound(params.endCommitAt + 1n, client, algod)
-    await client.send.revealMove({ 
-        args: { sessionId, choice: 0, salt: Buffer.from('saltP1') }, 
-        sender: testAccount.addr 
-    })
-
-    await waitForRound(params.endRevealAt + 1n, client, algod)
-
-    const p1BalanceBefore = Number((await algorand.account.getInformation(testAccount.addr)).balance)
-    const p2BalanceBefore = Number((await algorand.account.getInformation(player2.addr)).balance)
-
-    await client.send.claimTimeoutVictory({
-      args: { sessionId },
-      sender: player2.addr,
-      signer: player2.signer,
-      coverAppCallInnerTransactionFees: true,
-      maxFee:AlgoAmount.MicroAlgo(3000)
-    })
-
-    const p1BalanceAfter = (await algorand.account.getInformation(testAccount.addr)).balance
-    const p2BalanceAfter = (await algorand.account.getInformation(player2.addr)).balance
-
-    expect(p1BalanceAfter.valueOf()).toBeGreaterThan(p1BalanceBefore + 1_900_000) 
-    
-    expect(p2BalanceAfter.valueOf()).toBeLessThan(p2BalanceBefore)
-  }, 60_000)
 })
 
 })

@@ -2,7 +2,7 @@
 import React from 'react'
 
 // --- HEADER (Titolo, Badge Fase, Pot, Giocatori) ---
-export const SessionHeader = ({ session, isEnded, isTransitionRound, phaseText }: any) => {
+export const SessionHeader = ({ session, isEnded, isTransitionRound, phaseText, customBadges }: any) => {
   const textVal = isEnded ? 'text-gray-300' : 'text-white'
   const textDim = isEnded ? 'text-gray-500' : 'text-gray-400'
 
@@ -10,6 +10,7 @@ export const SessionHeader = ({ session, isEnded, isTransitionRound, phaseText }
     <div className="flex justify-between items-center mb-4">
       <div className="flex items-center gap-4">
         <span className={`font-mono text-2xl font-black ${isEnded ? 'opacity-20 text-gray-600' : 'opacity-30 text-white'}`}>#{session.id}</span>
+        
         <div className={`badge badge-lg font-bold tracking-wider border-0 px-4 py-3 ${
            isEnded ? 'bg-white/5 text-gray-400 border border-white/5' :
            session.phase === 'COMMIT' ? 'bg-primary text-black' :
@@ -18,9 +19,13 @@ export const SessionHeader = ({ session, isEnded, isTransitionRound, phaseText }
         }`}>
           {isTransitionRound ? 'REVEAL READY' : phaseText || session.phase}
         </div>
+
         {session.canClaim && !session.claimResult && (
           <div className="badge badge-success badge-outline badge-lg font-bold animate-pulse shadow-lg bg-green-500/10">CLAIM AVAILABLE</div>
         )}
+
+        {customBadges}
+        
       </div>
       <div className="text-right">
         <div className={`font-black text-2xl ${textVal}`}>{session.totalPot.toFixed(1)} <span className="text-sm text-primary font-mono font-medium">ALGO</span></div>
@@ -78,11 +83,11 @@ export const SessionResultBanner = ({ session, isEnded, myValueLabel }: any) => 
           {session.claimResult.amount > 0 ? (
             <div className="flex flex-col items-center gap-1"><span className="text-lg text-green-500 mb-1">🏆 YOU WON</span><span className="text-4xl font-mono text-white text-shadow-sm">+{session.claimResult.amount.toFixed(2)} ALGO</span></div>
           ) :  session.claimResult.amount == 0 ? (
-            <div className="flex flex-col items-center gap-1"><span className="text-lg text-yellow-500 mb-1">YOU DID NOT WIN - </span><span className="text-4xl font-mono text-white text-shadow-sm">+{session.claimResult.amount.toFixed(2)} ALGO</span></div>
+            <div className="flex flex-col items-center gap-1"><span className="text-lg text-yellow-500 mb-1">YOU DID NOT WIN </span><span className="text-4xl font-mono text-white text-shadow-sm">+{session.claimResult.amount.toFixed(2)} ALGO</span></div>
           ): session.claimResult.isTimeout ? (
             <div className="flex flex-col items-center gap-1"><span className="text-sm text-red-400 opacity-80 mb-1">⏱️ TIME OUT</span><span className="text-2xl font-mono text-white">{session.claimResult.amount.toFixed(2)} ALGO</span></div>
           ) : (
-            <div className="flex flex-col items-center gap-1"><span className="text-lg text-red-500 mb-1">💀 YOU LOST</span><span className="text-2xl font-mono text-white">{Math.abs(session.claimResult.amount).toFixed(2)} ALGO</span></div>
+            <div className="flex flex-col items-center gap-1"><span className="text-lg text-red-500 mb-1">💀 YOU LOST</span><span className="text-2xl font-mono text-white">{session.claimResult.amount.toFixed(2)} ALGO</span></div>
           )}
         </div>
       )}

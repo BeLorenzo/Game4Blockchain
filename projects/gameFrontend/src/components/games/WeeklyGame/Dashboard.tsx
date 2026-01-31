@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
-import { useWeeklyGame, WeeklySession } from '../../../hooks/useWeeklyGame'
+import { useWeeklyGame } from '../../../hooks/useWeeklyGame'
 import { GenericGameDashboard } from '../../common/GenericGameDashboard'
-import { GenericSessionItem, useSessionState } from '../../common/GenericSessionItem'
+import { GenericSessionItem } from '../../common/GenericSessionItem'
 import { DigitalInput } from '../../common/DigitalInput'
+import { config } from '../../../config'
 
 const DAYS_LABEL = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
@@ -110,7 +111,8 @@ export const WeeklyGameDashboard = () => {
     <GenericGameDashboard
       useGameHook={useWeeklyGame}
       SessionItemComponent={WeeklySessionItem}
-      defaultConfig={{ fee: 10, start: 10, commit: 100, reveal: 100 }}
+      gamePrefix="weekly"
+      appId={config.games.weeklyGame.appId}
       emptyStateConfig={{ icon: '🔭', message: 'No sessions found' }}
     />
   )

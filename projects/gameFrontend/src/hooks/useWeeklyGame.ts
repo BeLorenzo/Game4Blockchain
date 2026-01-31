@@ -129,7 +129,6 @@ export const useWeeklyGame = () => {
 
         const hasPlayed = !!localJson
 
-        // ✅ AGGIUNTO: Gestione timeout usando utility
         claimResult = handleTimeout(
           myKey,
           fee,
@@ -281,7 +280,9 @@ export const useWeeklyGame = () => {
       const result = await client.send.claimWinnings({
         args: { sessionId: BigInt(sessionId) },
         sender: activeAddress,
-        populateAppCallResources: true
+        populateAppCallResources: true,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(3000)
       })
 
       const grossPayout = Number(result.return) / 1e6
@@ -294,9 +295,6 @@ export const useWeeklyGame = () => {
         localStorage.setItem(key, JSON.stringify(stored))
         notifyUpdate()
       }
-
-      if (grossPayout > 0) showAlert(`You Won ${grossPayout} A (Net: ${netProfit})!`, 'success')
-      else showAlert('No winnings.', 'info')
 
       refreshData()
     } catch (e: any) {

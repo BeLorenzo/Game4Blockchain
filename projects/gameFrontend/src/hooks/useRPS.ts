@@ -130,7 +130,6 @@ export const useRPS = () => {
         const isPlayer2 = activeAddress === p2
         const hasPlayed = isPlayer1 || isPlayer2
 
-        // ✅ AGGIUNTO: Gestione timeout usando utility
         claimResult = handleTimeout(
           myKey,
           fee,
@@ -323,7 +322,6 @@ export const useRPS = () => {
             notifyUpdate()
           }
         }
-        showAlert('Better luck next time!', 'error')
         refreshData()
       } else {
         showAlert(e.message, 'error')

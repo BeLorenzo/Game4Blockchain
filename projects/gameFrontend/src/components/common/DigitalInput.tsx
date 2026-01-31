@@ -5,10 +5,10 @@ interface DigitalInputProps {
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  // Opzioni visuali
+
   suffix?: string
   label?: string
-  // Opzioni azione (stile GuessGame)
+  
   actionLabel?: string
   onAction?: () => void
   isLoading?: boolean
@@ -29,23 +29,43 @@ export const DigitalInput: React.FC<DigitalInputProps> = ({
   min,
   max
 }) => {
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newValue = e.target.value
+
+    if (newValue === '') {
+      onChange('')
+      return
+    }
+
+    const numValue = parseFloat(newValue)
+
+    if (max !== undefined && numValue > max) {
+      newValue = max.toString()
+    }
+
+    if (min !== undefined && min >= 0 && numValue < 0) {
+       newValue = '0' 
+    }
+
+    onChange(newValue)
+  }
+
   return (
     <div className={`relative flex items-center bg-black/40 border rounded-xl transition-all group ${
       disabled ? 'opacity-50 cursor-not-allowed border-white/5' : 'border-white/10 focus-within:border-primary/50 focus-within:shadow-[0_0_20px_rgba(64,224,208,0.1)]'
     }`}>
 
-      {/* Label a sinistra (es. "GUESS:") */}
       {label && (
         <div className="pl-4 font-bold text-[10px] text-gray-500 tracking-wider uppercase select-none whitespace-nowrap">
           {label}
         </div>
       )}
 
-      {/* Input Field */}
       <input
         type="number"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleInputChange}
         placeholder={placeholder}
         disabled={disabled}
         min={min}

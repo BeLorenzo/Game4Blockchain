@@ -257,7 +257,7 @@ export class PirateGame extends GameContract {
     const state = clone(this.gameState(sessionID).value)
     const config = clone(this.gameSessions(sessionID).value)
 
-    assert(state.phase === 3, 'Not in execution phase')
+    assert(state.phase === 3 || state.phase === 2, 'Not in execution phase')
     assert(Global.round > config.endRevealAt, 'Reveal phase not ended')
 
     const proposal = clone(this.proposals(sessionID).value)
@@ -316,8 +316,8 @@ export class PirateGame extends GameContract {
       }
 
       this.gameSessions(sessionID).value = clone(config)
-      this.gameState(sessionID).value = clone(state)
     }
+    this.gameState(sessionID).value = clone(state)
   }
 
   /**
@@ -341,18 +341,19 @@ export class PirateGame extends GameContract {
     const shareOffset: uint64 = pirate.seniorityIndex * 8
     const share = extractUint64(winningProposal.distribution, shareOffset)
 
-    assert(share > 0, 'No winnings for you')
-
     pirate.claimed = true
     this.pirates(pirateKey).value = clone(pirate)
-
-    itxn
-      .payment({
-        receiver: pirateAddr.native,
-        amount: share,
-        fee: 0,
-      })
-      .submit()
+    assert(share > 0, 'No winnings for you')
+    
+    if (share > 0) {
+      itxn
+        .payment({
+          receiver: pirateAddr.native,
+          amount: share,
+          fee: 0,
+        })
+        .submit()
+    }
 
     return share
   }
@@ -458,7 +459,6 @@ export class PirateGame extends GameContract {
         amount: config.participation,
         fee: 0
       }).submit()
-
       return
     }
 

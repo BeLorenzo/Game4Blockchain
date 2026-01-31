@@ -320,9 +320,6 @@ export const useGuessGame = () => {
         }
       }
 
-      if (wonAmount >= 0) showAlert(`You won ${wonAmount} ALGO!`, 'success')
-      else showAlert('Storage fee reclaimed.', 'info')
-
       refreshData()
     } catch (e: any) {
       const errorMsg = e.message || JSON.stringify(e)
@@ -337,7 +334,6 @@ export const useGuessGame = () => {
             notifyUpdate()
           }
         }
-        showAlert('Better luck next time!', 'error')
         refreshData()
       } else {
         showAlert(e.message, 'error')

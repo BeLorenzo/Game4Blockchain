@@ -4,7 +4,7 @@
     "../../abstract_contract/contract.algo.ts",
     "../../stagHunt/contract.algo.ts"
   ],
-  "mappings": "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",
+  "mappings": "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",
   "op_pc_offset": 0,
   "pc_events": {
     "1": {
@@ -1128,7 +1128,7 @@
       ]
     },
     "347": {
-      "op": "<=",
+      "op": "<",
       "stack_out": [
         "config#0",
         "values%0#0",
@@ -8180,65 +8180,13 @@
       ]
     },
     "949": {
-      "op": "dup",
-      "defined_out": [
-        "config#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalDistributable#0",
-        "totalDistributable#0 (copy)",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%2#0 (copy)",
-        "values%3#0"
-      ],
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "totalDistributable#0",
-        "totalDistributable#0 (copy)",
-        "values%2#0 (copy)",
-        "values%2#0 (copy)"
-      ]
-    },
-    "950": {
-      "op": "cover 3",
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "values%2#0",
-        "totalDistributable#0",
-        "totalDistributable#0 (copy)",
-        "values%2#0 (copy)"
-      ]
-    },
-    "952": {
       "op": "/",
       "defined_out": [
         "config#0",
         "currentRefundPct#0",
         "currentThresholdPct#0",
         "netSessionPot#0",
-        "share#0",
+        "tmp%17#0",
         "totalDistributable#0",
         "totalRevealed#0",
         "values%2#0",
@@ -8256,9 +8204,68 @@
         "values%2#0",
         "values%3#0",
         "sessionID#0",
-        "values%2#0",
         "totalDistributable#0",
-        "share#0"
+        "tmp%17#0"
+      ]
+    },
+    "950": {
+      "op": "itob",
+      "defined_out": [
+        "aggregate%val_as_bytes%0#0",
+        "config#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalDistributable#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0"
+      ],
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "totalDistributable#0",
+        "aggregate%val_as_bytes%0#0"
+      ]
+    },
+    "951": {
+      "op": "dig 9",
+      "defined_out": [
+        "aggregate%val_as_bytes%0#0",
+        "config#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "stats#0",
+        "totalDistributable#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0"
+      ],
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "totalDistributable#0",
+        "aggregate%val_as_bytes%0#0",
+        "stats#0"
       ]
     },
     "953": {
@@ -8275,228 +8282,12 @@
         "values%2#0",
         "values%3#0",
         "sessionID#0",
-        "values%2#0",
-        "share#0",
-        "totalDistributable#0"
-      ]
-    },
-    "954": {
-      "op": "uncover 2",
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "share#0",
         "totalDistributable#0",
-        "values%2#0"
-      ]
-    },
-    "956": {
-      "op": "%",
-      "defined_out": [
-        "config#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "remainder#0",
-        "share#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0"
-      ],
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "share#0",
-        "remainder#0"
-      ]
-    },
-    "957": {
-      "op": "dig 9",
-      "defined_out": [
-        "config#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "remainder#0",
-        "share#0",
-        "stats#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0"
-      ],
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "share#0",
-        "remainder#0",
-        "stats#0"
-      ]
-    },
-    "959": {
-      "op": "intc 5 // 129",
-      "defined_out": [
-        "129",
-        "config#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "remainder#0",
-        "share#0",
-        "stats#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0"
-      ],
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "share#0",
-        "remainder#0",
-        "stats#0",
-        "129"
-      ]
-    },
-    "961": {
-      "op": "intc_1 // 1",
-      "defined_out": [
-        "1",
-        "129",
-        "config#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "remainder#0",
-        "share#0",
-        "stats#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0"
-      ],
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "share#0",
-        "remainder#0",
-        "stats#0",
-        "129",
-        "1"
-      ]
-    },
-    "962": {
-      "op": "setbit",
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "share#0",
-        "remainder#0",
-        "stats#0"
-      ]
-    },
-    "963": {
-      "op": "uncover 2",
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "remainder#0",
-        "stats#0",
-        "share#0"
-      ]
-    },
-    "965": {
-      "op": "itob",
-      "defined_out": [
-        "aggregate%val_as_bytes%0#0",
-        "config#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "remainder#0",
-        "stats#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0"
-      ],
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
-        "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "remainder#0",
         "stats#0",
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "966": {
+    "954": {
       "op": "replace2 17",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8510,18 +8301,222 @@
         "values%2#0",
         "values%3#0",
         "sessionID#0",
-        "remainder#0",
+        "totalDistributable#0",
         "stats#0"
       ]
     },
-    "968": {
-      "op": "bury 9",
+    "956": {
+      "op": "dup",
       "defined_out": [
         "config#0",
         "currentRefundPct#0",
         "currentThresholdPct#0",
         "netSessionPot#0",
-        "remainder#0",
+        "stats#0",
+        "stats#0 (copy)",
+        "totalDistributable#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0"
+      ],
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "totalDistributable#0",
+        "stats#0",
+        "stats#0 (copy)"
+      ]
+    },
+    "957": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "totalDistributable#0",
+        "stats#0",
+        "stats#0 (copy)",
+        "0"
+      ]
+    },
+    "958": {
+      "op": "extract_uint64",
+      "defined_out": [
+        "config#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "stats#0",
+        "totalDistributable#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "values%9#0"
+      ],
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "totalDistributable#0",
+        "stats#0",
+        "values%9#0"
+      ]
+    },
+    "959": {
+      "op": "uncover 2",
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0",
+        "values%9#0",
+        "totalDistributable#0"
+      ]
+    },
+    "961": {
+      "op": "swap",
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0",
+        "totalDistributable#0",
+        "values%9#0"
+      ]
+    },
+    "962": {
+      "op": "%",
+      "defined_out": [
+        "config#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "stats#0",
+        "tmp%18#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0"
+      ],
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0",
+        "tmp%18#0"
+      ]
+    },
+    "963": {
+      "op": "bytec_0 // \"globalJackpot\"",
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0",
+        "tmp%18#0",
+        "\"globalJackpot\""
+      ]
+    },
+    "964": {
+      "op": "swap",
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0",
+        "\"globalJackpot\"",
+        "tmp%18#0"
+      ]
+    },
+    "965": {
+      "op": "app_global_put",
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0"
+      ]
+    },
+    "966": {
+      "op": "intc 5 // 129",
+      "defined_out": [
+        "129",
+        "config#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
         "stats#0",
         "totalRevealed#0",
         "values%2#0",
@@ -8539,47 +8534,70 @@
         "values%2#0",
         "values%3#0",
         "sessionID#0",
-        "remainder#0"
+        "stats#0",
+        "129"
+      ]
+    },
+    "968": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "1",
+        "129",
+        "config#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "stats#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0"
+      ],
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0",
+        "129",
+        "1"
+      ]
+    },
+    "969": {
+      "op": "setbit",
+      "stack_out": [
+        "box_prefixed_key%1#0",
+        "config#0",
+        "encoded_value%0#1",
+        "stats#0",
+        "currentRefundPct#0",
+        "currentThresholdPct#0",
+        "netSessionPot#0",
+        "totalRevealed#0",
+        "values%2#0",
+        "values%3#0",
+        "sessionID#0",
+        "stats#0"
       ]
     },
     "970": {
-      "op": "bytec_0 // \"globalJackpot\"",
-      "stack_out": [
-        "box_prefixed_key%1#0",
+      "op": "bury 8",
+      "defined_out": [
         "config#0",
-        "encoded_value%0#1",
-        "stats#0",
         "currentRefundPct#0",
         "currentThresholdPct#0",
         "netSessionPot#0",
-        "totalRevealed#0",
-        "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "remainder#0",
-        "\"globalJackpot\""
-      ]
-    },
-    "971": {
-      "op": "swap",
-      "stack_out": [
-        "box_prefixed_key%1#0",
-        "config#0",
-        "encoded_value%0#1",
         "stats#0",
-        "currentRefundPct#0",
-        "currentThresholdPct#0",
-        "netSessionPot#0",
         "totalRevealed#0",
         "values%2#0",
-        "values%3#0",
-        "sessionID#0",
-        "\"globalJackpot\"",
-        "remainder#0"
-      ]
-    },
-    "972": {
-      "op": "app_global_put",
+        "values%3#0"
+      ],
       "stack_out": [
         "box_prefixed_key%1#0",
         "config#0",
@@ -8594,7 +8612,7 @@
         "sessionID#0"
       ]
     },
-    "973": {
+    "972": {
       "block": "resolveSession_after_if_else@9",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -8628,7 +8646,7 @@
         "stats#0"
       ]
     },
-    "975": {
+    "974": {
       "op": "intc 4 // 128",
       "defined_out": [
         "128",
@@ -8650,7 +8668,7 @@
         "128"
       ]
     },
-    "977": {
+    "976": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -8674,7 +8692,7 @@
         "1"
       ]
     },
-    "978": {
+    "977": {
       "op": "setbit",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8691,7 +8709,7 @@
         "stats#0"
       ]
     },
-    "979": {
+    "978": {
       "op": "dig 11",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -8713,7 +8731,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "981": {
+    "980": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8731,7 +8749,7 @@
         "stats#0"
       ]
     },
-    "982": {
+    "981": {
       "op": "box_put",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8747,10 +8765,10 @@
         "sessionID#0"
       ]
     },
-    "983": {
+    "982": {
       "op": "b resolveSession_after_inlined_smart_contracts/stagHunt/contract.algo.ts::StagHunt.resolveSession@10"
     },
-    "986": {
+    "985": {
       "block": "resolveSession_else_body@8",
       "stack_in": [
         "box_prefixed_key%1#0",
@@ -8784,7 +8802,7 @@
         "0"
       ]
     },
-    "987": {
+    "986": {
       "op": "bytec_0 // \"globalJackpot\"",
       "defined_out": [
         "\"globalJackpot\"",
@@ -8806,7 +8824,7 @@
         "\"globalJackpot\""
       ]
     },
-    "988": {
+    "987": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%4#0",
@@ -8828,7 +8846,7 @@
         "maybe_exists%4#0"
       ]
     },
-    "989": {
+    "988": {
       "error": "check GlobalState exists",
       "op": "assert // check GlobalState exists",
       "stack_out": [
@@ -8846,7 +8864,7 @@
         "maybe_value%4#0"
       ]
     },
-    "990": {
+    "989": {
       "op": "dig 5",
       "defined_out": [
         "maybe_value%4#0",
@@ -8868,7 +8886,7 @@
         "netSessionPot#0"
       ]
     },
-    "992": {
+    "991": {
       "op": "+",
       "defined_out": [
         "netSessionPot#0",
@@ -8889,7 +8907,7 @@
         "tmp%19#0"
       ]
     },
-    "993": {
+    "992": {
       "op": "bytec_0 // \"globalJackpot\"",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8907,7 +8925,7 @@
         "\"globalJackpot\""
       ]
     },
-    "994": {
+    "993": {
       "op": "swap",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8925,7 +8943,7 @@
         "tmp%19#0"
       ]
     },
-    "995": {
+    "994": {
       "op": "app_global_put",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -8941,7 +8959,7 @@
         "sessionID#0"
       ]
     },
-    "996": {
+    "995": {
       "op": "dig 7",
       "defined_out": [
         "netSessionPot#0",
@@ -8962,7 +8980,7 @@
         "stats#0"
       ]
     },
-    "998": {
+    "997": {
       "op": "intc 5 // 129",
       "defined_out": [
         "129",
@@ -8985,7 +9003,7 @@
         "129"
       ]
     },
-    "1000": {
+    "999": {
       "op": "intc_0 // 0",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9004,7 +9022,7 @@
         "0"
       ]
     },
-    "1001": {
+    "1000": {
       "op": "setbit",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9021,7 +9039,7 @@
         "stats#0"
       ]
     },
-    "1002": {
+    "1001": {
       "op": "intc_0 // 0",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9039,7 +9057,7 @@
         "0"
       ]
     },
-    "1003": {
+    "1002": {
       "op": "itob",
       "defined_out": [
         "aggregate%val_as_bytes%1#0",
@@ -9062,7 +9080,7 @@
         "aggregate%val_as_bytes%1#0"
       ]
     },
-    "1004": {
+    "1003": {
       "op": "replace2 17",
       "stack_out": [
         "box_prefixed_key%1#0",
@@ -9079,7 +9097,7 @@
         "stats#0"
       ]
     },
-    "1006": {
+    "1005": {
       "op": "bury 8",
       "defined_out": [
         "netSessionPot#0",
@@ -9099,10 +9117,10 @@
         "sessionID#0"
       ]
     },
-    "1008": {
+    "1007": {
       "op": "b resolveSession_after_if_else@9"
     },
-    "1011": {
+    "1010": {
       "subroutine": "smart_contracts/stagHunt/contract.algo.ts::StagHunt.claimWinnings[routing]",
       "params": {},
       "block": "claimWinnings",
@@ -9112,7 +9130,7 @@
         "payout#1"
       ]
     },
-    "1013": {
+    "1012": {
       "op": "txna ApplicationArgs 1",
       "defined_out": [
         "tmp%0#0"
@@ -9122,7 +9140,7 @@
         "tmp%0#0"
       ]
     },
-    "1016": {
+    "1015": {
       "op": "dup",
       "defined_out": [
         "tmp%0#0",
@@ -9134,7 +9152,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "1017": {
+    "1016": {
       "op": "len",
       "defined_out": [
         "len%0#0",
@@ -9146,7 +9164,7 @@
         "len%0#0"
       ]
     },
-    "1018": {
+    "1017": {
       "op": "intc_2 // 8",
       "defined_out": [
         "8",
@@ -9160,7 +9178,7 @@
         "8"
       ]
     },
-    "1019": {
+    "1018": {
       "op": "==",
       "defined_out": [
         "eq%0#0",
@@ -9172,7 +9190,7 @@
         "eq%0#0"
       ]
     },
-    "1020": {
+    "1019": {
       "error": "invalid number of bytes for arc4.uint64",
       "op": "assert // invalid number of bytes for arc4.uint64",
       "stack_out": [
@@ -9180,7 +9198,7 @@
         "tmp%0#0"
       ]
     },
-    "1021": {
+    "1020": {
       "op": "btoi",
       "defined_out": [
         "sessionID#0"
@@ -9190,7 +9208,7 @@
         "sessionID#0"
       ]
     },
-    "1022": {
+    "1021": {
       "op": "itob",
       "defined_out": [
         "encoded_value%0#1"
@@ -9200,7 +9218,7 @@
         "encoded_value%0#1"
       ]
     },
-    "1023": {
+    "1022": {
       "op": "bytec_1 // \"gs\"",
       "defined_out": [
         "\"gs\"",
@@ -9212,7 +9230,7 @@
         "\"gs\""
       ]
     },
-    "1024": {
+    "1023": {
       "op": "dig 1",
       "defined_out": [
         "\"gs\"",
@@ -9226,7 +9244,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "1026": {
+    "1025": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%0#1",
@@ -9238,7 +9256,7 @@
         "box_prefixed_key%0#1"
       ]
     },
-    "1027": {
+    "1026": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%0#1",
@@ -9252,7 +9270,7 @@
         "box_prefixed_key%0#1 (copy)"
       ]
     },
-    "1028": {
+    "1027": {
       "op": "box_len",
       "defined_out": [
         "_%0#0",
@@ -9268,7 +9286,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "1029": {
+    "1028": {
       "op": "bury 1",
       "stack_out": [
         "payout#1",
@@ -9277,7 +9295,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "1031": {
+    "1030": {
       "error": "Session does not exist",
       "op": "assert // Session does not exist",
       "stack_out": [
@@ -9286,7 +9304,7 @@
         "box_prefixed_key%0#1"
       ]
     },
-    "1032": {
+    "1031": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%1#0",
@@ -9300,7 +9318,7 @@
         "aggregate%box_get%1#0"
       ]
     },
-    "1033": {
+    "1032": {
       "op": "pop",
       "stack_out": [
         "payout#1",
@@ -9308,7 +9326,7 @@
         "config#0"
       ]
     },
-    "1034": {
+    "1033": {
       "op": "swap",
       "defined_out": [
         "config#0",
@@ -9320,10 +9338,10 @@
         "encoded_value%0#1"
       ]
     },
-    "1035": {
+    "1034": {
       "op": "txn Sender"
     },
-    "1037": {
+    "1036": {
       "op": "dup",
       "defined_out": [
         "config#0",
@@ -9338,7 +9356,7 @@
         "playerAddr#0"
       ]
     },
-    "1038": {
+    "1037": {
       "op": "cover 2",
       "defined_out": [
         "config#0",
@@ -9353,7 +9371,7 @@
         "playerAddr#0"
       ]
     },
-    "1040": {
+    "1039": {
       "op": "dig 1",
       "stack_out": [
         "payout#1",
@@ -9364,7 +9382,7 @@
         "encoded_value%0#1 (copy)"
       ]
     },
-    "1042": {
+    "1041": {
       "op": "swap",
       "stack_out": [
         "payout#1",
@@ -9375,7 +9393,7 @@
         "playerAddr#0"
       ]
     },
-    "1043": {
+    "1042": {
       "op": "concat",
       "defined_out": [
         "config#0",
@@ -9391,7 +9409,7 @@
         "tmp%1#0"
       ]
     },
-    "1044": {
+    "1043": {
       "op": "sha256",
       "defined_out": [
         "config#0",
@@ -9407,7 +9425,7 @@
         "playerKey#0"
       ]
     },
-    "1045": {
+    "1044": {
       "op": "bytec 11 // \"pcho\"",
       "defined_out": [
         "\"pcho\"",
@@ -9425,7 +9443,7 @@
         "\"pcho\""
       ]
     },
-    "1047": {
+    "1046": {
       "op": "swap",
       "stack_out": [
         "payout#1",
@@ -9436,7 +9454,7 @@
         "playerKey#0"
       ]
     },
-    "1048": {
+    "1047": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9452,7 +9470,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "1049": {
+    "1048": {
       "op": "dup",
       "stack_out": [
         "payout#1",
@@ -9463,7 +9481,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "1050": {
+    "1049": {
       "op": "cover 2",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9480,7 +9498,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "1052": {
+    "1051": {
       "op": "dup",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9499,7 +9517,7 @@
         "box_prefixed_key%1#0 (copy)"
       ]
     },
-    "1053": {
+    "1052": {
       "op": "box_len",
       "stack_out": [
         "payout#1",
@@ -9512,7 +9530,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "1054": {
+    "1053": {
       "op": "bury 1",
       "stack_out": [
         "payout#1",
@@ -9524,7 +9542,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "1056": {
+    "1055": {
       "error": "Player has not revealed or already claimed",
       "op": "assert // Player has not revealed or already claimed",
       "stack_out": [
@@ -9536,7 +9554,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "1057": {
+    "1056": {
       "op": "bytec 5 // \"sh\"",
       "defined_out": [
         "\"sh\"",
@@ -9555,7 +9573,7 @@
         "\"sh\""
       ]
     },
-    "1059": {
+    "1058": {
       "op": "uncover 2",
       "stack_out": [
         "payout#1",
@@ -9567,7 +9585,7 @@
         "encoded_value%0#1"
       ]
     },
-    "1061": {
+    "1060": {
       "op": "concat",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9584,7 +9602,7 @@
         "box_prefixed_key%2#0"
       ]
     },
-    "1062": {
+    "1061": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%3#0",
@@ -9603,7 +9621,7 @@
         "aggregate%box_get%3#0"
       ]
     },
-    "1063": {
+    "1062": {
       "op": "swap",
       "stack_out": [
         "payout#1",
@@ -9615,7 +9633,7 @@
         "stats#0"
       ]
     },
-    "1064": {
+    "1063": {
       "op": "dup",
       "stack_out": [
         "payout#1",
@@ -9628,7 +9646,7 @@
         "stats#0 (copy)"
       ]
     },
-    "1065": {
+    "1064": {
       "op": "cover 2",
       "stack_out": [
         "payout#1",
@@ -9641,7 +9659,7 @@
         "stats#0"
       ]
     },
-    "1067": {
+    "1066": {
       "op": "cover 3",
       "defined_out": [
         "aggregate%box_get%3#0",
@@ -9661,7 +9679,7 @@
         "aggregate%box_get%3#0"
       ]
     },
-    "1069": {
+    "1068": {
       "error": "Box must have value",
       "op": "assert // Box must have value",
       "stack_out": [
@@ -9674,7 +9692,7 @@
         "stats#0"
       ]
     },
-    "1070": {
+    "1069": {
       "op": "intc 4 // 128",
       "defined_out": [
         "128",
@@ -9694,7 +9712,7 @@
         "128"
       ]
     },
-    "1072": {
+    "1071": {
       "op": "getbit",
       "defined_out": [
         "aggregate%get_bit%0#0",
@@ -9713,7 +9731,7 @@
         "aggregate%get_bit%0#0"
       ]
     },
-    "1073": {
+    "1072": {
       "error": "Game not resolved",
       "op": "assert // Game not resolved",
       "stack_out": [
@@ -9725,7 +9743,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "1074": {
+    "1073": {
       "op": "box_get",
       "defined_out": [
         "aggregate%box_get%4#0",
@@ -9745,7 +9763,7 @@
         "aggregate%box_get%5#0"
       ]
     },
-    "1075": {
+    "1074": {
       "op": "pop",
       "stack_out": [
         "payout#1",
@@ -9756,7 +9774,7 @@
         "aggregate%box_get%4#0"
       ]
     },
-    "1076": {
+    "1075": {
       "op": "btoi",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9774,7 +9792,7 @@
         "choice#0"
       ]
     },
-    "1077": {
+    "1076": {
       "op": "intc_0 // 0",
       "stack_out": [
         "payout#1",
@@ -9786,7 +9804,7 @@
         "0"
       ]
     },
-    "1078": {
+    "1077": {
       "op": "bytec_3 // \"hareRefundPercent\"",
       "defined_out": [
         "\"hareRefundPercent\"",
@@ -9808,7 +9826,7 @@
         "\"hareRefundPercent\""
       ]
     },
-    "1079": {
+    "1078": {
       "op": "app_global_get_ex",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9830,7 +9848,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "1080": {
+    "1079": {
       "op": "swap",
       "stack_out": [
         "payout#1",
@@ -9843,7 +9861,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1081": {
+    "1080": {
       "op": "cover 2",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9865,7 +9883,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "1083": {
+    "1082": {
       "error": "check GlobalState exists",
       "op": "assert // check GlobalState exists",
       "stack_out": [
@@ -9878,7 +9896,7 @@
         "choice#0"
       ]
     },
-    "1084": {
+    "1083": {
       "op": "bnz claimWinnings_else_body@3",
       "stack_out": [
         "payout#1",
@@ -9889,7 +9907,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1087": {
+    "1086": {
       "op": "dig 4",
       "stack_out": [
         "payout#1",
@@ -9901,7 +9919,7 @@
         "config#0"
       ]
     },
-    "1089": {
+    "1088": {
       "op": "pushint 24 // 24",
       "defined_out": [
         "24",
@@ -9922,7 +9940,7 @@
         "24"
       ]
     },
-    "1091": {
+    "1090": {
       "op": "extract_uint64",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9942,7 +9960,7 @@
         "values%1#0"
       ]
     },
-    "1092": {
+    "1091": {
       "op": "dig 1",
       "stack_out": [
         "payout#1",
@@ -9955,7 +9973,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1094": {
+    "1093": {
       "op": "*",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -9975,7 +9993,7 @@
         "tmp%3#1"
       ]
     },
-    "1095": {
+    "1094": {
       "op": "intc_3 // 100",
       "defined_out": [
         "100",
@@ -9997,7 +10015,7 @@
         "100"
       ]
     },
-    "1096": {
+    "1095": {
       "op": "/",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -10017,7 +10035,7 @@
         "payout#1"
       ]
     },
-    "1097": {
+    "1096": {
       "op": "bury 6",
       "stack_out": [
         "payout#1",
@@ -10028,7 +10046,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1099": {
+    "1098": {
       "block": "claimWinnings_after_if_else@7",
       "stack_in": [
         "payout#1",
@@ -10052,7 +10070,7 @@
         "box_prefixed_key%1#0"
       ]
     },
-    "1101": {
+    "1100": {
       "op": "box_del",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -10068,7 +10086,7 @@
         "{box_del}"
       ]
     },
-    "1102": {
+    "1101": {
       "op": "pop",
       "stack_out": [
         "payout#1",
@@ -10079,7 +10097,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1103": {
+    "1102": {
       "op": "dig 5",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -10095,7 +10113,7 @@
         "payout#1"
       ]
     },
-    "1105": {
+    "1104": {
       "op": "bz claimWinnings_after_if_else@10",
       "stack_out": [
         "payout#1",
@@ -10106,10 +10124,10 @@
         "currentRefundPct#0"
       ]
     },
-    "1108": {
+    "1107": {
       "op": "itxn_begin"
     },
-    "1109": {
+    "1108": {
       "op": "dig 5",
       "stack_out": [
         "payout#1",
@@ -10121,7 +10139,7 @@
         "payout#1"
       ]
     },
-    "1111": {
+    "1110": {
       "op": "itxn_field Amount",
       "stack_out": [
         "payout#1",
@@ -10132,7 +10150,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1113": {
+    "1112": {
       "op": "dig 3",
       "defined_out": [
         "box_prefixed_key%1#0",
@@ -10149,7 +10167,7 @@
         "playerAddr#0"
       ]
     },
-    "1115": {
+    "1114": {
       "op": "itxn_field Receiver",
       "stack_out": [
         "payout#1",
@@ -10160,7 +10178,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1117": {
+    "1116": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -10178,7 +10196,7 @@
         "1"
       ]
     },
-    "1118": {
+    "1117": {
       "op": "itxn_field TypeEnum",
       "stack_out": [
         "payout#1",
@@ -10189,7 +10207,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1120": {
+    "1119": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -10207,7 +10225,7 @@
         "0"
       ]
     },
-    "1121": {
+    "1120": {
       "op": "itxn_field Fee",
       "stack_out": [
         "payout#1",
@@ -10218,10 +10236,10 @@
         "currentRefundPct#0"
       ]
     },
-    "1123": {
+    "1122": {
       "op": "itxn_submit"
     },
-    "1124": {
+    "1123": {
       "block": "claimWinnings_after_if_else@10",
       "stack_in": [
         "payout#1",
@@ -10245,7 +10263,7 @@
         "payout#1"
       ]
     },
-    "1126": {
+    "1125": {
       "op": "itob",
       "defined_out": [
         "aggregate%val_as_bytes%0#0",
@@ -10261,7 +10279,7 @@
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "1127": {
+    "1126": {
       "op": "bytec 6 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -10279,7 +10297,7 @@
         "0x151f7c75"
       ]
     },
-    "1129": {
+    "1128": {
       "op": "swap",
       "stack_out": [
         "payout#1",
@@ -10292,7 +10310,7 @@
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "1130": {
+    "1129": {
       "op": "concat",
       "defined_out": [
         "payout#1",
@@ -10308,7 +10326,7 @@
         "tmp%4#0"
       ]
     },
-    "1131": {
+    "1130": {
       "op": "log",
       "stack_out": [
         "payout#1",
@@ -10319,7 +10337,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1132": {
+    "1131": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -10335,7 +10353,7 @@
         "1"
       ]
     },
-    "1133": {
+    "1132": {
       "op": "return",
       "stack_out": [
         "payout#1",
@@ -10346,7 +10364,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1134": {
+    "1133": {
       "block": "claimWinnings_else_body@3",
       "stack_in": [
         "payout#1",
@@ -10370,7 +10388,7 @@
         "stats#0"
       ]
     },
-    "1136": {
+    "1135": {
       "op": "intc 5 // 129",
       "defined_out": [
         "129",
@@ -10387,7 +10405,7 @@
         "129"
       ]
     },
-    "1138": {
+    "1137": {
       "op": "getbit",
       "defined_out": [
         "aggregate%get_bit%1#0",
@@ -10403,7 +10421,7 @@
         "aggregate%get_bit%1#0"
       ]
     },
-    "1139": {
+    "1138": {
       "op": "bz claimWinnings_else_body@5",
       "stack_out": [
         "payout#1",
@@ -10414,7 +10432,7 @@
         "currentRefundPct#0"
       ]
     },
-    "1142": {
+    "1141": {
       "op": "dig 1",
       "stack_out": [
         "payout#1",
@@ -10426,7 +10444,7 @@
         "stats#0"
       ]
     },
-    "1144": {
+    "1143": {
       "op": "pushint 17 // 17",
       "defined_out": [
         "17",
@@ -10443,7 +10461,7 @@
         "17"
       ]
     },
-    "1146": {
+    "1145": {
       "op": "extract_uint64",
       "defined_out": [
         "payout#1",
@@ -10459,7 +10477,7 @@
         "payout#1"
       ]
     },
-    "1147": {
+    "1146": {
       "op": "bury 6",
       "defined_out": [
         "payout#1",
@@ -10474,10 +10492,10 @@
         "currentRefundPct#0"
       ]
     },
-    "1149": {
+    "1148": {
       "op": "b claimWinnings_after_if_else@7"
     },
-    "1152": {
+    "1151": {
       "block": "claimWinnings_else_body@5",
       "stack_in": [
         "payout#1",
@@ -10501,7 +10519,7 @@
         "payout#1"
       ]
     },
-    "1153": {
+    "1152": {
       "op": "bury 6",
       "defined_out": [
         "payout#1"
@@ -10515,10 +10533,10 @@
         "currentRefundPct#0"
       ]
     },
-    "1155": {
+    "1154": {
       "op": "b claimWinnings_after_if_else@7"
     },
-    "1158": {
+    "1157": {
       "subroutine": "smart_contracts/stagHunt/contract.algo.ts::StagHunt.getRequiredMBR[routing]",
       "params": {},
       "block": "getRequiredMBR",
@@ -10531,7 +10549,7 @@
         "tmp%0#0"
       ]
     },
-    "1161": {
+    "1160": {
       "op": "dup",
       "defined_out": [
         "tmp%0#0",
@@ -10542,7 +10560,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "1162": {
+    "1161": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -10555,7 +10573,7 @@
         "0"
       ]
     },
-    "1163": {
+    "1162": {
       "error": "invalid array length header",
       "op": "extract_uint16 // on error: invalid array length header",
       "defined_out": [
@@ -10567,7 +10585,7 @@
         "aggregate%array_length%0#0"
       ]
     },
-    "1164": {
+    "1163": {
       "op": "pushint 2 // 2",
       "defined_out": [
         "2",
@@ -10580,7 +10598,7 @@
         "2"
       ]
     },
-    "1166": {
+    "1165": {
       "op": "+",
       "defined_out": [
         "add%0#0",
@@ -10591,7 +10609,7 @@
         "add%0#0"
       ]
     },
-    "1167": {
+    "1166": {
       "op": "dig 1",
       "stack_out": [
         "tmp%0#0",
@@ -10599,7 +10617,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "1169": {
+    "1168": {
       "op": "len",
       "defined_out": [
         "add%0#0",
@@ -10612,7 +10630,7 @@
         "len%0#0"
       ]
     },
-    "1170": {
+    "1169": {
       "op": "==",
       "defined_out": [
         "eq%0#0",
@@ -10623,14 +10641,14 @@
         "eq%0#0"
       ]
     },
-    "1171": {
+    "1170": {
       "error": "invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "op": "assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "stack_out": [
         "tmp%0#0"
       ]
     },
-    "1172": {
+    "1171": {
       "op": "extract 2 0",
       "defined_out": [
         "tmp%1#0"
@@ -10639,7 +10657,7 @@
         "tmp%1#0"
       ]
     },
-    "1175": {
+    "1174": {
       "callsub": "smart_contracts/stagHunt/contract.algo.ts::StagHunt.getRequiredMBR",
       "op": "callsub smart_contracts/stagHunt/contract.algo.ts::StagHunt.getRequiredMBR",
       "defined_out": [
@@ -10649,7 +10667,7 @@
         "tmp%2#0"
       ]
     },
-    "1178": {
+    "1177": {
       "op": "itob",
       "defined_out": [
         "aggregate%val_as_bytes%0#0"
@@ -10658,7 +10676,7 @@
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "1179": {
+    "1178": {
       "op": "bytec 6 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -10669,14 +10687,14 @@
         "0x151f7c75"
       ]
     },
-    "1181": {
+    "1180": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "aggregate%val_as_bytes%0#0"
       ]
     },
-    "1182": {
+    "1181": {
       "op": "concat",
       "defined_out": [
         "tmp%4#0"
@@ -10685,11 +10703,11 @@
         "tmp%4#0"
       ]
     },
-    "1183": {
+    "1182": {
       "op": "log",
       "stack_out": []
     },
-    "1184": {
+    "1183": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1"
@@ -10698,11 +10716,11 @@
         "1"
       ]
     },
-    "1185": {
+    "1184": {
       "op": "return",
       "stack_out": []
     },
-    "1186": {
+    "1185": {
       "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getGameType[routing]",
       "params": {},
       "block": "getGameType",
@@ -10715,7 +10733,7 @@
         "0"
       ]
     },
-    "1187": {
+    "1186": {
       "op": "bytec_2 // \"gameType\"",
       "defined_out": [
         "\"gameType\"",
@@ -10726,7 +10744,7 @@
         "\"gameType\""
       ]
     },
-    "1188": {
+    "1187": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%0#0",
@@ -10737,14 +10755,14 @@
         "maybe_exists%0#0"
       ]
     },
-    "1189": {
+    "1188": {
       "error": "check GlobalState exists",
       "op": "assert // check GlobalState exists",
       "stack_out": [
         "maybe_value%0#0"
       ]
     },
-    "1190": {
+    "1189": {
       "op": "dup",
       "defined_out": [
         "maybe_value%0#0",
@@ -10755,7 +10773,7 @@
         "maybe_value%0#0 (copy)"
       ]
     },
-    "1191": {
+    "1190": {
       "op": "len",
       "defined_out": [
         "aggregate%length%0#0",
@@ -10766,7 +10784,7 @@
         "aggregate%length%0#0"
       ]
     },
-    "1192": {
+    "1191": {
       "op": "itob",
       "defined_out": [
         "aggregate%as_bytes%0#0",
@@ -10777,7 +10795,7 @@
         "aggregate%as_bytes%0#0"
       ]
     },
-    "1193": {
+    "1192": {
       "op": "extract 6 2",
       "defined_out": [
         "aggregate%length_uint16%0#0",
@@ -10788,14 +10806,14 @@
         "aggregate%length_uint16%0#0"
       ]
     },
-    "1196": {
+    "1195": {
       "op": "swap",
       "stack_out": [
         "aggregate%length_uint16%0#0",
         "maybe_value%0#0"
       ]
     },
-    "1197": {
+    "1196": {
       "op": "concat",
       "defined_out": [
         "aggregate%encoded_value%0#0"
@@ -10804,7 +10822,7 @@
         "aggregate%encoded_value%0#0"
       ]
     },
-    "1198": {
+    "1197": {
       "op": "bytec 6 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -10815,14 +10833,14 @@
         "0x151f7c75"
       ]
     },
-    "1200": {
+    "1199": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "aggregate%encoded_value%0#0"
       ]
     },
-    "1201": {
+    "1200": {
       "op": "concat",
       "defined_out": [
         "tmp%2#0"
@@ -10831,11 +10849,11 @@
         "tmp%2#0"
       ]
     },
-    "1202": {
+    "1201": {
       "op": "log",
       "stack_out": []
     },
-    "1203": {
+    "1202": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1"
@@ -10844,11 +10862,11 @@
         "1"
       ]
     },
-    "1204": {
+    "1203": {
       "op": "return",
       "stack_out": []
     },
-    "1205": {
+    "1204": {
       "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.initialize[routing]",
       "params": {},
       "block": "initialize",
@@ -10861,7 +10879,7 @@
         "tmp%0#0"
       ]
     },
-    "1208": {
+    "1207": {
       "op": "dup",
       "defined_out": [
         "tmp%0#0",
@@ -10872,7 +10890,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "1209": {
+    "1208": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -10885,7 +10903,7 @@
         "0"
       ]
     },
-    "1210": {
+    "1209": {
       "error": "invalid array length header",
       "op": "extract_uint16 // on error: invalid array length header",
       "defined_out": [
@@ -10897,7 +10915,7 @@
         "aggregate%array_length%0#0"
       ]
     },
-    "1211": {
+    "1210": {
       "op": "pushint 2 // 2",
       "defined_out": [
         "2",
@@ -10910,7 +10928,7 @@
         "2"
       ]
     },
-    "1213": {
+    "1212": {
       "op": "+",
       "defined_out": [
         "add%0#0",
@@ -10921,7 +10939,7 @@
         "add%0#0"
       ]
     },
-    "1214": {
+    "1213": {
       "op": "dig 1",
       "stack_out": [
         "tmp%0#0",
@@ -10929,7 +10947,7 @@
         "tmp%0#0 (copy)"
       ]
     },
-    "1216": {
+    "1215": {
       "op": "len",
       "defined_out": [
         "add%0#0",
@@ -10942,7 +10960,7 @@
         "len%0#0"
       ]
     },
-    "1217": {
+    "1216": {
       "op": "==",
       "defined_out": [
         "eq%0#0",
@@ -10953,14 +10971,14 @@
         "eq%0#0"
       ]
     },
-    "1218": {
+    "1217": {
       "error": "invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "op": "assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>",
       "stack_out": [
         "tmp%0#0"
       ]
     },
-    "1219": {
+    "1218": {
       "op": "extract 2 0",
       "defined_out": [
         "gameType#0"
@@ -10969,14 +10987,14 @@
         "gameType#0"
       ]
     },
-    "1222": {
+    "1221": {
       "op": "intc_0 // 0",
       "stack_out": [
         "gameType#0",
         "0"
       ]
     },
-    "1223": {
+    "1222": {
       "op": "bytec_2 // \"gameType\"",
       "defined_out": [
         "\"gameType\"",
@@ -10989,7 +11007,7 @@
         "\"gameType\""
       ]
     },
-    "1224": {
+    "1223": {
       "op": "app_global_get_ex",
       "defined_out": [
         "gameType#0",
@@ -11002,7 +11020,7 @@
         "maybe_exists%0#0"
       ]
     },
-    "1225": {
+    "1224": {
       "error": "check GlobalState exists",
       "op": "assert // check GlobalState exists",
       "stack_out": [
@@ -11010,7 +11028,7 @@
         "maybe_value%0#0"
       ]
     },
-    "1226": {
+    "1225": {
       "op": "len",
       "defined_out": [
         "gameType#0",
@@ -11021,7 +11039,7 @@
         "tmp%0#1"
       ]
     },
-    "1227": {
+    "1226": {
       "op": "!",
       "defined_out": [
         "gameType#0",
@@ -11032,14 +11050,14 @@
         "tmp%1#1"
       ]
     },
-    "1228": {
+    "1227": {
       "error": "Contract already initialized",
       "op": "assert // Contract already initialized",
       "stack_out": [
         "gameType#0"
       ]
     },
-    "1229": {
+    "1228": {
       "op": "txn Sender",
       "defined_out": [
         "gameType#0",
@@ -11050,7 +11068,7 @@
         "tmp%2#0"
       ]
     },
-    "1231": {
+    "1230": {
       "op": "global CreatorAddress",
       "defined_out": [
         "gameType#0",
@@ -11063,7 +11081,7 @@
         "tmp%3#0"
       ]
     },
-    "1233": {
+    "1232": {
       "op": "==",
       "defined_out": [
         "gameType#0",
@@ -11074,32 +11092,32 @@
         "tmp%4#0"
       ]
     },
-    "1234": {
+    "1233": {
       "error": "Only creator can initialize",
       "op": "assert // Only creator can initialize",
       "stack_out": [
         "gameType#0"
       ]
     },
-    "1235": {
+    "1234": {
       "op": "bytec_2 // \"gameType\"",
       "stack_out": [
         "gameType#0",
         "\"gameType\""
       ]
     },
-    "1236": {
+    "1235": {
       "op": "swap",
       "stack_out": [
         "\"gameType\"",
         "gameType#0"
       ]
     },
-    "1237": {
+    "1236": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "1238": {
+    "1237": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1"
@@ -11108,11 +11126,11 @@
         "1"
       ]
     },
-    "1239": {
+    "1238": {
       "op": "return",
       "stack_out": []
     },
-    "1240": {
+    "1239": {
       "subroutine": "smart_contracts/stagHunt/contract.algo.ts::StagHunt.getRequiredMBR",
       "params": {
         "command#0": "bytes"
@@ -11121,7 +11139,7 @@
       "stack_in": [],
       "op": "proto 1 1"
     },
-    "1243": {
+    "1242": {
       "op": "frame_dig -1",
       "defined_out": [
         "command#0 (copy)"
@@ -11130,7 +11148,7 @@
         "command#0 (copy)"
       ]
     },
-    "1245": {
+    "1244": {
       "op": "bytec 4 // \"newGame\"",
       "defined_out": [
         "\"newGame\"",
@@ -11141,7 +11159,7 @@
         "\"newGame\""
       ]
     },
-    "1247": {
+    "1246": {
       "op": "==",
       "defined_out": [
         "tmp%0#0"
@@ -11150,17 +11168,17 @@
         "tmp%0#0"
       ]
     },
-    "1248": {
+    "1247": {
       "op": "bz smart_contracts/stagHunt/contract.algo.ts::StagHunt.getRequiredMBR_after_if_else@2",
       "stack_out": []
     },
-    "1251": {
+    "1250": {
       "op": "bytec 4 // \"newGame\"",
       "stack_out": [
         "\"newGame\""
       ]
     },
-    "1253": {
+    "1252": {
       "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "op": "callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "defined_out": [
@@ -11170,7 +11188,7 @@
         "tmp%2#0"
       ]
     },
-    "1256": {
+    "1255": {
       "op": "pushint 18500 // 18500",
       "defined_out": [
         "18500",
@@ -11181,7 +11199,7 @@
         "18500"
       ]
     },
-    "1260": {
+    "1259": {
       "op": "+",
       "defined_out": [
         "tmp%3#0"
@@ -11190,11 +11208,11 @@
         "tmp%3#0"
       ]
     },
-    "1261": {
+    "1260": {
       "retsub": true,
       "op": "retsub"
     },
-    "1262": {
+    "1261": {
       "block": "smart_contracts/stagHunt/contract.algo.ts::StagHunt.getRequiredMBR_after_if_else@2",
       "stack_in": [],
       "op": "frame_dig -1",
@@ -11205,7 +11223,7 @@
         "command#0 (copy)"
       ]
     },
-    "1264": {
+    "1263": {
       "callsub": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "op": "callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "defined_out": [
@@ -11215,11 +11233,11 @@
         "tmp%4#0"
       ]
     },
-    "1267": {
+    "1266": {
       "retsub": true,
       "op": "retsub"
     },
-    "1268": {
+    "1267": {
       "subroutine": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR",
       "params": {
         "command#0": "bytes"
@@ -11228,7 +11246,7 @@
       "stack_in": [],
       "op": "proto 1 1"
     },
-    "1271": {
+    "1270": {
       "op": "frame_dig -1",
       "defined_out": [
         "command#0 (copy)"
@@ -11237,7 +11255,7 @@
         "command#0 (copy)"
       ]
     },
-    "1273": {
+    "1272": {
       "op": "bytec 4 // \"newGame\"",
       "defined_out": [
         "\"newGame\"",
@@ -11248,7 +11266,7 @@
         "\"newGame\""
       ]
     },
-    "1275": {
+    "1274": {
       "op": "==",
       "defined_out": [
         "tmp%0#0"
@@ -11257,24 +11275,24 @@
         "tmp%0#0"
       ]
     },
-    "1276": {
+    "1275": {
       "op": "bz smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
       "stack_out": []
     },
-    "1279": {
-      "op": "pushint 42600 // 42600",
+    "1278": {
+      "op": "pushint 29800 // 29800",
       "defined_out": [
-        "42600"
+        "29800"
       ],
       "stack_out": [
-        "42600"
+        "29800"
       ]
     },
-    "1283": {
+    "1282": {
       "retsub": true,
       "op": "retsub"
     },
-    "1284": {
+    "1283": {
       "block": "smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR_else_body@2",
       "stack_in": [],
       "op": "frame_dig -1",
@@ -11285,7 +11303,7 @@
         "command#0 (copy)"
       ]
     },
-    "1286": {
+    "1285": {
       "op": "pushbytes \"join\"",
       "defined_out": [
         "\"join\"",
@@ -11296,7 +11314,7 @@
         "\"join\""
       ]
     },
-    "1292": {
+    "1291": {
       "op": "==",
       "defined_out": [
         "tmp%4#0"
@@ -11305,12 +11323,12 @@
         "tmp%4#0"
       ]
     },
-    "1293": {
+    "1292": {
       "error": "Command not supported",
       "op": "assert // Command not supported",
       "stack_out": []
     },
-    "1294": {
+    "1293": {
       "op": "pushint 29700 // 29700",
       "defined_out": [
         "29700"
@@ -11319,7 +11337,7 @@
         "29700"
       ]
     },
-    "1298": {
+    "1297": {
       "retsub": true,
       "op": "retsub"
     }

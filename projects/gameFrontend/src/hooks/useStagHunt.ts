@@ -303,7 +303,6 @@ export const useStagHunt = () => {
     }
   }
 
-  // NUOVO: resolveSession
   const resolveSession = async (sessionId: number) => {
     setLoading(true)
     try {
@@ -313,6 +312,8 @@ export const useStagHunt = () => {
       await client.send.resolveSession({
         args: { sessionId: BigInt(sessionId) },
         sender: activeAddress,
+        coverAppCallInnerTransactionFees: true,
+        maxFee: AlgoAmount.MicroAlgo(4000),
       })
 
       showAlert('Session Resolved!', 'success')
@@ -329,9 +330,6 @@ export const useStagHunt = () => {
     try {
       if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
-
-      // OPZIONE: Auto-resolve se non ancora fatto
-      // Verifica se la sessione è resolved
       const session = [...activeSessions, ...historySessions].find(s => s.id === sessionId)
       if (session && !session.gameStats.resolved) {
         try {
@@ -341,7 +339,6 @@ export const useStagHunt = () => {
           })
           showAlert('Session auto-resolved before claim', 'info')
         } catch (resolveError: any) {
-          // Se fallisce il resolve, probabilmente già fatto da qualcun altro
           console.warn('Auto-resolve failed:', resolveError)
         }
       }
@@ -381,7 +378,6 @@ export const useStagHunt = () => {
             notifyUpdate()
           }
         }
-        showAlert('Better luck next time!', 'error')
         refreshData()
       } else {
         showAlert(e.message, 'error')
@@ -408,7 +404,7 @@ export const useStagHunt = () => {
     createSession,
     joinSession,
     revealMove,
-    resolveSession, // NUOVO
+    resolveSession, 
     claimWinnings,
   }
 }

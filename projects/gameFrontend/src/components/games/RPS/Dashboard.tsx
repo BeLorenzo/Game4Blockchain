@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
-import { useRPS, RPSSession } from '../../../hooks/useRPS'
+import { useRPS } from '../../../hooks/useRPS'
 import { useWallet } from '@txnlab/use-wallet-react'
 import { GenericGameDashboard } from '../../common/GenericGameDashboard'
-import { GenericSessionItem, useSessionState } from '../../common/GenericSessionItem'
+import { GenericSessionItem,  } from '../../common/GenericSessionItem'
 import { ellipseAddress } from '../../../utils/ellipseAddress'
+import { config } from '../../../config'
 
 const MOVES = [
   { id: 0, label: 'ROCK', icon: '🪨', border: 'border-stone-500' },
@@ -19,7 +20,6 @@ const MOVES = [
 const RPSSessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) => {
   const [selectedMove, setSelectedMove] = useState<number | null>(null)
   const { activeAddress } = useWallet()
-  const { isEnded, isRevealPhase } = useSessionState(session)
 
   const isPlayer1 = session.player1 === activeAddress
   const isPlayer2 = session.player2 === activeAddress
@@ -39,7 +39,7 @@ const RPSSessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) =>
       phaseTextOverride={session.phase === 'ACTIVE' ? 'OPEN' : undefined}
 
       // Game-specific stats: Players VS display
-      renderGameStats={(s, isEnded) => (
+      renderGameStats={(s) => (
         <>
           <div className="mt-6 flex justify-between px-6 py-4 bg-black/40 rounded-xl border border-white/5">
             <div className="text-center font-mono font-bold">
@@ -103,7 +103,8 @@ export const RPSDashboard = () => {
     <GenericGameDashboard
       useGameHook={useRPS}
       SessionItemComponent={RPSSessionItem}
-      defaultConfig={{ fee: 5, start: 5, commit: 50, reveal: 50 }}
+      gamePrefix="rps"
+      appId={config.games.rps.appId}
       emptyStateConfig={{ icon: '⚔️', message: 'No battles found' }}
     />
   )

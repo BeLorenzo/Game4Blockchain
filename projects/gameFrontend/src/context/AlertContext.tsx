@@ -11,7 +11,6 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const showAlert = useCallback((message: string, type: 'success' | 'error' | 'info') => {
     setAlert({ message, type })
-    // Durata aumentata a 5 secondi per dare tempo di leggere
     setTimeout(() => setAlert(null), 5000)
   }, [])
 

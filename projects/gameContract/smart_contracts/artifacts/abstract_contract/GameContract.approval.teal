@@ -7,19 +7,19 @@ main:
     bytecblock "gameType"
     txn ApplicationID
     bnz main_after_if_else@2
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
     pushbytes ""
     app_global_put
-    // smart_contracts/abstract_contract/contract.algo.ts:57
+    // smart_contracts/abstract_contract/contract.algo.ts:49
     // sessionIDCounter = GlobalState<uint64>({ initialValue: 0 })
     pushbytes "sessionIDCounter"
     intc_0 // 0
     app_global_put
 
 main_after_if_else@2:
-    // smart_contracts/abstract_contract/contract.algo.ts:45
+    // smart_contracts/abstract_contract/contract.algo.ts:38
     // export class GameContract extends Contract {
     txn NumAppArgs
     bz main___algots__.defaultCreate@11
@@ -34,7 +34,7 @@ main_after_if_else@2:
     err
 
 main___algots__.defaultCreate@11:
-    // smart_contracts/abstract_contract/contract.algo.ts:45
+    // smart_contracts/abstract_contract/contract.algo.ts:38
     // export class GameContract extends Contract {
     txn OnCompletion
     !
@@ -48,17 +48,17 @@ main___algots__.defaultCreate@11:
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.getGameType[routing]() -> void:
 getGameType:
-    // smart_contracts/abstract_contract/contract.algo.ts:88
+    // smart_contracts/abstract_contract/contract.algo.ts:79
     // return this.gameType.value
     intc_0 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:88
+    // smart_contracts/abstract_contract/contract.algo.ts:79
     // return this.gameType.value
     app_global_get_ex
     assert // check GlobalState exists
-    // smart_contracts/abstract_contract/contract.algo.ts:87
+    // smart_contracts/abstract_contract/contract.algo.ts:78
     // public getGameType(): bytes {
     dup
     len
@@ -76,7 +76,7 @@ getGameType:
 
 // smart_contracts/abstract_contract/contract.algo.ts::GameContract.initialize[routing]() -> void:
 initialize:
-    // smart_contracts/abstract_contract/contract.algo.ts:92
+    // smart_contracts/abstract_contract/contract.algo.ts:86
     // public initialize(gameType: string): void {
     txna ApplicationArgs 1
     dup
@@ -89,33 +89,33 @@ initialize:
     ==
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
     extract 2 0
-    // smart_contracts/abstract_contract/contract.algo.ts:93
+    // smart_contracts/abstract_contract/contract.algo.ts:87
     // assert(this.gameType.value.length === 0, 'Contract already initialized')
     intc_0 // 0
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:93
+    // smart_contracts/abstract_contract/contract.algo.ts:87
     // assert(this.gameType.value.length === 0, 'Contract already initialized')
     app_global_get_ex
     assert // check GlobalState exists
     len
     !
     assert // Contract already initialized
-    // smart_contracts/abstract_contract/contract.algo.ts:94
+    // smart_contracts/abstract_contract/contract.algo.ts:88
     // assert(Txn.sender === Global.creatorAddress, 'Only creator can initialize')
     txn Sender
     global CreatorAddress
     ==
     assert // Only creator can initialize
-    // smart_contracts/abstract_contract/contract.algo.ts:52
+    // smart_contracts/abstract_contract/contract.algo.ts:44
     // gameType = GlobalState<bytes>({ initialValue: Bytes('') })
     bytec_0 // "gameType"
-    // smart_contracts/abstract_contract/contract.algo.ts:95
+    // smart_contracts/abstract_contract/contract.algo.ts:89
     // this.gameType.value = Bytes(gameType)
     swap
     app_global_put
-    // smart_contracts/abstract_contract/contract.algo.ts:92
+    // smart_contracts/abstract_contract/contract.algo.ts:86
     // public initialize(gameType: string): void {
     intc_1 // 1
     return

@@ -29,6 +29,7 @@ interface GenericSessionItemProps<T extends BaseGameSession> {
 
   getMyValueLabel?: (session: T) => string
   phaseTextOverride?: string
+  customBadges?: ReactNode
 }
 
 /**
@@ -92,6 +93,7 @@ export function GenericSessionItem<T extends BaseGameSession>({
   renderJoinControls,
   getMyValueLabel = () => '???',
   phaseTextOverride,
+  customBadges
 }: GenericSessionItemProps<T>) {
   const {
     isTransitionRound,
@@ -112,6 +114,7 @@ export function GenericSessionItem<T extends BaseGameSession>({
           isEnded={isEnded}
           isTransitionRound={isTransitionRound}
           phaseText={phaseTextOverride}
+          customBadges={customBadges}
         />
         <SessionProgress
           session={session}

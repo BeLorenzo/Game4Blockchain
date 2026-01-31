@@ -78,7 +78,7 @@ describe('PirateGame Contract - Complete Test Suite', () => {
       const expectedMBR = 2500 + 400 * (11 + 72) + // gameState
                          2500 + 400 * (11 + 640) + // pirateList
                          2500 + 400 * (11 + 184) + // proposals
-                         2500 + 400 * (10 + 64) +  // parent: gameSessions
+                         2500 + 400 * (10 + 32) +  // parent: gameSessions
                          2500 + 400 * (12 + 8)      // parent: sessionBalances
 
       expect(Number(mbrAmount)).toBe(expectedMBR)
