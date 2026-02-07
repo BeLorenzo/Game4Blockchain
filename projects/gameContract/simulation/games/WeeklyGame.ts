@@ -7,6 +7,7 @@ import crypto from 'node:crypto'
 import { WeeklyGameClient, WeeklyGameFactory } from '../../smart_contracts/artifacts/weeklyGame/WeeklyGameClient'
 import { Agent } from '../Agent'
 import { IBaseGameAdapter } from './IBaseGameAdapter'
+import { deploy } from '../../smart_contracts/weeklyGame/deploy-config'
 
 /**
  * Helper interface to store local player secrets (choice + salt)
@@ -54,6 +55,20 @@ export class WeeklyGame implements IBaseGameAdapter {
   }
 
   private dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+  async deploy(deployer: Agent): Promise<void> {
+    console.log(`\n🛠 Deploying ${this.name} logic...`)
+    
+    // Esegue il deploy usando lo script specifico importato in alto
+    const deployment = await deploy();
+    
+    // Salva i riferimenti dentro la classe
+    this.appClient = deployment.appClient;
+    // Se ti serve l'appId, puoi salvarlo in una proprietà della classe se la definisci, 
+    // ma appClient ha già tutto.
+    
+    console.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`);
+  }
 
   /**
    * Initializes a new game session on the blockchain.

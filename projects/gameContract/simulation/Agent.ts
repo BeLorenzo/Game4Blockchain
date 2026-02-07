@@ -69,6 +69,8 @@ interface PendingDecision {
   timestamp: number
 }
 
+type LogCallback = (agentName: string, type: 'thought' | 'action', message: string) => void;
+
 /**
  * Represents an AI Agent capable of interacting with Algorand Smart Contracts.
  * * Features:
@@ -91,6 +93,8 @@ export class Agent {
   // Temporary storage for a decision before the transaction confirms
   private pendingDecisions: PendingDecision[] = []
 
+  private onLog: LogCallback = () => {}
+
   constructor(account: Account, name: string, profile: PsychologicalProfile, model: string) {
     this.account = account
     this.name = name
@@ -110,6 +114,10 @@ export class Agent {
     this.filePath = path.join(dataDir, `${this.name.replace(/\s+/g, '_')}.json`)
 
     this.loadState() 
+  }
+
+  public setLogger(callback: LogCallback) {
+    this.onLog = callback;
   }
 
   /**
@@ -144,6 +152,8 @@ export class Agent {
     schema: T = BaseDecisionSchema as any
   ): Promise<z.infer<T>> {    
 
+    this.onLog(this.name, 'thought', `Analyzing ${gameName}... Temperature: ${this.dynamicTemperature.toFixed(2)}`);
+
     // 1. Build Standard Prompt
     const fullPrompt = this.buildFullPrompt(gameName, gamePrompt)
 
@@ -151,6 +161,8 @@ export class Agent {
     const decision = await askLLM(fullPrompt, this.model, schema, {
       temperature: this.dynamicTemperature,
     })
+
+    this.onLog(this.name, 'action', `Chose Option ${decision.choice}. Reasoning: ${decision.reasoning.substring(0, 100)}...`);
 
     console.log(`[${this.name}] Choice: ${decision.choice}`)
     console.log(`[${this.name}] Reasoning: ${decision.reasoning}\n`)
@@ -306,7 +318,7 @@ Patience: ${(p.patience * 10).toFixed(1)}/10
     this.saveState()
   }
 
-  clearPendingDecisions() {
+  clearPendingDecisions() { 
     this.pendingDecisions = []
   }
 

@@ -274,9 +274,9 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       const roundHistory = sessionHistory.filter(h => h.round === round)
 
       const proposer = roundHistory.find(h => h.role === 'proposer')
-      const voters = roundHistory.filter(h => h.role === 'voter')
-      const yesVotes = voters.filter(h => h.choice === 1).length
-      const noVotes = voters.filter(h => h.choice === 0).length
+      
+      const yesVotes = roundHistory.filter(h => h.choice === 1).length
+      const noVotes = roundHistory.filter(h => h.choice === 0).length
 
       const eliminated = roundHistory.find(h => h.result === 'ELIMINATED')
 

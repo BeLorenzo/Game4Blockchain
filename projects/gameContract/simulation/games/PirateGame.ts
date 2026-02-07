@@ -10,6 +10,7 @@ import { PirateGameClient, PirateGameFactory } from '../../smart_contracts/artif
 import { Agent } from '../Agent'
 import { BaseDecisionSchema } from '../llm'
 import { IMultiRoundGameAdapter } from './IMultiRoundGameAdapter'
+import { deploy } from '../../smart_contracts/pirateGame/deploy-config'
 
 /**
  * Extended Zod Schema for Pirate Proposals.
@@ -73,6 +74,21 @@ export class PirateGame implements IMultiRoundGameAdapter {
   async getMaxTotalRounds(sessionId: bigint): Promise<number> {
     return this.pirates.length - 1
   }
+
+  async deploy(deployer: Agent): Promise<void> {
+    console.log(`\n🛠 Deploying ${this.name} logic...`)
+    
+    // Esegue il deploy usando lo script specifico importato in alto
+    const deployment = await deploy();
+    
+    // Salva i riferimenti dentro la classe
+    this.appClient = deployment.appClient;
+    // Se ti serve l'appId, puoi salvarlo in una proprietà della classe se la definisci, 
+    // ma appClient ha già tutto.
+    
+    console.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`);
+  }
+
 
   /**
    * Initializes the game session on-chain.
@@ -601,6 +617,7 @@ RESPONSE FORMAT (JSON ONLY):
       reasoning: 'Default greedy proposal',
       distribution: this.buildFallbackDistribution(Number(state.totalPirates), proposerIndex),
     }
+    proposer.agent.clearPendingDecisions()
     while (attempts < maxAttempts && !finalDistributionBuffer) {
       try {
         const prompt = this.buildProposerPrompt(proposer.agent, state, roundNumber, proposerIndex, errorFeedback)
@@ -666,6 +683,7 @@ RESPONSE FORMAT (JSON ONLY):
         break
       } catch (e: any) {
         attempts++
+        proposer.agent.clearPendingDecisions()
         const currentDist = response && response.distribution ? JSON.stringify(response.distribution) : 'null'
         errorFeedback = `
         [SYSTEM ERROR - ATTEMPT ${attempts}]:

@@ -11,6 +11,8 @@ export interface IBaseGameAdapter {
   /** Game identifier */
   readonly name: string
 
+  deploy(deployer: Agent): Promise<void>;
+
   /** Start a new game session */
   startSession(dealer: Agent): Promise<bigint>
 

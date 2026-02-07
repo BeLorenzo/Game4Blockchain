@@ -8,6 +8,7 @@ import crypto from 'node:crypto'
 import { StagHuntClient, StagHuntFactory } from '../../smart_contracts/artifacts/stagHunt/StagHuntClient'
 import { Agent } from '../Agent'
 import { IBaseGameAdapter } from './IBaseGameAdapter'
+import { deploy } from '../../smart_contracts/stagHunt/deploy-config'
 
 /**
  * Helper interface to store local player secrets (choice + salt)
@@ -52,6 +53,20 @@ export class StagHuntGame implements IBaseGameAdapter {
     warmUp: 3n,
     commitPhase: 15n,
     revealPhase: 10n,
+  }
+
+  async deploy(deployer: Agent): Promise<void> {
+    console.log(`\n🛠 Deploying ${this.name} logic...`)
+    
+    // Esegue il deploy usando lo script specifico importato in alto
+    const deployment = await deploy();
+    
+    // Salva i riferimenti dentro la classe
+    this.appClient = deployment.appClient;
+    // Se ti serve l'appId, puoi salvarlo in una proprietà della classe se la definisci, 
+    // ma appClient ha già tutto.
+    
+    console.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`);
   }
 
   /**
