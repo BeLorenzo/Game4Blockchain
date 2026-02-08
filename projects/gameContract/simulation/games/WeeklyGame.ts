@@ -6,7 +6,7 @@ import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { WeeklyGameClient, WeeklyGameFactory } from '../../smart_contracts/artifacts/weeklyGame/WeeklyGameClient'
 import { Agent } from '../Agent'
-import { IBaseGameAdapter } from './IBaseGameAdapter'
+import { IBaseGameAdapter, GameLogger } from './IBaseGameAdapter'
 import { deploy } from '../../smart_contracts/weeklyGame/deploy-config'
 
 /**
@@ -20,16 +20,17 @@ interface RoundSecret {
 
 /**
  * Adapter for the "Weekly Lottery" Game (Minority Game variant).
- * * Game Mechanics:
- * 1. Players pick a day of the week (0-6).
- * 2. Total pot is split equally across ALL active days (days with >0 players).
- * 3. Each active day's share is then split among the players who chose that day.
- * 4. Goal: Choose a day that is active but has the fewest other players.
- * * This class manages the simulation lifecycle: deploying, running rounds,
- * managing the Commit-Reveal scheme, and handling agent interactions.
  */
 export class WeeklyGame implements IBaseGameAdapter {
   readonly name = 'WeeklyGame'
+
+  // --- LOGGER IMPLEMENTATION ---
+  private log: GameLogger = () => {}
+
+  public setLogger(logger: GameLogger) {
+    this.log = logger
+  }
+  // -----------------------------
 
   // Tracks vote distribution from the previous round to help Agents learn.
   private lastRoundVotes: Record<string, number> | null = null
@@ -57,22 +58,19 @@ export class WeeklyGame implements IBaseGameAdapter {
   private dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
   async deploy(deployer: Agent): Promise<void> {
-    console.log(`\n🛠 Deploying ${this.name} logic...`)
+    this.log(`\n🛠 Deploying ${this.name} logic...`, 'system')
     
     // Esegue il deploy usando lo script specifico importato in alto
     const deployment = await deploy();
     
     // Salva i riferimenti dentro la classe
     this.appClient = deployment.appClient;
-    // Se ti serve l'appId, puoi salvarlo in una proprietà della classe se la definisci, 
-    // ma appClient ha già tutto.
     
-    console.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`);
+    this.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`, 'system');
   }
 
   /**
    * Initializes a new game session on the blockchain.
-   * Calculates the specific timeline (Start, Commit Deadline, Reveal Deadline) based on the current block.
    */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
@@ -113,7 +111,7 @@ export class WeeklyGame implements IBaseGameAdapter {
     })
 
     const sessionId = Number(result.return) + 1
-    console.log(`Session ${sessionId} created. Start: round ${startAt}`)
+    this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
 
     // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
@@ -122,11 +120,9 @@ export class WeeklyGame implements IBaseGameAdapter {
 
   /**
    * Commit.
-   * Iterates through all agents, asks them to make a decision (Day of Week),
-   * generates a cryptographic salt, hashes the move, and submits it to the chain.
    */
   async commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
-    console.log(`\n--- PHASE 1: COMMIT ---`)
+    this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
 
     for (const agent of agents) {
       // 1. Construct the context for the LLM
@@ -138,7 +134,7 @@ export class WeeklyGame implements IBaseGameAdapter {
       // 3. Sanitize Input: Ensure choice is an integer between 0 and 6
       let safeChoice = decision.choice
       if (safeChoice < 0 || safeChoice > 6) {
-        console.warn(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0`)
+        this.log(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0`, 'system')
         safeChoice = 0
       }
 
@@ -167,8 +163,6 @@ export class WeeklyGame implements IBaseGameAdapter {
 
   /**
    * Constructs the specific prompt for this game.
-   * Injects game rules, current session status, and historical trends
-   * (Vote distribution) to help the agent make an informed decision.
    */
   private buildGamePrompt(agent: Agent, roundNumber: number): string {
     const gameRules = `
@@ -254,20 +248,18 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Reveal.
-   * Waits for the commit phase to end, then submits the original choice and salt
-   * for each agent to verify their commitment on-chain.
    */
   async reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
-    console.log(`\n--- PHASE 2: REVEAL ---`)
+    this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
     // Fast-forward chain to the reveal phase
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
-    await Promise.all(
-      agents.map(async (agent) => {
+    // Usiamo ciclo for sequenziale per log puliti
+    for (const agent of agents) {
         const secret = this.roundSecrets.get(agent.account.addr.toString())
-        if (!secret) return
+        if (!secret) continue
 
         try {
           await this.appClient!.send.revealMove({
@@ -280,18 +272,16 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
             signer: agent.signer,
             suppressLog: true,
           })
-          console.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`)
+          this.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`, 'game_event')
         } catch (e) {
           console.error(`Error revealing for ${agent.name}:`, e)
+          this.log(`[${agent.name}] Error revealing move`, 'system')
         }
-      }),
-    )
+    }
   }
 
   /**
    * Resolve.
-   * In this specific game, resolution happens implicitly during the Claim phase,
-   * so this method is empty.
    */
   async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
     return
@@ -299,13 +289,11 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Claim.
-   * Waits for the game to end, calculates local stats for reporting,
-   * and triggers the claim transaction for each agent to receive payouts.
    */
   async claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
-    console.log(`\n--- PHASE 3: CLAIM ---`)
+    this.log(`\n--- PHASE 3: CLAIM ---`, 'system')
     // Fast-forward chain to the end of the game
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
@@ -322,7 +310,13 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     })
 
     this.lastRoundVotes = votes
-    console.log('📊 Vote distribution:', votes)
+    // Formattiamo la distribuzione voti per il log
+    const voteStr = Object.entries(votes)
+        .filter(([_, count]) => count > 0)
+        .map(([day, count]) => `${day}: ${count}`)
+        .join(', ');
+        
+    this.log(`📊 Vote Distribution: ${voteStr}`, 'game_event')
 
     // Process claims for each agent
     for (const agent of agents) {
@@ -334,7 +328,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
           args: { sessionId: sessionId },
           sender: agent.account.addr,
           signer: agent.signer,
-          coverAppCallInnerTransactionFees: true, // Crucial: cover inner payment fees
+          coverAppCallInnerTransactionFees: true, 
           maxFee: AlgoAmount.MicroAlgos(3_000),
           suppressLog: true,
         })
@@ -344,13 +338,13 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         netProfitAlgo = (payoutMicro - entryMicro) / 1_000_000
 
         outcome = netProfitAlgo > 0 ? 'WIN' : netProfitAlgo === 0 ? 'DRAW' : 'LOSS'
-        console.log(`${agent.name}: \x1b[32m${outcome} (${netProfitAlgo.toFixed(2)} ALGO)\x1b[0m`)
-      } catch (e: any) {
-        if (e.message && e.message.includes('assert failed')) {
-          console.log(`${agent.name}: \x1b[31mLOSS\x1b[0m`)
-        } else {
-          console.error(`${agent.name}: ERROR`)
+        
+        if (outcome === 'WIN') {
+            this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
         }
+
+      } catch (e: any) {
+        // error handling silently or debug log
       }
 
       // Feedback loop: Update agent's memory with the result
@@ -360,7 +354,6 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Helper utility to generate the SHA256 Commit Hash.
-   * Matches the TEAL logic: SHA256(Uint64(choice) ++ Salt)
    */
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
@@ -375,7 +368,6 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Utility to fast-forward LocalNet time.
-   * Sends 0-value spam transactions to force block production until the target round is reached.
    */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any

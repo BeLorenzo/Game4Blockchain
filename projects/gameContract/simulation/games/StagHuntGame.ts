@@ -7,7 +7,7 @@ import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { StagHuntClient, StagHuntFactory } from '../../smart_contracts/artifacts/stagHunt/StagHuntClient'
 import { Agent } from '../Agent'
-import { IBaseGameAdapter } from './IBaseGameAdapter'
+import { IBaseGameAdapter, GameLogger } from './IBaseGameAdapter'
 import { deploy } from '../../smart_contracts/stagHunt/deploy-config'
 
 /**
@@ -21,16 +21,17 @@ interface RoundSecret {
 
 /**
  * Adapter for the "Stag Hunt" Game (Coordination Game).
- * * Game Mechanics:
- * - Two Choices: Stag (1) or Hare (0).
- * - Hare: Low risk, low reward (guaranteed small refund).
- * - Stag: High risk, high reward (requires coordination).
- * - Win Condition: Stag players win big ONLY if a certain % of players also chose Stag.
- * * This class manages the simulation lifecycle: deploying, running rounds,
- * managing the Commit-Reveal scheme, and handling agent interactions.
  */
 export class StagHuntGame implements IBaseGameAdapter {
   readonly name = 'StagHunt'
+
+  // --- LOGGER IMPLEMENTATION ---
+  private log: GameLogger = () => {}
+
+  public setLogger(logger: GameLogger) {
+    this.log = logger
+  }
+  // -----------------------------
 
   // Tracks the cooperation rate from the previous round to help Agents learn.
   private lastCooperationRate: number | null = null
@@ -56,22 +57,19 @@ export class StagHuntGame implements IBaseGameAdapter {
   }
 
   async deploy(deployer: Agent): Promise<void> {
-    console.log(`\n🛠 Deploying ${this.name} logic...`)
+    this.log(`\n🛠 Deploying ${this.name} logic...`, 'system')
     
     // Esegue il deploy usando lo script specifico importato in alto
     const deployment = await deploy();
     
     // Salva i riferimenti dentro la classe
     this.appClient = deployment.appClient;
-    // Se ti serve l'appId, puoi salvarlo in una proprietà della classe se la definisci, 
-    // ma appClient ha già tutto.
     
-    console.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`);
+    this.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`, 'system');
   }
 
   /**
    * Initializes a new game session on the blockchain.
-   * Calculates the specific timeline (Start, Commit Deadline, Reveal Deadline) based on the current block.
    */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
@@ -111,10 +109,8 @@ export class StagHuntGame implements IBaseGameAdapter {
       suppressLog: true,
     })
 
-    // The return value is the session ID.
-    // Assuming the contract returns the ID of the created session here.
     const sessionId = Number(result.return) + 1
-    console.log(`Session ${sessionId} created. Start: round ${startAt}`)
+    this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
 
     // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
@@ -123,11 +119,9 @@ export class StagHuntGame implements IBaseGameAdapter {
 
   /**
    * Commit.
-   * Iterates through all agents, asks them to make a decision (Stag vs Hare),
-   * generates a cryptographic salt, hashes the move, and submits it to the chain.
    */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
-    console.log(`\n--- PHASE 1: COMMIT ---`)
+    this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
 
     // Fetch global state to inform agents about current Jackpot and Threshold
     const globalState = await this.appClient!.state.global.getAll()
@@ -144,7 +138,7 @@ export class StagHuntGame implements IBaseGameAdapter {
       // 3. Sanitize Input: Ensure choice is 0 (Hare) or 1 (Stag)
       let safeChoice = decision.choice
       if (safeChoice !== 0 && safeChoice !== 1) {
-        console.warn(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0 (Hare)`)
+        this.log(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0 (Hare)`, 'system')
         safeChoice = 0
       }
 
@@ -176,8 +170,6 @@ export class StagHuntGame implements IBaseGameAdapter {
 
   /**
    * Constructs the specific prompt for this game.
-   * Injects game rules, current session status, and historical trends
-   * (Cooperation rate) to help the agent make an informed decision.
    */
   private buildGamePrompt(agent: Agent, sessionNumber: number, jackpot: number, threshold: number): string {
     const gameRules = `
@@ -238,13 +230,11 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 
   /**
    * Reveal.
-   * Waits for the commit phase to end, then submits the original choice and salt
-   * for each agent to verify their commitment on-chain.
    */
   async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
-    console.log(`\n--- PHASE 2: REVEAL ---`)
+    this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
     // Fast-forward chain to the reveal phase
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
@@ -264,9 +254,10 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
             signer: agent.signer,
             suppressLog: true,
           })
-          console.log(`[${agent.name}] Revealed: ${secret.choice === 1 ? 'STAG' : 'HARE'}`)
+          this.log(`[${agent.name}] Revealed: ${secret.choice === 1 ? '🦌 STAG' : '🐇 HARE'}`, 'game_event')
         } catch (e) {
           console.error(`Error revealing for ${agent.name}:`, e)
+          this.log(`[${agent.name}] Error revealing move`, 'system')
         }
       }),
     )
@@ -274,13 +265,11 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 
   /**
    * Resolution.
-   * Triggers the smart contract to calculate whether the Stag Threshold was met.
-   * Updates local stats (Cooperation Rate) for the next round's prompt.
    */
   async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
-    console.log(`\n--- PHASE 3: RESOLUTION ---`)
+    this.log(`\n--- PHASE 3: RESOLUTION ---`, 'system')
     // Fast-forward chain to the resolution phase
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
@@ -295,7 +284,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 
     if (totalRevealed > 0) {
       this.lastCooperationRate = stags / totalRevealed
-      console.log(`📊 Cooperation rate: ${(this.lastCooperationRate * 100).toFixed(1)}%`)
+      this.log(`📊 Cooperation rate: ${(this.lastCooperationRate * 100).toFixed(1)}%`, 'game_event')
     } else {
       this.lastCooperationRate = 0
     }
@@ -317,11 +306,9 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 
   /**
    * Claim & Feedback.
-   * Agents claim their winnings (or refunds for Hares).
-   * Updates each agent's memory with the round result.
    */
   async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
-    console.log('\n--- PHASE 4: CLAIM & FEEDBACK ---')
+    this.log('\n--- PHASE 4: CLAIM & FEEDBACK ---', 'system')
 
     for (const agent of agents) {
       let outcome = 'LOSS'
@@ -342,12 +329,16 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         netProfitAlgo = (payoutMicro - entryMicro) / 1_000_000
 
         outcome = netProfitAlgo > 0 ? 'WIN' : netProfitAlgo === 0 ? 'DRAW' : 'LOSS'
-        console.log(`${agent.name}: \x1b[32m${outcome} (${netProfitAlgo.toFixed(2)} ALGO)\x1b[0m`)
+        
+        if (outcome === 'WIN') {
+            this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
+        }
+
       } catch (e: any) {
         if (e.message && e.message.includes('assert failed')) {
-          console.log(`${agent.name}: \x1b[31mLOSS (No winnings)\x1b[0m`)
+          // this.log(`${agent.name}: LOSS`, 'game_event') 
         } else {
-          console.log(`${agent.name}: ERROR`)
+          // this.log(`${agent.name}: ERROR`, 'system')
         }
       }
 
@@ -358,7 +349,6 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 
   /**
    * Helper utility to generate the SHA256 Commit Hash.
-   * Matches the TEAL logic: SHA256(Uint64(choice) ++ Salt)
    */
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
@@ -373,7 +363,6 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
 
   /**
    * Utility to fast-forward LocalNet time.
-   * Sends 0-value spam transactions to force block production until the target round is reached.
    */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
