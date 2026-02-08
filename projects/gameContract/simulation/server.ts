@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express from 'express'
 import cors from 'cors'
+import * as fs from 'fs'
+import * as path from 'path'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Agent } from './Agent'
@@ -19,11 +21,10 @@ const PORT = 3000
 app.use(cors())
 app.use(express.json())
 
-// --- STATO DELLA SIMULAZIONE ---
+// --- STATO DELLA SIMULAZIONE LIVE ---
 let simulationState = {
   isRunning: false,
   gameName: '',
-  appId: 0,
   round: 0,
   logs: [] as { timestamp: number; agent: string; type: string; message: string }[]
 }
@@ -31,18 +32,68 @@ let simulationState = {
 const addLog = (agent: string, type: 'thought' | 'action' | 'system', message: string) => {
   const logEntry = { timestamp: Date.now(), agent, type, message }
   simulationState.logs.push(logEntry)
-  if (simulationState.logs.length > 100) simulationState.logs.shift()
+  // Teniamo gli ultimi 200 log per il live
+  if (simulationState.logs.length > 200) simulationState.logs.shift()
   console.log(`[${type.toUpperCase()}] ${agent}: ${message}`)
 }
 
+// --- API: RECUPERO STORICO (NUOVA) ---
+app.get('/api/history/:gameId', (req, res) => {
+    const gameId = req.params.gameId;
+    const agentsDir = path.join(process.cwd(), 'simulation', 'data', 'agents');
+    
+    try {
+        const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.json'));
+        const allSessions: any[] = [];
+
+        // Leggiamo tutti i file degli agenti per ricostruire la storia
+        files.forEach(file => {
+            const content = JSON.parse(fs.readFileSync(path.join(agentsDir, file), 'utf-8'));
+            const agentName = content.name;
+            const history = content.history.filter((h: any) => h.game === gameId);
+            
+            history.forEach((h: any) => {
+                // Cerchiamo se questa sessione/round esiste già nel nostro aggregatore
+                let sessionEntry = allSessions.find(s => s.session === h.session);
+                if (!sessionEntry) {
+                    sessionEntry = { session: h.session, rounds: [], timestamp: h.timestamp };
+                    allSessions.push(sessionEntry);
+                }
+                
+                // Aggiungiamo il dato dell'agente a questa sessione
+                sessionEntry.rounds.push({
+                    round: h.round,
+                    agent: agentName,
+                    choice: h.choice,
+                    result: h.result,
+                    profit: h.profit,
+                    reasoning: h.reasoning
+                });
+            });
+        });
+
+        // Ordiniamo per sessione decrescente (più recenti prima)
+        allSessions.sort((a, b) => b.session - a.session);
+        res.json(allSessions);
+
+    } catch (e) {
+        console.error("Error reading history:", e);
+        res.json([]);
+    }
+});
+
+// --- LOGICA DI GIOCO ---
 async function runGameLogic(gameName: string) {
   if (simulationState.isRunning) return
   simulationState.isRunning = true
-  simulationState.logs = []
+  
+  // RESET COMPLETO DEI LOG QUANDO PARTE UN NUOVO GIOCO
+  // Questo risolve il problema di vedere log di giochi vecchi
+  simulationState.logs = [] 
   simulationState.gameName = gameName
   simulationState.round = 0
 
-  addLog('System', 'system', `Initializing ${gameName}...`)
+  addLog('System', 'system', `Initializing ${gameName} simulation...`)
 
   try {
     const algorand = AlgorandClient.defaultLocalNet()
@@ -69,29 +120,23 @@ async function runGameLogic(gameName: string) {
 
     agents.forEach(a => a.setLogger((agent, type, msg) => addLog(agent, type, msg)));
 
-    addLog('System', 'system', 'Funding agents...')
+    addLog('System', 'system', 'Funding agents & Deploying...')
     await Promise.all(agents.map(a => algorand.account.ensureFundedFromEnvironment(a.account.addr, AlgoAmount.Algos(100))))
-
-    addLog('System', 'system', 'Deploying contract...')
     await game.deploy(agents[0])
     
-    // Tentativo di recupero AppID (se supportato dal gioco)
-    if ((game as any).appClient) {
-       // simulationState.appId = ... (da implementare se serve esporlo)
-    }
-    
-    addLog('System', 'system', `Game Ready. Starting Sessions...`)
+    addLog('System', 'system', `Starting Single Session...`)
 
-    const NUM_SESSIONS = 5
+    // ESEGUIAMO SOLO 1 SESSIONE COME RICHIESTO
+    const NUM_SESSIONS = 1 
     for (let i = 0; i < NUM_SESSIONS; i++) {
         if (!simulationState.isRunning) break;
 
         simulationState.round = i + 1;
-        addLog('System', 'system', `--- Starting Session ${i + 1} ---`)
+        // Otteniamo l'ID sessione reale dalla blockchain
+        const sessionId = await game.startSession(agents[0])
+        addLog('System', 'system', `--- Session ID ${sessionId} Started ---`)
         
         try {
-            const sessionId = await game.startSession(agents[0])
-            
             if ('playRound' in game && 'setup' in game) {
                 const multiGame = game as IMultiRoundGameAdapter
                 await multiGame.setup(agents, sessionId)
@@ -111,11 +156,9 @@ async function runGameLogic(gameName: string) {
         } catch (e: any) {
             addLog('System', 'system', `Session Error: ${e.message}`)
         }
-        
-        await new Promise(r => setTimeout(r, 2000))
     }
 
-    addLog('System', 'system', 'Simulation Complete.')
+    addLog('System', 'system', 'Simulation Session Completed.')
 
   } catch (error: any) {
     addLog('System', 'system', `CRITICAL ERROR: ${error.message}`)
@@ -124,18 +167,13 @@ async function runGameLogic(gameName: string) {
   }
 }
 
-// --- API ENDPOINTS ---
-
 app.post('/api/start', (req, res) => {
   const { game } = req.body
   if (simulationState.isRunning) {
-    // Aggiunto return per coerenza
     return res.status(400).json({ error: 'Simulation already running' })
   }
-  
+  // Avvia in background
   runGameLogic(game)
-  
-  // Aggiunto return qui per risolvere l'errore TS7030
   return res.json({ success: true, message: `Starting ${game}...` })
 })
 

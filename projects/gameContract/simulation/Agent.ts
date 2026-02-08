@@ -153,6 +153,7 @@ export class Agent {
   ): Promise<z.infer<T>> {    
 
     this.onLog(this.name, 'thought', `Analyzing ${gameName}... Temperature: ${this.dynamicTemperature.toFixed(2)}`);
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     // 1. Build Standard Prompt
     const fullPrompt = this.buildFullPrompt(gameName, gamePrompt)
@@ -162,8 +163,9 @@ export class Agent {
       temperature: this.dynamicTemperature,
     })
 
-    this.onLog(this.name, 'action', `Chose Option ${decision.choice}. Reasoning: ${decision.reasoning.substring(0, 100)}...`);
-
+    this.onLog(this.name, 'action', `Chose Option ${decision.choice}. Reasoning: ${decision.reasoning}...`);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
     console.log(`[${this.name}] Choice: ${decision.choice}`)
     console.log(`[${this.name}] Reasoning: ${decision.reasoning}\n`)
 

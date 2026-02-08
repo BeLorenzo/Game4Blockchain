@@ -16,7 +16,7 @@ function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
 }
 
 // === SIMULATION CONFIGURATION ===
-const NUM_SESSIONS = 5
+const NUM_SESSIONS = 1
 const INITIAL_FUNDING = 100_000
 const MODEL = 'hermes3'
 // === GAME SELECTION ===
