@@ -29,7 +29,7 @@ const PORT = 3000
 app.use(cors())
 app.use(express.json())
 
-// --- STATO DELLA SIMULAZIONE LIVE ---
+// --- STATO ---
 let simulationState = {
   isRunning: false,
   gameName: '',
@@ -38,7 +38,6 @@ let simulationState = {
   logs: [] as { timestamp: number; agent: string; type: string; message: string }[]
 }
 
-// --- GAME STATE TRACKING ---
 let currentGameState: any = {
   sessionId: '0',
   round: 0,
@@ -52,10 +51,8 @@ let currentGameState: any = {
 const addLog = (agent: string, type: 'thought' | 'action' | 'system' | 'game_event', message: string) => {
   const logEntry = { timestamp: Date.now(), agent, type, message }
   simulationState.logs.push(logEntry)
-  // Buffer circolare per evitare memory leak
   if (simulationState.logs.length > 1000) simulationState.logs.shift()
   
-  // Console Server colorata per debug
   const time = new Date().toISOString().split('T')[1].split('.')[0];
   let color = '\x1b[37m'; 
   if (type === 'system') color = '\x1b[32m'; 
@@ -70,29 +67,25 @@ const updateGameState = (updates: any) => {
 
 function getLastSessionId(gameName: string): number {
     const agentsDir = path.join(process.cwd(), 'simulation', 'data', 'agents');
+    // DEBUG PATH: Controlla nella console del server se questo percorso è giusto!
+    console.log(`[SERVER] Checking history in: ${agentsDir}`);
+    
     let maxSession = 0;
-
     try {
         if (!fs.existsSync(agentsDir)) return 0;
         const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.json'));
-        
         files.forEach(file => {
             const content = JSON.parse(fs.readFileSync(path.join(agentsDir, file), 'utf-8'));
             const history = content.history || [];
-            
             history.forEach((h: any) => {
-                if (h.game === gameName && h.session > maxSession) {
-                    maxSession = h.session;
-                }
+                if (h.game === gameName && h.session > maxSession) maxSession = h.session;
             });
         });
-    } catch (e) {
-        console.error("Error finding last session ID", e);
-    }
+    } catch (e) { /* ignore */ }
     return maxSession;
 }
 
-// --- API ENDPOINTS ---
+// --- API ---
 
 app.get('/api/status', (req, res) => {
   res.json({ ...simulationState, gameState: currentGameState })
@@ -108,7 +101,7 @@ app.post('/api/start', (req, res) => {
   })
   return res.json({ success: true })
 })
-  
+
 app.post('/api/stop', (req, res) => {
   simulationState.isRunning = false
   res.json({ message: 'Stopping...' })
@@ -125,19 +118,34 @@ app.get('/api/agent-stats', (req, res) => {
                 try {
                     const content = JSON.parse(fs.readFileSync(path.join(agentsDir, file), 'utf-8'));
                     const history = content.history || [];
+                    const profile = content.profile || {}; 
+
                     const totalGames = history.length;
                     const totalProfit = history.reduce((sum: number, h: any) => sum + (Number(h.profit) || 0), 0);
                     const wins = history.filter((h: any) => h.result === 'WIN').length;
                     const winRate = totalGames > 0 ? wins / totalGames : 0;
 
-                    stats[content.name] = { totalGames, totalProfit, winRate };
+                    const personality = {
+                        riskTolerance: profile.riskTolerance || 0,
+                        trustInOthers: profile.trustInOthers || 0,
+                        wealthFocus: profile.wealthFocus || 0,
+                        fairnessFocus: profile.fairnessFocus || 0,
+                        curiosity: profile.curiosity || 0
+                    };
+
+                    stats[content.name] = { 
+                        totalGames, 
+                        totalProfit, 
+                        winRate,
+                        personality 
+                    };
                 } catch (err) {
                     console.error(`Error processing stats for ${file}:`, err);
                 }
             });
         }
     } catch (e) { console.error("Stats error", e); }
-    return res.json(stats);
+    res.json(stats);
 })
 
 app.get('/api/history/:gameId', (req, res) => {
@@ -191,7 +199,7 @@ app.get('/api/history/:gameId', (req, res) => {
     }
 });
 
-// --- LOGICA DI GIOCO ---
+// --- GAME LOGIC ---
 
 async function runGameLogic(gameName: string) {
   if (simulationState.isRunning) return
@@ -202,17 +210,14 @@ async function runGameLogic(gameName: string) {
   simulationState.round = 0
   
   currentGameState = {
-    sessionId: '0',
-    round: 0,
-    phase: 'INITIALIZING',
-    agents: {},
-    pot: 0
+    sessionId: '0', round: 0, phase: 'INITIALIZING', agents: {}, pot: 0
   }
 
   const sessionOffset = getLastSessionId(gameName);
   const visualSessionId = sessionOffset + 1;
+
   addLog('System', 'system', `Initializing ${gameName} (Session #${visualSessionId})...`)
-  
+
   try {
     const algorand = AlgorandClient.defaultLocalNet()
     const MODEL = 'hermes3' 
@@ -228,7 +233,9 @@ async function runGameLogic(gameName: string) {
 
     game.setLogger((msg, type) => addLog('Game', type || 'game_event', msg));
     
-    // === DEFINIZIONE AGENTI (COPIATA DA MAIN.TS PER COERENZA) ===
+    // === AGENTI INTELLIGENTI (COPIATI DAL MAIN.TS) ===
+    // IMPORTANTE: Queste definizioni devono essere IDENTICHE al main.ts 
+    // affinché gli agenti si comportino allo stesso modo.
     const agents = [
         new Agent(
           algorand.account.random().account,
@@ -504,7 +511,6 @@ async function runGameLogic(gameName: string) {
         ),
       ]
 
-    // Inizializza stato visuale agenti
     const initialAgentState: any = {}
     agents.forEach(a => {
         initialAgentState[a.name] = { status: 'initializing', profit: 0 }
@@ -549,7 +555,7 @@ async function runGameLogic(gameName: string) {
                 await multiGame.finalize(agents, sessionId)
             } else {
                 updateGameState({ phase: 'COMMIT' })
-                await game.commit(agents, sessionId, visualSessionId) // Passa visualSessionId per i JSON
+                await game.commit(agents, sessionId, visualSessionId) 
                 updateGameState({ phase: 'REVEAL' })
                 await game.reveal(agents, sessionId, visualSessionId)
                 updateGameState({ phase: 'RESOLVE' })

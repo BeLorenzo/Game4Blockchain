@@ -109,7 +109,7 @@ export class Agent {
     }
 
     // Ensure data directory exists
-    const dataDir = path.join(process.cwd(), 'simulation', 'data', 'agents')
+    const dataDir = path.join(__dirname, 'data', 'agents')
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
     this.filePath = path.join(dataDir, `${this.name.replace(/\s+/g, '_')}.json`)
 

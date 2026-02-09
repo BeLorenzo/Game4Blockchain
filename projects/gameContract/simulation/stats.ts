@@ -245,27 +245,20 @@ function printMultiRoundTimeline(agents: AgentData[]) {
   console.log(`${B}📜 Session-by-Session Timeline${R}`)
   console.log(DIM + '─'.repeat(80) + R)
 
-  const allVirtualSessions = agents.flatMap(a => 
-    a.history.map(h => h.virtualSession !== undefined ? h.virtualSession : h.session)
-  )
+    const allSessions = agents.flatMap(a => a.history.map(h => h.virtualSession || 0));
+  const minSession = allSessions.length ? Math.min(...allSessions) : 0;
+  const maxSession = allSessions.length ? Math.max(...allSessions) : 0;
   
-  if (allVirtualSessions.length === 0) {
-    console.log(DIM + 'No data available' + R)
-    return
-  }
-
-  const uniqueSessions = [...new Set(allVirtualSessions)].sort((a, b) => a - b)
-  
-  for (const vSession of uniqueSessions) {
+  for (let session = minSession; session <= maxSession; session++) {
     const sessionHistory = agents.flatMap(a => 
       a.history
-        .filter(h => (h.virtualSession !== undefined ? h.virtualSession : h.session) === vSession)
+        .filter(h => (h.virtualSession !== undefined ? h.virtualSession : h.session) === session)
         .map(h => ({ agent: a.name, ...h }))
     )
 
     if (sessionHistory.length === 0) continue
 
-    console.log(`\n${B}${C}🎮 SESSION ${vSession}${R}`)
+    console.log(`\n${B}${C}🎮 SESSION ${session}${R}`)
     
     const rounds = [...new Set(sessionHistory.map(h => h.round))].sort((a, b) => a - b)
 
@@ -274,7 +267,6 @@ function printMultiRoundTimeline(agents: AgentData[]) {
       const roundHistory = sessionHistory.filter(h => h.round === round)
 
       const proposer = roundHistory.find(h => h.role === 'proposer')
-      
       const yesVotes = roundHistory.filter(h => h.choice === 1).length
       const noVotes = roundHistory.filter(h => h.choice === 0).length
 
