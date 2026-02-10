@@ -8,66 +8,52 @@ import { GuessGameClient, GuessGameFactory } from '../../smart_contracts/artifac
 import { Agent } from '../Agent'
 import { IBaseGameAdapter, GameLogger } from './IBaseGameAdapter'
 import { deploy } from '../../smart_contracts/guessGame/deploy-config'
+import algosdk, { Account, Address } from 'algosdk'
 
-/**
- * Helper interface to store local player secrets (choice + salt)
- * required for the Reveal phase.
- */
 interface RoundSecret {
   choice: number
   salt: string
 }
 
-/**
- * Adapter for the "Guess 2/3 of the Average" Game.
- */
 export class GuessGame implements IBaseGameAdapter {
   readonly name = 'GuessGame'
 
-  // --- LOGGER IMPLEMENTATION ---
   private log: GameLogger = () => {}
+  private stateUpdater: (updates: any) => void = () => {}  
 
   public setLogger(logger: GameLogger) {
     this.log = logger
   }
-  // -----------------------------
 
-  // Tracks historical data (Average and Target) to help Agents learn over time.
+  public setStateUpdater(updater: (updates: any) => void) {
+    this.stateUpdater = updater
+  }
+
   private roundHistory: { avg: number; target: number }[] = []
-
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: GuessGameFactory | null = null
   private appClient: GuessGameClient | null = null
-
-  // Fixed entry fee
   private participationAmount = AlgoAmount.Algos(10)
-
-  // Local storage for commit secrets (Salt/Choice) mapped by Agent Address
   private roundSecrets: Map<string, RoundSecret> = new Map()
-
-  // Cache for the current session's timeline configuration
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
-  // Hardcoded durations for simulation speed (in blocks)
   private durationParams = {
     warmUp: 3n,
     commitPhase: 15n,
     revealPhase: 10n,
   }
 
-async deploy(admin: Agent, suffix: string = ''): Promise<void> {
-    const appName = `GuessGame${suffix}`; // Esempio: "PirateGame_Sim" vs "PirateGame"
+  async deploy(admin: Account, suffix: string = ''): Promise<void> {
+    const appName = `GuessGame${suffix}`
 
-    // 1. Configura la Factory con il nome specifico
+    const signer = algosdk.makeBasicAccountTransactionSigner(admin)
+    
     this.factory = this.algorand.client.getTypedAppFactory(GuessGameFactory, {
-      defaultSender: admin.account.addr,
-      defaultSigner: admin.signer,
-      appName: appName, // Questo separa le istanze sulla chain
+      defaultSender: admin.addr,
+      defaultSigner: signer,
+      appName: appName,
     })
 
-    // 2. Deploy Idempotente (Stile GuessGame)
-    // Se l'app esiste già (stesso nome, stesso creatore), la riusa.
-    // Se non esiste o il codice è cambiato, la crea/aggiorna.
     const { appClient, result } = await this.factory.deploy({
       onUpdate: 'append', 
       onSchemaBreak: 'append', 
@@ -76,23 +62,18 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
 
     this.appClient = appClient
 
-    // 3. Finanzia il contratto se necessario (idempotente)
     await this.algorand.account.ensureFundedFromEnvironment(
         appClient.appAddress, 
         AlgoAmount.Algos(5)
     )
 
-    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing';
+    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing'
     this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
   }
 
-  /**
-   * Initializes a new game session on the blockchain.
-   */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
-    // Fetch current block round to calculate deadlines
     const status = (await this.algorand.client.algod.status().do()) as any
     const currentRound = BigInt(status['lastRound'])
 
@@ -102,10 +83,8 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
 
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
-    // Query the contract to find out exactly how much MBR is needed
     const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true })).return!
 
-    // Prepare the MBR payment transaction
     const mbrPayment = await this.algorand.createTransaction.payment({
       sender: dealer.account.addr,
       receiver: this.appClient.appAddress,
@@ -131,26 +110,31 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
     this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
     console.log(`Session ${sessionId} created with config:`, this.sessionConfig)
 
-    // Fast-forward the chain to the start round
+    const initialPot = Number(this.participationAmount.microAlgos) * 0 / 1_000_000
+    this.stateUpdater({ pot: initialPot })
+
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  /**
-   * Commit.
-   */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
     console.log(`Starting commit phase for session ${sessionId} with agents:`, agents.map(a => a.name))
-    for (const agent of agents) {
-      // 1. Construct the context for the LLM
-      const prompt = this.buildGamePrompt(agent, sessionNumber)
 
-      // 2. Get decision from Agent
-      // Nota: agent.playRound userà il suo logger interno per "thought" e "action"
+    const currentPot = Number(this.participationAmount.microAlgos) * agents.length / 1_000_000
+    this.stateUpdater({ pot: currentPot })
+
+    for (const agent of agents) {
+      this.stateUpdater({
+        agents: {
+          [agent.name]: { status: 'thinking' }
+        }
+      })
+      this.log(`[${agent.name}] Calculating optimal guess...`, 'thought')
+
+      const prompt = this.buildGamePrompt(agent, sessionNumber)
       const decision = await agent.playRound(this.name, prompt)
 
-      // 3. Sanitize Input
       let safeChoice = Math.round(decision.choice)
       if (safeChoice < 0 || safeChoice > 100) {
         this.log(
@@ -161,17 +145,23 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
       }
       safeChoice = Math.max(0, Math.min(100, safeChoice))
 
-      // 4. Generate Secret Salt and Store Locally
       const salt = crypto.randomBytes(16).toString('hex')
       this.roundSecrets.set(agent.account.addr.toString(), {
         choice: safeChoice,
         salt,
       })
 
-      // 5. Create SHA256 Hash (Choice + Salt)
-      const hash = this.getHash(safeChoice, salt)
+      this.stateUpdater({
+        agents: {
+          [agent.name]: { 
+            status: 'decided',
+            choice: safeChoice
+          }
+        }
+      })
+      this.log(`[${agent.name}] Committed: ${safeChoice}`, 'action')
 
-      // 6. Submit Transaction
+      const hash = this.getHash(safeChoice, salt)
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
         receiver: this.appClient!.appAddress,
@@ -187,9 +177,6 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
     }
   }
 
-  /**
-   * Constructs the specific prompt for this game.
-   */
   private buildGamePrompt(agent: Agent, sessionNumber: number): string {
     const gameRules = `
 GAME: Guess 2/3 of the Average (Nash Convergence Game)
@@ -209,7 +196,6 @@ Step 2: If everyone picks 67 → avg=67 → target=45
 Step 3: If everyone picks 45 → avg=45 → target=30
 Step 4: If everyone picks 30 → avg=30 → target=20
 Step 5: If everyone picks 20 → avg=20 → target=13
-
 `.trim()
 
     let situation = `
@@ -218,7 +204,6 @@ Round: ${sessionNumber}
 Entry fee: 10 ALGO
 `.trim()
 
-    // Add historical context to help the agent detect the convergence trend
     if (this.roundHistory.length === 0) {
       situation += `\n\nFirst round - expect average around 40-50, target around 27-33.`
     } else {
@@ -257,21 +242,22 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 `.trim()
   }
 
-  /**
-   * Reveal.
-   */
   async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
-    console.log(`Starting reveal phase for session ${sessionId} with agents:`, agents.map(a => a.name))
-    // Fast-forward chain to the reveal phase
+    console.log(`Starting reveal phase for session ${sessionId}`)
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
-    // Usiamo loop sequenziale per avere log ordinati nel frontend
     for (const agent of agents) {
         const secret = this.roundSecrets.get(agent.account.addr.toString())
         if (!secret) continue
+
+        this.stateUpdater({
+          agents: {
+            [agent.name]: { status: 'revealing' }
+          }
+        })
 
         try {
           await this.appClient!.send.revealMove({
@@ -285,34 +271,31 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
             suppressLog: true,
           })
           this.log(`[${agent.name}] Revealed Choice: ${secret.choice}`, 'game_event')
-          console.log(`Agent ${agent.name} revealed choice ${secret.choice} in session ${sessionId}`)
+          console.log(`Agent ${agent.name} revealed choice ${secret.choice}`)
+
+          this.stateUpdater({
+            agents: {
+              [agent.name]: { status: 'revealed', choice: secret.choice }
+            }
+          })
         } catch (e) {
           console.error(`Error revealing for ${agent.name}:`, e)
           this.log(`[${agent.name}] Error revealing move`, 'system')
-          console.log(`Agent ${agent.name} failed to reveal in session ${sessionId}`)
         }
     }
   }
 
-  /**
-   * Resolve.
-   */
   async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
     return
   }
 
-  /**
-   * Claim.
-   */
   async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 3: CLAIM ---`, 'system')
-    console.log(`Starting claim phase for session ${sessionId} with agents:`, agents.map(a => a.name))
-    // Fast-forward chain to the end of the game
+    console.log(`Starting claim phase for session ${sessionId}`)
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Calculate local statistics for the console log and history tracking
     const currentRoundChoices: number[] = []
     agents.forEach((agent) => {
       const secret = this.roundSecrets.get(agent.account.addr.toString())
@@ -329,7 +312,6 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
       console.log(`Session ${sessionId} stats - Average: ${avg.toFixed(1)}, Target: ${target.toFixed(1)}`)
     }
 
-    // Attempt to claim for each agent
     for (const agent of agents) {
       let outcome = 'LOSS'
       let netProfitAlgo = -Number(this.participationAmount.microAlgos) / 1_000_000
@@ -345,7 +327,6 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
         })
 
         const payoutMicro = Number(result.return!)
-
         const entryMicro = Number(this.participationAmount.microAlgos)
         netProfitAlgo = (payoutMicro - entryMicro) / 1_000_000
 
@@ -353,24 +334,27 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
         
         if (outcome === 'WIN') {
             this.log(`🏆 ${agent.name} WINS! Profit: +${netProfitAlgo.toFixed(2)} ALGO`, 'game_event')
-            console.log(`Agent ${agent.name} won ${netProfitAlgo.toFixed(2)} ALGO in session ${sessionId}`)
-          } 
-            
-
-
+            console.log(`Agent ${agent.name} won ${netProfitAlgo.toFixed(2)} ALGO`)
+        }
       } catch (e: any) {
         this.log(`💸 ${agent.name} LOSES. Loss: ${netProfitAlgo.toFixed(2)} ALGO`, 'game_event')
-        console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO in session ${sessionId}`)
+        console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO`)
         outcome = 'LOSS'
       }
-      // Feedback loop: Update agent's memory with the result
+
+      this.stateUpdater({
+        agents: {
+          [agent.name]: {
+            profit: netProfitAlgo,
+            status: 'finished'
+          }
+        }
+      })
+
       await agent.finalizeRound(this.name, outcome, netProfitAlgo, sessionNumber, 1)
     }
   }
 
-  /**
-   * Helper utility to generate the SHA256 Commit Hash.
-   */
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -382,9 +366,6 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     )
   }
 
-  /**
-   * Utility to fast-forward LocalNet time.
-   */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
     const currentRound = BigInt(status['lastRound'])

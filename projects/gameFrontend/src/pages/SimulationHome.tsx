@@ -32,7 +32,7 @@ const GAMES = [
   },
   { 
     id: 'GuessGame', 
-    name: 'Beauty Contest', 
+    name: 'Guess Game', 
     desc: 'Guess 2/3 of the average. A test of recursive reasoning.', 
     color: 'from-purple-500/20 to-indigo-500/5',
     icon: '🎯',

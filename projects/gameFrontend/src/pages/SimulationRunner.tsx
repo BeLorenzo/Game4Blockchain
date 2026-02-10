@@ -18,7 +18,7 @@ interface LogEntry {
 interface AgentState {
   name?: string 
   choice?: number
-  profit: number
+  profit?: number
   status: 'waiting' | 'thinking' | 'decided' | 'eliminated'
   lastAction: string
 }
@@ -63,6 +63,30 @@ const AGENT_COLORS: Record<string, string> = {
 
 const TYPING_SPEED = 15 
 const MIN_DISPLAY_TIME = 300 
+
+// =====================================================================
+// HELPER PER VISUALIZZAZIONE SCELTE
+// =====================================================================
+
+const getGameChoiceDisplay = (gameId: string | undefined, choice: number | undefined) => {
+  if (choice === undefined) return null;
+
+  switch (gameId) {
+    case 'StagHunt':
+      // 0 = Hare (Pecora/Sicuro), 1 = Stag (Cervo/Rischio)
+      return choice === 1 ? '🦌 STAG' : '🐑 HARE';
+    
+    case 'WeeklyGame':
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return days[choice] ? `📅 ${days[choice]}` : `Day ${choice}`;
+    
+    case 'GuessGame':
+      return `🔢 Guess: ${choice}`; // Assumiamo sia un numero tra 0 e 100
+      
+    default:
+      return `Choice: ${choice}`;
+  }
+};
 
 // =====================================================================
 // COMPONENTE PRINCIPALE
@@ -175,51 +199,69 @@ export default function SimulationRunner() {
   // =====================================================================
 
   const processNextLog = useCallback(() => {
-    if (isProcessingRef.current || logQueueRef.current.length === 0) return
-    
-    isProcessingRef.current = true
-    const nextLog = logQueueRef.current.shift()!
-    
-    setCurrentLog(nextLog)
-    setCurrentText('')
+  if (isProcessingRef.current || logQueueRef.current.length === 0) return
+  
+  isProcessingRef.current = true
+  const nextLog = logQueueRef.current.shift()!
+  
+  setCurrentLog(nextLog)
+  setCurrentText('')
 
-    // === SINCRONIZZAZIONE STATO ===
-    // Se il log contiene uno snapshot, aggiorniamo la grafica ADESSO.
-    // Così "Agent Matrix" mostra lo stato corrispondente al testo che sta per apparire.
-    if (nextLog.stateSnapshot) {
-        setGameState(nextLog.stateSnapshot)
-    }
-
-    let charIndex = 0
-    const messageLength = nextLog.message.length
-    
-    // Calcola durata dinamica basata su tipo e lunghezza
-    let charDelay = TYPING_SPEED
-    if (nextLog.type === 'system' || nextLog.type === 'game_event') {
-      charDelay = 8 // Più veloce per messaggi di sistema
-    }
-
-    typingIntervalRef.current = setInterval(() => {
-      if (charIndex < messageLength) {
-        setCurrentText(nextLog.message.slice(0, charIndex + 1))
-        charIndex++
-      } else {
-        // Scrittura completata
-        if (typingIntervalRef.current) {
-          clearInterval(typingIntervalRef.current)
+  // === SINCRONIZZAZIONE STATO CON MERGE ===
+  // Se il log contiene uno snapshot, uniamo i nuovi dati con lo stato esistente
+  if (nextLog.stateSnapshot) {
+    setGameState(prev => {
+      if (!prev) return nextLog.stateSnapshot!
+      
+      // Merge degli agenti: manteniamo tutti gli agenti esistenti e aggiorniamo solo quelli nuovi
+      const mergedAgents = { ...prev.agents }
+      
+      // Aggiorna solo gli agenti presenti nello snapshot
+      Object.entries(nextLog.stateSnapshot!.agents).forEach(([agentName, agentState]) => {
+        mergedAgents[agentName] = {
+          ...mergedAgents[agentName], // Mantieni i dati esistenti se ci sono
+          ...agentState, // Sovrascrivi con i nuovi dati
+          name: agentName // Assicurati che il nome sia impostato
         }
-        
-        setCompletedLogs(prev => [...prev, nextLog])
-        setCurrentLog(null)
-        setCurrentText('')
-        isProcessingRef.current = false
-        
-        // Processa il prossimo
-        setTimeout(() => processNextLog(), MIN_DISPLAY_TIME)
+      })
+      
+      return {
+        ...prev,
+        ...nextLog.stateSnapshot,
+        agents: mergedAgents
       }
-    }, charDelay)
+    })
+  }
 
-  }, [])
+  let charIndex = 0
+  const messageLength = nextLog.message.length
+  
+  // Calcola durata dinamica basata su tipo e lunghezza
+  let charDelay = TYPING_SPEED
+  if (nextLog.type === 'system' || nextLog.type === 'game_event') {
+    charDelay = 8
+  }
+
+  typingIntervalRef.current = setInterval(() => {
+    if (charIndex < messageLength) {
+      setCurrentText(nextLog.message.slice(0, charIndex + 1))
+      charIndex++
+    } else {
+      // Scrittura completata
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current)
+      }
+      
+      setCompletedLogs(prev => [...prev, nextLog])
+      setCurrentLog(null)
+      setCurrentText('')
+      isProcessingRef.current = false
+      
+      // Processa il prossimo
+      setTimeout(() => processNextLog(), MIN_DISPLAY_TIME)
+    }
+  }, charDelay)
+}, [])
 
   // =====================================================================
   // POLLING SERVER
@@ -407,15 +449,9 @@ export default function SimulationRunner() {
           </div>
         </div>
         <div className="flex gap-2">
-          {!serverStatus.isRunning || isWrongGame ? (
             <button onClick={startSimulation} className="btn btn-primary btn-sm gap-2 shadow-lg shadow-primary/20">
               <Play size={16} /> Start Session
             </button>
-          ) : (
-            <button onClick={stopSimulation} className="btn btn-error btn-sm gap-2">
-              <Square size={16} /> Stop
-            </button>
-          )}
         </div>
       </div>
       {isWrongGame && (
@@ -488,6 +524,11 @@ export default function SimulationRunner() {
                   let statusIcon = null;
                   let statusText = "";
                   let rowOpacity = "opacity-100";
+                  
+                  // SYNC LOG: Controlla se l'agente sta "pensando" o scrivendo ora
+                  const isActing = currentLog?.agent === agentName;
+                  // Se l'agente è attivo, diamogli un bordo o un'evidenziazione
+                  const activeClass = isActing ? "border-primary bg-primary/10" : "border-white/5 bg-black/30";
 
                   if (isPirateGame && gameState.pirateData) {
                       const isAlive = gameState.pirateData.alivePirates?.includes(agentName) || '';
@@ -503,22 +544,32 @@ export default function SimulationRunner() {
                           statusText = "CREW";
                       }
                   } else {
-                      // Giochi normali: mostra scelta se disponibile
-                      if (agentData.choice !== undefined) statusText = `Choice: ${agentData.choice}`;
+                      // Giochi normali: mostra scelta formattata
+                      // Usa la helper function creata sopra
+                      const displayChoice = getGameChoiceDisplay(gameId, agentData.choice);
+                      
+                      if (displayChoice) {
+                        statusText = displayChoice;
+                      } else if (isActing) {
+                        statusText = "Thinking...";
+                      } else {
+                        statusText = "Waiting...";
+                      }
                   }
+                  
                   return (
-                    <div key={agentName} className={`flex items-center justify-between p-2 rounded bg-black/30 border border-white/5 ${rowOpacity}`}>
+                    <div key={agentName} className={`flex items-center justify-between p-2 rounded border transition-colors duration-200 ${activeClass} ${rowOpacity}`}>
                         <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full ${AGENT_COLORS[agentName]?.split(' ')[0] || 'bg-gray-500'}`}></div>
+                            <div className={`w-2 h-2 rounded-full ${AGENT_COLORS[agentName]?.split(' ')[0] || 'bg-gray-500'} ${isActing ? 'animate-ping' : ''}`}></div>
                             <div>
                                 <div className="font-bold text-sm text-white flex items-center gap-2">
                                    {agentName} {statusIcon}
                                 </div>
-                                {statusText && <div className="text-[10px] text-gray-500 uppercase">{statusText}</div>}
+                                {statusText && <div className={`text-[10px] uppercase ${isActing ? 'text-primary' : 'text-gray-500'}`}>{statusText}</div>}
                             </div>
                         </div>
-                        <div className={`text-xs font-mono font-bold ${agentData.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                            {agentData.profit > 0 ? '+' : ''}{agentData.profit.toFixed(1)} A
+                        <div className={`text-xs font-mono font-bold ${(agentData.profit ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {(agentData.profit ?? 0) > 0 ? '+' : ''}{(agentData.profit ?? 0).toFixed(1)} A
                         </div>
                     </div>
                   );
@@ -530,9 +581,40 @@ export default function SimulationRunner() {
               </div>
             )}
           </div>
-          
+          {/* 2. GAME STATE METRICS */}
+          <div className="bg-[#1e1e1e] rounded-xl border border-white/10 p-4 shrink-0">
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">
+              Environment Data
+            </h3>
+            
+            {gameState ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-black/30 p-2 rounded border border-white/5">
+                    <div className="text-[10px] text-gray-500 uppercase">Session ID</div>
+                    <div className="text-white font-mono font-bold">#{gameState.sessionId}</div>
+                  </div>
+                  <div className="bg-black/30 p-2 rounded border border-white/5">
+                    <div className="text-[10px] text-gray-500 uppercase">Current Round</div>
+                    <div className="text-primary font-mono font-bold text-lg">
+                      {isPirateGame ? gameState.round : 1}
+                    </div>
+                  </div>
+                  <div className="bg-black/30 p-2 rounded border border-white/5 col-span-2">
+                    <div className="text-[10px] text-gray-500 uppercase">Total Pot</div>
+                    <div className="text-yellow-400 font-mono font-bold text-lg">{gameState.pot} A</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-xs text-gray-600 py-8 border border-dashed border-white/5 rounded">
+                No active session
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
-      </div>
+    </div>
   )
 }

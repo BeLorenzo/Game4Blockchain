@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
-import algosdk from 'algosdk'
+import algosdk, { Account, Address } from 'algosdk'
 import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import { z } from 'zod'
@@ -88,15 +88,16 @@ export class PirateGame implements IMultiRoundGameAdapter {
     return this.pirates.length - 1
   }
 
-  async deploy(admin: Agent, suffix: string = ''): Promise<void> {
-    const appName = `PirateGame${suffix}`; // Esempio: "PirateGame_Sim" vs "PirateGame"
+  async deploy(admin: Account, suffix: string = ''): Promise<void> {
+    const appName = `PirateGame${suffix}`; 
 
-    // 1. Configura la Factory con il nome specifico
-    this.factory = this.algorand.client.getTypedAppFactory(PirateGameFactory, {
-      defaultSender: admin.account.addr,
-      defaultSigner: admin.signer,
-      appName: appName, // Questo separa le istanze sulla chain
-    })
+    const signer = algosdk.makeBasicAccountTransactionSigner(admin)
+        
+        this.factory = this.algorand.client.getTypedAppFactory(PirateGameFactory, {
+          defaultSender: admin.addr,
+          defaultSigner: signer,
+          appName: appName,
+        })
 
     // 2. Deploy Idempotente (Stile GuessGame)
     // Se l'app esiste già (stesso nome, stesso creatore), la riusa.
@@ -468,10 +469,10 @@ export class PirateGame implements IMultiRoundGameAdapter {
 
       // 3. Check entitlement
       const coins = finalAmounts[pirate.seniorityIndex]
-      const winnings = this.participationAmount.algo - Number(coins)
+      const winnings =  (Number(coins) / 1_000_000) - this.participationAmount.algo
       if (winnings > 0n) {
-        console.log(`💰 [${pirate.agent.name}] Claiming ${Number(coins) / 1_000_000} ALGO - Profit: +${Number(winnings) / 1_000_000} ALGO...`)
-        this.log(`💰 [${pirate.agent.name}] Claiming ${Number(coins) / 1_000_000} ALGO - Profit: +${Number(winnings) / 1_000_000} ALGO...`, 'game_event')
+        console.log(`💰 [${pirate.agent.name}] Claiming ${(Number(coins) / 1_000_000).toFixed(2)} ALGO - Profit: +${Number(winnings).toFixed(2)} ALGO...`)
+        this.log(`💰 [${pirate.agent.name}] Claiming ${(Number(coins) / 1_000_000).toFixed(2)} ALGO - Profit: +${Number(winnings).toFixed(2)} ALGO...`, 'game_event')
         await this.safeSend(
           () =>
             this.appClient!.send.claimWinnings({
@@ -488,8 +489,8 @@ export class PirateGame implements IMultiRoundGameAdapter {
         console.log(`⚖️ [${pirate.agent.name}] No winnings to claim (0 ALGO)`)
         this.log(`⚖️ [${pirate.agent.name}] No winnings to claim (0 ALGO)`, 'game_event')
     } else {
-        console.log(`YOU LOSE! - Loss: ${Number(winnings) / 1_000_000} ALGO...`)
-        this.log(`💸 YOU LOSE! - Loss: ${Number(winnings) / 1_000_000} ALGO...`, 'game_event') 
+        console.log(`[${pirate.agent.name}] YOU LOSE! - Loss: ${Number(winnings).toFixed(2) } ALGO...`)
+        this.log(`💸 [${pirate.agent.name}] YOU LOSE! - Loss: ${Number(winnings).toFixed(2) } ALGO...`, 'game_event') 
     }
     }
   }
@@ -972,8 +973,8 @@ Current Status: ${this.pirates.map((p) => `#${p.seniorityIndex}:${p.alive ? 'Ali
       const amount = buffer.readBigUInt64BE(i * 8)
       const pirate = this.pirates.find((p) => p.seniorityIndex === i)
       const status = pirate?.alive ? '🟢' : '💀'
-      console.log(`  ${status} Pirate #${i} (${pirate?.agent.name}): ${Number(amount) / 1_000_000} ALGO`)
-      this.log(`  ${status} Pirate #${i} (${pirate?.agent.name}): ${Number(amount) / 1_000_000} ALGO`, 'system')
+      console.log(`  ${status} Pirate #${i} (${pirate?.agent.name}): ${(Number(amount) / 1_000_000).toFixed(2)} ALGO`)
+      this.log(`  ${status} Pirate #${i} (${pirate?.agent.name}): ${(Number(amount) / 1_000_000).toFixed(2)} ALGO`, 'system')
     }
   }
 

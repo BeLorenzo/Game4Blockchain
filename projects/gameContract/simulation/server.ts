@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import * as fs from 'fs'
@@ -14,6 +15,7 @@ import { WeeklyGame } from './games/WeeklyGame'
 import { GuessGame } from './games/GuessGame'
 import { IBaseGameAdapter } from './games/IBaseGameAdapter'
 import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
+import algosdk from 'algosdk'
 
 // =====================================================================
 // 🚨 FIX CRITICO PER BIGINT 🚨
@@ -539,10 +541,12 @@ async function runGameLogic(gameName: string) {
         })
     })
     updateGameState({ agents: initialAgentState })
-
+    const admimMnemonic = process.env.MNEMONIC || ''
+    const adminAccount = algosdk.mnemonicToSecretKey(admimMnemonic);
+    algorand.account.ensureFundedFromEnvironment(adminAccount.addr, AlgoAmount.Algos(1000))
     addLog('System', 'system', 'Funding agents...')
     await Promise.all(agents.map(a => algorand.account.ensureFundedFromEnvironment(a.account.addr, AlgoAmount.Algos(100))))
-    await game.deploy(agents[0], '_sim')
+    await game.deploy(adminAccount, '_sim')
     
     updateGameState({ phase: 'DEPLOYED' })
     addLog('System', 'system', 'Contract deployed.')

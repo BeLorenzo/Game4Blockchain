@@ -8,47 +8,36 @@ import { WeeklyGameClient, WeeklyGameFactory } from '../../smart_contracts/artif
 import { Agent } from '../Agent'
 import { IBaseGameAdapter, GameLogger } from './IBaseGameAdapter'
 import { deploy } from '../../smart_contracts/weeklyGame/deploy-config'
+import algosdk, { Account, Address } from 'algosdk'
 
-/**
- * Helper interface to store local player secrets (choice + salt)
- * required for the Reveal phase.
- */
 interface RoundSecret {
   choice: number
   salt: string
 }
 
-/**
- * Adapter for the "Weekly Lottery" Game (Minority Game variant).
- */
 export class WeeklyGame implements IBaseGameAdapter {
   readonly name = 'WeeklyGame'
 
-  // --- LOGGER IMPLEMENTATION ---
   private log: GameLogger = () => {}
+  private stateUpdater: (updates: any) => void = () => {}  // <-- AGGIUNTO
 
   public setLogger(logger: GameLogger) {
     this.log = logger
   }
-  // -----------------------------
 
-  // Tracks vote distribution from the previous round to help Agents learn.
+  // <-- NUOVO METODO
+  public setStateUpdater(updater: (updates: any) => void) {
+    this.stateUpdater = updater
+  }
+
   private lastRoundVotes: Record<string, number> | null = null
-
   private algorand = AlgorandClient.defaultLocalNet()
   private factory: WeeklyGameFactory | null = null
   private appClient: WeeklyGameClient | null = null
-
-  // Fixed entry fee
   private participationAmount = AlgoAmount.Algos(10)
-
-  // Local storage for commit secrets (Salt/Choice) mapped by Agent Address
   private roundSecrets: Map<string, RoundSecret> = new Map()
-
-  // Cache for the current session's timeline configuration
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
-  // Hardcoded durations for simulation speed (in blocks)
   private durationParams = {
     warmUp: 3n,
     commitPhase: 15n,
@@ -57,19 +46,17 @@ export class WeeklyGame implements IBaseGameAdapter {
 
   private dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-async deploy(admin: Agent, suffix: string = ''): Promise<void> {
-    const appName = `WeeklyGame${suffix}`; // Esempio: "PirateGame_Sim" vs "PirateGame"
+  async deploy(admin: Account, suffix: string = ''): Promise<void> {
+    const appName = `WeeklyGame${suffix}`
 
-    // 1. Configura la Factory con il nome specifico
-    this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
-      defaultSender: admin.account.addr,
-      defaultSigner: admin.signer,
-      appName: appName, // Questo separa le istanze sulla chain
-    })
+    const signer = algosdk.makeBasicAccountTransactionSigner(admin)
+        
+        this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
+          defaultSender: admin.addr,
+          defaultSigner: signer,
+          appName: appName,
+        })
 
-    // 2. Deploy Idempotente (Stile GuessGame)
-    // Se l'app esiste già (stesso nome, stesso creatore), la riusa.
-    // Se non esiste o il codice è cambiato, la crea/aggiorna.
     const { appClient, result } = await this.factory.deploy({
       onUpdate: 'append', 
       onSchemaBreak: 'append', 
@@ -78,23 +65,18 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
 
     this.appClient = appClient
 
-    // 3. Finanzia il contratto se necessario (idempotente)
     await this.algorand.account.ensureFundedFromEnvironment(
         appClient.appAddress, 
         AlgoAmount.Algos(5)
     )
 
-    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing';
+    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing'
     this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
   }
 
-  /**
-   * Initializes a new game session on the blockchain.
-   */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
-    // Fetch current block round to calculate deadlines
     const status = (await this.algorand.client.algod.status().do()) as any
     const currentRound = BigInt(status['lastRound'])
 
@@ -104,10 +86,8 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
 
     this.sessionConfig = { startAt, endCommitAt, endRevealAt }
 
-    // Query the contract to find out exactly how much MBR is needed for the storage boxes
     const mbr = (await this.appClient.send.getRequiredMbr({ args: { command: 'newGame' }, suppressLog: true })).return!
 
-    // Prepare the MBR payment transaction
     const mbrPayment = await this.algorand.createTransaction.payment({
       sender: dealer.account.addr,
       receiver: this.appClient.appAddress,
@@ -132,39 +112,59 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
     const sessionId = Number(result.return) + 1
     this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
 
-    // Fast-forward the chain to the start round
+    // <-- AGGIORNA POT INIZIALE
+    const initialPot = Number(this.participationAmount.microAlgos) * 0 / 1_000_000
+    this.stateUpdater({ pot: initialPot })
+
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
-  /**
-   * Commit.
-   */
   async commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
 
-    for (const agent of agents) {
-      // 1. Construct the context for the LLM
-      const prompt = this.buildGamePrompt(agent, roundNumber)
+    // <-- AGGIORNA POT
+    const currentPot = Number(this.participationAmount.microAlgos) * agents.length / 1_000_000
+    this.stateUpdater({ pot: currentPot })
 
-      // 2. Get decision from Agent
+    // <-- LOOP SEQUENZIALE
+    for (const agent of agents) {
+      // 1. Agente sta pensando
+      this.stateUpdater({
+        agents: {
+          [agent.name]: { status: 'thinking' }
+        }
+      })
+      this.log(`[${agent.name}] Analyzing day distribution...`, 'thought')
+
+      // 2. Ottieni decisione
+      const prompt = this.buildGamePrompt(agent, roundNumber)
       const decision = await agent.playRound(this.name, prompt)
 
-      // 3. Sanitize Input: Ensure choice is an integer between 0 and 6
+      // 3. Sanitize
       let safeChoice = decision.choice
       if (safeChoice < 0 || safeChoice > 6) {
         this.log(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0`, 'system')
         safeChoice = 0
       }
 
-      // 4. Generate Secret Salt and Store Locally
+      // 4. Genera salt
       const salt = crypto.randomBytes(16).toString('hex')
       this.roundSecrets.set(agent.account.addr.toString(), { choice: safeChoice, salt })
 
-      // 5. Create SHA256 Hash (Choice + Salt)
-      const hash = this.getHash(safeChoice, salt)
+      // 5. Aggiorna stato: agente ha deciso
+      this.stateUpdater({
+        agents: {
+          [agent.name]: { 
+            status: 'decided',
+            choice: safeChoice
+          }
+        }
+      })
+      this.log(`[${agent.name}] Committed: ${this.dayNames[safeChoice]}`, 'action')
 
-      // 6. Submit Transaction (Commit Hash + Pay Entry Fee)
+      // 6. Submit
+      const hash = this.getHash(safeChoice, salt)
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
         receiver: this.appClient!.appAddress,
@@ -180,9 +180,6 @@ async deploy(admin: Agent, suffix: string = ''): Promise<void> {
     }
   }
 
-  /**
-   * Constructs the specific prompt for this game.
-   */
   private buildGamePrompt(agent: Agent, roundNumber: number): string {
     const gameRules = `
 GAME: Weekly Lottery (Minority Game)
@@ -212,7 +209,6 @@ Round: ${roundNumber}
 Entry fee: 10 ALGO
 `.trim()
 
-    // Add historical context to help the agent detect crowd behavior
     if (this.lastRoundVotes === null) {
       situation += `\n\nFirst round - all days equally likely.`
     } else {
@@ -265,20 +261,22 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 `.trim()
   }
 
-  /**
-   * Reveal.
-   */
   async reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
-    // Fast-forward chain to the reveal phase
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
-    // Usiamo ciclo for sequenziale per log puliti
+    // <-- LOOP SEQUENZIALE
     for (const agent of agents) {
         const secret = this.roundSecrets.get(agent.account.addr.toString())
         if (!secret) continue
+
+        this.stateUpdater({
+          agents: {
+            [agent.name]: { status: 'revealing' }
+          }
+        })
 
         try {
           await this.appClient!.send.revealMove({
@@ -292,6 +290,12 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
             suppressLog: true,
           })
           this.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`, 'game_event')
+
+          this.stateUpdater({
+            agents: {
+              [agent.name]: { status: 'revealed', choice: secret.choice }
+            }
+          })
         } catch (e) {
           console.error(`Error revealing for ${agent.name}:`, e)
           this.log(`[${agent.name}] Error revealing move`, 'system')
@@ -299,24 +303,17 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     }
   }
 
-  /**
-   * Resolve.
-   */
   async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
     return
   }
 
-  /**
-   * Claim.
-   */
   async claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 3: CLAIM ---`, 'system')
-    // Fast-forward chain to the end of the game
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Collect votes for next round's prompt history
+    // Raccogli voti
     const votes: Record<string, number> = {}
     this.dayNames.forEach((d) => (votes[d] = 0))
 
@@ -329,15 +326,13 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     })
 
     this.lastRoundVotes = votes
-    // Formattiamo la distribuzione voti per il log
     const voteStr = Object.entries(votes)
         .filter(([_, count]) => count > 0)
         .map(([day, count]) => `${day}: ${count}`)
-        .join(', ');
+        .join(', ')
         
     this.log(`📊 Vote Distribution: ${voteStr}`, 'game_event')
 
-    // Process claims for each agent
     for (const agent of agents) {
       let outcome = 'LOSS'
       let netProfitAlgo = -Number(this.participationAmount.microAlgos) / 1_000_000
@@ -360,28 +355,29 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         
         if (outcome === 'WIN') {
             this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
-        }
-        else if (outcome === 'DRAW') {
+        } else if (outcome === 'DRAW') {
             this.log(`⚖️ ${agent.name} BREAK-EVEN (0 ALGO)`, 'game_event')
-            console.log(`Agent ${agent.name} broke even in session ${sessionId}`)
+        } else {
+            this.log(`💸 ${agent.name} LOSES (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
         }
-          else {
-              this.log(`💸 ${agent.name} LOSES (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
-              console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO in session ${sessionId}`)
-            }
-
       } catch (e: any) {
-        // error handling silently or debug log
+        // error handling
       }
 
-      // Feedback loop: Update agent's memory with the result
+      // <-- AGGIORNA PROFIT IN TEMPO REALE
+      this.stateUpdater({
+        agents: {
+          [agent.name]: {
+            profit: netProfitAlgo,
+            status: 'finished'
+          }
+        }
+      })
+
       agent.finalizeRound(this.name, outcome, netProfitAlgo, roundNumber, 1)
     }
   }
 
-  /**
-   * Helper utility to generate the SHA256 Commit Hash.
-   */
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -393,9 +389,6 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     )
   }
 
-  /**
-   * Utility to fast-forward LocalNet time.
-   */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
     const currentRound = BigInt(status['lastRound'])

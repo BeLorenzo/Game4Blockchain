@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import 'dotenv/config'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Agent } from './Agent'
@@ -8,6 +9,7 @@ import { IBaseGameAdapter } from './games/IBaseGameAdapter'
 import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
 import { PirateGame } from './games/PirateGame'
 import { GuessGame } from './games/GuessGame'
+import algosdk from 'algosdk'
 
 /**
  * Type Guard to check if a game supports multi-round logic (e.g., Pirate Game).
@@ -373,7 +375,9 @@ STRATEGIC PRINCIPLES:
   )
 
   // === CONTRACT DEPLOYMENT ===
-  const admin = agents[0]
+  const adminMem = process.env.MNEMONIC || ''
+  const admin = algosdk.mnemonicToSecretKey(adminMem);
+  algorand.account.ensureFundedFromEnvironment(admin.addr, AlgoAmount.Algos(1000))
   console.log('\n--- DEPLOYMENT ---')
   await game.deploy(admin, '') 
 
@@ -383,8 +387,9 @@ STRATEGIC PRINCIPLES:
   for (let i = 0; i < NUM_SESSIONS; i++) {
     let sessionId: bigint | null = null
     try {
+      const agent = agents[0]
       console.log(`${'='.repeat(60)}`)
-      sessionId = await game.startSession(admin)
+      sessionId = await game.startSession(agent)
       console.log('='.repeat(60))
 
       if (isTurnBased(game)) {
@@ -422,7 +427,7 @@ STRATEGIC PRINCIPLES:
 
         try {
           // Phase 3: Resolution & Claim
-          await game.resolve(admin, sessionId, i)
+          await game.resolve(agent, sessionId, i)
           await game.claim(agents, sessionId, i)
 
           console.log(`\n🎉 Session ${i + 1} COMPLETED.\n`)

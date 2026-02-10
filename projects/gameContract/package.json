@@ -17,7 +17,7 @@
     "cli": "npx tsx cli/index.ts",
     "start": "npx ts-node simulation/main.ts",
     "stats": "npx ts-node simulation/stats.ts",
-    "simulation": "ts-node simulation/main.ts", 
+    "simulation": "ts-node simulation/main.ts",
     "serve-simulation": "ts-node simulation/server.ts"
   },
   "engines": {
