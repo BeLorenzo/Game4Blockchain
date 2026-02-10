@@ -55,16 +55,35 @@ export class GuessGame implements IBaseGameAdapter {
     revealPhase: 10n,
   }
 
-  async deploy(deployer: Agent): Promise<void> {
-    this.log(`\n🛠 Deploying ${this.name} logic...`, 'system')
-    
-    // Esegue il deploy usando lo script specifico importato in alto
-    const deployment = await deploy();
-    
-    // Salva i riferimenti dentro la classe
-    this.appClient = deployment.appClient;
-    
-    this.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`, 'system');
+async deploy(admin: Agent, suffix: string = ''): Promise<void> {
+    const appName = `GuessGame${suffix}`; // Esempio: "PirateGame_Sim" vs "PirateGame"
+
+    // 1. Configura la Factory con il nome specifico
+    this.factory = this.algorand.client.getTypedAppFactory(GuessGameFactory, {
+      defaultSender: admin.account.addr,
+      defaultSigner: admin.signer,
+      appName: appName, // Questo separa le istanze sulla chain
+    })
+
+    // 2. Deploy Idempotente (Stile GuessGame)
+    // Se l'app esiste già (stesso nome, stesso creatore), la riusa.
+    // Se non esiste o il codice è cambiato, la crea/aggiorna.
+    const { appClient, result } = await this.factory.deploy({
+      onUpdate: 'append', 
+      onSchemaBreak: 'append', 
+      suppressLog: true
+    })
+
+    this.appClient = appClient
+
+    // 3. Finanzia il contratto se necessario (idempotente)
+    await this.algorand.account.ensureFundedFromEnvironment(
+        appClient.appAddress, 
+        AlgoAmount.Algos(5)
+    )
+
+    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing';
+    this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
   }
 
   /**
@@ -110,6 +129,7 @@ export class GuessGame implements IBaseGameAdapter {
 
     const sessionId = Number(result.return) + 1
     this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
+    console.log(`Session ${sessionId} created with config:`, this.sessionConfig)
 
     // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
@@ -121,7 +141,7 @@ export class GuessGame implements IBaseGameAdapter {
    */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
-
+    console.log(`Starting commit phase for session ${sessionId} with agents:`, agents.map(a => a.name))
     for (const agent of agents) {
       // 1. Construct the context for the LLM
       const prompt = this.buildGamePrompt(agent, sessionNumber)
@@ -137,6 +157,7 @@ export class GuessGame implements IBaseGameAdapter {
           `[${agent.name}] ⚠️ Invalid choice ${safeChoice}. Clamping to range 0-100.`,
           'system'
         )
+        console.warn(`Agent ${agent.name} provided invalid choice ${safeChoice}. Clamping to 0-100.`)
       }
       safeChoice = Math.max(0, Math.min(100, safeChoice))
 
@@ -243,6 +264,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
+    console.log(`Starting reveal phase for session ${sessionId} with agents:`, agents.map(a => a.name))
     // Fast-forward chain to the reveal phase
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
@@ -263,9 +285,11 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
             suppressLog: true,
           })
           this.log(`[${agent.name}] Revealed Choice: ${secret.choice}`, 'game_event')
+          console.log(`Agent ${agent.name} revealed choice ${secret.choice} in session ${sessionId}`)
         } catch (e) {
           console.error(`Error revealing for ${agent.name}:`, e)
           this.log(`[${agent.name}] Error revealing move`, 'system')
+          console.log(`Agent ${agent.name} failed to reveal in session ${sessionId}`)
         }
     }
   }
@@ -284,6 +308,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 3: CLAIM ---`, 'system')
+    console.log(`Starting claim phase for session ${sessionId} with agents:`, agents.map(a => a.name))
     // Fast-forward chain to the end of the game
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
@@ -301,6 +326,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 
       this.roundHistory.push({ avg, target })
       this.log(`📊 Game Stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`, 'game_event')
+      console.log(`Session ${sessionId} stats - Average: ${avg.toFixed(1)}, Target: ${target.toFixed(1)}`)
     }
 
     // Attempt to claim for each agent
@@ -327,14 +353,14 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
         
         if (outcome === 'WIN') {
             this.log(`🏆 ${agent.name} WINS! Profit: +${netProfitAlgo.toFixed(2)} ALGO`, 'game_event')
-        } else if (outcome === 'DRAW') {
-            this.log(`⚖️ ${agent.name}: BREAK-EVEN`, 'game_event')
-        } else {
-            // Non logghiamo tutte le perdite per non intasare, o usiamo un log debug
-            // this.log(`${agent.name}: LOSS`, 'game_event')
-        }
+            console.log(`Agent ${agent.name} won ${netProfitAlgo.toFixed(2)} ALGO in session ${sessionId}`)
+          } 
+            
+
 
       } catch (e: any) {
+        this.log(`💸 ${agent.name} LOSES. Loss: ${netProfitAlgo.toFixed(2)} ALGO`, 'game_event')
+        console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO in session ${sessionId}`)
         outcome = 'LOSS'
       }
       // Feedback loop: Update agent's memory with the result

@@ -3,7 +3,6 @@
 import { Agent } from '../Agent'
 
 export type GameLogger = (message: string, type?: 'thought' | 'action' | 'system' | 'game_event') => void;
-
 /**
  * Base Game Adapter Interface.
  * Defines the standard lifecycle methods that all game implementations must support
@@ -15,7 +14,7 @@ export interface IBaseGameAdapter {
 
   setLogger(logger: GameLogger): void;
 
-  deploy(deployer: Agent): Promise<void>;
+  deploy(deployer: Agent, suffix: string): Promise<void>;
 
   /** Start a new game session */
   startSession(dealer: Agent): Promise<bigint>

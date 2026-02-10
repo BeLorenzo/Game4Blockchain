@@ -375,7 +375,7 @@ STRATEGIC PRINCIPLES:
   // === CONTRACT DEPLOYMENT ===
   const admin = agents[0]
   console.log('\n--- DEPLOYMENT ---')
-  await game.deploy(admin) 
+  await game.deploy(admin, '') 
 
   console.log(`\n--- STARTING ${NUM_SESSIONS} GAMES ---`)
 
@@ -393,7 +393,8 @@ STRATEGIC PRINCIPLES:
         await game.setup(agents, sessionId)
 
         const totalInternalRounds = await game.getMaxTotalRounds(sessionId)
-        for (let r = 0; r < totalInternalRounds; r++) {
+        let r = 0;
+        while (r < totalInternalRounds) {
           console.log(`  --- Internal Round ${r + 1}/${totalInternalRounds} ---`)
           try {
             const isGameOver = await game.playRound(agents, sessionId, r + 1)
@@ -405,8 +406,10 @@ STRATEGIC PRINCIPLES:
             console.error(`❌ Round ${r + 1} crashed! Aborting.`)
             throw roundError
           }
+          r++;
         }
         console.log(`Ending game...`)
+        await game.claim(agents, sessionId,r)
         await game.finalize(agents, sessionId)
         console.log(`\n🎉 Session ${i + 1} COMPLETED.\n`)
       } else {

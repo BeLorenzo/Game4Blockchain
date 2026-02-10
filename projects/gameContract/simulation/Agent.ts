@@ -364,7 +364,7 @@ private updatePerformanceStats(game: string, choice: number, profit: number, res
           this.mentalState = data.mentalState
         }
         
-        console.log(`[${this.name}] 💾 Loaded state: ${this.fullHistory.length} games, ${Object.keys(this.performanceStats).length} game types`)
+        console.log(`[${this.name}] 💾 Loaded state: ${this.fullHistory.length} rounds, ${Object.keys(this.performanceStats).length} game types`)
       } catch (e) {
         console.warn(`[${this.name}] ⚠️ Failed to load state: ${e}`)
       }

@@ -57,16 +57,35 @@ export class WeeklyGame implements IBaseGameAdapter {
 
   private dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-  async deploy(deployer: Agent): Promise<void> {
-    this.log(`\n🛠 Deploying ${this.name} logic...`, 'system')
-    
-    // Esegue il deploy usando lo script specifico importato in alto
-    const deployment = await deploy();
-    
-    // Salva i riferimenti dentro la classe
-    this.appClient = deployment.appClient;
-    
-    this.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`, 'system');
+async deploy(admin: Agent, suffix: string = ''): Promise<void> {
+    const appName = `WeeklyGame${suffix}`; // Esempio: "PirateGame_Sim" vs "PirateGame"
+
+    // 1. Configura la Factory con il nome specifico
+    this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
+      defaultSender: admin.account.addr,
+      defaultSigner: admin.signer,
+      appName: appName, // Questo separa le istanze sulla chain
+    })
+
+    // 2. Deploy Idempotente (Stile GuessGame)
+    // Se l'app esiste già (stesso nome, stesso creatore), la riusa.
+    // Se non esiste o il codice è cambiato, la crea/aggiorna.
+    const { appClient, result } = await this.factory.deploy({
+      onUpdate: 'append', 
+      onSchemaBreak: 'append', 
+      suppressLog: true
+    })
+
+    this.appClient = appClient
+
+    // 3. Finanzia il contratto se necessario (idempotente)
+    await this.algorand.account.ensureFundedFromEnvironment(
+        appClient.appAddress, 
+        AlgoAmount.Algos(5)
+    )
+
+    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing';
+    this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
   }
 
   /**
@@ -342,6 +361,14 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         if (outcome === 'WIN') {
             this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
         }
+        else if (outcome === 'DRAW') {
+            this.log(`⚖️ ${agent.name} BREAK-EVEN (0 ALGO)`, 'game_event')
+            console.log(`Agent ${agent.name} broke even in session ${sessionId}`)
+        }
+          else {
+              this.log(`💸 ${agent.name} LOSES (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
+              console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO in session ${sessionId}`)
+            }
 
       } catch (e: any) {
         // error handling silently or debug log

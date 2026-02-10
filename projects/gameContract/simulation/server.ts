@@ -30,12 +30,13 @@ app.use(cors())
 app.use(express.json())
 
 // --- STATO ---
+// Aggiungiamo stateSnapshot all'interfaccia dei log nel server
 let simulationState = {
   isRunning: false,
   gameName: '',
   sessionId: '0', 
   round: 0,
-  logs: [] as { timestamp: number; agent: string; type: string; message: string }[]
+  logs: [] as { timestamp: number; agent: string; type: string; message: string; stateSnapshot: any }[]
 }
 
 let currentGameState: any = {
@@ -48,8 +49,19 @@ let currentGameState: any = {
   pirateData: null
 }
 
+// MODIFICA 1: addLog ora cattura lo stato corrente (Snapshot)
 const addLog = (agent: string, type: 'thought' | 'action' | 'system' | 'game_event', message: string) => {
-  const logEntry = { timestamp: Date.now(), agent, type, message }
+  // Facciamo una "Deep Copy" dello stato attuale per congelarlo nel tempo
+  const snapshot = JSON.parse(JSON.stringify(currentGameState));
+  
+  const logEntry = { 
+      timestamp: Date.now(), 
+      agent, 
+      type, 
+      message,
+      stateSnapshot: snapshot // <--- Il log si porta dietro lo stato di QUESTO momento
+  }
+  
   simulationState.logs.push(logEntry)
   if (simulationState.logs.length > 1000) simulationState.logs.shift()
   
@@ -67,7 +79,6 @@ const updateGameState = (updates: any) => {
 
 function getLastSessionId(gameName: string): number {
     const agentsDir = path.join(process.cwd(), 'simulation', 'data', 'agents');
-    // DEBUG PATH: Controlla nella console del server se questo percorso è giusto!
     console.log(`[SERVER] Checking history in: ${agentsDir}`);
     
     let maxSession = 0;
@@ -88,7 +99,7 @@ function getLastSessionId(gameName: string): number {
 // --- API ---
 
 app.get('/api/status', (req, res) => {
-  res.json({ ...simulationState, gameState: currentGameState })
+  return res.json({ ...simulationState, gameState: currentGameState })
 })
 
 app.post('/api/start', (req, res) => {
@@ -104,7 +115,7 @@ app.post('/api/start', (req, res) => {
 
 app.post('/api/stop', (req, res) => {
   simulationState.isRunning = false
-  res.json({ message: 'Stopping...' })
+  return res.json({ message: 'Stopping...' })
 })
 
 app.get('/api/agent-stats', (req, res) => {
@@ -145,7 +156,7 @@ app.get('/api/agent-stats', (req, res) => {
             });
         }
     } catch (e) { console.error("Stats error", e); }
-    res.json(stats);
+    return res.json(stats);
 })
 
 app.get('/api/history/:gameId', (req, res) => {
@@ -233,9 +244,13 @@ async function runGameLogic(gameName: string) {
 
     game.setLogger((msg, type) => addLog('Game', type || 'game_event', msg));
     
-    // === AGENTI INTELLIGENTI (COPIATI DAL MAIN.TS) ===
-    // IMPORTANTE: Queste definizioni devono essere IDENTICHE al main.ts 
-    // affinché gli agenti si comportino allo stesso modo.
+    if ('setStateUpdater' in game) {
+        (game as any).setStateUpdater((updates: any) => {
+            updateGameState(updates);
+        });
+    }
+    
+    // === AGENTI INTELLIGENTI ===
     const agents = [
         new Agent(
           algorand.account.random().account,
@@ -515,17 +530,19 @@ async function runGameLogic(gameName: string) {
     agents.forEach(a => {
         initialAgentState[a.name] = { status: 'initializing', profit: 0 }
         a.setLogger((name, type, msg) => {
-            addLog(name, type, msg)
+            // MODIFICA CRITICA 2: Prima aggiorniamo stato, poi creiamo il log (che prende lo snapshot)
             const newState: any = { status: type === 'thought' ? 'thinking' : 'decided' }
             if (type === 'action') newState.lastAction = msg
+            
             updateGameState({ agents: { ...currentGameState.agents, [name]: { ...currentGameState.agents[name], ...newState } } })
+            addLog(name, type, msg)
         })
     })
     updateGameState({ agents: initialAgentState })
 
     addLog('System', 'system', 'Funding agents...')
     await Promise.all(agents.map(a => algorand.account.ensureFundedFromEnvironment(a.account.addr, AlgoAmount.Algos(100))))
-    await game.deploy(agents[0])
+    await game.deploy(agents[0], '_sim')
     
     updateGameState({ phase: 'DEPLOYED' })
     addLog('System', 'system', 'Contract deployed.')
@@ -552,6 +569,7 @@ async function runGameLogic(gameName: string) {
                     const over = await multiGame.playRound(agents, sessionId, r)
                     if (over) break
                 }
+                await multiGame.claim(agents, sessionId, visualSessionId)
                 await multiGame.finalize(agents, sessionId)
             } else {
                 updateGameState({ phase: 'COMMIT' })

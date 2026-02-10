@@ -168,11 +168,6 @@ export default function SimulationHome() {
                     <SessionHistoryList 
                       sessions={sessions}
                       loading={isLoading}
-                      onSessionClick={(session) => {
-                        console.log('Session clicked:', session)
-                        // TODO: Navigate to detail view
-                        // navigate(`/simulation/session/${game.id}/${session.session}`)
-                      }}
                     />
                   </div>
                 )}

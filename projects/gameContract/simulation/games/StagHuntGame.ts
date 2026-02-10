@@ -25,13 +25,12 @@ interface RoundSecret {
 export class StagHuntGame implements IBaseGameAdapter {
   readonly name = 'StagHunt'
 
-  // --- LOGGER IMPLEMENTATION ---
   private log: GameLogger = () => {}
 
   public setLogger(logger: GameLogger) {
     this.log = logger
   }
-  // -----------------------------
+
 
   // Tracks the cooperation rate from the previous round to help Agents learn.
   private lastCooperationRate: number | null = null
@@ -56,16 +55,35 @@ export class StagHuntGame implements IBaseGameAdapter {
     revealPhase: 10n,
   }
 
-  async deploy(deployer: Agent): Promise<void> {
-    this.log(`\n🛠 Deploying ${this.name} logic...`, 'system')
-    
-    // Esegue il deploy usando lo script specifico importato in alto
-    const deployment = await deploy();
-    
-    // Salva i riferimenti dentro la classe
-    this.appClient = deployment.appClient;
-    
-    this.log(`✅ ${this.name} ready (App ID: ${deployment.appId})`, 'system');
+async deploy(admin: Agent, suffix: string = ''): Promise<void> {
+    const appName = `StagHunt${suffix}`; // Esempio: "PirateGame_Sim" vs "PirateGame"
+
+    // 1. Configura la Factory con il nome specifico
+    this.factory = this.algorand.client.getTypedAppFactory(StagHuntFactory, {
+      defaultSender: admin.account.addr,
+      defaultSigner: admin.signer,
+      appName: appName, // Questo separa le istanze sulla chain
+    })
+
+    // 2. Deploy Idempotente (Stile GuessGame)
+    // Se l'app esiste già (stesso nome, stesso creatore), la riusa.
+    // Se non esiste o il codice è cambiato, la crea/aggiorna.
+    const { appClient, result } = await this.factory.deploy({
+      onUpdate: 'append', 
+      onSchemaBreak: 'append', 
+      suppressLog: true
+    })
+
+    this.appClient = appClient
+
+    // 3. Finanzia il contratto se necessario (idempotente)
+    await this.algorand.account.ensureFundedFromEnvironment(
+        appClient.appAddress, 
+        AlgoAmount.Algos(5)
+    )
+
+    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing';
+    this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
   }
 
   /**
@@ -111,8 +129,8 @@ export class StagHuntGame implements IBaseGameAdapter {
 
     const sessionId = Number(result.return) + 1
     this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
+    console.log(`Session ${sessionId} created with config:`, this.sessionConfig)
 
-    // Fast-forward the chain to the start round
     await this.waitUntilRound(startAt)
     return result.return!
   }
@@ -122,6 +140,7 @@ export class StagHuntGame implements IBaseGameAdapter {
    */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
+    console.log(`Starting commit phase for session ${sessionId}...`)
 
     // Fetch global state to inform agents about current Jackpot and Threshold
     const globalState = await this.appClient!.state.global.getAll()
@@ -139,6 +158,7 @@ export class StagHuntGame implements IBaseGameAdapter {
       let safeChoice = decision.choice
       if (safeChoice !== 0 && safeChoice !== 1) {
         this.log(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0 (Hare)`, 'system')
+        console.warn(`Agent ${agent.name} returned invalid choice:`, safeChoice)
         safeChoice = 0
       }
 
@@ -235,6 +255,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
+    console.log(`Starting reveal phase for session ${sessionId}...`)
     // Fast-forward chain to the reveal phase
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
@@ -255,9 +276,11 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
             suppressLog: true,
           })
           this.log(`[${agent.name}] Revealed: ${secret.choice === 1 ? '🦌 STAG' : '🐇 HARE'}`, 'game_event')
+          console.log(`Agent ${agent.name} revealed choice ${secret.choice} with salt ${secret.salt}`)
         } catch (e) {
           console.error(`Error revealing for ${agent.name}:`, e)
           this.log(`[${agent.name}] Error revealing move`, 'system')
+          console.error(`Reveal error for ${agent.name}:`, e)
         }
       }),
     )
@@ -270,6 +293,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 3: RESOLUTION ---`, 'system')
+    console.log(`Starting resolution phase for session ${sessionId}...`)
     // Fast-forward chain to the resolution phase
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
@@ -285,6 +309,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     if (totalRevealed > 0) {
       this.lastCooperationRate = stags / totalRevealed
       this.log(`📊 Cooperation rate: ${(this.lastCooperationRate * 100).toFixed(1)}%`, 'game_event')
+      console.log(`Cooperation rate for session ${sessionId}: ${(this.lastCooperationRate * 100).toFixed(1)}% (${stags} Stags out of ${totalRevealed} revealed)`)
     } else {
       this.lastCooperationRate = 0
     }
@@ -309,7 +334,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
    */
   async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     this.log('\n--- PHASE 4: CLAIM & FEEDBACK ---', 'system')
-
+    console.log(`Starting claim phase for session ${sessionId}...`)
     for (const agent of agents) {
       let outcome = 'LOSS'
       let netProfitAlgo = -Number(this.participationAmount.microAlgos) / 1_000_000
@@ -332,14 +357,16 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         
         if (outcome === 'WIN') {
             this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
-        }
-
-      } catch (e: any) {
-        if (e.message && e.message.includes('assert failed')) {
-          // this.log(`${agent.name}: LOSS`, 'game_event') 
+            console.log(`Agent ${agent.name} won ${netProfitAlgo.toFixed(2)} ALGO in session ${sessionId}`)
+        } else if (outcome === 'DRAW') {
+            this.log(`🤝 ${agent.name} breaks even. (0 ALGO)`, 'game_event')
+            console.log(`Agent ${agent.name} broke even in session ${sessionId}`)
         } else {
-          // this.log(`${agent.name}: ERROR`, 'system')
+            this.log(`💸 ${agent.name} loses. (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
+            console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO in session ${sessionId}`)
         }
+      } catch (e: any) {
+          this.log(`${agent.name}: ERROR`, 'system')
       }
 
       // Feedback loop: Update agent's memory with the result

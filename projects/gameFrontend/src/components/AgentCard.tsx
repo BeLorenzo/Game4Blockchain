@@ -1,8 +1,24 @@
 import React, { useEffect, useState } from 'react'
 
+// Interfaccia completa che include i dati dinamici dal server
+interface AgentStatsResponse {
+  totalGames: number
+  winRate: number
+  totalProfit: number
+  // Aggiungiamo i campi opzionali per la personalità dinamica
+  personality?: {
+    riskTolerance: number
+    trustInOthers: number
+    wealthFocus: number
+    fairnessFocus: number
+    curiosity: number
+  }
+}
+
 interface AgentProfile {
   name: string
   description: string
+  // Questa rimane come "default" iniziale
   personality: {
     riskTolerance: number
     trustInOthers: number
@@ -19,22 +35,15 @@ interface AgentCardProps {
 }
 
 export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
-  const [stats, setStats] = useState<{
-    totalGames: number
-    winRate: number
-    totalProfit: number
-  } | null>(null)
+  const [stats, setStats] = useState<AgentStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch real stats from server
     fetch('http://localhost:3000/api/agent-stats')
       .then(res => res.json())
       .then(data => {
         if (data && data[agent.name]) {
           setStats(data[agent.name])
-        } else {
-          setStats({ totalGames: 0, winRate: 0, totalProfit: 0 })
         }
         setLoading(false)
       })
@@ -50,10 +59,12 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
     return 'bg-red-500'
   }
 
+  // LOGICA DINAMICA: Usa la personalità dal server se c'è, altrimenti quella statica
+  const activePersonality = stats?.personality || agent.personality;
+
   return (
     <div className="relative w-full rounded-2xl border border-white/10 bg-[#111] shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all duration-300 overflow-hidden group">
       
-      {/* Background gradient */}
       <div className={`absolute top-0 right-0 w-32 h-32 ${agent.color} opacity-10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all duration-500 group-hover:opacity-20`}></div>
 
       <div className="p-6 md:p-8 relative z-10">
@@ -74,21 +85,13 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
           </div>
         </div>
 
-        {/* Stats (from real JSON files) */}
+        {/* Stats */}
         {loading ? (
           <div className="flex justify-center items-center h-20 mb-6">
             <span className="loading loading-spinner loading-sm text-primary"></span>
           </div>
         ) : stats ? (
-          <div className="grid grid-cols-3 gap-3 mb-6 p-4 rounded-lg bg-black/40 border border-white/5">
-            <div className="text-center">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Games</div>
-              <div className="text-xl font-bold text-white">{stats.totalGames}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Win Rate</div>
-              <div className="text-xl font-bold text-primary">{stats.winRate.toFixed(0)}%</div>
-            </div>
+          <div className="gap-3 mb-6 p-4 rounded-lg bg-black/40 border border-white/5">
             <div className="text-center">
               <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Profit</div>
               <div className={`text-xl font-bold ${stats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -98,15 +101,15 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
           </div>
         ) : (
           <div className="text-center text-xs text-gray-600 mb-6 p-4">
-            No stats available yet. Run some simulations!
+            No stats available yet.
           </div>
         )}
 
-        {/* Personality Traits */}
+        {/* Personality Matrix (DINAMICA) */}
         <div className="space-y-3">
           <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Personality Matrix</h4>
           
-          {Object.entries(agent.personality).map(([trait, value]) => (
+          {Object.entries(activePersonality).map(([trait, value]) => (
             <div key={trait} className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-400 capitalize">{trait.replace(/([A-Z])/g, ' $1').trim()}</span>
