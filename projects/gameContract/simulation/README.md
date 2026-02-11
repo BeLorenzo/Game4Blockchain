@@ -2,7 +2,7 @@
 
 > Multi-agent game theory experiments powered by LLMs
 
-This system enables running automated game theory experiments with AI agents that have distinct personalities, learning capabilities, and strategic approaches.
+This system enables running automated game theory experiments with AI agents that have distinct personalities, learning capabilities, and strategic approaches. It includes a headless simulation mode, a fully-featured Express API server for UI integration, and advanced CLI statistics generation.
 
 ---
 
@@ -12,23 +12,14 @@ This system enables running automated game theory experiments with AI agents tha
 
 A sophisticated simulation framework that:
 - Deploys smart contracts on LocalNet
-- Creates AI agents with unique psychological profiles
-- Runs multiple game rounds automatically
+- Creates AI agents with unique psychological profiles and persistent memory.
+- Runs multiple game rounds automatically (both single-round and multi-round negotiation games).
 - Collects and analyzes behavioral data
-- Tests game theory hypotheses with machine learning
+- Provides an Express API to stream real-time state to a frontend
 
 ### Why AI Agents?
-
-**Traditional Testing Limitations:**
-- Humans are slow and expensive
-- Hard to isolate specific strategies
-- Difficult to reproduce results
-- Limited sample size
-
-**AI Agent Advantages:**
 - ✅ Run 100+ rounds without interruptions
 - ✅ Precise personality control
-- ✅ Perfect reproducibility
 - ✅ Scales to any number of players
 - ✅ Learn from experience across games
 
@@ -44,10 +35,12 @@ simulation/
 ├── Agent.ts             # AI agent with personality & memory
 ├── llm.ts               # LLM integration (Ollama)
 ├── stats.ts             # Results visualization
+├── server.ts            # Express API server for UI integration
 ├── games/
 │   ├── IGameAdapter.ts  # Common interface
 │   ├── StagHuntGame.ts  # StagHunt implementation
 │   ├── GuessGame.ts     # GuessGame implementation
+│   ├── PirateGame.ts    # PirateGame implementation
 │   └── WeeklyGame.ts    # WeeklyGame implementation
 └── data/
     └── agents/          # Persistent agent memories (JSON)
@@ -58,7 +51,7 @@ simulation/
 
 ### Psychological Profile
 
-Each agent has 8 core traits (0-1 scale):
+Each agent has 8 core traits (0-1 scale). See the Agent.ts and main.ts files for the exact archetypes (Alpha, Beta, Gamma, Delta, Epsilon, Zeta, Eta).
 
 ```typescript
 interface PsychologicalProfile {
@@ -108,285 +101,146 @@ interface AgentMentalState {
 
 ---
 
-## 👥 Included Agent Archetypes
-
-### 1. Alpha - The Scientist (EV Maximizer)
-
-**Strategy**: Pure Expected Value optimization
-
-```typescript
-{
-  personalityDescription: "EV Maximizer. Analyze stats strictly.",
-  riskTolerance: 0.3,
-  wealthFocus: 1.0,
-  adaptability: 1.0,
-  resilience: 1.0
-}
-```
-
-**Behavior:**
-- Analyzes `performanceStats` for highest `avgProfit`
-- Ignores emotions and sunk costs
-- Explores undersampled options for data
-- Purely rational decision-making
-
-**Best In**: Games with clear probability calculations
-
----
-
-### 2. Beta - The Paranoid (Minimax)
-
-**Strategy**: Minimize maximum loss
-
-```typescript
-{
-  personalityDescription: "Minimax. Avoid worst-case scenarios.",
-  riskTolerance: 0.0,
-  trustInOthers: 0.0,
-  adaptability: 0.2,
-  resilience: 0.1
-}
-```
-
-**Behavior:**
-- Identifies worst possible outcome for each choice
-- Chooses option with least damaging failure mode
-- Bans choices that caused losses > 10 ALGO
-- Assumes others will hurt them
-
-**Best In**: High-risk games, volatile environments
-
----
-
-### 3. Gamma - The Gambler (Volatility Hunter)
-
-**Strategy**: Chase maximum payouts
-
-```typescript
-{
-  personalityDescription: "Volatility Hunter. Bold strategic moves.",
-  riskTolerance: 1.0,
-  wealthFocus: 0.8,
-  adaptability: 0.9,
-  curiosity: 0.8
-}
-```
-
-**Behavior:**
-- Finds choice with highest single profit in history
-- After loss: makes BOLDER strategic move
-- After win: presses advantage
-- Never plays conservatively
-
-**Best In**: Winner-take-all games, high-variance scenarios
-
----
-
-### 4. Delta - The Avenger (Tit-for-Tat)
-
-**Strategy**: Mirror group behavior
-
-```typescript
-{
-  personalityDescription: "Tit-for-Tat reciprocity.",
-  riskTolerance: 0.4,
-  fairnessFocus: 1.0,
-  adaptability: 1.0,
-  patience: 0.2
-}
-```
-
-**Behavior:**
-- If previous round = WIN → Cooperate this round
-- If previous round = LOSS → Defect/Punish this round
-- Teaches group that betrayal has consequences
-- Immediate retaliation
-
-**Best In**: Repeated games, cooperation scenarios
-
----
-
-### 5. Epsilon - The Cooperator (Grim Trigger)
-
-**Strategy**: Maximize global wealth
-
-```typescript
-{
-  personalityDescription: "Systemic Cooperator. Maximize total wealth.",
-  riskTolerance: 0.6,
-  trustInOthers: 1.0,
-  fairnessFocus: 0.9,
-  wealthFocus: 0.1
-}
-```
-
-**Behavior:**
-- Calculates which choice maximizes TOTAL group wealth
-- Always chooses high-trust options (Stag, high numbers)
-- EXCEPTION: Switches to survival mode if personal wealth < 30%
-- Altruistic until desperate
-
-**Best In**: Cooperation games with shared benefits
-
----
-
-### 6. Zeta - The Opportunist (Trend Follower)
-
-**Strategy**: Copy current winners
-
-```typescript
-{
-  personalityDescription: "Trend Follower. Copy winning strategies.",
-  riskTolerance: 0.5,
-  wealthFocus: 0.9,
-  patience: 0.0,
-  adaptability: 1.0
-}
-```
-
-**Behavior:**
-- Analyzes `winRate` and `timesChosen` in stats
-- Identifies "crowd favorite" from last 3 rounds
-- COPIES the winning strategy
-- Drops strategies after 2 losses
-- Zero loyalty to beliefs
-
-**Best In**: Trending markets, momentum-based games
-
----
-
-### 7. Eta - The Contrarian (Anti-Crowd)
-
-**Strategy**: Bet on minority outcomes
-
-```typescript
-{
-  personalityDescription: "Contrarian. Value where others aren't.",
-  riskTolerance: 0.8,
-  trustInOthers: 0.2,
-  curiosity: 0.9,
-  resilience: 0.9
-}
-```
-
-**Behavior:**
-- Looks at `timesChosen` in stats
-- Chooses LEAST popular option
-- Bets on minority having less competition
-- If everyone risks → plays safe
-- If everyone's safe → takes risks
-
-**Best In**: Minority games (WeeklyGame), contrarian value plays
-
----
-
 ## 🎮 Game Adapters
 
-### Interface
+The framework handles two fundamentally different types of games:
 
-Each game implements:
-
+### Single-Round Game
 ```typescript
-interface IGameAdapter {
-  readonly name: string;
-  
-  deploy(admin: Agent): Promise<bigint>;
-  startSession(dealer: Agent): Promise<bigint>;
-  play_Commit(agents: Agent[], sessionId: bigint, round: number): Promise<void>;
-  play_Reveal(agents: Agent[], sessionId: bigint, round: number): Promise<void>;
-  resolve(dealer: Agent, sessionId: bigint, round: number): Promise<void>;
-  play_Claim(agents: Agent[], sessionId: bigint, round: number): Promise<void>;
+interface IBaseGameAdapter {
+  readonly name: string
+
+  setLogger(logger: GameLogger): void;
+  setStateUpdater(updater: (updates: any) => void): void;
+
+  deploy(deployer: Account, suffix: string): Promise<void>;
+  startSession(dealer: Agent): Promise<bigint>
+  commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void>
+  reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void>
+  resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void>
+  claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void>
+}
+```
+### Multi-Round Games
+```typescript
+interface IMultiRoundGameAdapter extends IBaseGameAdapter  {
+  setup(agents: Agent[], sessionId: bigint): Promise<void>
+  getMaxTotalRounds(sessionId: bigint): Promise<number>; 
+  playRound(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<boolean>;
+  finalize(agents: Agent[], sessionId: bigint): Promise<void>;
 }
 ```
 
-### Adapter Responsibilities
+### Architecture & Prompt Assembly
 
-**1. Game Context (Objective Information):**
-- Game rules and mechanics (same for all players)
-- Current game state (round number, jackpot, etc.)
-- Strategic hints and considerations (generic advice)
-- Historical game data (cooperation rates, past averages, etc.)
+The framework uses a strict separation of concerns when building the LLM context.
 
-**2. Agent Interrogation:**
-- Queries each agent for their personality via `agent.profile.personalityDescription`
-- Retrieves agent's learned lessons via `agent.getLessonsLearned(game)`
-- Fetches recent move history via `agent.getRecentHistory(game, 3)`
-- Gets current mental state via `agent.getMentalState()`
 
-**3. Prompt Assembly:**
+**1. The Game Adapter's Job (Objective Context):**
+The adapter (e.g., `PirateGame`, `GuessGame`) is only responsible for the state of the board. It generates a `gamePrompt` containing:
 
-The adapter combines game context + agent data into a complete prompt:
+* Game rules and absolute mechanics
+* Current dynamic state (round number, alive players, pot size)
+* Strategic generic hints
+
+**2. The Agent's Job (Subjective Context):**
+The adapter passes the `gamePrompt` to `agent.playRound(name, prompt)`. Inside the `Agent` class, the framework automatically wraps the game context with the agent's internal state using `buildFullPrompt()`:
+
+* `profile.personalityDescription` (Core archetype)
+* `getProfileSummary()` (Risk, trust, etc. on a 0-10 scale)
+* `getStatsSummary(game)` (Past performance, win rates, historical ROI)
+* `getRecentHistory(game)` (Last 5 moves)
+* `getMentalState()` (Current optimism/frustration)
+
+**The Final Prompt Structure (Constructed inside Agent.ts):**
+
+```text
+You are [Agent Name].
+
+═══════════════════════════════════════════════════════════
+GAME RULES AND CONTEXT
+═══════════════════════════════════════════════════════════
+[Injected by Game Adapter: Rules, Pot, Deadlines, Hints]
+
+═══════════════════════════════════════════════════════════
+YOUR IDENTITY AND KNOWLEDGE
+═══════════════════════════════════════════════════════════
+YOUR PERSONALITY: [Core traits]
+YOUR PARAMETERS: [Risk tolerance, Trust, etc.]
+
+════════ YOUR MEMORY ════════
+[Injected by Agent Memory: Win rates and past ROI for choices]
+
+YOUR RECENT MOVES: 
+[Injected by Agent Memory: Last 5 choices and outcomes]
+
+MENTAL STATE:
+[Injected by Agent Psychology: Frustration levels, Loss streaks]
+═══════════════════════════════════════════════════════════
+[Expected JSON output format]
 
 ```
-GAME RULES: [Objective description - same for everyone]
-CURRENT STATUS: [Round data, jackpot - same for everyone]
-STRATEGIC HINTS: [Generic advice - same for everyone]
-═══════════════════════════════════════════════════════════
 
-YOUR PERSONALITY: [From agent.profile - unique per agent]
-YOUR PARAMETERS: [From agent.getProfileSummary() - unique per agent]
-═══════════════════════════════════════════════════════════
+**Key Principle**:
 
-WHAT YOU'VE LEARNED: [From agent.getLessonsLearned() - unique per agent]
-YOUR RECENT MOVES: [From agent.getRecentHistory() - unique per agent]
-MENTAL STATE: [From agent.getMentalState() - unique per agent]
-═══════════════════════════════════════════════════════════
-[Decision request]
-```
-**Key Principle**: 
-- **Game Adapter** = "What's happening in the game?" (objective context)
-- **Agent** = "Who am I and what have I learned?" (subjective state)
-- **Final Prompt** = Combination of bot
+* **Game Adapter** = *"Here are the rules and the current state of the world."*
+* **Agent** = *"Here is who I am, how stressed I am, and what I learned from my past mistakes."*
 
-**4. Phase Management:**
-- Handles commit/reveal/claim sequences
-- Manages blockchain timing (waiting for rounds)
-- Collects round results for next iteration
+**3. Phase Management:**
+The adapters also handle all blockchain interactions, managing the commit/reveal sequences, waiting for block progression, calculating smart contract fees (MBR), and parsing the on-chain bytes into readable data.
 
 ---
 
-## 🚀 Running Simulations
+## 🔌 API Server (`server.ts`)
+
+The simulation can run as a backend service for a frontend UI, running on `http://localhost:3000`.
+
+**Key Endpoints:**
+
+* `GET /api/status`: Returns current game state and a log timeline for synchronized UI playback.
+* `POST /api/start`: Starts a new simulation session for a specific game.
+* `GET /api/agent-stats`: Retrieves aggregated stats (win rates, total profit) for all agents.
+* `GET /api/history/:gameId`: Returns complete historical session data.
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
+
+You need [Ollama](https://ollama.ai/) installed locally to run the LLMs.
 
 ```bash
 # 1. Install Ollama
 # macOS: brew install ollama
 # Linux: curl https://ollama.ai/install.sh | sh
 
-# 2. Pull LLM model
-ollama pull llama3
+# 2. Pull the required model (Hermes 3 is default. You can pull and use others by modifying the MODEL constant in main.ts and server.ts)
+ollama pull hermes3
 
 # 3. Start Ollama server
 ollama serve
 ```
 
-### Quick Start
+### Running the Simulation
+
+You can run the simulation in two ways:
+
+**Option A: Headless CLI Mode**
+Edit `main.ts` to select your game and number of rounds, then run:
 
 ```bash
-# From projects/gameContract/simulation/
-npm run simulate
+npm run simulation
 ```
 
-### Configuration
-
-Edit `main.ts`:
-
-```typescript
-// Number of game rounds
-const NUM_ROUNDS = 10;
-
-// Initial funding per agent (microAlgos)
-const INITIAL_FUNDING = 100_000;
-
-// Game selection
-const game = new StagHuntGame();
-// const game = new GuessGame();
-// const game = new WeeklyGame();
+**Option B: API Server Mode (For UI)**
+```bash
+npm run server
 ```
+---
 
 ### Custom Agent Setup
-
+You can easily inject custom agents into the simulation by defining their psychological traits. Just add them to the `agents` array in `main.ts` or `server.ts`:
 ```typescript
 const myAgent = new Agent(
   algorand.account.random().account,
@@ -402,38 +256,25 @@ const myAgent = new Agent(
     resilience: 0.7,
     curiosity: 0.5,
   },
-  'llama3:latest'
+  MODEL
 );
 ```
 
 ---
 
 ## 📊 Analyzing Results
+Run the built-in analytics engine to parse the agent JSONs and generate ASCII visualizations.
 
 ### Statistics Dashboard
 
 ```bash
 npm run stats
 ```
+**What it does:**
 
-**Output:**
-```
-🔸 GAME: STAGHUNT
-
-Agent          | P1   P2   P3   P4   P5
-───────────────────────────────────────
-Alpha          | 🦌   🦌   🐇   🦌   🦌
-Beta           | 🐇   🐇   🐇   🐇   🐇
-Gamma          | 🦌   🦌   🦌   🐇   🦌
-Delta          | 🦌   🐇   🦌   🦌   🦌
-```
-
-**Legend:**
-- 🦌 = Stag (cooperation)
-- 🐇 = Hare (safety)
-- Green = WIN
-- Red = LOSS
-- Yellow = TIE
+* **Single-Round Games:** Generates a matrix timeline of agent choices across all sessions.
+* **Multi-Round Games:** Generates a detailed session-by-session progression tree (e.g., showing Who proposed, Voting splits, Who was eliminated, and Final profits).
+* **Virtual Sessions:** Automatically detects simulation restarts/crashes and aligns session numbering for clean historical tracking.
 
 ### Data Files
 
@@ -474,39 +315,6 @@ Agent memories stored in `/data/agents/`:
 }
 ```
 
----
-
-### Learning System
-
-**Exponential Moving Average:**
-```typescript
-stat.avgProfit = stat.avgProfit * 0.7 + newProfit * 0.3;
-```
-- Recent results weighted more heavily
-- Gradual adaptation to changing conditions
-
-**Streak Detection:**
-```typescript
-if (consecutiveLosses >= 3 && adaptability > 0.5) {
-  frustration *= 0.6;  // Reset frustration
-  optimism = 0.5;      // Force strategy change
-}
-```
-
-### Mental State Updates
-
-```typescript
-// After loss
-if (isStubbornness) pain *= 2.0;  // Punish repeating failed moves
-if (resilience > 0.7) pain *= 0.6;  // Resilient agents less affected
-
-// After win
-const recovery = 0.2 * (1 + resilience * 0.3);
-frustration = Math.max(0, frustration - recovery);
-```
-
----
-
 ## 🐛 Troubleshooting
 
 ### "Connection refused to Ollama"
@@ -521,10 +329,10 @@ curl http://localhost:11434/api/tags
 ### "Model not found"
 ```bash
 # Pull the model
-ollama pull llama3
+ollama pull hermes3
 
 # Or use a different model in Agent constructor
-new Agent(..., 'llama2:latest')
+new Agent(..., 'llama3:latest')
 ```
 
 ### "Insufficient funds"

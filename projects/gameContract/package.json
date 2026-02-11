@@ -18,7 +18,7 @@
     "start": "npx ts-node simulation/main.ts",
     "stats": "npx ts-node simulation/stats.ts",
     "simulation": "ts-node simulation/main.ts",
-    "serve-simulation": "ts-node simulation/server.ts"
+    "server": "ts-node simulation/server.ts"
   },
   "engines": {
     "node": ">=22.0",

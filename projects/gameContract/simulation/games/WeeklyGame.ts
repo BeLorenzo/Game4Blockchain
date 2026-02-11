@@ -10,52 +10,90 @@ import { IBaseGameAdapter, GameLogger } from './IBaseGameAdapter'
 import { deploy } from '../../smart_contracts/weeklyGame/deploy-config'
 import algosdk, { Account, Address } from 'algosdk'
 
+/**
+ * Interface representing a round secret (choice and salt)
+ * Used to generate the hash during the commit phase
+ */
 interface RoundSecret {
   choice: number
   salt: string
 }
 
+/**
+ * Implementation of the "Weekly Lottery" (Minority Game).
+ * 
+ * Game Mechanics:
+ * - Each player chooses a day of the week (0=Monday to 6=Sunday)
+ * - The total pot is split equally among all active days (days with at least one vote)
+ * - Each active day's share is then divided among players who chose that day
+ * - Players on less crowded days receive larger shares (minority advantage)
+ */
 export class WeeklyGame implements IBaseGameAdapter {
+  /** Game identifier name */
   readonly name = 'WeeklyGame'
 
+  /** Logger for game event tracking */
   private log: GameLogger = () => {}
-  private stateUpdater: (updates: any) => void = () => {}  // <-- AGGIUNTO
+  /** Callback to update game state (used for UI updates) */
+  private stateUpdater: (updates: any) => void = () => {}  // <-- ADDED
 
+  /**
+   * Sets the logger for event tracking
+   */
   public setLogger(logger: GameLogger) {
     this.log = logger
   }
 
-  // <-- NUOVO METODO
+  /**
+   * Sets the callback to update game state
+   */
   public setStateUpdater(updater: (updates: any) => void) {
     this.stateUpdater = updater
   }
 
+  /** Record of votes from the last round (day name -> vote count) */
   private lastRoundVotes: Record<string, number> | null = null
+  /** Algorand client for blockchain interaction */
   private algorand = AlgorandClient.defaultLocalNet()
+  /** Factory for smart contract deployment */
   private factory: WeeklyGameFactory | null = null
+  /** Client to interact with deployed smart contract */
   private appClient: WeeklyGameClient | null = null
+  /** Participation fee for the game (10 ALGO) */
   private participationAmount = AlgoAmount.Algos(10)
+  /** Map of agents' secrets for current round (addr -> RoundSecret) */
   private roundSecrets: Map<string, RoundSecret> = new Map()
+  /** Configuration of current session (timing based on Algorand rounds) */
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
+  /**
+   * Game phase duration parameters (expressed in Algorand rounds)
+   * - warmUp: wait time before game starts
+   * - commitPhase: duration of commit phase
+   * - revealPhase: duration of reveal phase
+   */
   private durationParams = {
     warmUp: 3n,
     commitPhase: 15n,
     revealPhase: 10n,
   }
 
+  /** Array of day names for display and mapping */
   private dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
+  /**
+   * Deploys the smart contract on Algorand
+   */
   async deploy(admin: Account, suffix: string = ''): Promise<void> {
     const appName = `WeeklyGame${suffix}`
 
     const signer = algosdk.makeBasicAccountTransactionSigner(admin)
         
-        this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
-          defaultSender: admin.addr,
-          defaultSigner: signer,
-          appName: appName,
-        })
+    this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
+      defaultSender: admin.addr,
+      defaultSigner: signer,
+      appName: appName,
+    })
 
     const { appClient, result } = await this.factory.deploy({
       onUpdate: 'append', 
@@ -74,6 +112,9 @@ export class WeeklyGame implements IBaseGameAdapter {
     this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
   }
 
+  /**
+   * Starts a new game session on Algorand
+   */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
@@ -112,7 +153,6 @@ export class WeeklyGame implements IBaseGameAdapter {
     const sessionId = Number(result.return) + 1
     this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
 
-    // <-- AGGIORNA POT INIZIALE
     const initialPot = Number(this.participationAmount.microAlgos) * 0 / 1_000_000
     this.stateUpdater({ pot: initialPot })
 
@@ -120,16 +160,16 @@ export class WeeklyGame implements IBaseGameAdapter {
     return result.return!
   }
 
+  /**
+   * COMMIT phase: Agents choose and commit their day selection (0-6)
+   */
   async commit(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
 
-    // <-- AGGIORNA POT
     const currentPot = Number(this.participationAmount.microAlgos) * agents.length / 1_000_000
     this.stateUpdater({ pot: currentPot })
 
-    // <-- LOOP SEQUENZIALE
     for (const agent of agents) {
-      // 1. Agente sta pensando
       this.stateUpdater({
         agents: {
           [agent.name]: { status: 'thinking' }
@@ -137,22 +177,19 @@ export class WeeklyGame implements IBaseGameAdapter {
       })
       this.log(`[${agent.name}] Analyzing day distribution...`, 'thought')
 
-      // 2. Ottieni decisione
       const prompt = this.buildGamePrompt(agent, roundNumber)
       const decision = await agent.playRound(this.name, prompt)
 
-      // 3. Sanitize
+      // Sanitize choice (must be 0-6)
       let safeChoice = decision.choice
       if (safeChoice < 0 || safeChoice > 6) {
         this.log(`[${agent.name}] Invalid choice ${safeChoice}, defaulting to 0`, 'system')
         safeChoice = 0
       }
 
-      // 4. Genera salt
       const salt = crypto.randomBytes(16).toString('hex')
       this.roundSecrets.set(agent.account.addr.toString(), { choice: safeChoice, salt })
 
-      // 5. Aggiorna stato: agente ha deciso
       this.stateUpdater({
         agents: {
           [agent.name]: { 
@@ -163,7 +200,6 @@ export class WeeklyGame implements IBaseGameAdapter {
       })
       this.log(`[${agent.name}] Committed: ${this.dayNames[safeChoice]}`, 'action')
 
-      // 6. Submit
       const hash = this.getHash(safeChoice, salt)
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
@@ -180,6 +216,9 @@ export class WeeklyGame implements IBaseGameAdapter {
     }
   }
 
+  /**
+   * Builds agent prompt with game rules, historical data, and strategic hints
+   */
   private buildGamePrompt(agent: Agent, roundNumber: number): string {
     const gameRules = `
 GAME: Weekly Lottery (Minority Game)
@@ -209,9 +248,11 @@ Round: ${roundNumber}
 Entry fee: 10 ALGO
 `.trim()
 
+    // Add historical information if available
     if (this.lastRoundVotes === null) {
       situation += `\n\nFirst round - all days equally likely.`
     } else {
+      // Sort days by vote count (ascending)
       const sortedDays = Object.entries(this.lastRoundVotes)
         .map(([day, votes]) => ({ day, votes }))
         .sort((a, b) => a.votes - b.votes)
@@ -261,13 +302,15 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 `.trim()
   }
 
+  /**
+   * REVEAL phase: Agents reveal their committed day choices
+   */
   async reveal(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
-    // <-- LOOP SEQUENZIALE
     for (const agent of agents) {
         const secret = this.roundSecrets.get(agent.account.addr.toString())
         if (!secret) continue
@@ -303,17 +346,22 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     }
   }
 
+  /**
+   * RESOLVE phase: Empty in this implementation (resolution happens on-chain during claim)
+   */
   async resolve(dealer: Agent, sessionId: bigint, roundNumber: number): Promise<void> {
     return
   }
 
+  /**
+   * CLAIM phase: Agents claim winnings based on the day distribution
+   */
   async claim(agents: Agent[], sessionId: bigint, roundNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 3: CLAIM ---`, 'system')
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
-    // Raccogli voti
     const votes: Record<string, number> = {}
     this.dayNames.forEach((d) => (votes[d] = 0))
 
@@ -360,11 +408,8 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         } else {
             this.log(`💸 ${agent.name} LOSES (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
         }
-      } catch (e: any) {
-        // error handling
-      }
+      } catch (e: any) { }
 
-      // <-- AGGIORNA PROFIT IN TEMPO REALE
       this.stateUpdater({
         agents: {
           [agent.name]: {
@@ -378,6 +423,9 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     }
   }
 
+  /**
+   * Calculates SHA256 hash of a choice and salt
+   */
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -389,6 +437,10 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     )
   }
 
+  /**
+   * Waits until Algorand blockchain reaches a specific round
+   * Uses spam transactions to advance rounds in test environment
+   */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
     const currentRound = BigInt(status['lastRound'])
@@ -399,6 +451,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
     const spammer = await this.algorand.account.random()
     await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
 
+    // Send empty transactions to advance rounds
     for (let i = 0; i < blocksToSpam; i++) {
       await this.algorand.send.payment({
         sender: spammer.addr,

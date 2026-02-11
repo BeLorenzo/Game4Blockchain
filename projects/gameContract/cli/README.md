@@ -35,7 +35,9 @@ MNEMONIC="your twenty-four word mnemonic phrase here"
 If not already active:
 
 ```bash
-algokit localnet start
+algokit localnet start   # Starts the local Algorand node
+or
+algokit localnet reset   # Resets the chain state (crucial between test runs)
 ```
 
 ### 3. Launch the CLI
@@ -76,7 +78,7 @@ Use this option to open a new game table.
 
 After the commit phase ends:
 
-1. Select **`🔓 Reveal Move`**
+1. Select **`🔓 Reveal Move`** (or **`🔓 Reveal Vote`** for Pirate Game) 
 2. Enter the required data (Session ID, Move, Salt)
 3. The contract will verify your move
 
@@ -116,11 +118,13 @@ All games are fully functional with complete CLI integration!
 > Create Session → SESSION: 0, Fee: 1 ALGO
 > Join Game → Rock (0), Save salt: abc123...
 > Reveal Move → Rock + abc123...
+> Claim Winnings → Check results
 
 # Terminal 2 (Player 2)
 > Join Game → APP 1005, SESSION 0
 > Choose Paper (1), Save salt: def456...
-> Reveal Move → Paper + def456... → WINS 2 ALGO!
+> Reveal Move → Paper + def456... 
+> Claim Winnings → WINS 2 ALGO!
 ```
 
 ---
@@ -134,6 +138,7 @@ All games are fully functional with complete CLI integration!
 - Choose a day: Monday (0) to Sunday (6)
 - Prize pool divided across active days
 - Each day's pot split among its players
+- Least popular day wins the most
 
 **Example:**
 ```bash
@@ -159,6 +164,7 @@ All games are fully functional with complete CLI integration!
 - Stag (1): Risky, need 51%+ cooperation to win
 - Success: Stags split pot + Global Jackpot
 - Failure: Stags lose everything → feeds Jackpot
+- Must resolve session before claiming
 
 **Example:**
 ```bash
@@ -207,6 +213,40 @@ All games are fully functional with complete CLI integration!
 
 ---
 
+### 🎯 Pirate Game
+
+**Multi-round resource distribution with voting and elimination**
+
+**Rules:**
+- 3-20 pirates compete for treasure
+- Senior pirate proposes distribution
+- All pirates vote (commit-reveal)
+- >= 50% YES → Game ends, proposal executed
+- < 50% NO → Proposer eliminated, next round
+- Timeout system eliminates AFK players
+
+**Phases:**
+- Registration: Pirates join and pay entry fee
+- Proposal: Current senior proposes distribution
+- Vote Commit: Pirates commit vote (YES/NO)
+- Vote Reveal: Pirates reveal their vote
+- Execute Round: Check majority and proceed
+- Finished: Distribution complete
+
+**Example:**
+```bash
+# 5 pirates, 10 ALGO pot, Pirate #0 proposes:
+# P0: 6 ALGO, P1: 1 ALGO, P2: 1 ALGO, P3: 1 ALGO, P4: 1 ALGO
+
+# Voting Results: 3 YES, 2 NO → PASSED!
+# Distribution executed, game ends
+
+# If vote FAILED:
+# - Pirate #0 eliminated
+# - 4 pirates remain, Pirate #1 now proposes
+# - Process repeats until majority passes
+```
+
 ## 🛠️ Technical Details
 
 ### Architecture
@@ -220,10 +260,11 @@ cli/
 ├── ui.ts                 # Interactive menus (Inquirer)
 ├── utils.ts              # Shared utilities
 └── games/
-    ├── rps.ts           # RockPaperScissors (COMPLETE)
-    ├── stagHunt.ts      # StagHunt (TODO)
-    ├── guessGame.ts     # GuessGame (TODO)
-    └── weekly.ts        # WeeklyGame (TODO)
+    ├── rps.ts           # RockPaperScissors 
+    ├── stagHunt.ts      # StagHunt 
+    ├── guessGame.ts     # GuessGame 
+    ├── weekly.ts        # WeeklyGame
+    └── pirateGame.ts    # PirateGame 
 ```
 
 ### Plugin System
@@ -235,11 +276,27 @@ export const MyGameModule: IGameModule = {
   id: 'MYGAME',
   name: '🎲 My Game',
   
-  deploy: async (wallet) => { /* deploy logic. It needs to call initialize() */ },
+getAvailableActions: (): GameAction[] => [
+    { name: '🚀 Deploy', value: 'deploy' },
+    { name: '🆕 Create', value: 'create', separator: true },
+    { name: '👋 Join', value: 'join' },
+    { name: '🔓 Reveal', value: 'reveal' },
+    { name: '📊 Dashboard', value: 'status', separator: true },
+    { name: '💵 Claim', value: 'claim' },
+    ...
+  ],
+
+   deploy: async (wallet) => { /* deploy logic. It needs to call initialize() 
+           await appClient.send.initialize({
+                args: { gameType: 'MYGAME' },
+                sender: wallet.account.addr,
+             });
+    */ },
   create: async (wallet) => { /* create logic */ },
   join: async (wallet) => { /* join logic */ },
   reveal: async (wallet) => { /* reveal logic */ },
-  getStatus: async (wallet) => { /* status logic */ }
+  status: async (wallet) => { /* status logic */ },
+  claim: async (wallet) => { /* claim logic */ }
 };
 
 // Register in index.ts
@@ -281,6 +338,7 @@ await client.revealMove({ choice, salt });
 - 🟡 **Yellow**: Waiting/Transitioning
 - 🔴 **Red**: Closed/Expired
 - 🏁 **Finished**: Game completed
+- ⚖️ **Needs Action**: Requires resolve/execute
 
 ### Smart Prompts
 
@@ -288,6 +346,7 @@ await client.revealMove({ choice, salt });
 - Auto-calculates fees from on-chain data
 - Shows remaining rounds for each phase
 - Warns about expired sessions
+- Game-type verification prevents wrong contract usage
 
 ---
 
@@ -343,5 +402,48 @@ npm run cli
 # Terminal 3: Player 3 (temporary)
 npm run cli
 ```
+### Game-Specific Tips
 
+**Rock Paper Scissors:**
+- Quick 1v1 matches
+- Use timeout claim if opponent doesn't reveal
+- Perfect for testing basic commit-reveal
 
+**Weekly Lottery:**
+- Think contrarian: pick the least popular day
+- Monitor dashboard to see player distribution
+- No skill required, pure luck and strategy
+
+**Stag Hunt:**
+- Watch Global Jackpot accumulation
+- Cooperation threshold usually 51%
+- Safe players choose Hare, risk-takers choose Stag
+- Must call "Resolve" before claiming
+
+**Guess 2/3 Average:**
+- Pure game theory
+- Level-0 thinking: 66
+- Level-1 thinking: 44
+- Level-2 thinking: 29
+- Experienced players tend toward 0-10
+
+**Pirate Game:**
+- As proposer: give minimum to secure votes
+- As voter: calculate if next round is better
+- AFK players get eliminated via timeout
+- Senior position is powerful but not absolute
+- Complex multi-round strategy required
+
+---
+
+## 🤝 Contributing
+
+To add a new game:
+
+1. Create game module in `cli/games/yourGame.ts`
+2. Implement `IGameModule` interface
+3. Add game-specific logic
+4. Register in `cli/index.ts`
+5. Update this README with game rules
+
+---

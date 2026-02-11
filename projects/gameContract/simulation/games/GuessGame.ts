@@ -10,39 +10,82 @@ import { IBaseGameAdapter, GameLogger } from './IBaseGameAdapter'
 import { deploy } from '../../smart_contracts/guessGame/deploy-config'
 import algosdk, { Account, Address } from 'algosdk'
 
+/**
+ * Interface representing a round secret (choice and salt)
+ */
 interface RoundSecret {
   choice: number
   salt: string
 }
 
+/**
+ * Implementation of the "Guess 2/3 of the Average" game
+ * 
+ * This is a classic game theory problem where each player chooses
+ * a number between 0 and 100, and the winner is the one who chooses
+ * the number closest to 2/3 of the average of all chosen numbers.
+ * 
+ * The game runs on Algorand using smart contracts to ensure transparency
+ * and fair execution. It follows a commit-reveal pattern to prevent cheating.
+ * 
+ * Game phases:
+ * 1. COMMIT: Each player sends the hash of their choice (with salt)
+ * 2. REVEAL: Each player reveals their choice and salt to verify the hash
+ * 3. CLAIM: Players claim winnings, smart contract determines the winner
+ */
 export class GuessGame implements IBaseGameAdapter {
+  /** Game identifier name */
   readonly name = 'GuessGame'
 
+  /** Logger for game event tracking */
   private log: GameLogger = () => {}
+  /** Callback to update game state (used for UI updates) */
   private stateUpdater: (updates: any) => void = () => {}  
 
+  /**
+   * Sets the logger for event tracking
+   */
   public setLogger(logger: GameLogger) {
     this.log = logger
   }
 
+  /**
+   * Sets the callback to update game state
+   */
   public setStateUpdater(updater: (updates: any) => void) {
     this.stateUpdater = updater
   }
 
+  /** History of previous rounds (average and target) to help agents' decisions */
   private roundHistory: { avg: number; target: number }[] = []
+  /** Algorand client for blockchain interaction */
   private algorand = AlgorandClient.defaultLocalNet()
+  /** Factory for smart contract deployment */
   private factory: GuessGameFactory | null = null
+  /** Client to interact with deployed smart contract */
   private appClient: GuessGameClient | null = null
+  /** Participation fee for the game (10 ALGO) */
   private participationAmount = AlgoAmount.Algos(10)
+  /** Map of agents' secrets for current round (addr -> RoundSecret) */
   private roundSecrets: Map<string, RoundSecret> = new Map()
+  /** Configuration of current session (timing based on Algorand rounds) */
   private sessionConfig: { startAt: bigint; endCommitAt: bigint; endRevealAt: bigint } | null = null
 
+  /**
+   * Game phase duration parameters (expressed in Algorand rounds)
+   * - warmUp: wait time before game starts
+   * - commitPhase: duration of commit phase
+   * - revealPhase: duration of reveal phase
+   */
   private durationParams = {
     warmUp: 3n,
     commitPhase: 15n,
     revealPhase: 10n,
   }
 
+  /**
+   * Deploys the smart contract on Algorand
+   */
   async deploy(admin: Account, suffix: string = ''): Promise<void> {
     const appName = `GuessGame${suffix}`
 
@@ -54,6 +97,7 @@ export class GuessGame implements IBaseGameAdapter {
       appName: appName,
     })
 
+    // Deploy contract (create if doesn't exist, otherwise use existing)
     const { appClient, result } = await this.factory.deploy({
       onUpdate: 'append', 
       onSchemaBreak: 'append', 
@@ -71,6 +115,9 @@ export class GuessGame implements IBaseGameAdapter {
     this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
   }
 
+  /**
+   * Starts a new game session
+   */
   async startSession(dealer: Agent): Promise<bigint> {
     if (!this.appClient) throw new Error('Deploy first!')
 
@@ -106,21 +153,28 @@ export class GuessGame implements IBaseGameAdapter {
       suppressLog: true,
     })
 
+    // NOTE: Contract returns sessionId-1, so we add 1 for clarity
     const sessionId = Number(result.return) + 1
     this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
     console.log(`Session ${sessionId} created with config:`, this.sessionConfig)
 
+    // Initialize pot to 0 (since no agent has paid yet)
     const initialPot = Number(this.participationAmount.microAlgos) * 0 / 1_000_000
     this.stateUpdater({ pot: initialPot })
 
+    // Wait until start round
     await this.waitUntilRound(startAt)
     return result.return!
   }
 
+  /**
+   * COMMIT phase: agents send the hash of their choice
+   */
   async commit(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     this.log(`\n--- PHASE 1: COMMIT ---`, 'system')
     console.log(`Starting commit phase for session ${sessionId} with agents:`, agents.map(a => a.name))
 
+    // Calculate total pot (participation fee * number of agents)
     const currentPot = Number(this.participationAmount.microAlgos) * agents.length / 1_000_000
     this.stateUpdater({ pot: currentPot })
 
@@ -132,9 +186,11 @@ export class GuessGame implements IBaseGameAdapter {
       })
       this.log(`[${agent.name}] Calculating optimal guess...`, 'thought')
 
+      // Build prompt for agent and get decision
       const prompt = this.buildGamePrompt(agent, sessionNumber)
       const decision = await agent.playRound(this.name, prompt)
 
+      // Validate and normalize choice to 0-100 range
       let safeChoice = Math.round(decision.choice)
       if (safeChoice < 0 || safeChoice > 100) {
         this.log(
@@ -145,6 +201,7 @@ export class GuessGame implements IBaseGameAdapter {
       }
       safeChoice = Math.max(0, Math.min(100, safeChoice))
 
+      // Generate random salt and save secret
       const salt = crypto.randomBytes(16).toString('hex')
       this.roundSecrets.set(agent.account.addr.toString(), {
         choice: safeChoice,
@@ -177,6 +234,9 @@ export class GuessGame implements IBaseGameAdapter {
     }
   }
 
+  /**
+   * Builds agent prompt with game rules, current state, and strategic hints
+   */
   private buildGamePrompt(agent: Agent, sessionNumber: number): string {
     const gameRules = `
 GAME: Guess 2/3 of the Average (Nash Convergence Game)
@@ -204,6 +264,7 @@ Round: ${sessionNumber}
 Entry fee: 10 ALGO
 `.trim()
 
+    // Add historical information if available
     if (this.roundHistory.length === 0) {
       situation += `\n\nFirst round - expect average around 40-50, target around 27-33.`
     } else {
@@ -242,16 +303,20 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
 `.trim()
   }
 
+  /**
+   * REVEAL phase: agents reveal their choice and salt
+   */
   async reveal(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 2: REVEAL ---`, 'system')
     console.log(`Starting reveal phase for session ${sessionId}`)
+    
     await this.waitUntilRound(this.sessionConfig.endCommitAt + 1n)
 
     for (const agent of agents) {
         const secret = this.roundSecrets.get(agent.account.addr.toString())
-        if (!secret) continue
+        if (!secret) continue // Skip agents who didn't commit
 
         this.stateUpdater({
           agents: {
@@ -285,15 +350,23 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     }
   }
 
+  /**
+   * RESOLVE phase: empty in this implementation
+   * (Resolution happens on-chain during claim phase)
+   */
   async resolve(dealer: Agent, sessionId: bigint, sessionNumber: number): Promise<void> {
     return
   }
 
+  /**
+   * CLAIM phase: agents claim winnings and contract determines winner
+   */
   async claim(agents: Agent[], sessionId: bigint, sessionNumber: number): Promise<void> {
     if (!this.sessionConfig) throw new Error('Config missing')
 
     this.log(`\n--- PHASE 3: CLAIM ---`, 'system')
     console.log(`Starting claim phase for session ${sessionId}`)
+    
     await this.waitUntilRound(this.sessionConfig.endRevealAt + 1n)
 
     const currentRoundChoices: number[] = []
@@ -307,11 +380,13 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
       const avg = sum / currentRoundChoices.length
       const target = avg * (2 / 3)
 
+      // Save statistics for future rounds
       this.roundHistory.push({ avg, target })
       this.log(`📊 Game Stats: Avg=${avg.toFixed(1)}, Target=${target.toFixed(1)}`, 'game_event')
       console.log(`Session ${sessionId} stats - Average: ${avg.toFixed(1)}, Target: ${target.toFixed(1)}`)
     }
 
+    // Each agent attempts to claim winnings
     for (const agent of agents) {
       let outcome = 'LOSS'
       let netProfitAlgo = -Number(this.participationAmount.microAlgos) / 1_000_000
@@ -355,6 +430,9 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     }
   }
 
+  /**
+   * Calculates SHA256 hash of a choice and salt
+   */
   private getHash(choice: number, salt: string): Uint8Array {
     const b = Buffer.alloc(8)
     b.writeBigUInt64BE(BigInt(choice))
@@ -366,6 +444,10 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     )
   }
 
+  /**
+   * Waits until Algorand blockchain reaches a specific round
+   * Uses spam transactions to advance rounds in test environment
+   */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
     const currentRound = BigInt(status['lastRound'])
@@ -376,6 +458,7 @@ Respond ONLY with JSON: {"choice": <number 0-100>, "reasoning": "<your explanati
     const spammer = await this.algorand.account.random()
     await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
 
+    // Send empty transactions to advance rounds
     for (let i = 0; i < blocksToSpam; i++) {
       await this.algorand.send.payment({
         sender: spammer.addr,

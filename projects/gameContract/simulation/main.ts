@@ -18,11 +18,13 @@ function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
   return (game as IMultiRoundGameAdapter).playRound !== undefined
 }
 
-// === SIMULATION CONFIGURATION ===
+/** Number of game sessions to simulate */
 const NUM_SESSIONS = 1
+/** Initial funding amount for each agent in microAlgos */
 const INITIAL_FUNDING = 100_000
+/** LLM model to use for agent decision-making */
 const MODEL = 'hermes3'
-// === GAME SELECTION ===
+
 // Uncomment the game you wish to simulate
 //const game : IBaseGameAdapter = new StagHuntGame()
 //const game : IBaseGameAdapter = new WeeklyGame()
@@ -31,21 +33,26 @@ const game: IBaseGameAdapter = new PirateGame()
 
 /**
  * Main Entry Point for the Simulation Framework.
- * * Workflow:
+ * 
+ * Workflow:
  * 1. Initializes the LocalNet Algorand client.
  * 2. Creates AI Agents with distinct personality archetypes.
  * 3. Funds agents with test ALGO.
  * 4. Scans existing logs to resume session numbering if needed.
  * 5. Deploys the selected Game Contract.
  * 6. Runs the main Game Loop (Session Creation -> Play -> Resolve).
+ * 
+ * The simulation supports two types of games:
+ * - Single-round games: Simple commit-reveal-resolve pattern
+ * - Multi-round games: Complex negotiation games like Pirate Game with internal rounds
  */
 async function main() {
   console.log(`Game: ${game.name}`)
   console.log(`Rounds to play: ${NUM_SESSIONS}\n`)
 
+  // Initialize Algorand client for localnet
   const algorand = AlgorandClient.defaultLocalNet()
 
-  // === AGENT INITIALIZATION ===
   // Creating 7 agents with diverse Game Theory strategies
   const agents = [
     new Agent(
@@ -223,7 +230,7 @@ COOPERATION PHILOSOPHY:
 - Accept short-term losses to establish trust
 - Punish defectors by withdrawing cooperation (not revenge)
 
-STRATEGIC PRINCIPLES:ch
+STRATEGIC PRINCIPLES:
 - Rising tide lifts all boats - grow the pot first
 - In multi-round games, establish cooperative norms early
 - Signal trustworthiness through consistent fair play
@@ -331,7 +338,7 @@ STRATEGIC PRINCIPLES:
   })
   console.log()
 
-  // Fund agents
+  // Fund agents with initial capital
   console.log(`Funding agents with ${INITIAL_FUNDING} ALGO each...`)
   await Promise.all(
     agents.map(async (agent) => {
@@ -339,7 +346,6 @@ STRATEGIC PRINCIPLES:
     }),
   )
 
-  // === SESSION RESUME LOGIC ===
   // Check agent logs to see if we are continuing a previous simulation run
   let sessionFound = 0
   agents.forEach((a) => {
@@ -374,31 +380,33 @@ STRATEGIC PRINCIPLES:
       : `Starting fresh - no previous sessions found for ${game.name}`,
   )
 
-  // === CONTRACT DEPLOYMENT ===
+  // Get admin account from environment variable for contract deployment
   const adminMem = process.env.MNEMONIC || ''
   const admin = algosdk.mnemonicToSecretKey(adminMem);
+  // Ensure admin account is funded
   algorand.account.ensureFundedFromEnvironment(admin.addr, AlgoAmount.Algos(1000))
   console.log('\n--- DEPLOYMENT ---')
   await game.deploy(admin, '') 
 
   console.log(`\n--- STARTING ${NUM_SESSIONS} GAMES ---`)
 
-  // === MAIN GAME LOOP ===
   for (let i = 0; i < NUM_SESSIONS; i++) {
     let sessionId: bigint | null = null
     try {
+      // Use first agent as dealer to start the session
       const agent = agents[0]
       console.log(`${'='.repeat(60)}`)
       sessionId = await game.startSession(agent)
       console.log('='.repeat(60))
 
+      // Check if this is a multi-round (turn-based) game
       if (isTurnBased(game)) {
-        // --- LOGIC FOR MULTI-ROUND GAMES (e.g., Pirate Game) ---
-
+        // Setup the game (register agents, initialize state)
         await game.setup(agents, sessionId)
 
         const totalInternalRounds = await game.getMaxTotalRounds(sessionId)
         let r = 0;
+        
         while (r < totalInternalRounds) {
           console.log(`  --- Internal Round ${r + 1}/${totalInternalRounds} ---`)
           try {
@@ -413,12 +421,13 @@ STRATEGIC PRINCIPLES:
           }
           r++;
         }
+        
+        // Finalize the game and distribute winnings
         console.log(`Ending game...`)
         await game.claim(agents, sessionId,r)
         await game.finalize(agents, sessionId)
         console.log(`\n🎉 Session ${i + 1} COMPLETED.\n`)
       } else {
-        // --- LOGIC FOR SIMPLE GAMES (e.g., RPS, StagHunt) ---
         // Phase 1: Commit (Agents make secret moves)
         await game.commit(agents, sessionId, i)
 
@@ -433,7 +442,6 @@ STRATEGIC PRINCIPLES:
           console.log(`\n🎉 Session ${i + 1} COMPLETED.\n`)
         } catch (resolveError) {
           console.error(` ❌ Failed during Resolution/Claim:`, resolveError)
-          // We do not throw here to allow the simulation to proceed to the next session
         }
       }
     } catch (e) {
@@ -442,12 +450,14 @@ STRATEGIC PRINCIPLES:
     }
   }
 
+  // Simulation completion message
   console.log('\n' + '='.repeat(60))
   console.log('🏁 SIMULATION COMPLETE')
   console.log('='.repeat(60))
   console.log("\n📊 Run 'npm run stats'\n")
 }
 
+// Entry point with error handling
 main().catch((e) => {
   console.error('\nCRITICAL ERROR:')
   console.error(e)

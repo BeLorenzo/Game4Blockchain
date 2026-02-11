@@ -8,7 +8,7 @@ import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { Agent } from './Agent'
 
-// Importa i tuoi giochi
+// Import game implementations
 import { StagHuntGame } from './games/StagHuntGame'
 import { PirateGame } from './games/PirateGame'
 import { WeeklyGame } from './games/WeeklyGame'
@@ -17,22 +17,29 @@ import { IBaseGameAdapter } from './games/IBaseGameAdapter'
 import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
 import algosdk from 'algosdk'
 
-// =====================================================================
-// 🚨 FIX CRITICO PER BIGINT 🚨
-// =====================================================================
+/**
+ * Override BigInt.prototype.toJSON to serialize BigInt values as strings.
+ * This prevents JSON serialization errors when BigInt values are included in responses.
+ */
 (BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
-// =====================================================================
 
+/**
+ * Express application for the Game Simulation Server
+ * Provides API endpoints to control game simulations, retrieve status, and access agent data.
+ */
 const app = express()
 const PORT = 3000
 
+// Middleware configuration
 app.use(cors())
 app.use(express.json())
 
-// --- STATO ---
-// Aggiungiamo stateSnapshot all'interfaccia dei log nel server
+/**
+ * Global simulation state tracking the current game session
+ * Includes logs with state snapshots for synchronized UI playback
+ */
 let simulationState = {
   isRunning: false,
   gameName: '',
@@ -41,6 +48,10 @@ let simulationState = {
   logs: [] as { timestamp: number; agent: string; type: string; message: string; stateSnapshot: any }[]
 }
 
+/**
+ * Current game state that gets updated during simulation
+ * Used to provide real-time UI updates and create state snapshots for logs
+ */
 let currentGameState: any = {
   sessionId: '0',
   round: 0,
@@ -51,9 +62,12 @@ let currentGameState: any = {
   pirateData: null
 }
 
-// MODIFICA 1: addLog ora cattura lo stato corrente (Snapshot)
+/**
+ * Adds a log entry to the simulation state with a snapshot of current game state
+ * This enables synchronized playback in the frontend where logs are paired with state
+ */
 const addLog = (agent: string, type: 'thought' | 'action' | 'system' | 'game_event', message: string) => {
-  // Facciamo una "Deep Copy" dello stato attuale per congelarlo nel tempo
+  // Create a deep copy of current game state to freeze it in time
   const snapshot = JSON.parse(JSON.stringify(currentGameState));
   
   const logEntry = { 
@@ -61,24 +75,32 @@ const addLog = (agent: string, type: 'thought' | 'action' | 'system' | 'game_eve
       agent, 
       type, 
       message,
-      stateSnapshot: snapshot // <--- Il log si porta dietro lo stato di QUESTO momento
+      stateSnapshot: snapshot 
   }
   
   simulationState.logs.push(logEntry)
   if (simulationState.logs.length > 1000) simulationState.logs.shift()
   
+  // Console output with color coding
   const time = new Date().toISOString().split('T')[1].split('.')[0];
-  let color = '\x1b[37m'; 
-  if (type === 'system') color = '\x1b[32m'; 
-  if (type === 'game_event') color = '\x1b[36m'; 
-  if (type === 'thought') color = '\x1b[90m'; 
+  let color = '\x1b[37m'; // Default white
+  if (type === 'system') color = '\x1b[32m'; // Green
+  if (type === 'game_event') color = '\x1b[36m'; // Cyan
+  if (type === 'thought') color = '\x1b[90m'; // Gray
   console.log(`${color}[${time}] [${type.toUpperCase()}] ${agent}: ${message}\x1b[0m`)
 }
 
+/**
+ * Updates the current game state with new values
+ */
 const updateGameState = (updates: any) => {
   currentGameState = { ...currentGameState, ...updates }
 }
 
+/**
+ * Scans agent history files to determine the last session ID for a given game
+ * Enables session numbering continuity across server restarts
+ */
 function getLastSessionId(gameName: string): number {
     const agentsDir = path.join(process.cwd(), 'simulation', 'data', 'agents');
     console.log(`[SERVER] Checking history in: ${agentsDir}`);
@@ -94,20 +116,30 @@ function getLastSessionId(gameName: string): number {
                 if (h.game === gameName && h.session > maxSession) maxSession = h.session;
             });
         });
-    } catch (e) { /* ignore */ }
+    } catch (e) { }
     return maxSession;
 }
 
-// --- API ---
+// --- API ENDPOINTS ---
 
+/**
+ * GET /api/status
+ * Returns the current simulation state including logs and game state
+ * Used by frontend to poll for updates
+ */
 app.get('/api/status', (req, res) => {
   return res.json({ ...simulationState, gameState: currentGameState })
 })
 
+/**
+ * POST /api/start
+ * Starts a new simulation session for the specified game
+ */
 app.post('/api/start', (req, res) => {
   const { game } = req.body
   if (simulationState.isRunning) return res.status(400).json({ error: 'Running' })
   
+  // Run game logic asynchronously
   runGameLogic(game).catch(err => {
     console.error('Logic Error:', err)
     simulationState.isRunning = false
@@ -115,11 +147,11 @@ app.post('/api/start', (req, res) => {
   return res.json({ success: true })
 })
 
-app.post('/api/stop', (req, res) => {
-  simulationState.isRunning = false
-  return res.json({ message: 'Stopping...' })
-})
-
+/**
+ * GET /api/agent-stats
+ * Retrieves aggregated statistics for all agents from their persistent storage
+ * Returns win rates, total profits, and personality profiles
+ */
 app.get('/api/agent-stats', (req, res) => {
     const agentsDir = path.join(process.cwd(), 'simulation', 'data', 'agents');
     const stats: any = {};
@@ -161,50 +193,96 @@ app.get('/api/agent-stats', (req, res) => {
     return res.json(stats);
 })
 
+/**
+ * GET /api/history/:gameId
+ * Retrieves complete historical session data for a specific game
+ * Groups results by session and includes all agent decisions and outcomes
+ */
 app.get('/api/history/:gameId', (req, res) => {
     const gameId = req.params.gameId;
     const agentsDir = path.join(process.cwd(), 'simulation', 'data', 'agents');
+    
     try {
         if (!fs.existsSync(agentsDir)) return res.json([]);
+        
         const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.json'));
-        const sessionMap = new Map<number, any>();
+        let allHistory: any[] = [];
 
+        // 1. Raccogliamo tutta la storia di tutti gli agenti per questo gioco
         files.forEach(file => {
             const content = JSON.parse(fs.readFileSync(path.join(agentsDir, file), 'utf-8'));
             const agentName = content.name;
-            const history = content.history.filter((h: any) => h.game === gameId);
+            const history = (content.history || []).filter((h: any) => h.game === gameId);
             
             history.forEach((h: any) => {
-                if (!sessionMap.has(h.session)) {
-                    sessionMap.set(h.session, {
-                        session: h.session,
-                        timestamp: h.timestamp,
-                        game: gameId,
-                        rounds: []
-                    });
-                }
-                const sessionEntry = sessionMap.get(h.session);
-                sessionEntry.rounds.push({
-                    round: h.round,
+                allHistory.push({
+                    ...h,
                     agent: agentName,
-                    choice: h.choice,
-                    result: h.result,
-                    profit: h.profit,
-                    reasoning: h.reasoning,
-                    role: h.role,
-                    proposalAccepted: h.proposalAccepted
+                    // Assicuriamo che il timestamp sia un numero valido per poter ordinare
+                    timeMs: new Date(h.timestamp).getTime() || 0 
                 });
             });
         });
 
+        // 2. Ordiniamo tutto RIGOROSAMENTE in ordine cronologico
+        allHistory.sort((a, b) => a.timeMs - b.timeMs);
+
+        // 3. Raggruppamento logico per creare le sessioni "Virtuali" e consecutive
+        const sessionMap = new Map<number, any>();
+        let virtualSessionId = 0;
+        let lastOriginalSession = -1;
+        let seenAgentRounds = new Set<string>();
+
+        allHistory.forEach(h => {
+            // Chiave per capire se un agente sta rigiocando un round già visto
+            const agentRoundKey = `${h.agent}-R${h.round}`;
+            
+            // TAGLIO E NUOVA SESSIONE SE:
+            // A) L'ID sessione cambia naturalmente
+            // B) Vediamo un duplicato di agente+round (Significa che c'è stato un riavvio e l'ID originale si è azzerato)
+            if (h.session !== lastOriginalSession || seenAgentRounds.has(agentRoundKey)) {
+                virtualSessionId++;
+                lastOriginalSession = h.session;
+                seenAgentRounds.clear(); // Svuotiamo la memoria dei round per la nuova sessione
+                
+                sessionMap.set(virtualSessionId, {
+                    session: virtualSessionId,   // Questo è il numero (1, 2, 3...) che vedrà il frontend!
+                    originalSession: h.session,  // Lo teniamo per puro debug
+                    timestamp: h.timestamp,
+                    game: gameId,
+                    rounds: []
+                });
+            }
+            
+            // Segnamo che questo agente ha giocato questo round nell'attuale sessione
+            seenAgentRounds.add(agentRoundKey);
+
+            // Aggiungiamo la mossa al contenitore
+            const currentSession = sessionMap.get(virtualSessionId);
+            currentSession.rounds.push({
+                round: h.round,
+                agent: h.agent,
+                choice: h.choice,
+                result: h.result,
+                profit: h.profit,
+                reasoning: h.reasoning,
+                role: h.role,
+                proposalAccepted: h.proposalAccepted
+            });
+        });
+
+        // 4. Mettiamo le sessioni dalla più recente alla più vecchia per la dashboard
         const allSessions = Array.from(sessionMap.values());
         allSessions.sort((a, b) => b.session - a.session);
+        
+        // 5. All'interno della sessione, ordiniamo le mosse dal Round 1 in su
         allSessions.forEach(session => {
             session.rounds.sort((a: any, b: any) => {
                 if (a.round === b.round) return a.agent.localeCompare(b.agent);
                 return a.round - b.round;
             });
         });
+
         return res.json(allSessions);
     } catch (e) {
         console.error("Error reading history:", e);
@@ -212,8 +290,12 @@ app.get('/api/history/:gameId', (req, res) => {
     }
 });
 
-// --- GAME LOGIC ---
+// --- SIMULATION LOGIC ---
 
+/**
+ * Main game simulation logic
+ * Orchestrates the entire game lifecycle: agent creation, funding, contract deployment, and game execution
+ */
 async function runGameLogic(gameName: string) {
   if (simulationState.isRunning) return
   
@@ -233,8 +315,8 @@ async function runGameLogic(gameName: string) {
 
   try {
     const algorand = AlgorandClient.defaultLocalNet()
-    const MODEL = 'hermes3' 
-
+    const MODEL = 'hermes3'
+    // Instantiate the selected game adapter
     let game: IBaseGameAdapter
     switch (gameName) {
       case 'StagHunt': game = new StagHuntGame(); break;
@@ -244,6 +326,7 @@ async function runGameLogic(gameName: string) {
       default: throw new Error("Unknown Game");
     }
 
+    // Connect game logging and state updating to server functions
     game.setLogger((msg, type) => addLog('Game', type || 'game_event', msg));
     
     if ('setStateUpdater' in game) {
@@ -252,7 +335,7 @@ async function runGameLogic(gameName: string) {
         });
     }
     
-    // === AGENTI INTELLIGENTI ===
+    // Create 7 agents with distinct game theory strategies
     const agents = [
         new Agent(
           algorand.account.random().account,
@@ -429,7 +512,7 @@ async function runGameLogic(gameName: string) {
     - Accept short-term losses to establish trust
     - Punish defectors by withdrawing cooperation (not revenge)
     
-    STRATEGIC PRINCIPLES:ch
+    STRATEGIC PRINCIPLES:
     - Rising tide lifts all boats - grow the pot first
     - In multi-round games, establish cooperative norms early
     - Signal trustworthiness through consistent fair play
@@ -532,7 +615,6 @@ async function runGameLogic(gameName: string) {
     agents.forEach(a => {
         initialAgentState[a.name] = { status: 'initializing', profit: 0 }
         a.setLogger((name, type, msg) => {
-            // MODIFICA CRITICA 2: Prima aggiorniamo stato, poi creiamo il log (che prende lo snapshot)
             const newState: any = { status: type === 'thought' ? 'thinking' : 'decided' }
             if (type === 'action') newState.lastAction = msg
             
@@ -541,6 +623,8 @@ async function runGameLogic(gameName: string) {
         })
     })
     updateGameState({ agents: initialAgentState })
+    
+    // Deploy and fund the game contract
     const admimMnemonic = process.env.MNEMONIC || ''
     const adminAccount = algosdk.mnemonicToSecretKey(admimMnemonic);
     algorand.account.ensureFundedFromEnvironment(adminAccount.addr, AlgoAmount.Algos(1000))
@@ -551,6 +635,7 @@ async function runGameLogic(gameName: string) {
     updateGameState({ phase: 'DEPLOYED' })
     addLog('System', 'system', 'Contract deployed.')
 
+    // Execute the game session
     const NUM_SESSIONS = 1 
     for (let i = 0; i < NUM_SESSIONS; i++) {
         if (!simulationState.isRunning) break;
@@ -564,6 +649,7 @@ async function runGameLogic(gameName: string) {
         addLog('System', 'system', `=== Session ${visualSessionId} Started ===`)
         
         try {
+            // Check if game is multi-round (like Pirate Game) or single-round
             if ('playRound' in game && 'setup' in game) {
                 const multiGame = game as IMultiRoundGameAdapter
                 await multiGame.setup(agents, sessionId)
@@ -576,6 +662,7 @@ async function runGameLogic(gameName: string) {
                 await multiGame.claim(agents, sessionId, visualSessionId)
                 await multiGame.finalize(agents, sessionId)
             } else {
+                // Single-round game flow: Commit -> Reveal -> Resolve -> Claim
                 updateGameState({ phase: 'COMMIT' })
                 await game.commit(agents, sessionId, visualSessionId) 
                 updateGameState({ phase: 'REVEAL' })
@@ -600,6 +687,9 @@ async function runGameLogic(gameName: string) {
   }
 }
 
+/**
+ * Starts the Express server
+ */
 app.listen(PORT, () => {
   console.log(`🚀 Simulation Server running on http://localhost:${PORT}`)
 })

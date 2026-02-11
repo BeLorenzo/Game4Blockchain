@@ -303,23 +303,19 @@ export const RPSGameModule: IGameModule = {
 
         for (let i = totalSessions - 1; i >= start; i--) {
             const sessionID = BigInt(i);
-            const [config, players, finishedMask] = await Promise.all([
+            const [config, players] = await Promise.all([
                 client.state.box.gameSessions.value(sessionID),
                 client.state.box.sessionPlayers.value(sessionID),
-                client.state.box.gameFinished.value(sessionID)
             ]);
 
             if (!config || !players) continue;
 
             let label = '🔴 EXPIRED';
-            const mask = Number(finishedMask);
 
-            if (mask === 3) label = '🏁 FINISHED';
-            else if (mask > 0) label = '💰 CLAIMING'; 
-            else if (currentRound < config.startAt) label = '⏳ WAITING';
+            if (currentRound < config.startAt) label = '⏳ WAITING';
             else if (currentRound <= config.endCommitAt) label = '🟢 COMMIT OPEN';
             else if (currentRound <= config.endRevealAt) label = '🟡 REVEAL OPEN';
-            else if (currentRound > config.endRevealAt) label = '⚠️  TIMEOUT / CLAIM';
+            else label = '🏁 CLAIMABLE/FINISHED';
 
             const p1 = players.p1 === algosdk.ALGORAND_ZERO_ADDRESS_STRING ? '[Empty]' : wallet.shortAddr(players.p1);
             const p2 = players.p2 === algosdk.ALGORAND_ZERO_ADDRESS_STRING ? '[Empty]' : wallet.shortAddr(players.p2);
