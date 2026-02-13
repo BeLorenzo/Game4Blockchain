@@ -56,13 +56,13 @@ export class StagHuntGame implements IBaseGameAdapter {
   /** Last recorded cooperation rate (percentage of players choosing Stag) */
   private lastCooperationRate: number | null = null
   /** Algorand client for blockchain interaction */
-  private algorand = AlgorandClient.defaultLocalNet()
+  private algorand = AlgorandClient.fromEnvironment()
   /** Factory for smart contract deployment */
   private factory: StagHuntFactory | null = null
   /** Client to interact with deployed smart contract */
   private appClient: StagHuntClient | null = null
-  /** Participation fee for the game (10 ALGO) */
-  private participationAmount = AlgoAmount.Algos(10)
+  /** Participation fee for the game (1 ALGO) */
+  private participationAmount = AlgoAmount.Algos(1)
   /** Map of agents' secrets for current round (addr -> RoundSecret) */
   private roundSecrets: Map<string, RoundSecret> = new Map()
   /** Configuration of current session (timing based on Algorand rounds) */
@@ -74,10 +74,10 @@ export class StagHuntGame implements IBaseGameAdapter {
    * - commitPhase: duration of commit phase
    * - revealPhase: duration of reveal phase
    */
-  private durationParams = {
-    warmUp: 3n,
-    commitPhase: 15n,
-    revealPhase: 10n,
+    private durationParams = {
+    warmUp: 10n,
+    commitPhase: 40n,
+    revealPhase: 30n,
   }
 
   /**
@@ -85,15 +85,15 @@ export class StagHuntGame implements IBaseGameAdapter {
    */
   async deploy(admin: Account, suffix: string = ''): Promise<void> {
     const appName = `StagHunt${suffix}`
-
     const signer = algosdk.makeBasicAccountTransactionSigner(admin)
-        
+    
     this.factory = this.algorand.client.getTypedAppFactory(StagHuntFactory, {
       defaultSender: admin.addr,
       defaultSigner: signer,
       appName: appName,
     })
 
+    // Deploy contract (create if doesn't exist, otherwise use existing)
     const { appClient, result } = await this.factory.deploy({
       onUpdate: 'append', 
       onSchemaBreak: 'append', 
@@ -101,14 +101,32 @@ export class StagHuntGame implements IBaseGameAdapter {
     })
 
     this.appClient = appClient
+    const appInfo = await this.algorand.account.getInformation(appClient.appAddress);
+    const minBalance = AlgoAmount.Algos(1);
 
-    await this.algorand.account.ensureFundedFromEnvironment(
-        appClient.appAddress, 
-        AlgoAmount.Algos(5)
-    )
-
+    if (appInfo.balance < minBalance) {
+        console.log(`Funding App ${appName} from Admin...`);
+        const adminSigner = algosdk.makeBasicAccountTransactionSigner(admin);
+        await this.algorand.send.payment({
+            sender: admin.addr,
+            receiver: appClient.appAddress,
+            amount: AlgoAmount.Algos(1), 
+            signer: adminSigner
+        });
+    }
     const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing'
-    this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
+     const txId = result.operationPerformed !== 'nothing' 
+      ? result.transaction.txID() 
+      : undefined
+      this.log(
+        `${action} contract: ${appName} (AppID: ${result.appId})`, 
+        'system', 
+        { 
+          txId: txId,       
+          txType: 'DEPLOY', 
+          agentName: admin.addr.toString().substring(0,6)
+        }
+      )
   }
 
   /**
@@ -150,7 +168,7 @@ export class StagHuntGame implements IBaseGameAdapter {
     })
 
     const sessionId = Number(result.return) + 1
-    this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
+    this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event', {txId: result.transaction.txID(), txType: 'START', agentName:dealer.name})
     console.log(`Session ${sessionId} created with config:`, this.sessionConfig)
 
     // Get initial jackpot value from contract and update frontend pot
@@ -211,21 +229,21 @@ export class StagHuntGame implements IBaseGameAdapter {
           }
         }
       })
-      this.log(`[${agent.name}] Committed: ${choiceLabel}`, 'action')
-
+      
       const hash = this.getHash(safeChoice, salt)
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
         receiver: this.appClient!.appAddress,
         amount: this.participationAmount,
       })
-
-      await this.appClient!.send.joinSession({
+      
+      const result = await this.appClient!.send.joinSession({
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
         suppressLog: true,
       })
+      this.log(`[${agent.name}] Committed: ${choiceLabel}`, 'action', {txId: result.transaction.txID(), txType: 'COMMIT', agentName: agent.name})
     }
   }
 
@@ -246,13 +264,13 @@ OPTIONS:
 - STAG (1): Risky cooperation
   - Need ${threshold}% of players to also choose Stag
   - If threshold MET: Winners split pot + jackpot (big win)
-  - If threshold MISSED: Stags lose everything (-10 ALGO)
+  - If threshold MISSED: Stags lose everything (-1 ALGO)
 `.trim()
 
     let situation = `
 CURRENT STATUS:
 Game: ${sessionNumber}
-Entry fee: 10 ALGO
+Entry fee: 1 ALGO
 Global jackpot: ${jackpot.toFixed(1)} ALGO
 `.trim()
 
@@ -311,7 +329,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
       })
 
       try {
-        await this.appClient!.send.revealMove({
+        const result = await this.appClient!.send.revealMove({
           args: {
             sessionId,
             choice: BigInt(secret.choice),
@@ -323,7 +341,7 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         })
         
         const choiceEmoji = secret.choice === 1 ? '🦌 STAG' : '🐇 HARE'
-        this.log(`[${agent.name}] Revealed: ${choiceEmoji}`, 'game_event')
+        this.log(`[${agent.name}] Revealed: ${choiceEmoji}`, 'game_event', {txId: result.transaction.txID(), txType: 'REVEAL', agentName: agent.name})
         console.log(`Agent ${agent.name} revealed choice ${secret.choice}`)
 
         this.stateUpdater({
@@ -408,14 +426,14 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
         outcome = netProfitAlgo > 0 ? 'WIN' : netProfitAlgo === 0 ? 'DRAW' : 'LOSS'
         
         if (outcome === 'WIN') {
-            this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
+            this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event', {txId: result.transaction.txID(), txType: 'CLAIM', agentName: agent.name})
             console.log(`Agent ${agent.name} won ${netProfitAlgo.toFixed(2)} ALGO`)
         } else if (outcome === 'DRAW') {
-            this.log(`🤝 ${agent.name} breaks even. (0 ALGO)`, 'game_event')
+            this.log(`🤝 ${agent.name} breaks even. (0 ALGO)`, 'game_event', {txId: result.transaction.txID(), txType: 'CLAIM', agentName: agent.name})
             console.log(`Agent ${agent.name} broke even`)
         } else {
             this.log(`💸 ${agent.name} loses. (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
-            console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO`)
+            console.log(`Agent ${agent.name} lost ${Math.abs(netProfitAlgo).toFixed(2)} ALGO`, {txId: result.transaction.txID(), txType: 'CLAIM', agentName: agent.name})
         }
       } catch (e: any) {
           this.log(`${agent.name}: ERROR`, 'system')
@@ -448,30 +466,42 @@ Respond ONLY with JSON: {"choice": <0 or 1>, "reasoning": "<your explanation>"}
     )
   }
 
-  /**
+/**
    * Waits until Algorand blockchain reaches a specific round
-   * Uses spam transactions to advance rounds in test environment
+   * Uses spam transactions to advance rounds in local environment 
+   * or simply wait in test environment
    */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
-    const currentRound = BigInt(status['lastRound'])
+    let currentRound = BigInt(status['lastRound'])
 
     if (currentRound >= targetRound) return
 
-    const blocksToSpam = Number(targetRound - currentRound)
-    const spammer = await this.algorand.account.random()
-    await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
+    const isTestNet = process.env.ALGOD_NETWORK === 'testnet';
 
-    // Send empty transactions to advance rounds
-    for (let i = 0; i < blocksToSpam; i++) {
-      await this.algorand.send.payment({
-        sender: spammer.addr,
-        receiver: spammer.addr,
-        amount: AlgoAmount.MicroAlgos(0),
-        signer: spammer.signer,
-        note: `spam-${i}-${Date.now()}`,
-        suppressLog: true,
-      })
+    if (isTestNet) {
+      console.log(`⏳ Waiting for TestNet round ${targetRound} (Current: ${currentRound})...`);
+      this.log(`⏳ Waiting for TestNet round ${targetRound} (Current: ${currentRound})...`)
+      while (currentRound < targetRound) {
+        const nextStatus = await this.algorand.client.algod.statusAfterBlock(Number(currentRound)).do();
+        currentRound = BigInt(nextStatus['lastRound']);
+        process.stdout.write('.'); 
+      }
+      console.log(" Done.");
+    } else {
+      const blocksToSpam = Number(targetRound - currentRound)
+      const spammer = await this.algorand.account.random()
+      await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
+      for (let i = 0; i < blocksToSpam; i++) {
+        await this.algorand.send.payment({
+          sender: spammer.addr,
+          receiver: spammer.addr,
+          amount: AlgoAmount.MicroAlgos(0),
+          signer: spammer.signer,
+          note: `spam-${i}-${Date.now()}`,
+          suppressLog: true,
+        })
+    }
     }
   }
 }

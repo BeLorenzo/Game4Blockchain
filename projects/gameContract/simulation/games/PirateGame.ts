@@ -78,14 +78,14 @@ export class PirateGame implements IMultiRoundGameAdapter {
   }
 
   /** Algorand client for blockchain interaction */
-  private algorand = AlgorandClient.defaultLocalNet()
+  private algorand = AlgorandClient.fromEnvironment()
   /** Factory for smart contract deployment */
   private factory: PirateGameFactory | null = null
   /** Client to interact with deployed smart contract */
   private appClient: PirateGameClient | null = null
 
-  /** Participation fee for the game (10 ALGO) */
-  private participationAmount = AlgoAmount.Algos(10)
+  /** Participation fee for the game (1 ALGO) */
+  private participationAmount = AlgoAmount.Algos(1)
   /** Array tracking all pirates with their local state */
   private pirates: PirateInfo[] = []
   /** Map of agents' vote secrets for current round (addr -> RoundSecret) */
@@ -105,9 +105,9 @@ export class PirateGame implements IMultiRoundGameAdapter {
    * - revealPhase: duration of reveal phase for voting
    */
   private durationParams = {
-    warmUp: 50n,
-    commitPhase: 70n,
-    revealPhase: 50n,
+    warmUp: 30n,
+    commitPhase: 40n,
+    revealPhase: 30n,
   }
 
   /**
@@ -121,10 +121,9 @@ export class PirateGame implements IMultiRoundGameAdapter {
    * Deploys the smart contract on Algorand
    */
   async deploy(admin: Account, suffix: string = ''): Promise<void> {
-    const appName = `PirateGame${suffix}`; 
-
+    const appName = `PirateGame${suffix}`
     const signer = algosdk.makeBasicAccountTransactionSigner(admin)
-        
+    
     this.factory = this.algorand.client.getTypedAppFactory(PirateGameFactory, {
       defaultSender: admin.addr,
       defaultSigner: signer,
@@ -139,14 +138,32 @@ export class PirateGame implements IMultiRoundGameAdapter {
     })
 
     this.appClient = appClient
+    const appInfo = await this.algorand.account.getInformation(appClient.appAddress);
+    const minBalance = AlgoAmount.Algos(1);
 
-    await this.algorand.account.ensureFundedFromEnvironment(
-        appClient.appAddress, 
-        AlgoAmount.Algos(5)
-    )
-
-    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing';
-    this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
+    if (appInfo.balance < minBalance) {
+        console.log(`Funding App ${appName} from Admin...`);
+        const adminSigner = algosdk.makeBasicAccountTransactionSigner(admin);
+        await this.algorand.send.payment({
+            sender: admin.addr,
+            receiver: appClient.appAddress,
+            amount: AlgoAmount.Algos(1), 
+            signer: adminSigner
+        });
+    }
+    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing'
+     const txId = result.operationPerformed !== 'nothing' 
+      ? result.transaction.txID() 
+      : undefined
+      this.log(
+        `${action} contract: ${appName} (AppID: ${result.appId})`, 
+        'system', 
+        { 
+          txId: txId,       
+          txType: 'DEPLOY',
+          agentName: admin.addr.toString().substring(0,6) 
+        }
+      )
   }
 
 
@@ -196,7 +213,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
     
     const sessionId = Number(result.return) + 1
     console.log(`Session ${sessionId} created. Start: round ${startAt}`)
-    this.log(`Session ${sessionId} created. Start: round ${startAt}`)
+    this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'system', {txId: result.transaction.txID(), txType: 'START', agentName: dealer.name})
 
     this.stateUpdater({ pot: 0, pirateData: { captain: 'None', aliveCount: 0 } })
     return result.return!
@@ -231,7 +248,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
     // Register each agent as a pirate
     for (let i = 0; i < agents.length; i++) {
       const agent = agents[i]
-      await this.safeSend(
+      const result = await this.safeSend(
         () =>
           this.appClient!.send.registerPirate({
             args: {
@@ -262,7 +279,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
         finalized: false,
       })
       console.log(`[${agent.name}] Registered as Pirate #${i}`)
-      this.log(`[${agent.name}] Registered as Pirate #${i}`, 'game_event')
+      this.log(`[${agent.name}] Registered as Pirate #${i}`, 'game_event', {txId: result.transaction.txID(), txType: 'JOIN', agentName:agent.name})
     }
 
     // Update frontend with initial state (no captain yet, pot is 0)
@@ -332,11 +349,11 @@ export class PirateGame implements IMultiRoundGameAdapter {
     // === EXECUTE ROUND ===
     console.log(`\n⚙️  EXECUTING ROUND...`)
     this.log(`\n⚙️  Counting votes...`, 'system')
-    await this.safeSend(
+    const result = await this.safeSend(
       () =>
         this.appClient!.send.executeRound({
           args: { sessionId },
-          sender: agents[0].account.addr, // Use first agent as executor (anyone can call)
+          sender: agents[0].account.addr, 
           signer: agents[0].signer,
           coverAppCallInnerTransactionFees: true,
           maxFee: AlgoAmount.MicroAlgo(3000),
@@ -344,7 +361,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
         }),
       'Execute Round',
     )
-
+    this.log(`[${agents[0].name}] Executing round`, 'game_event', {txId: result.transaction.txID(), txType: 'RESOLVE', agentName: agents[0].name})
     await this.syncPirateStatus(sessionId)
 
     await this.recordRoundResults(sessionId, roundNumber)
@@ -427,7 +444,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
       const salt = crypto.randomBytes(16).toString('hex')
       this.roundSecrets.set(pirate.agent.account.addr.toString(), { vote, salt })
 
-      await this.safeSend(
+      const result = await this.safeSend(
         () =>
           this.appClient!.send.commitVote({
             args: {
@@ -445,6 +462,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
           }),
         `Vote ${pirate.agent.name}`,
       )
+      this.log(`[${pirate.agent.name}] Committed`, 'game_event', {txId: result.transaction.txID(), txType: 'COMMIT', agentName: pirate.agent.name })
     }
   }
 
@@ -460,7 +478,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
       const secret = this.roundSecrets.get(pirate.agent.account.addr.toString())
       if (!secret) continue
 
-      await this.safeSend(
+      const result = await this.safeSend(
         () =>
           this.appClient!.send.revealVote({
             args: {
@@ -476,7 +494,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
       )
 
       console.log(`[${pirate.agent.name}] Revealed: ${secret.vote === 1 ? 'YES' : 'NO'}`)
-      this.log(`[${pirate.agent.name}] Revealed: ${secret.vote === 1 ? 'YES' : 'NO'}`, 'system')
+      this.log(`[${pirate.agent.name}] Revealed: ${secret.vote === 1 ? 'YES' : 'NO'}`, 'system', {txId: result.transaction.txID(), txType: 'REVEAL', agentName: pirate.agent.name})
     }
   }
 
@@ -512,9 +530,7 @@ export class PirateGame implements IMultiRoundGameAdapter {
       const winnings =  (Number(coins) / 1_000_000) - this.participationAmount.algo
       
       if (winnings > 0) {
-        console.log(`💰 [${pirate.agent.name}] Claiming ${(Number(coins) / 1_000_000).toFixed(2)} ALGO - Profit: +${Number(winnings).toFixed(2)} ALGO...`)
-        this.log(`💰 [${pirate.agent.name}] Claiming ${(Number(coins) / 1_000_000).toFixed(2)} ALGO - Profit: +${Number(winnings).toFixed(2)} ALGO...`, 'game_event')
-        await this.safeSend(
+        const result = await this.safeSend(
           () =>
             this.appClient!.send.claimWinnings({
               args: { sessionId },
@@ -524,8 +540,10 @@ export class PirateGame implements IMultiRoundGameAdapter {
               maxFee: AlgoAmount.MicroAlgo(3000),
               suppressLog: true,
             }),
-          `Claim ${pirate.agent.name}`,
-        )
+            `Claim ${pirate.agent.name}`,
+          )
+          console.log(`💰 [${pirate.agent.name}] Claiming ${(Number(coins) / 1_000_000).toFixed(2)} ALGO - Profit: +${Number(winnings).toFixed(2)} ALGO...`)
+          this.log(`💰 [${pirate.agent.name}] Claiming ${(Number(coins) / 1_000_000).toFixed(2)} ALGO - Profit: +${Number(winnings).toFixed(2)} ALGO...`, 'game_event', {txId: result.transaction.txID(), txType: 'CLAIM', agentName: pirate.agent.name})
       } else if (winnings === 0) {
         console.log(`⚖️ [${pirate.agent.name}] No winnings to claim (0 ALGO)`)
         this.log(`⚖️ [${pirate.agent.name}] No winnings to claim (0 ALGO)`, 'game_event')
@@ -686,28 +704,42 @@ RESPONSE FORMAT (JSON ONLY):
     return percentages
   }
 
-  /**
+/**
    * Waits until Algorand blockchain reaches a specific round
-   * Uses spam transactions to advance rounds in test environment
+   * Uses spam transactions to advance rounds in local environment 
+   * or simply wait in test environment
    */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
-    const currentRound = BigInt(status['lastRound'])
+    let currentRound = BigInt(status['lastRound'])
+
     if (currentRound >= targetRound) return
-    
-    const blocks = Number(targetRound - currentRound)
-    const spammer = await this.algorand.account.random()
-    await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
-    
-    for (let i = 0; i < blocks; i++) {
-      await this.algorand.send.payment({
-        sender: spammer.addr,
-        receiver: spammer.addr,
-        amount: AlgoAmount.MicroAlgos(0),
-        signer: spammer.signer,
-        note: `spam-${i}-${Date.now()}`,
-        suppressLog: true,
-      })
+
+    const isTestNet = process.env.ALGOD_NETWORK === 'testnet';
+
+    if (isTestNet) {
+      console.log(`⏳ Waiting for TestNet round ${targetRound} (Current: ${currentRound})...`);
+      this.log(`⏳ Waiting for TestNet round ${targetRound} (Current: ${currentRound})...`)
+      while (currentRound < targetRound) {
+        const nextStatus = await this.algorand.client.algod.statusAfterBlock(Number(currentRound)).do();
+        currentRound = BigInt(nextStatus['lastRound']);
+        process.stdout.write('.'); 
+      }
+      console.log(" Done.");
+    } else {
+      const blocksToSpam = Number(targetRound - currentRound)
+      const spammer = await this.algorand.account.random()
+      await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
+      for (let i = 0; i < blocksToSpam; i++) {
+        await this.algorand.send.payment({
+          sender: spammer.addr,
+          receiver: spammer.addr,
+          amount: AlgoAmount.MicroAlgos(0),
+          signer: spammer.signer,
+          note: `spam-${i}-${Date.now()}`,
+          suppressLog: true,
+        })
+    }
     }
   }
 
@@ -1028,7 +1060,7 @@ Current Status: ${this.pirates.map((p) => `#${p.seniorityIndex}:${p.alive ? 'Ali
    */
   private async safeSend(action: () => Promise<any>, label: string) {
     try {
-      await action()
+      return await action()
     } catch (e: any) {
       if (e.message?.includes('transaction already in ledger')) {
         console.log(`⚠️  ${label} already on chain`)
@@ -1036,5 +1068,6 @@ Current Status: ${this.pirates.map((p) => `#${p.seniorityIndex}:${p.alive ? 'Ali
         console.error(`❌ ${label} failed:`, e.message)
       }
     }
+    return undefined
   }
 }

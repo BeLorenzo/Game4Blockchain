@@ -1,5 +1,5 @@
 import React from 'react'
-import { PirateInfo } from '../../../hooks/Pirate/types' // Assicurati del path corretto
+import { PirateInfo } from '../../../hooks/Pirate/types' 
 
 interface PirateCrewListProps {
   pirates: PirateInfo[]

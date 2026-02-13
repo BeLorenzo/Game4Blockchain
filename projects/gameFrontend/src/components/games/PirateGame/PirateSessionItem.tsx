@@ -13,7 +13,6 @@ const PirateResultBanner = ({ session }: { session: PirateGameSession }) => {
   const { amount, isTimeout } = session.claimResult
   const displayAmount = Math.abs(amount)
 
-  // Configurazione Dinamica Testi e Colori
   let title = ''
   let subtitle = ''
   let amountSign = ''
@@ -22,7 +21,6 @@ const PirateResultBanner = ({ session }: { session: PirateGameSession }) => {
   let borderClass = ''
 
   if (amount > 0) {
-      // VITTORIA
       title = '🏆 VICTORY!'
       subtitle = 'NET PROFIT'
       amountSign = '+'
@@ -30,7 +28,6 @@ const PirateResultBanner = ({ session }: { session: PirateGameSession }) => {
       textClass = 'text-green-400'
       borderClass = 'border-green-500'
   } else if (amount === 0) {
-      // RIMBORSO / PAREGGIO
       title = isTimeout ? '💸 REFUNDED' : '⚓ NO LOSS'
       subtitle = isTimeout ? 'FULL FEE RETURNED' : 'BROKE EVEN'
       amountSign = isTimeout ? '+' : ''
@@ -38,7 +35,6 @@ const PirateResultBanner = ({ session }: { session: PirateGameSession }) => {
       textClass = 'text-yellow-400'
       borderClass = 'border-yellow-500'
   } else {
-      // SCONFITTA
       title = '☠️ YOU LOST' 
       subtitle = 'BETTER LUCK NEXT TIME' 
       amountSign = '-'
@@ -132,7 +128,7 @@ export const PirateSessionItem: React.FC<PirateSessionItemProps> = ({ session, l
                     </div>
                  )}
 
-                 {/* Badge EXECUTE (Per Timeout, No Proposal o Reveal Scaduto) */}
+                 {/* Badge EXECUTE (Timeout, No Proposal o Reveal timeout) */}
                  {session.canExecute && (
                     <div className="badge badge-error badge-outline font-black animate-pulse bg-red-500/10 shadow-[0_0_15px_red] border-red-500 text-red-500">
                         ☠️ EXECUTE AVAILABLE
@@ -167,13 +163,13 @@ export const PirateSessionItem: React.FC<PirateSessionItemProps> = ({ session, l
 
       <SessionCardBody isEnded={isEnded}>
         
-        {/* 1. Messaggi Globali */}
+        {/* 1. Global messages */}
         <GameStateBanner session={session} />
 
-        {/* 2. Risultato Personale */}
+        {/* 2. Personal Result */}
         <PirateResultBanner session={session} />
 
-        {/* 3. Proposta (se attiva) */}
+        {/* 3. Propose (if active) */}
         {session.currentProposal && (
             <div className="mb-6">
                 <ProposalStatus 

@@ -10,6 +10,8 @@ import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
 import { PirateGame } from './games/PirateGame'
 import { GuessGame } from './games/GuessGame'
 import algosdk from 'algosdk'
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Type Guard to check if a game supports multi-round logic (e.g., Pirate Game).
@@ -18,10 +20,27 @@ function isTurnBased(game: IBaseGameAdapter): game is IMultiRoundGameAdapter {
   return (game as IMultiRoundGameAdapter).playRound !== undefined
 }
 
+function getPersistentAccounts(count: number): algosdk.Account[] {
+  const filePath = path.join(process.cwd(), 'agent-wallets.json');
+  if (fs.existsSync(filePath)) {
+    console.log(`Loading existing wallets from ${filePath}`);
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    return data.map((mnemonic: string) => algosdk.mnemonicToSecretKey(mnemonic));
+  }
+  console.log(`Creating ${count} new persistent wallets...`);
+  const accounts = Array.from({ length: count }, () => algosdk.generateAccount());
+  const mnemonics = accounts.map(acc => algosdk.secretKeyToMnemonic(acc.sk));
+  
+  fs.writeFileSync(filePath, JSON.stringify(mnemonics, null, 2));
+  console.log(`Wallets saved to ${filePath}`);
+  
+  return accounts;
+}
+
 /** Number of game sessions to simulate */
 const NUM_SESSIONS = 1
 /** Initial funding amount for each agent in microAlgos */
-const INITIAL_FUNDING = 100_000
+const INITIAL_FUNDING = 2_000_000
 /** LLM model to use for agent decision-making */
 const MODEL = 'hermes3'
 
@@ -50,13 +69,18 @@ async function main() {
   console.log(`Game: ${game.name}`)
   console.log(`Rounds to play: ${NUM_SESSIONS}\n`)
 
-  // Initialize Algorand client for localnet
-  const algorand = AlgorandClient.defaultLocalNet()
+  const persistentAccounts = getPersistentAccounts(7);
+
+  const isTestNet = process.env.ALGOD_NETWORK === 'testnet';
+  const algorand = isTestNet 
+  ? AlgorandClient.testNet() 
+  : AlgorandClient.defaultLocalNet();
+
 
   // Creating 7 agents with diverse Game Theory strategies
   const agents = [
     new Agent(
-      algorand.account.random().account,
+      persistentAccounts[0],
       'Alpha', // THE CALCULATOR: EV Maximizer
       {
         personalityDescription: `
@@ -95,7 +119,7 @@ STRATEGIC PRINCIPLES:
     ),
 
     new Agent(
-      algorand.account.random().account,
+      persistentAccounts[1],
       'Beta', // THE PARANOID: Minimax Strategist
       {
         personalityDescription: `
@@ -133,7 +157,7 @@ STRATEGIC PRINCIPLES:
     ),
 
     new Agent(
-      algorand.account.random().account,
+      persistentAccounts[2],
       'Gamma', // THE GAMBLER: Volatility Hunter
       {
         personalityDescription: `
@@ -172,7 +196,7 @@ STRATEGIC PRINCIPLES:
     ),
 
     new Agent(
-      algorand.account.random().account,
+      persistentAccounts[3],
       'Delta', // THE MIRROR: Tit-for-Tat Reciprocator
       {
         personalityDescription: `
@@ -211,7 +235,7 @@ STRATEGIC PRINCIPLES:
     ),
 
     new Agent(
-      algorand.account.random().account,
+      persistentAccounts[4],
       'Epsilon', // THE ALTRUIST: Group Welfare Maximizer
       {
         personalityDescription: `
@@ -250,7 +274,7 @@ STRATEGIC PRINCIPLES:
     ),
 
     new Agent(
-      algorand.account.random().account,
+      persistentAccounts[5],
       'Zeta', // THE FOLLOWER: Momentum Trader
       {
         personalityDescription: `
@@ -289,7 +313,7 @@ STRATEGIC PRINCIPLES:
     ),
 
     new Agent(
-      algorand.account.random().account,
+      persistentAccounts[6],
       'Eta', // THE CONTRARIAN: Anti-Crowd Strategist
       {
         personalityDescription: `
@@ -338,14 +362,6 @@ STRATEGIC PRINCIPLES:
   })
   console.log()
 
-  // Fund agents with initial capital
-  console.log(`Funding agents with ${INITIAL_FUNDING} ALGO each...`)
-  await Promise.all(
-    agents.map(async (agent) => {
-      await algorand.account.ensureFundedFromEnvironment(agent.account.addr, AlgoAmount.Algos(INITIAL_FUNDING))
-    }),
-  )
-
   // Check agent logs to see if we are continuing a previous simulation run
   let sessionFound = 0
   agents.forEach((a) => {
@@ -383,8 +399,48 @@ STRATEGIC PRINCIPLES:
   // Get admin account from environment variable for contract deployment
   const adminMem = process.env.MNEMONIC || ''
   const admin = algosdk.mnemonicToSecretKey(adminMem);
-  // Ensure admin account is funded
-  algorand.account.ensureFundedFromEnvironment(admin.addr, AlgoAmount.Algos(1000))
+  const adminSigner = algorand.account.getSigner(admin.addr);
+
+  if (isTestNet) {
+    console.log(`📡 TESTNET MODE: Checking agent balances...`);
+    
+    await Promise.all(
+      agents.map(async (agent) => {
+        try {
+          const info = await algorand.account.getInformation(agent.account.addr);
+          const balance = info.balance; 
+          const required = AlgoAmount.MicroAlgo(INITIAL_FUNDING); 
+
+          if (balance < required) {
+            const amountToSend = Number(required) - Number(balance) + 100_000;
+            console.log(`💸 Funding ${agent.name} (Need: ${amountToSend} µA)`);
+            
+            await algorand.send.payment({
+              sender: admin.addr,
+              receiver: agent.account.addr,
+              amount: AlgoAmount.MicroAlgos(amountToSend), 
+              signer: adminSigner
+            })
+          } else {
+             process.stdout.write(`[${agent.name} OK] `) 
+          }
+        } catch (e) {
+          console.error(`\n❌ Error checking/funding ${agent.name}:`, e)
+        }
+      })
+    )
+    console.log("\n✅ Wallet Check Complete");
+  } else {
+     await Promise.all(
+      agents.map(async (agent) => {
+        await algorand.account.ensureFundedFromEnvironment(
+            agent.account.addr, 
+            AlgoAmount.MicroAlgos(INITIAL_FUNDING)
+        )
+      }),
+    )
+  }
+
   console.log('\n--- DEPLOYMENT ---')
   await game.deploy(admin, '') 
 

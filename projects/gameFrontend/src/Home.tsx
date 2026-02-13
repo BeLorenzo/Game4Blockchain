@@ -11,12 +11,14 @@ import { config } from './config'
 import { PirateGameDashboard } from './components/games/PirateGame/Dashboard'
 
 /**
- * 🎮 GAME REGISTRY
- *
- * Per aggiungere un nuovo gioco:
- * 1. Import il Dashboard component
- * 2. Aggiungi entry in questo array
- * 3. Done! Zero modifiche al resto del codice 🎉
+ * GAME REGISTRY
+ * 
+ * Central configuration registry for all available blockchain games.
+ * 
+ * To add a new game:
+ * 1. Import the game's Dashboard component
+ * 2. Add an entry to this array with the required properties
+ * 3. The game will automatically appear in the UI with proper layout and functionality
  */
 const GAMES = [
   {
@@ -83,10 +85,31 @@ const GAMES = [
   },
 ]
 
+/**
+ * Home Component
+ * 
+ * Main application component that renders the game selection interface.
+ * 
+ * Features:
+ * - Responsive grid layout for game cards
+ * - Expandable/collapsible game dashboards
+ * - Automatic ordering of game cards
+ * - Integration with blockchain statistics display
+ */
 export const Home = () => {
+  /**
+   * State tracking which game card is currently expanded.
+   */
   const [expandedGameId, setExpandedGameId] = useState<string | null>(null)
 
+  /**
+   * Handles toggling the expansion state of a game card.
+   * 
+   * If the clicked game is already expanded, collapses it.
+   * If a different game is clicked, expands it and collapses any other expanded game.
+   */
   const handleToggle = (id: string) => {
+    // Toggle expansion: if already expanded, collapse; otherwise expand this game
     setExpandedGameId((prev) => (prev === id ? null : id))
   }
 
@@ -107,6 +130,10 @@ export const Home = () => {
                 className={`${isExpanded ? 'lg:col-span-2' : ''}`}
                 style={{ order: index + 1 }}
               >
+                {/* 
+                  GameCard component handles the collapsible UI container
+                  GameComponent renders the actual game dashboard inside
+                */}
                 <GameCard
                   id={game.id}
                   title={game.config.name}
@@ -114,11 +141,12 @@ export const Home = () => {
                   appId={game.config.appId}
                   description={game.description}
                   rules={game.rules}
-                  isActive={game.config.appId > 0n}
+                  isActive={game.config.appId > 0n} 
                   missingEnvText={game.envVarName}
                   isOpen={isExpanded}
                   onToggle={() => handleToggle(game.id)}
                 >
+                  {/* Render the game-specific dashboard component */}
                   <GameComponent />
                 </GameCard>
               </div>
@@ -126,6 +154,7 @@ export const Home = () => {
           })}
         </div>
       </main>
+      {/* Application footer */}
       <footer className="footer footer-center p-8 border-t border-white/5 bg-black text-gray-600 text-xs font-mono">
         <div>
           <p>© 2026 Game4Blockchain • Powered by Algorand</p>

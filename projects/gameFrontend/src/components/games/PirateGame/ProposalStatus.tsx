@@ -84,7 +84,7 @@ export const ProposalStatus: React.FC<ProposalStatusProps> = ({ proposal, pirate
         </div>
       )}
 
-      {/* Lista Distribuzione */}
+      {/* Distribution List */}
           <div className="collapse collapse-arrow border border-white/5 bg-black/20 rounded-lg">
             <input type="checkbox" /> 
             <div className="collapse-title text-xs font-bold text-gray-400 uppercase tracking-wider">

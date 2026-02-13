@@ -22,7 +22,6 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   render(): ReactNode {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
         <div className="hero min-h-screen bg-teal-400">
           <div className="hero-content text-center rounded-lg p-6 max-w-md bg-white mx-auto">

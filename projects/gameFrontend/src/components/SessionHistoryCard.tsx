@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from 'react'
 import { ChevronDown, Clock, AlertCircle, Skull, Trophy, TrendingDown, CheckCircle, XCircle } from 'lucide-react'
 
-// --- INTERFACCE ---
+
+/**
+ * Represents a single action/event within a game round.
+ */
 interface RawRoundAction {
   round: number
   agent: string
@@ -17,6 +20,9 @@ interface RawRoundAction {
   virtualSession?: number
 }
 
+/**
+ * Represents a complete game session with all its rounds.
+ */
 interface SessionData {
   session: number
   timestamp: string | number
@@ -25,12 +31,19 @@ interface SessionData {
   virtualId?: number
 }
 
-// Icone specifiche
-const STAG_ICONS: Record<number, string> = { 1: '🦌', 0: '🐇' }
+// Game-specific icon mappings
 const WEEKLY_ICONS: Record<number, string> = { 0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri', 5: 'Sat', 6: 'Sun' }
 
-// --- LOGICA DI AGGREGAZIONE ---
 
+/**
+ * Processes raw session data to calculate statistics and categorize agents.
+ * 
+ * Analyzes all round actions to:
+ * - Calculate total profit per agent
+ * - Determine final outcome (WIN/LOSS/ELIMINATED/SURVIVED)
+ * - Track agent choices and roles
+ * - Identify unique rounds
+ */
 const processSessionStats = (session: SessionData) => {
   const agentMap = new Map<string, any>()
   const roundsSet = new Set<number>()
@@ -56,7 +69,8 @@ const processSessionStats = (session: SessionData) => {
     else if (r.profit < -0.01) ag.result = 'LOSS'
   })
 
-  const agents = Array.from(agentMap.values()).sort((a, b) => b.totalProfit - a.totalProfit)
+  // Sort agents by total profit (highest first)
+  const agents = Array.from(agentMap.values()).sort((a, b) => b.totalProfit - a.profit)
   
   return { 
     winners: agents.filter(a => a.result === 'WIN'), 
@@ -67,32 +81,47 @@ const processSessionStats = (session: SessionData) => {
   }
 }
 
-// --- HELPER DI ORDINAMENTO E NUMERAZIONE (FIX DATE) ---
+/**
+ * Normalizes session data for consistent display.
+ * 
+ * Performs three key operations:
+ * 1. Sorts sessions chronologically (oldest to newest)
+ * 2. Assigns sequential virtual IDs (1, 2, 3...)
+ * 3. Reverses order for display (newest first)
+ */
 const normalizeSessions = (sessions: SessionData[]) => {
     if (!sessions || sessions.length === 0) return [];
 
-    // 1. Ordina CRONOLOGICAMENTE (dal più vecchio al più recente)
-    // FIX IMPORTANTE: Convertiamo in .getTime() perché timestamp può essere stringa ISO
+    // 1. Sort CHRONOLOGICALLY (oldest to newest)
     const sorted = [...sessions].sort((a, b) => {
         const timeA = new Date(a.timestamp).getTime();
         const timeB = new Date(b.timestamp).getTime();
         return timeA - timeB;
     });
 
-    // 2. Assegna ID progressivi (1, 2, 3...)
-    // La sessione più vecchia avrà virtualId = 1, quella più nuova = N
+    // 2. Assign progressive IDs (1, 2, 3...)
+    // Oldest session gets virtualId = 1, newest = N
     const labeled = sorted.map((s, index) => ({
         ...s,
         virtualId: index + 1 
     }));
 
-    // 3. INVERTI per la visualizzazione
-    // Risultato: In alto la sessione con virtualId più alto (la più recente)
     return labeled.reverse();
 }
 
-// --- COMPONENTE PRINCIPALE ---
-
+/**
+ * SessionHistoryList Component
+ * 
+ * Displays a list of game session history items with expandable details.
+ * Handles loading states, empty states, and normalizes session data for display.
+ * 
+ * Features:
+ * - Sequential numbering of sessions (1 = oldest, N = newest)
+ * - Expandable/collapsible session details
+ * - Game-specific visualization (standard games vs PirateGame)
+ * - Real-time statistics calculation
+ * - Responsive grid layout for session details
+ */
 export const SessionHistoryList: React.FC<{ 
   sessions: SessionData[]; 
   loading: boolean;
@@ -101,16 +130,16 @@ export const SessionHistoryList: React.FC<{
   if (loading) return <div className="text-center p-8 text-gray-500 font-mono text-xs animate-pulse">Loading archive...</div>
   if (!sessions || sessions.length === 0) return <div className="text-center p-8 text-gray-600 font-mono text-xs border border-dashed border-white/10 rounded">No history available</div>
 
-  // Calcola la lista normalizzata
   const normalizedSessions = useMemo(() => normalizeSessions(sessions), [sessions]);
 
   return (
     <div className="space-y-3">
-      {/* Header con totale */}
+      {/* Header with total count */}
       <div className="text-right text-[10px] text-gray-500 font-mono mb-2 px-1">
         Total Sessions: {normalizedSessions.length}
       </div>
 
+      {/* Render each session as a history item */}
       {normalizedSessions.map((session) => (
         <HistoryItem 
             key={`${session.session}-${session.timestamp}`} 
@@ -121,14 +150,18 @@ export const SessionHistoryList: React.FC<{
   )
 }
 
-// --- ITEM SINGOLA SESSIONE ---
 
+/**
+ * HistoryItem Component
+ * 
+ * Represents a single game session in the history list.
+ * Shows compact summary header and expandable detailed view.
+ */
 const HistoryItem = ({ session }: { session: SessionData }) => {
   const [isOpen, setIsOpen] = useState(false)
   const stats = processSessionStats(session)
   const date = new Date(session.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
-  // Bordo colorato in base all'esito
   let borderColor = 'border-white/5'
   if (stats.eliminated.length > 0) borderColor = 'border-red-500/30'
   else if (stats.winners.length > 0) borderColor = 'border-green-500/30'
@@ -136,14 +169,14 @@ const HistoryItem = ({ session }: { session: SessionData }) => {
   return (
     <div className={`bg-[#1a1a1a] rounded border ${borderColor} overflow-hidden transition-all duration-200`}>
       
-      {/* HEADER COMPATTO */}
+      {/* COMPACT HEADER - Clickable for expansion */}
       <div 
         className="p-3 flex items-center justify-between cursor-pointer hover:bg-white/5 select-none"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-4">
           <div className="font-mono text-xs text-gray-500 flex items-center gap-2">
-            {/* ID Sequenziale (#5, #4, ... #1) */}
+            {/* Sequential ID (#5, #4, ... #1) */}
             <span className="text-cyan-400 font-bold">#{session.virtualId}</span>
             <span className="opacity-50 flex items-center gap-1"><Clock size={10}/> {date}</span>
           </div>
@@ -160,12 +193,13 @@ const HistoryItem = ({ session }: { session: SessionData }) => {
           </div>
         </div>
 
+        {/* Expand/collapse indicator */}
         <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
           <ChevronDown size={14} className="text-gray-500" />
         </div>
       </div>
 
-      {/* DETTAGLIO */}
+      {/* EXPANDED DETAIL VIEW */}
       {isOpen && (
         <div className="bg-black/20 border-t border-white/5 p-4 text-xs font-mono animate-in slide-in-from-top-1 fade-in duration-200">
           {session.game === 'PirateGame' ? (
@@ -179,9 +213,18 @@ const HistoryItem = ({ session }: { session: SessionData }) => {
   )
 }
 
-// --- DETTAGLIO GIOCHI STANDARD ---
+
+/**
+ * StandardGameDetail Component
+ * 
+ * Displays detailed statistics for standard games (non-PirateGame).
+ * Shows winners and losers with their choices and profits.
+ */
 const StandardGameDetail = ({ stats, gameName }: { stats: ReturnType<typeof processSessionStats>, gameName: string }) => {
     
+    /**
+     * Decodes numeric choice into human-readable format based on game type.
+     */
     const decodeChoice = (choice: number) => {
         if (gameName === 'StagHunt') return choice === 1 ? '🦌 STAG' : '🐇 HARE';
         if (gameName === 'WeeklyGame') return WEEKLY_ICONS[choice] || choice;
@@ -190,6 +233,7 @@ const StandardGameDetail = ({ stats, gameName }: { stats: ReturnType<typeof proc
 
     return (
         <div className="grid grid-cols-2 gap-6">
+            {/* Winners Column */}
             <div>
                 <div className="text-[9px] uppercase tracking-wider font-bold text-green-500 mb-2 flex items-center gap-1">
                     <Trophy size={10}/> Winners
@@ -203,6 +247,8 @@ const StandardGameDetail = ({ stats, gameName }: { stats: ReturnType<typeof proc
                     </div>
                 ))}
             </div>
+            
+            {/* Losers Column */}
             <div>
                 <div className="text-[9px] uppercase tracking-wider font-bold text-red-500 mb-2 flex items-center gap-1">
                     <TrendingDown size={10}/> Losers
@@ -215,6 +261,8 @@ const StandardGameDetail = ({ stats, gameName }: { stats: ReturnType<typeof proc
                         <span className="text-red-400 font-mono">{ag.totalProfit.toFixed(1)}A</span>
                     </div>
                 ))}
+                
+                {/* Break-even players */}
                 {stats.neutral.length > 0 && (
                     <div className="mt-2 text-gray-500 italic">
                         Break-even: {stats.neutral.map(a => a.name).join(', ')}
@@ -225,9 +273,18 @@ const StandardGameDetail = ({ stats, gameName }: { stats: ReturnType<typeof proc
     )
 }
 
-// --- DETTAGLIO PIRATE GAME ---
+/**
+ * PirateGameDetail Component
+ * 
+ * Displays detailed round-by-round timeline and final statistics for Pirate Game.
+ * Shows proposal history, voting results, eliminations, and final outcomes.
+ */
 const PirateGameDetail = ({ session, finalStats }: { session: SessionData, finalStats: ReturnType<typeof processSessionStats> }) => {
     
+    /**
+     * Groups round actions by round number for timeline display.
+     * Memoized to prevent recalculation on re-renders.
+     */
     const roundsMap = useMemo(() => {
         const map = new Map<number, RawRoundAction[]>()
         session.rounds.forEach(r => {
@@ -242,7 +299,7 @@ const PirateGameDetail = ({ session, finalStats }: { session: SessionData, final
     return (
         <div className="space-y-6">
             
-            {/* TIMELINE ROUNDS */}
+            {/* ROUND TIMELINE */}
             <div className="space-y-4">
                 {sortedRounds.map(roundNum => {
                     const logs = roundsMap.get(roundNum)!
@@ -266,6 +323,7 @@ const PirateGameDetail = ({ session, finalStats }: { session: SessionData, final
 
                     return (
                         <div key={roundNum} className="relative pl-4 border-l border-white/10 pb-1">
+                            {/* Round indicator dot */}
                             <div className={`absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full ${eliminated ? 'bg-red-500' : 'bg-gray-600'}`}></div>
                             
                             <div className="flex justify-between items-start mb-1">
@@ -277,12 +335,14 @@ const PirateGameDetail = ({ session, finalStats }: { session: SessionData, final
                                 </span>
                             </div>
 
+                            {/* Voting breakdown */}
                             <div className="flex gap-4 text-gray-500 text-[10px] mb-2">
                                 <span className="flex items-center gap-1"><CheckCircle size={10} className="text-green-500"/> {yesVotes} Yes</span>
                                 <span className="flex items-center gap-1"><XCircle size={10} className="text-red-500"/> {noVotes} No</span>
                                 <span>(Total: {totalVotes})</span>
                             </div>
 
+                            {/* Elimination notice */}
                             {eliminated && (
                                 <div className="text-red-400 bg-red-500/5 px-3 py-1.5 rounded border border-red-500/10 inline-flex items-center gap-2">
                                     <Skull size={12}/> 
@@ -294,9 +354,10 @@ const PirateGameDetail = ({ session, finalStats }: { session: SessionData, final
                 })}
             </div>
 
-            {/* STATISTICHE FINALI */}
+            {/* FINAL STATISTICS */}
             <div className="pt-4 border-t border-white/10">
                 <div className="grid grid-cols-2 gap-6">
+                    {/* Survivors Column */}
                     <div>
                         <div className="text-[9px] uppercase tracking-wider font-bold text-green-500 mb-2">Survivors (Loot)</div>
                         {finalStats.winners.map(p => (
@@ -323,6 +384,8 @@ const PirateGameDetail = ({ session, finalStats }: { session: SessionData, final
                             </div>
                         )}
                     </div>
+                    
+                    {/* Casualties Column */}
                     <div>
                         <div className="text-[9px] uppercase tracking-wider font-bold text-red-500 mb-2">Casualties</div>
                         {finalStats.eliminated.length === 0 && <div className="text-gray-600 italic">-</div>}

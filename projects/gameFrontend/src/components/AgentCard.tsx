@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
-// Interfaccia completa che include i dati dinamici dal server
+/**
+ * Interface representing the dynamic agent statistics response from the server
+ * Contains gameplay metrics and optional personality traits that evolve over time
+ */
 interface AgentStatsResponse {
   totalGames: number
   winRate: number
   totalProfit: number
-  // Aggiungiamo i campi opzionali per la personalità dinamica
+  /**
+   * Optional dynamic personality traits that override default values when available
+   */
   personality?: {
     riskTolerance: number
     trustInOthers: number
@@ -15,10 +20,16 @@ interface AgentStatsResponse {
   }
 }
 
+/**
+ * Interface defining the static agent profile structure
+ * Contains default personality traits and visual presentation data
+ */
 interface AgentProfile {
   name: string
   description: string
-  // Questa rimane come "default" iniziale
+  /**
+   * Default personality traits (used when server data is unavailable)
+   */
   personality: {
     riskTolerance: number
     trustInOthers: number
@@ -30,14 +41,31 @@ interface AgentProfile {
   icon: string
 }
 
+/**
+ * Props interface for the AgentCard component
+ */
 interface AgentCardProps {
   agent: AgentProfile
 }
 
+/**
+ * AgentCard Component
+ * 
+ * Displays agent information including dynamic statistics from the server
+ * and personality traits that can evolve over time. Combines static profile
+ * data with real-time performance metrics.
+ */
 export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
+  // State for storing dynamic agent statistics fetched from the server
   const [stats, setStats] = useState<AgentStatsResponse | null>(null)
+  
+  // Loading state to handle async data fetching
   const [loading, setLoading] = useState(true)
 
+  /**
+   * useEffect hook for fetching agent statistics from the server
+   * Runs once when component mounts and whenever agent.name changes
+   */
   useEffect(() => {
     fetch('http://localhost:3000/api/agent-stats')
       .then(res => res.json())
@@ -53,23 +81,26 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
       })
   }, [agent.name])
 
+  /**
+   * Determines the color of personality trait bars based on value
+   */
   const getBarColor = (value: number) => {
     if (value >= 0.7) return 'bg-green-500'
     if (value >= 0.4) return 'bg-yellow-500'
     return 'bg-red-500'
   }
 
-  // LOGICA DINAMICA: Usa la personalità dal server se c'è, altrimenti quella statica
-  const activePersonality = stats?.personality || agent.personality;
+  const activePersonality = stats?.personality || agent.personality
 
   return (
     <div className="relative w-full rounded-2xl border border-white/10 bg-[#111] shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all duration-300 overflow-hidden group">
       
+      {/* Background glow effect using agent's color */}
       <div className={`absolute top-0 right-0 w-32 h-32 ${agent.color} opacity-10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all duration-500 group-hover:opacity-20`}></div>
 
       <div className="p-6 md:p-8 relative z-10">
         
-        {/* Header */}
+        {/* Header Section - Agent name, icon, and description */}
         <div className="flex items-start gap-4 mb-6">
           <div className="text-4xl md:text-5xl filter drop-shadow-lg transition-transform duration-300 group-hover:scale-110">
             {agent.icon}
@@ -85,7 +116,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Dynamic Statistics Section */}
         {loading ? (
           <div className="flex justify-center items-center h-20 mb-6">
             <span className="loading loading-spinner loading-sm text-primary"></span>
@@ -105,7 +136,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
           </div>
         )}
 
-        {/* Personality Matrix (DINAMICA) */}
+        {/* Personality Matrix Section - Displays dynamic or static personality traits */}
         <div className="space-y-3">
           <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Personality Matrix</h4>
           
@@ -129,7 +160,11 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
   )
 }
 
-// Preset degli agenti dalla simulazione
+/**
+ * Array of predefined agent profiles for the simulation
+ * Each agent has a unique name, description, default personality traits,
+ * visual color scheme, and representative icon
+ */
 export const SIMULATION_AGENTS: AgentProfile[] = [
   {
     name: 'Alpha',

@@ -4,13 +4,10 @@ import { useWallet } from '@txnlab/use-wallet-react'
 export const KmdSwitcher = () => {
   const { wallets } = useWallet()
 
-  // Trova il wallet KMD tra quelli attivi
   const kmdWallet = wallets?.find((w) => w.id === 'kmd')
 
-  // Se non c'è KMD (es. sei in Mainnet/Testnet o non hai avviato LocalNet), non mostrare nulla
   if (!kmdWallet) return null
 
-  // Se non è connesso, mostriamo un bottone discreto per connetterlo
   if (!kmdWallet.isConnected) {
     return (
       <button className="btn btn-xs btn-outline btn-warning font-mono" onClick={() => kmdWallet.connect()}>

@@ -1,13 +1,28 @@
 /**
- * LE FASI DEL PIRATE GAME
+ * PIRATE GAME TYPE DEFINITIONS
+ * 
+ * This module defines the core TypeScript interfaces and types for the Pirate Game,
+ * a multi-round bargaining and voting game implemented on the Algorand blockchain.
+ * 
+ * The game models a classic game theory problem where pirates must agree on
+ * treasure distribution through sequential proposals and voting.
+ */
+
+/**
+ * THE PHASES OF THE PIRATE GAME
+ * 
+ * The game progresses through these sequential phases:
  */
 export type PirateGamePhase = 
-  | 'REGISTRATION'  // Fase 0: Iscrizione aperta
-  | 'PROPOSAL'      // Fase 1: Il capitano corrente deve inviare la distribuzione
-  | 'VOTE_COMMIT'   // Fase 2: La ciurma invia l'hash del voto
-  | 'VOTE_REVEAL'   // Fase 3: La ciurma rivela il voto (Sì/No)
-  | 'ENDED'      // Fase 4: Attesa di risoluzione -> o Bottino distribuito o rinizio round
+  | 'REGISTRATION'  // Phase 0: Open registration
+  | 'PROPOSAL'      // Phase 1: Current captain must send distribution
+  | 'VOTE_COMMIT'   // Phase 2: Crew submits vote hash
+  | 'VOTE_REVEAL'   // Phase 3: Crew reveals vote (Yes/No)
+  | 'ENDED'         // Phase 4: Awaiting resolution → either treasure distributed or restart round
 
+/**
+ * Represents the result of a pirate's claim (win/loss).
+ */
 export interface PirateClaimResult {
   amount: number
   isTimeout: boolean
@@ -16,58 +31,62 @@ export interface PirateClaimResult {
 }
 
 /**
- * DATI DEL SINGOLO PIRATA
+ * Data for a single pirate
  */
 export interface PirateInfo {
-  /** L'indirizzo wallet del pirata */
+  /** The pirate's wallet address */
   address: string
   
-  /** Determina l'ordine di successione.
-   * 0 = Primo Capitano. Se muore, tocca a 1, ecc.
+  /** 
+   * Determines succession order.
+   * 0 = First Captain. If dies, responsibility goes to 1, etc.
    */
   seniorityIndex: number
   
-  /** Se false, il pirata è stato eliminato e non può più votare/proporre */
+  /** If false, the pirate was eliminated and can no longer vote/propose */
   alive: boolean
   
   /** 
-   * True se questo pirata è quello che deve agire nella fase PROPOSAL.
+   * True if this pirate is the one who must act in the PROPOSAL phase.
+   * Only the oldest alive pirate (lowest seniorityIndex) is the current proposer.
    */
   isCurrentProposer: boolean
   
-  /** Se true, ha già ritirato la sua quota di vincita */
+  /** If true, has already withdrawn their winning share */
   claimed: boolean
 }
 
 /**
- * DATI DELLA PROPOSTA CORRENTE
+ * Data for the current proposal
  */
 export interface ProposalInfo {
-  /** L'indice di seniority del pirata che ha fatto questa proposta */
+  /** Seniority index of the pirate who made this proposal */
   proposerIndex: number
   
-  /** * La distribuzione dell'oro proposta.
-   * L'indice dell'array corrisponde al seniorityIndex del pirata.
-   * Esempio: [0, 100, 50] significa:
-   * Pirata 0 (Morto): 0
-   * Pirata 1: 100 ALGO
-   * Pirata 2: 50 ALGO
+  /** 
+   * The proposed gold distribution in microAlgos.
+   * Array index corresponds to the pirate's seniorityIndex.
+   * Example: [0, 100, 50] means:
+   *   Pirate 0 (Dead): 0 microAlgos
+   *   Pirate 1: 100 microAlgos
+   *   Pirate 2: 50 microAlgos
    */
   distribution: number[]
   
-  /** Conteggio voti SÌ */
+  /** Count of YES votes */
   votesFor: number
   
-  /** Conteggio voti NO */
+  /** Count of NO votes */
   votesAgainst: number
   
-  /** Stato finale della proposta */
+  /** Final state of the proposal */
   outcome: 'PENDING' | 'PASSED' | 'REJECTED' | null
 }
 
 /**
- * DATI SUL VOTO DEL GIOCATORE CORRENTE (Me)
- * * Serve a gestire lo stato della UI per Commit/Reveal.
+ * Voting status for the current player (Me)
+ * 
+ * Used to manage UI state for Commit/Reveal actions.
  */
 export interface MyVoteStatus {
   hasCommitted: boolean
@@ -76,64 +95,65 @@ export interface MyVoteStatus {
 }
 
 /**
- * SESSIONE DI GIOCO COMPLETA
+ * Complete game session data
+ * 
+ * Contains all state information for a single Pirate Game session.
  */
 export interface PirateGameSession {
-  [x: string]: unknown
+  [x: string]: unknown  
   id: number
   phase: PirateGamePhase
   fee: number
   totalPot: number 
   
-  // --- Stato dei Partecipanti ---
-  /** Lista completa di tutti i pirati iscritti, ordinata per seniority */
+  /** Complete list of all registered pirates, ordered by seniority */
   pirates: PirateInfo[]
   
-  /** Numero di pirati ancora vivi (utile per calcolare la maggioranza) */
+  /** Number of pirates still alive (useful for majority calculation) */
   alivePiratesCount: number
   
-  /** L'indice di seniority del capitano che "comanda" in questo round */
+  /** Seniority index of the captain who "commands" in this round */
   currentProposerIndex: number
 
-  // --- Stato del Round Corrente ---
-  /** Dettagli sulla proposta attiva (se esiste) */
+  /** Details of the active proposal (if exists) */
   currentProposal: ProposalInfo | null
   
+  /** Current player's pirate data (null if not registered) */
   myPirateInfo: PirateInfo | null
   
-  /** Stato del mio voto nel round corrente */
+  /** Current player's voting status in the current round */
   myVote: MyVoteStatus | null
 
-
+  /** Result of claim (if game ended for this player) */
   claimResult: PirateClaimResult | null
 
-  // --- Action Flags (Boolean per la UI) ---
+  /** Can the player register? (Phase === REGISTRATION && before start time) */
   canRegister: boolean
   
-  /** Tocca a me proporre? (Phase === PROPOSAL && isCurrentProposer) */
+  /** Is it my turn to propose? (Phase === PROPOSAL && isCurrentProposer) */
   canPropose: boolean
   
-  /** Posso votare? (Phase === VOTE_COMMIT && alive && !isProposer && !hasCommitted) */
+  /** Can I vote? (Phase === VOTE_COMMIT && alive && !isProposer && !hasCommitted) */
   canVote: boolean
   
-  /** Posso rivelare? (Phase === VOTE_REVEAL && hasCommitted && !hasRevealed) */
+  /** Can I reveal? (Phase === VOTE_REVEAL && hasCommitted && !hasRevealed) */
   canReveal: boolean
   
-  /** * Posso forzare l'esecuzione? 
-   * True se il tempo è scaduto per Reveal.
+  /** Can I force execution? 
+   * True if time expired for Reveal phase or other timeout conditions.
    */
   canExecute: boolean
   
-  /** Posso ritirare? */
+  /** Can I withdraw winnings? (Phase === ENDED && not claimed) */
   canClaim: boolean
 
+  /** Current game round number (increments after each captain elimination) */
   gameRound: number
-  // --- Timing (Blocks/Rounds) ---
-  /** * Gestione temporale. 
-   */
+  
+  /** Timing management for phase transitions and timeouts */
   rounds: {
-    current: number      // Blocco attuale della chain
-    start: number        // Inizio della fase corrente
-    endPhase: number     // Scadenza della fase corrente (Timeout)
+    current: number      // Current blockchain round
+    start: number        // Start round of current phase
+    endPhase: number     // Expiration round of current phase (for timeout)
   }
 }

@@ -75,7 +75,6 @@ export const ConnectWallet = () => {
     </dialog>
   )
 
-  // 1. SE CONNESSO: Mostra dropdown
   if (activeAddress) {
     return (
       <div className="dropdown dropdown-end">
@@ -94,7 +93,6 @@ export const ConnectWallet = () => {
     )
   }
 
-  // 2. SE DISCONNESSO: Bottone + Modale (Portal)
   return (
     <>
       <button

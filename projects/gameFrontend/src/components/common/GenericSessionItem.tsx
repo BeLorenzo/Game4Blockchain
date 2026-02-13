@@ -82,7 +82,6 @@ export function useSessionState<T extends BaseGameSession>(session: T) {
 
 /**
  * Generic Session Item
- * Gestisce il rendering comune di ogni sessione
  */
 export function GenericSessionItem<T extends BaseGameSession>({
   session,

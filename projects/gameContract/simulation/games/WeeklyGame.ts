@@ -54,13 +54,13 @@ export class WeeklyGame implements IBaseGameAdapter {
   /** Record of votes from the last round (day name -> vote count) */
   private lastRoundVotes: Record<string, number> | null = null
   /** Algorand client for blockchain interaction */
-  private algorand = AlgorandClient.defaultLocalNet()
+  private algorand = AlgorandClient.fromEnvironment()
   /** Factory for smart contract deployment */
   private factory: WeeklyGameFactory | null = null
   /** Client to interact with deployed smart contract */
   private appClient: WeeklyGameClient | null = null
-  /** Participation fee for the game (10 ALGO) */
-  private participationAmount = AlgoAmount.Algos(10)
+  /** Participation fee for the game (1 ALGO) */
+  private participationAmount = AlgoAmount.Algos(1)
   /** Map of agents' secrets for current round (addr -> RoundSecret) */
   private roundSecrets: Map<string, RoundSecret> = new Map()
   /** Configuration of current session (timing based on Algorand rounds) */
@@ -73,9 +73,9 @@ export class WeeklyGame implements IBaseGameAdapter {
    * - revealPhase: duration of reveal phase
    */
   private durationParams = {
-    warmUp: 3n,
-    commitPhase: 15n,
-    revealPhase: 10n,
+    warmUp: 10n,
+    commitPhase: 40n,
+    revealPhase: 30n,
   }
 
   /** Array of day names for display and mapping */
@@ -84,32 +84,50 @@ export class WeeklyGame implements IBaseGameAdapter {
   /**
    * Deploys the smart contract on Algorand
    */
-  async deploy(admin: Account, suffix: string = ''): Promise<void> {
-    const appName = `WeeklyGame${suffix}`
-
-    const signer = algosdk.makeBasicAccountTransactionSigner(admin)
-        
-    this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
-      defaultSender: admin.addr,
-      defaultSigner: signer,
-      appName: appName,
-    })
-
-    const { appClient, result } = await this.factory.deploy({
-      onUpdate: 'append', 
-      onSchemaBreak: 'append', 
-      suppressLog: true
-    })
-
-    this.appClient = appClient
-
-    await this.algorand.account.ensureFundedFromEnvironment(
-        appClient.appAddress, 
-        AlgoAmount.Algos(5)
-    )
-
-    const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing'
-    this.log(`${action} contract: ${appName} (AppID: ${appClient.appId})`)
+   async deploy(admin: Account, suffix: string = ''): Promise<void> {
+     const appName = `WeeklyGame${suffix}`
+     const signer = algosdk.makeBasicAccountTransactionSigner(admin)
+     
+     this.factory = this.algorand.client.getTypedAppFactory(WeeklyGameFactory, {
+       defaultSender: admin.addr,
+       defaultSigner: signer,
+       appName: appName,
+     })
+ 
+     // Deploy contract (create if doesn't exist, otherwise use existing)
+     const { appClient, result } = await this.factory.deploy({
+       onUpdate: 'append', 
+       onSchemaBreak: 'append', 
+       suppressLog: true
+     })
+ 
+     this.appClient = appClient
+     const appInfo = await this.algorand.account.getInformation(appClient.appAddress);
+     const minBalance = AlgoAmount.Algos(1);
+ 
+     if (appInfo.balance < minBalance) {
+         console.log(`Funding App ${appName} from Admin...`);
+         const adminSigner = algosdk.makeBasicAccountTransactionSigner(admin);
+         await this.algorand.send.payment({
+             sender: admin.addr,
+             receiver: appClient.appAddress,
+             amount: AlgoAmount.Algos(1), 
+             signer: adminSigner
+         });
+     }
+     const action = result.operationPerformed === 'create' ? 'Created new' : 'Reusing existing'
+     const txId = result.operationPerformed !== 'nothing' 
+      ? result.transaction.txID() 
+      : undefined
+      this.log(
+        `${action} contract: ${appName} (AppID: ${result.appId})`, 
+        'system', 
+        { 
+          txId: txId,       
+          txType: 'DEPLOY',
+          agentName: admin.addr.toString().substring(0,6)
+        }
+      )
   }
 
   /**
@@ -151,7 +169,7 @@ export class WeeklyGame implements IBaseGameAdapter {
     })
 
     const sessionId = Number(result.return) + 1
-    this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event')
+    this.log(`Session ${sessionId} created. Start: round ${startAt}`, 'game_event', {txId: result.transaction.txID(), txType: 'START', agentName: dealer.name})
 
     const initialPot = Number(this.participationAmount.microAlgos) * 0 / 1_000_000
     this.stateUpdater({ pot: initialPot })
@@ -198,21 +216,21 @@ export class WeeklyGame implements IBaseGameAdapter {
           }
         }
       })
-      this.log(`[${agent.name}] Committed: ${this.dayNames[safeChoice]}`, 'action')
-
+      
       const hash = this.getHash(safeChoice, salt)
       const payment = await this.algorand.createTransaction.payment({
         sender: agent.account.addr,
         receiver: this.appClient!.appAddress,
         amount: this.participationAmount,
       })
-
-      await this.appClient!.send.joinSession({
+      
+      const result = await this.appClient!.send.joinSession({
         args: { sessionId, commit: hash, payment },
         sender: agent.account.addr,
         signer: agent.signer,
         suppressLog: true,
       })
+      this.log(`[${agent.name}] Committed: ${this.dayNames[safeChoice]}`, 'action', {txId: result.transaction.txID(), txType: 'COMMIT'})
     }
   }
 
@@ -245,7 +263,7 @@ Tuesday players get: 23.33 / 2 = 11.66 ALGO each
     let situation = `
 CURRENT STATUS:
 Round: ${roundNumber}
-Entry fee: 10 ALGO
+Entry fee: 1 ALGO
 `.trim()
 
     // Add historical information if available
@@ -322,7 +340,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         })
 
         try {
-          await this.appClient!.send.revealMove({
+          const result = await this.appClient!.send.revealMove({
             args: {
               sessionId,
               choice: BigInt(secret.choice),
@@ -332,8 +350,7 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
             signer: agent.signer,
             suppressLog: true,
           })
-          this.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`, 'game_event')
-
+          this.log(`[${agent.name}] Revealed: ${this.dayNames[secret.choice]}`, 'game_event', {txId: result.transaction.txID(), txType: 'REVEAL', agentName:agent.name})
           this.stateUpdater({
             agents: {
               [agent.name]: { status: 'revealed', choice: secret.choice }
@@ -402,11 +419,11 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
         outcome = netProfitAlgo > 0 ? 'WIN' : netProfitAlgo === 0 ? 'DRAW' : 'LOSS'
         
         if (outcome === 'WIN') {
-            this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
+            this.log(`💰 ${agent.name} WINS! (+${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event', {txId: result.transaction.txID(), txType: 'CLAIM', agentName: agent.name})
         } else if (outcome === 'DRAW') {
-            this.log(`⚖️ ${agent.name} BREAK-EVEN (0 ALGO)`, 'game_event')
+            this.log(`⚖️ ${agent.name} BREAK-EVEN (0 ALGO)`, 'game_event', {txId: result.transaction.txID(), txType: 'CLAIM', agentName: agent.name})
         } else {
-            this.log(`💸 ${agent.name} LOSES (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event')
+            this.log(`💸 ${agent.name} LOSES (${netProfitAlgo.toFixed(2)} ALGO)`, 'game_event', {txId: result.transaction.txID(), txType: 'CLAIM', agentName:agent.name})
         }
       } catch (e: any) { }
 
@@ -439,28 +456,39 @@ Respond ONLY with JSON: {"choice": <0-6>, "reasoning": "<your explanation>"}
 
   /**
    * Waits until Algorand blockchain reaches a specific round
-   * Uses spam transactions to advance rounds in test environment
+   * Uses spam transactions to advance rounds in local environment 
+   * or simply wait in test environment
    */
   private async waitUntilRound(targetRound: bigint) {
     const status = (await this.algorand.client.algod.status().do()) as any
-    const currentRound = BigInt(status['lastRound'])
+    let currentRound = BigInt(status['lastRound'])
 
     if (currentRound >= targetRound) return
 
-    const blocksToSpam = Number(targetRound - currentRound)
-    const spammer = await this.algorand.account.random()
-    await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
+    const isTestNet = process.env.ALGOD_NETWORK === 'testnet';
 
-    // Send empty transactions to advance rounds
-    for (let i = 0; i < blocksToSpam; i++) {
-      await this.algorand.send.payment({
-        sender: spammer.addr,
-        receiver: spammer.addr,
-        amount: AlgoAmount.MicroAlgos(0),
-        signer: spammer.signer,
-        note: `spam-${i}-${Date.now()}`,
-        suppressLog: true,
-      })
+    if (isTestNet) {
+      console.log(`⏳ Waiting for TestNet round ${targetRound} (Current: ${currentRound})...`);
+      this.log(`⏳ Waiting for TestNet round ${targetRound} (Current: ${currentRound})...`)
+      while (currentRound < targetRound) {
+        const nextStatus = await this.algorand.client.algod.statusAfterBlock(Number(currentRound)).do();
+        currentRound = BigInt(nextStatus['lastRound']);
+      }
+      console.log(" Done.");
+    } else {
+      const blocksToSpam = Number(targetRound - currentRound)
+      const spammer = await this.algorand.account.random()
+      await this.algorand.account.ensureFundedFromEnvironment(spammer.addr, AlgoAmount.Algos(1))
+      for (let i = 0; i < blocksToSpam; i++) {
+        await this.algorand.send.payment({
+          sender: spammer.addr,
+          receiver: spammer.addr,
+          amount: AlgoAmount.MicroAlgos(0),
+          signer: spammer.signer,
+          note: `spam-${i}-${Date.now()}`,
+          suppressLog: true,
+        })
+    }
     }
   }
 }

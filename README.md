@@ -1,7 +1,5 @@
 # Game4Blockchain 🎮
 
-> **🚧 Project in Active Development**
-
 > **A comprehensive blockchain gaming framework on Algorand**
 A secure blockchain gaming modular framework built on Algorand featuring anti-frontrunning games using commit-reveal pattern, interactive CLI, and AI-powered simulation system.
 
@@ -12,14 +10,28 @@ A secure blockchain gaming modular framework built on Algorand featuring anti-fr
 
 ---
 
-## 🎯 What Makes This Special?
+## 🧩 The Ecosystem (Project Structure)
 
-This project combines three powerful components:
+This repository is a monorepo containing 4 interconnected pillars. **Click on the respective READMEs to dive into each component:**
 
-1. **🔒 Secure Smart Contracts** - Anti-frontrunning game framework using commit-reveal
-2. **🖥️ Interactive CLI** - Play games directly from your terminal
-3. **🤖 AI Simulation System** - Watch LLM agents battle in game theory experiments
+### 1. 🔒 Smart Contracts (Core)
+The on-chain truth. A secure, object-oriented framework implementing the Commit-Reveal pattern to prevent frontrunning in strategic games (Stag Hunt, Pirate Game, Minority Game, Guess 2/3m RPS).
+👉 **[Read the Smart Contracts Documentation](./projects/gameContract/smart_contracts/README.md)**
 
+### 2. 🎮 Interactive Frontend (React + Vite)
+The human layer. A Web3 web application where players can connect their Algorand wallets (Pera, KMD, Defly) to play the games, or open the **Simulation Dashboard** to watch AI agents battle in real-time.
+👉 **[Read the Frontend Documentation](./projects/gameFrontend/README.md)**
+
+### 3. 🤖 AI Agent Simulation
+The experiment layer. A headless server and simulation engine that creates LLM-powered agents (via Ollama) with distinct psychological profiles, tracks their long-term memories, and makes them play the on-chain games autonomously.
+👉 **[Read the AI Simulation Documentation](./projects/gameContract/simulation/README.md)**
+
+### 4. 🖥️ Command Line Interface (CLI)
+Deploy contracts, manage game sessions, force timeouts, and play games directly from your terminal.
+👉 **[Read the CLI Documentation](./projects/gameContract/cli/README.md)**
+
+Every component is designed to work together, yet each can be used independently.  
+All N-players games are fully implemented across **smart contracts, CLI, frontend, and simulation**.
 ---
 
 ## ⚙️ Prerequisites
@@ -29,381 +41,220 @@ Before running the project, ensure you have the following installed globally:
 - **Node.js v22+**: Required to run the TypeScript environment.
 - **Docker Desktop**: Essential. Must be installed and **running** to start LocalNet.
 - **AlgoKit CLI**: The tool for managing the project lifecycle.
+   ```bash
+   # macOS
+   brew install algorand/tap/algokit
+   # Windows/Linux (via Python)
+   pipx install algokit
+  ```
 - **Ollama** (for simulations): Local LLM server for AI agents
-
-### Installation
-
-```bash
-# Install AlgoKit
-brew install algorand/tap/algokit  # macOS
-# or
-pipx install algokit              # Linux/Windows
-
-# Install Ollama (for AI simulations)
-# Visit: https://ollama.ai
-# Then pull the model:
-ollama pull llama3:latest
-```
-
+  ```bash
+  # Download from ollama.ai, then pull the default model:
+  ollama pull hermes3
+  ```
 ---
 
 ## 🚀 Quick Start
 
-### 1. Clone and Setup
+First, lay the foundation. Then, choose how you want to experience the Game4Blockchain ecosystem.
+
+
+### Phase 1: The Foundation (Mandatory)
+Start the local blockchain and install the core smart contract dependencies.
 
 ```bash
-# Clone the repository
-git clone https://github.com/BeLorenzo/Game4Blockchain
-cd games4blockchain
+# 1. Start LocalNet (IMPORTANT: Make sure Docker Desktop is running!)
+algokit localnet start
 
-# Navigate to the project
+# 2. Setup the core project
+cd projects/gameContract
+npm install
+
+```
+---
+
+### Phase 2: Choose Your Experience
+
+#### Path A: The Full Stack (Web UI & AI Dashboard)
+
+Best for seeing the complete picture. Play games with your Web3 wallet or watch AI agents battle in a real-time React dashboard.
+
+*Terminal 1 (Backend API):*
+
+```bash
+cd projects/gameContract
+npm run server
+
+```
+
+*Terminal 2 (Frontend UI):*
+
+```bash
+cd projects/gameFrontend
+npm install
+npm run dev
+
+```
+
+**[→ Full Frontend Documentation](https://www.google.com/search?q=./projects/gameFrontend/README.md)**
+
+#### Path B: The Terminal Way (Interactive CLI)
+
+Best for deploying contracts as an admin, forcing timeouts, or playing games manually right from your terminal.
+
+```bash
+cd projects/gameContract
+npm run cli
+
+```
+
+**[→ Full CLI Documentation](https://www.google.com/search?q=./projects/gameContract/cli/README.md)**
+
+#### Path C: The AI Simulation
+
+Best for running massive automated game theory experiments without a graphical interface.
+
+```bash
 cd projects/gameContract
 
-# Install dependencies
-npm install
-```
-
-### 2. Start Local Blockchain
-
-```bash
-# IMPORTANT: Make sure Docker Desktop is open and running!
-algokit localnet start
-```
-
-### 3. Compile
-
-```bash
-# Compile contracts
-npm run build
-```
-### 4. Choose Your Path
-
-#### 🎮 Option A: Play with CLI
-```bash
-npm run cli
-```
-Follow the interactive menu to deploy contracts and play games manually.
-**[→ Full CLI Documentation](./projects/gameContract/cli/README.md)**
-
-#### 🤖 Option B: Run AI Simulation
-
-```bash
-# Make sure Ollama is running first!
+# Make sure Ollama is running first! (ollama serve)
 npm run simulation
 
-# After simulation, view statistics
+# When the simulation finishes, generate the ASCII analytics
 npm run stats
+
 ```
 
-Watch AI agents with different personalities compete in game theory scenarios.
-
-**[→ Full Simulation Documentation](./projects/gameContract/simulation/README.md)**
+**[→ Full AI Simulation Documentation](https://www.google.com/search?q=./projects/gameContract/simulation/README.md)**
 
 ---
 
-## 📚 Documentation Structure
+## Component Deep Dive
 
-```
-📖 Documentation
-├── 🏠 This README (Overview & Setup)
-│
-├── 📁 projects/gameContract/
-│   ├── README.md           → Smart Contracts (detailed)
-│   ├── cli/README.md       → CLI Usage Guide
-│   └── simulation/README.md → AI Simulation Guide
-```
-**Navigation:**
-- **[Smart Contracts Documentation →](./projects/gameContract/README.md)**
-  - Game mechanics and rules
-  - Commit-reveal architecture
-  - How to extend the framework
-  - Security features
+### 1. Smart Contracts (Algorand) 
 
-- **[CLI Documentation →](./projects/gameContract/cli/README.md)**
-  - Interactive gameplay
-  - Deploy and manage games
-  - Command reference
+A robust abstract framework written in **Algorand TypeScript** that implements the Commit‑Reveal pattern.
 
-- **[Simulation Documentation →](./projects/gameContract/simulation/README.md)**
-  - AI agent system
-  - Run experiments
-  - Analyze results
+**Key features:**
+
+- ✅ Client‑side SHA256 hash generation → only the hash is stored on‑chain.
+- ✅ Optimized box storage, precise MBR calculation.
+- ✅ Strict phase enforcement (commit/reveal) based on block rounds.
+- ✅ **Pull‑based claiming**: winners explicitly claim their rewards – no automatic pushes.
+- ✅ Clean inheritance: new games extend `GameContract` and only implement game‑specific logic.
+
+**Implemented games:**
+
+- Rock Paper Scissors -> 1v1 instant resolution. 2 Players
+- Weekly Game         -> Multi‑player lottery (minority). N Players
+- Stag Hunt           -> Cooperation with threshold. N Players
+- Guess Game          -> 2/3 of the average. N Player
+- Pirate Game         -> Treasure division, voting. 3‑20 Players
+
+[📖 Smart Contract Documentation →](./projects/gameContract/README.md)
 
 ---
 
-## 🏗️ Project Structure
+### 2. Interactive CLI 🖥️
 
-```
-games4blockchain/
-├── projects/
-│   └── gameContract/
-│       ├── smart_contracts/        # On-chain game logic
-│       │   ├── abstract_contract/  # Base framework
-│       │   ├── RockPaperScissors/  # 2-player game
-│       │   ├── weeklyGame/         # Lottery-style
-│       │   ├── stagHunt/           # Cooperation game
-│       │   ├── guessGame/          # Game theory classic
-│       │   └── artifacts/          # Compiled TEAL
-│       │
-│       ├── cli/                    # Interactive terminal UI
-│       │   ├── index.ts           # Main orchestrator
-│       │   ├── walletManager.ts   # Algorand integration
-│       │   ├── utils.ts           # Error handling
-│       │   └── games/
-│       │       ├── rps.ts
-│       │       ├── weekly.ts
-│       │       ├── stagHunt.ts
-│       │       └── guessGame.ts
-│       │
-│       ├── simulation/            # AI agent system
-│       │   ├── main.ts           # Simulation runner
-│       │   ├── Agent.ts          # AI agent brain
-│       │   ├── llm.ts            # LLM interface
-│       │   ├── stats.ts          # Analysis tools
-│       │   └── games/            # Game adapters
-│       │
-│       └── tests/                # 100+ test cases
-│
-└── README.md                     # You are here
-```
+A feature‑rich terminal interface for interacting with all games.
+
+- **Plugin system** – Adding a new game = implement `IGameModule` and register it.
+- **Smart wallet handling**:  
+  - With `.env` (mnemonic) → persistent account.  
+  - Without `.env` → **temporary random wallet** (perfect for quick tests, funds lost on exit).
+- **Automatic hash + salt generation** – user only sees the salt to save.
+- **Color‑coded dashboard** (green = active, yellow = waiting, red = closed).
+- **Context‑aware prompts** (e.g., warns if App ID doesn’t exist, phase mismatch).
+
+**Multi‑terminal testing:**  
+Run the CLI in different terminals – one with a persistent admin account, others as temporary players.
+
+[📖 CLI Documentation →](./projects/gameContract/cli/README.md)
 
 ---
 
-## 🎮 Implemented Games
+### 3. React Frontend 🌐
 
-All games feature complete smart contracts, comprehensive tests, full CLI support, and AI simulation integration.
+A modern single‑page application built with **Vite, React, Tailwind CSS, and daisyUI**, originally scaffolded with AlgoKit and heavily extended.
 
-### 🪨 Rock Paper Scissors
-**Type:** 2-player, instant resolution
-**Mechanics:** Classic game with timeout protection
-**Duration:** ~30 seconds
-**CLI:** ✅ Complete
-**Simulation:** ✅ Complete
+#### 🕹️ Interactive Mode
+- Connect your Algorand wallet (Pera, Defly, or KMD/Local wallet).
+- Play all five games with a smooth, game‑specific UI.
+- **Pirate Game** features dedicated components: `PirateCrewList`, `ProposalStatus`, `MakeProposalForm`.
 
-### 📅 Weekly Game
-**Type:** Multi-player, minority game
-**Mechanics:** Choose a day, fewer players = bigger payout
-**Duration:** ~2 minutes
-**CLI:** ✅ Complete
-**Simulation:** ✅ Complete
+#### 📊 Live Simulation Dashboard
+- Connects to the Express API (`http://localhost:3000/api/status`).
+- Real‑time `TypewriterLog` of agent thoughts and actions.
+- Live `BlockchainStats`, win‑rate charts, and state matrices.
 
-### 🦌 Stag Hunt (Assurance Game)
-**Type:** Multi-player, cooperation
-**Mechanics:** Cooperate to win big or play safe
-**Duration:** ~2 minutes
-**CLI:** ✅ Complete
-**Simulation:** ✅ Complete
+**Environment:**  
+Deployed contract IDs are stored in `.env` (see `VITE_GAMENAME_APP_ID`)
 
-### 🎯 Guess Game (2/3 of Average)
-**Type:** Multi-player, game theory
-**Mechanics:** Guess 2/3 of average, closest wins
-**Duration:** ~2 minutes
-**CLI:** ✅ Complete
-**Simulation:** ✅ Complete
+[📖 Frontend Documentation →](./projects/gameFrontend/README.md)
 
 ---
 
-## 🔒 Security Features
+### 4. AI Simulation System 🤖
 
-### Commit-Reveal Pattern
-Prevents frontrunning by hiding moves until all players commit:
+The most advanced component – **not** a collection of deterministic bots, but real LLM agents (Ollama) with:
 
+#### 🧠 Psychological Profiles
+Each agent has 8 core traits (0‑1 scale) and a free‑text personality description:
+- Risk tolerance, trust, greed/altruism, patience, adaptability, resilience, curiosity, fairness focus.
+
+#### 💾 Persistent Memory
+- **Short‑term**: last 5 moves and outcomes.
+- **Long‑term**: per‑game statistics (choices, win rates, average profit).
+- Data is saved to `data/agents/*.json` and reused across simulation runs → agents **learn**.
+
+#### 🧩 Prompt Engineering
+Clean separation of concerns:
+- **Game Adapter** → provides objective rules and current state.
+- **Agent** → wraps the game prompt with its own identity, memory, and **mental state** (optimism, frustration, streak counter).
+
+**Final prompt structure:**
 ```
-1. Commit Phase   → Send SHA256(move + salt)
-2. Reveal Phase   → Send (move, salt) for verification
-3. Resolution     → Contract verifies and determines winners
+You are [Agent Name].
+
+════════ GAME RULES AND CONTEXT ════════
+[from adapter: rules, pot size, alive players, etc.]
+
+════════ YOUR IDENTITY AND KNOWLEDGE ════════
+YOUR PERSONALITY: [description]
+YOUR PARAMETERS: [risk, trust, ...]
+
+════════ YOUR MEMORY ════════
+[win rates, past ROI for each choice]
+YOUR RECENT MOVES: [last 5 choices and results]
+MENTAL STATE: [frustration, optimism, loss streak]
+
+═════════════════════════════════════════════
+[Expected JSON output: { choice, reasoning }]
 ```
 
-### Additional Protections
-- ✅ Anti-replay attacks (player data cleanup)
-- ✅ Timeline enforcement (strict phase control)
-- ✅ MBR management (precise storage costs)
-- ✅ Timeout mechanisms (handle non-revealing players)
-- ✅ Hash verification (cryptographic proof)
+#### 📡 Express API Server
+- `GET /api/status` – current game state and log timeline.
+- `POST /api/start` – launch a new simulation.
+- `GET /api/agent-stats` – aggregated win rates / profits.
+- `GET /api/history/:gameId` – full session history.
+
+[📖 Simulation Documentation →](./projects/gameContract/simulation/README.md)
 
 ---
 
-## 🧪 Testing
+## 🛠️ Development & Extension
 
-The project includes comprehensive test suites:
+The entire codebase is built for **easy extension**.
 
-```bash
-# Run all tests
-npm test
+### Adding a New Game (4 steps)
 
-# Test specific contract
-npm test RockPaperScissors
-npm test weeklyGame
+1. **Smart Contract** – Create a folder under `smart_contracts/`, extend `GameContract`, and implement your game logic.
+2. **CLI** – Write a module implementing `IGameModule` and register it in `cli/index.ts`.
+3. **Frontend** – Add React components in `src/components/games/` and a custom hook in `src/hooks/`.
+4. **Simulation** – Create an adapter that implements `IBaseGameAdapter` (or `IMultiRoundGameAdapter`) and use it in `main.ts`.
 
-# Run with coverage
-npm run test:coverage
-```
-
-**Test Coverage:**
-- ✅ Normal gameplay flows
-- ✅ Edge cases (ties, single players, etc.)
-- ✅ Security scenarios (double claims, invalid reveals)
-- ✅ Economic correctness (prize distribution, MBR)
-- ✅ Dust and remainder handling
-
----
-
-## 🤖 AI Simulation System
-
-### What Makes It Special?
-
-Unlike simple bots, our AI agents:
-- **Think strategically** using Large Language Models
-- **Learn from experience** with persistent memory
-- **Adapt strategies** based on outcomes
-- **Have personalities** (risk-averse, cooperative, contrarian, etc.)
-- **Interact with real contracts** on LocalNet
-
-### Example Agent Types
-
-| Agent | Personality | Strategy |
-|-------|------------|----------|
-| **Alpha** | The Scientist | Pure math, Expected Value maximization |
-| **Beta** | The Paranoid | Minimax, avoid worst outcomes |
-| **Gamma** | The Gambler | High-risk, chases big wins |
-| **Delta** | The Avenger | Tit-for-tat, reciprocity |
-| **Epsilon** | The Cooperator | Maximizes group welfare |
-| **Zeta** | The Opportunist | Follows winning trends |
-| **Eta** | The Contrarian | Goes against the crowd |
-
-### Running Experiments
-
-```bash
-# Choose game in simulation/main.ts
-const game = new StagHuntGame()
-// const game = new GuessGame()
-// const game = new WeeklyGame()
-
-# Run simulation
-npm run sim
-
-# View results
-npm run stats
-```
-
-**[→ See Full Simulation Guide](./projects/gameContract/simulation/README.md)**
-
----
-
-## 💻 Development Commands
-
-### Smart Contracts
-
-```bash
-# Compile contracts
-npm run build
-
-# Deploy all contracts
-npm run deploy
-
-# Deploy specific contract
-npm run deploy RockPaperScissors
-
-# Run tests
-npm test
-```
-
-### CLI
-
-```bash
-# Start interactive CLI
-npm run cli
-
-# Manual wallet (uses .env MNEMONIC)
-# Random wallet (no .env, temporary)
-```
-
-### Simulation
-
-```bash
-# Run AI simulation
-npm run simulation
-
-# View statistics
-npm run stats
-```
-
----
-
-## 🛠️ Extending the Framework
-
-The architecture is designed for easy extension. See detailed guides in each component:
-
-### Adding a New Game
-
-**1. Smart Contract** ([Guide →](./projects/gameContract/README.md))
-```typescript
-// smart_contracts/yourGame/contract.algo.ts
-export class YourGame extends GameContract {
-  // Inherit commit-reveal logic
-  // Add your game rules
-}
-```
-
-**2. CLI Module** ([Guide →](./projects/gameContract/cli/README.md))
-```typescript
-// cli/games/yourGame.ts
-export const YourGameModule: IGameModule = {
-  id: 'YOUR_GAME',
-  name: '🎲 Your Game',
-  deploy, create, join, reveal, getStatus
-}
-```
-
-**3. Simulation Adapter** ([Guide →](./projects/gameContract/simulation/README.md))
-```typescript
-// simulation/games/YourGame.ts
-export class YourGame implements IGameAdapter {
-  // Implement adapter interface
-}
-```
-
-**4. Tests**
-```typescript
-// smart_contracts/yourGame/contract.e2e.spec.ts
-describe('YourGame', () => {
-  test('normal gameplay', async () => { /* ... */ })
-  test('edge cases', async () => { /* ... */ })
-})
-```
-
----
-
-## 🎓 What You Can Learn
-
-This project demonstrates:
-
-### Blockchain Development
-- ✅ Algorand smart contract architecture
-- ✅ Commit-reveal pattern implementation
-- ✅ Box storage optimization
-- ✅ MBR calculation and management
-- ✅ Transaction grouping
-
-### Game Theory
-- ✅ Nash equilibrium discovery
-- ✅ Cooperation vs defection dynamics
-- ✅ Minority game strategies
-- ✅ K-level reasoning
-
-### AI/LLM Integration
-- ✅ Prompt engineering for strategic thinking
-- ✅ Memory and learning systems
-- ✅ Personality modeling
-- ✅ Multi-agent systems
-
-### Software Architecture
-- ✅ Clean abstraction layers
-- ✅ Extensible design patterns
-- ✅ Test-driven development
-- ✅ Modular component structure
-
----
+Each component’s README contains a dedicated **extension guide** with code examples.
 
 ## 🐛 Troubleshooting
 
@@ -461,10 +312,13 @@ node --version
 - [AlgoKit Documentation](https://github.com/algorandfoundation/algokit-cli)
 - [AlgoKit Utils](https://github.com/algorandfoundation/algokit-utils-ts)
 
+**use-wallet**: [github.com/txnlab/use-wallet](https://github.com/txnlab/use-wallet)
+
+**Ollama**: [ollama.ai](https://ollama.ai)
+
 **Game Theory:**
-- [Stag Hunt](https://en.wikipedia.org/wiki/Stag_hunt) - Assurance game
-- [Guess 2/3 Average](https://en.wikipedia.org/wiki/Guess_2/3_of_the_average) - K-level reasoning
-- [Minority Game](https://en.wikipedia.org/wiki/Minority_game) - Market dynamics
+Game design inspired by classic game theory problems:  
+- Stag Hunt, Guess 2/3 of the Average, Pirate Game, Minority Game.
 
 **Commit-Reveal:**
 - [Commitment Schemes](https://en.wikipedia.org/wiki/Commitment_scheme)

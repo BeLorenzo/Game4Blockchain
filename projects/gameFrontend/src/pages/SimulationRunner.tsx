@@ -1,20 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Play, Square, Terminal, AlertTriangle, Activity, Skull, Crown, Brain, Zap, ArrowDown } from 'lucide-react'
+import { useTransactionToast } from '../context/TransactionToast'
 
 // =====================================================================
-// INTERFACCE
+// INTERFACES
 // =====================================================================
 
+/**
+ * Represents a single log entry in the simulation stream.
+ */
 interface LogEntry {
   timestamp: number
   agent: string
   type: 'thought' | 'action' | 'system' | 'game_event'
   message: string
-  // MODIFICA: Lo snapshot arriva qui dentro
   stateSnapshot?: GameState
+  txId?: string
+  txType?: string
 }
 
+/**
+ * Represents the state of an individual agent in the simulation.
+ */
 interface AgentState {
   name?: string 
   choice?: number
@@ -23,6 +31,9 @@ interface AgentState {
   lastAction: string
 }
 
+/**
+ * Represents the complete game state at a point in time.
+ */
 interface GameState {
   sessionId: string | number
   round: number
@@ -36,6 +47,9 @@ interface GameState {
   }
 }
 
+/**
+ * Represents the server's simulation status.
+ */
 interface SimulationState {
   isRunning: boolean
   gameName: string
@@ -45,10 +59,10 @@ interface SimulationState {
   gameState?: GameState
 }
 
-// =====================================================================
-// CONFIGURAZIONE
-// =====================================================================
 
+/**
+ * Color mapping for different agent names in the UI.
+ */
 const AGENT_COLORS: Record<string, string> = {
   Alpha: 'text-blue-400 border-blue-500/30',
   Beta: 'text-red-400 border-red-500/30',
@@ -61,19 +75,19 @@ const AGENT_COLORS: Record<string, string> = {
   Game: 'text-cyan-400'
 }
 
-const TYPING_SPEED = 15 
-const MIN_DISPLAY_TIME = 300 
+const TYPING_SPEED = 15 // Milliseconds per character for typing animation
+const MIN_DISPLAY_TIME = 300 // Minimum display time for a log entry (ms)
 
-// =====================================================================
-// HELPER PER VISUALIZZAZIONE SCELTE
-// =====================================================================
 
+/**
+ * Formats game-specific choices into human-readable display strings.
+ */
 const getGameChoiceDisplay = (gameId: string | undefined, choice: number | undefined) => {
   if (choice === undefined) return null;
 
   switch (gameId) {
     case 'StagHunt':
-      // 0 = Hare (Pecora/Sicuro), 1 = Stag (Cervo/Rischio)
+      // 0 = Hare (Safe/Low reward), 1 = Stag (Risky/High reward)
       return choice === 1 ? '🦌 STAG' : '🐑 HARE';
     
     case 'WeeklyGame':
@@ -81,21 +95,26 @@ const getGameChoiceDisplay = (gameId: string | undefined, choice: number | undef
       return days[choice] ? `📅 ${days[choice]}` : `Day ${choice}`;
     
     case 'GuessGame':
-      return `🔢 Guess: ${choice}`; // Assumiamo sia un numero tra 0 e 100
+      return `🔢 Guess: ${choice}`; // Assumed to be a number between 0 and 100
       
     default:
       return `Choice: ${choice}`;
   }
 };
 
-// =====================================================================
-// COMPONENTE PRINCIPALE
-// =====================================================================
-
+/**
+ * SimulationRunner Component
+ * 
+ * Real-time visualization dashboard for blockchain game simulations.
+ * Displays:
+ * - Live agent thinking logs with typing animation
+ * - Current game state (agents, pot, round)
+ * - Interactive controls to start simulations
+ * - Intelligent scrolling and synchronization with server state
+ */
 export default function SimulationRunner() {
-  const { gameId } = useParams()
-  
-  // --- SERVER STATE ---
+  const { gameId } = useParams() // Get game ID from URL parameters
+  const { showToast } = useTransactionToast()
   const [serverStatus, setServerStatus] = useState<SimulationState>({
     isRunning: false,
     gameName: '',
@@ -104,8 +123,11 @@ export default function SimulationRunner() {
     logs: []
   })
   
-  // STATO GRAFICO (Agenti, Pot, Round)
-  // Viene aggiornato SOLO dal processore dei log per mantenere la sincronia
+  /**
+   * Visual game state (agents, pot, round).
+   * Updated ONLY by the log processor to maintain synchronization
+   * between displayed logs and visual state.
+   */
   const [gameState, setGameState] = useState<GameState | null>(null)
   
   const [serverReachable, setServerReachable] = useState(true)
@@ -120,22 +142,21 @@ export default function SimulationRunner() {
   const [showScrollButton, setShowScrollButton] = useState(false)
   
   // --- REFS ---
-  const logQueueRef = useRef<LogEntry[]>([])
-  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const logsContainerRef = useRef<HTMLDivElement>(null)
-  const logsEndRef = useRef<HTMLDivElement>(null)
-  const lastSeenLogCountRef = useRef(0)
-  const isProcessingRef = useRef(false)
+  const logQueueRef = useRef<LogEntry[]>([]) // Queue of logs waiting to be displayed
+  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null) 
+  const logsContainerRef = useRef<HTMLDivElement>(null) 
+  const logsEndRef = useRef<HTMLDivElement>(null) 
+  const lastSeenLogCountRef = useRef(0) 
+  const isProcessingRef = useRef(false) 
+
+  const lastToastedIdRef = useRef<string | null>(null)
 
   const isPirateGame = gameId === 'PirateGame';
-
-  // =====================================================================
-  // CLEANUP COMPLETO
-  // =====================================================================
 
   useEffect(() => {
     console.log('🔄 Game changed or component mounted, resetting state')
     
+    // Reset all state to initial values
     setCompletedLogs([])
     setCurrentLog(null)
     setCurrentText('')
@@ -143,6 +164,7 @@ export default function SimulationRunner() {
     logQueueRef.current = []
     isProcessingRef.current = false
     lastSeenLogCountRef.current = 0
+    lastToastedIdRef.current = null
     
     if (typingIntervalRef.current) {
       clearInterval(typingIntervalRef.current)
@@ -159,10 +181,25 @@ export default function SimulationRunner() {
     }
   }, [gameId])
 
-  // =====================================================================
-  // SCROLL INTELLIGENTE
-  // =====================================================================
 
+  useEffect(() => {
+    if (!currentLog) return
+    if (currentLog.txId && currentLog.txId !== lastToastedIdRef.current) {
+        lastToastedIdRef.current = currentLog.txId
+        setTimeout(() => {
+            showToast({
+                agentName: currentLog.agent,
+                txId: currentLog.txId!,
+                type: (currentLog.txType as any) || 'GENERIC'
+            })
+        }, 100)
+    }
+  }, [currentLog, showToast])
+
+
+  /**
+   * Checks if the user is scrolled to the bottom of the logs container.
+   */
   const checkIfAtBottom = useCallback(() => {
     const container = logsContainerRef.current
     if (!container) return true
@@ -174,12 +211,16 @@ export default function SimulationRunner() {
     return isBottom
   }, [])
 
+  /**
+   * Smoothly scrolls to the bottom of the logs container.
+   */
   const scrollToBottom = useCallback(() => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     setIsAtBottom(true)
     setShowScrollButton(false)
   }, [])
 
+  // Attach scroll event listener to logs container
   useEffect(() => {
     const container = logsContainerRef.current
     if (!container) return
@@ -188,16 +229,21 @@ export default function SimulationRunner() {
     return () => container.removeEventListener('scroll', handleScroll)
   }, [checkIfAtBottom])
 
+  // Auto-scroll when new logs arrive and user is at bottom
   useEffect(() => {
     if (isAtBottom) {
       logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
   }, [completedLogs.length, currentText, isAtBottom])
 
-  // =====================================================================
-  // QUEUE PROCESSOR - CUORE DELLA SINCRONIZZAZIONE
-  // =====================================================================
-
+  /**
+   * Processes the next log in the queue with typing animation.
+   * 
+   * Key responsibilities:
+   * 1. Animates log message character by character
+   * 2. Merges state snapshots into current game state
+   * 3. Maintains synchronization between logs and visual state
+   */
   const processNextLog = useCallback(() => {
   if (isProcessingRef.current || logQueueRef.current.length === 0) return
   
@@ -207,21 +253,18 @@ export default function SimulationRunner() {
   setCurrentLog(nextLog)
   setCurrentText('')
 
-  // === SINCRONIZZAZIONE STATO CON MERGE ===
-  // Se il log contiene uno snapshot, uniamo i nuovi dati con lo stato esistente
+  // If log contains a snapshot, merge new data with existing state
   if (nextLog.stateSnapshot) {
     setGameState(prev => {
       if (!prev) return nextLog.stateSnapshot!
       
-      // Merge degli agenti: manteniamo tutti gli agenti esistenti e aggiorniamo solo quelli nuovi
       const mergedAgents = { ...prev.agents }
       
-      // Aggiorna solo gli agenti presenti nello snapshot
       Object.entries(nextLog.stateSnapshot!.agents).forEach(([agentName, agentState]) => {
         mergedAgents[agentName] = {
-          ...mergedAgents[agentName], // Mantieni i dati esistenti se ci sono
-          ...agentState, // Sovrascrivi con i nuovi dati
-          name: agentName // Assicurati che il nome sia impostato
+          ...mergedAgents[agentName], 
+          ...agentState, 
+          name: agentName 
         }
       })
       
@@ -236,7 +279,6 @@ export default function SimulationRunner() {
   let charIndex = 0
   const messageLength = nextLog.message.length
   
-  // Calcola durata dinamica basata su tipo e lunghezza
   let charDelay = TYPING_SPEED
   if (nextLog.type === 'system' || nextLog.type === 'game_event') {
     charDelay = 8
@@ -247,7 +289,6 @@ export default function SimulationRunner() {
       setCurrentText(nextLog.message.slice(0, charIndex + 1))
       charIndex++
     } else {
-      // Scrittura completata
       if (typingIntervalRef.current) {
         clearInterval(typingIntervalRef.current)
       }
@@ -257,17 +298,15 @@ export default function SimulationRunner() {
       setCurrentText('')
       isProcessingRef.current = false
       
-      // Processa il prossimo
       setTimeout(() => processNextLog(), MIN_DISPLAY_TIME)
     }
   }, charDelay)
 }, [])
 
-  // =====================================================================
-  // POLLING SERVER
-  // =====================================================================
-
   useEffect(() => {
+    /**
+     * Polls server for current simulation status and new logs.
+     */
     const pollServer = async () => {
       try {
         const res = await fetch('http://localhost:3000/api/status')
@@ -276,20 +315,14 @@ export default function SimulationRunner() {
         const data = await res.json()
         setServerReachable(true)
         
+        // Prevent mixing logs from different games
         if (data.gameName && data.gameName !== gameId && data.isRunning) {
           return 
         }
 
-        // NOTA IMPORTANTE:
-        // Qui NON facciamo setGameState(data.gameState).
-        // Ignoriamo lo stato "live" perché è troppo avanti nel futuro rispetto ai log.
-        // Lo stato verrà aggiornato da processNextLog usando lo snapshot.
-
-        // GESTIONE LOG: Rileva reset o nuovi log
         const serverLogCount = data.logs?.length || 0
         
         if (serverLogCount < lastSeenLogCountRef.current) {
-          // SERVER RESET - Pulisci tutto
           console.log('🔄 Server reset detected, clearing queue')
           setCompletedLogs([])
           setCurrentLog(null)
@@ -306,7 +339,6 @@ export default function SimulationRunner() {
             processNextLog()
           }
         } else if (serverLogCount > lastSeenLogCountRef.current) {
-          // NUOVI LOG
           const newLogs = data.logs.slice(lastSeenLogCountRef.current)
           logQueueRef.current.push(...newLogs)
           
@@ -328,10 +360,11 @@ export default function SimulationRunner() {
     return () => clearInterval(interval)
   }, [gameId, processNextLog, currentLog])
 
-  // =====================================================================
-  // HANDLERS
-  // =====================================================================
 
+  /**
+   * Starts a new simulation session for the current game.
+   * Resets all local state before making the API call.
+   */
   const startSimulation = async () => {
     setCompletedLogs([])
     setCurrentLog(null)
@@ -356,28 +389,12 @@ export default function SimulationRunner() {
     }
   }
 
-  const stopSimulation = async () => {
-    await fetch('http://localhost:3000/api/stop', { method: 'POST' })
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current)
-      typingIntervalRef.current = null
-    }
-    if (currentLog) {
-      setCompletedLogs(prev => [...prev, currentLog])
-      setCurrentLog(null)
-      setCurrentText('')
-    }
-    logQueueRef.current = []
-    isProcessingRef.current = false
-  }
 
-  // =====================================================================
-  // RENDER HELPERS
-  // =====================================================================
-
+  /**
+   * Renders a single log entry with appropriate styling.
+   */
   const renderLogEntry = (log: LogEntry, isTyping: boolean, displayText?: string, index?: number) => {
     const text = displayText || log.message
-    // FIX KEYS: Usa l'indice se disponibile per evitare duplicati su timestamp identici
     const uniqueKey = `${log.timestamp}-${log.agent}-${index !== undefined ? index : 'typing'}`
 
     return (
@@ -418,10 +435,6 @@ export default function SimulationRunner() {
 
   const isWrongGame = serverStatus.isRunning && serverStatus.gameName && serverStatus.gameName !== gameId
 
-  // =====================================================================
-  // RENDER
-  // =====================================================================
-
    return (
     <div className="pt-20 min-h-screen bg-[#0d1117] text-gray-300 flex flex-col font-sans">
 
@@ -454,13 +467,6 @@ export default function SimulationRunner() {
             </button>
         </div>
       </div>
-      {isWrongGame && (
-        <div className="alert alert-warning mx-4 md:mx-6 mt-4 shrink-0">
-          <AlertTriangle />
-          <span>Server busy with <strong>{serverStatus.gameName}</strong>. Stop it first.</span>
-          <button onClick={stopSimulation} className="btn btn-sm">Force Stop</button>
-        </div>
-      )}
 
       {/* MAIN CONTENT - TWO COLUMN LAYOUT */}
       <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 md:p-6 relative">      
@@ -512,7 +518,7 @@ export default function SimulationRunner() {
         {/* RIGHT: STATUS PANELS (40%) */}
         <div className="flex-[4] flex flex-col gap-4 overflow-y-auto pr-1">       
 
-          {/* 1. AGENT MATRIX (Rifatta) */}
+          {/* 1. AGENT MATRIX (Redesigned) */}
           <div className="bg-[#1e1e1e] rounded-xl border border-white/10 p-4 shrink-0">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
               <Activity size={14} /> Agent Matrix
@@ -520,14 +526,14 @@ export default function SimulationRunner() {
             {gameState && Object.keys(gameState.agents).length > 0 ? (
               <div className="space-y-2">
                 {Object.entries(gameState.agents).map(([agentName, agentData]) => {
-                  // Logica Pirate Game
+                  // Pirate Game logic
                   let statusIcon = null;
                   let statusText = "";
                   let rowOpacity = "opacity-100";
                   
-                  // SYNC LOG: Controlla se l'agente sta "pensando" o scrivendo ora
+                  // SYNC LOG: Check if agent is currently "thinking" or typing
                   const isActing = currentLog?.agent === agentName;
-                  // Se l'agente è attivo, diamogli un bordo o un'evidenziazione
+                  // If agent is activ highlight
                   const activeClass = isActing ? "border-primary bg-primary/10" : "border-white/5 bg-black/30";
 
                   if (isPirateGame && gameState.pirateData) {
@@ -544,8 +550,7 @@ export default function SimulationRunner() {
                           statusText = "CREW";
                       }
                   } else {
-                      // Giochi normali: mostra scelta formattata
-                      // Usa la helper function creata sopra
+                      // Normal games: show formatted choice
                       const displayChoice = getGameChoiceDisplay(gameId, agentData.choice);
                       
                       if (displayChoice) {

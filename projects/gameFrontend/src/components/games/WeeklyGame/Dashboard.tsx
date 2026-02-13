@@ -10,7 +10,6 @@ const DAYS_LABEL = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
 /**
  * WeeklyGame Session Item
- * Estende GenericSessionItem con la logica specifica del WeeklyGame
  */
 const WeeklySessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) => {
   const [input, setInput] = useState('')
@@ -104,7 +103,6 @@ const WeeklySessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any)
 
 /**
  * WeeklyGame Dashboard
- * Usa GenericGameDashboard con configurazione specifica
  */
 export const WeeklyGameDashboard = () => {
   return (

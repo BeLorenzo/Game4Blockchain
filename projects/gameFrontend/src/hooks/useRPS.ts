@@ -2,15 +2,22 @@
 import { useState, useEffect, useCallback } from 'react'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { useWallet } from '@txnlab/use-wallet-react'
-import algosdk from 'algosdk'
+import algosdk, { TransactionSigner } from 'algosdk'
 import { RockPaperScissorsClient } from '../contracts/RockPaperScissors'
 import { config } from '../config'
 import { useAlert } from '../context/AlertContext'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { createCommit, getPhase, handleTimeout, notifyUpdate } from './gameUtils'
+import { useTransactionToast } from '../context/TransactionToast'
 
+/**
+ * Represents the current phase of a Rock Paper Scissors game session.
+ */
 export type RPSPhase = 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
 
+/**
+ * Represents a Rock Paper Scissors game session with all its state and metadata.
+ */
 export type RPSSession = {
   id: number
   phase: RPSPhase
@@ -29,10 +36,21 @@ export type RPSSession = {
   rounds: { start: number; endCommit: number; endReveal: number; current: number }
 }
 
+/**
+ * Custom React hook for managing Rock Paper Scissors game interactions.
+ * 
+ * Provides:
+ * - Session state management (active, history, user's sessions)
+ * - Game actions (create, join, reveal, claim)
+ * - Real-time data synchronization with blockchain
+ * - MBR (Minimum Balance Requirement) calculation
+ * - Local storage persistence for user moves
+ * - 1v1 PvP game with commitment/reveal pattern for fairness
+ */
 export const useRPS = () => {
   const { activeAddress, transactionSigner } = useWallet()
   const { showAlert } = useAlert()
-
+  const { showToast } = useTransactionToast()
   const [loading, setLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
   const [activeSessions, setActiveSessions] = useState<RPSSession[]>([])
@@ -42,33 +60,58 @@ export const useRPS = () => {
 
   const appId = config.games.rps.appId
 
+  /**
+   * Generates a storage key for persisting user's session data in localStorage.
+   */
   const getStorageKey = useCallback(
     (sessionId: number) => activeAddress ? `rps_${appId}_${activeAddress}_${sessionId}` : null,
     [activeAddress, appId],
   )
 
+  /**
+   * Creates and configures a RockPaperScissorsClient instance.
+   */
   const getClient = useCallback(() => {
     const algorand = AlgorandClient.fromConfig({ algodConfig: config.algodConfig })
     algorand.setDefaultSigner(transactionSigner)
     return new RockPaperScissorsClient({ algorand, appId })
   }, [transactionSigner, appId])
 
+   /**
+   * Creates and configures a RockPaperScissorsClient instance for the MBR simulation.
+   */
+  const getSimClient = useCallback(() => {
+  const algorand = AlgorandClient.fromConfig({ algodConfig: config.algodConfig })
+  return new RockPaperScissorsClient({ algorand, appId })
+}, [appId])
+
   // --- DATA FETCHING ---
+  
+  /**
+   * Fetches and processes all RPS session data from the blockchain.
+   * 
+   * This function:
+   * 1. Calculates MBR requirements if not already known
+   * 2. Reads session configuration, player data, and balances from contract boxes
+   * 3. Computes current phase and user-specific permissions
+   * 4. Handles timeout claims for unrevealed commitments
+   * 5. Updates local state with categorized sessions
+   */
   const refreshData = useCallback(async () => {
     if (!appId || appId === 0n) return
 
     try {
-      const client = getClient()
+      const client = getSimClient()
       const algorand = client.algorand
 
-      // 1. MBR Calculation
-      if (mbrs.create === 0) {
+      if (mbrs.create === 0 && activeAddress) {
         try {
+          
           const composer = client.newGroup()
-          const simulatorSender = activeAddress ?? client.appAddress
-          composer.getRequiredMbr({ args: { command: 'newGame' }, sender: simulatorSender })
+          const simulatorSender = activeAddress
+          composer.getRequiredMbr({ args: { command: 'newGame' }, sender: simulatorSender})
           composer.getRequiredMbr({ args: { command: 'join' }, sender: simulatorSender })
-          const result = await composer.simulate({ allowUnnamedResources: true })
+          const result = await composer.simulate({ allowUnnamedResources: true, skipSignatures: true})
           if (result.returns[0] !== undefined && result.returns[1] !== undefined) {
             setMbrs({ create: Number(result.returns[0]) / 1e6, join: Number(result.returns[1]) / 1e6 })
           }
@@ -77,7 +120,7 @@ export const useRPS = () => {
         }
       }
 
-      // 2. Bulk Fetch
+      // Bulk Fetch
       const boxSessionsMap = await client.state.box.gameSessions.getMap()
       const boxPlayersMap = await client.state.box.sessionPlayers.getMap()
       const boxBalancesMap = await client.state.box.sessionBalances.getMap()
@@ -97,20 +140,21 @@ export const useRPS = () => {
         const fee = Number(conf.participation) / 1e6
         const totalPot = balance ? Number(balance) / 1e6 : 0
 
+        // Extract and decode player addresses
         const p1 = players?.p1 ? algosdk.encodeAddress(algosdk.decodeAddress(players.p1).publicKey) : ''
         const p2 = players?.p2 ? algosdk.encodeAddress(algosdk.decodeAddress(players.p2).publicKey) : ''
 
+        // Check if player slots are empty (using zero address check)
         const isP1Empty = p1 === 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ'
         const isP2Empty = p2 === 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ'
 
+        // Count actual players (1 or 2)
         let playersCount = 0
         if (!isP1Empty) playersCount++
         if (!isP2Empty) playersCount++
 
-        // Usa utility per calcolare fase
         const phase = getPhase(currentRound, start, endCommit, endReveal)
 
-        // Local Storage
         const myKey = getStorageKey(id)
         const localJson = myKey ? localStorage.getItem(myKey) : null
         let myMove: number | null = null
@@ -126,6 +170,7 @@ export const useRPS = () => {
           } catch {}
         }
 
+        // Determine if current user is a player in this session
         const isPlayer1 = activeAddress === p1
         const isPlayer2 = activeAddress === p2
         const hasPlayed = isPlayer1 || isPlayer2
@@ -165,14 +210,17 @@ export const useRPS = () => {
     }
   }, [appId, activeAddress, getClient, mbrs.create, getStorageKey])
 
-  // --- ACTIONS ---
 
+  /**
+   * Creates a new 1v1 Rock Paper Scissors game session.
+   */
   const createSession = async (fee: number, startDelay: number, commitLen: number, revealLen: number) => {
     setLoading(true)
     try {
       if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
       const algorand = client.algorand
+      
       const status = await algorand.client.algod.status().do()
       const currentRound = BigInt(status['lastRound'])
 
@@ -187,7 +235,7 @@ export const useRPS = () => {
         amount: AlgoAmount.Algos(mbrs.create)
       })
 
-      await client.send.createSession({
+      const result = await client.send.createSession({
         args: {
           config: { startAt, endCommitAt, endRevealAt, participation: BigInt(participationAmount.microAlgos) },
           mbrPayment: { txn: mbrPayment, signer: transactionSigner }
@@ -197,6 +245,11 @@ export const useRPS = () => {
       })
 
       showAlert('RPS Session created!', 'success')
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'CREATE'
+        })
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -205,6 +258,9 @@ export const useRPS = () => {
     }
   }
 
+  /**
+   * Joins an existing RPS session by committing to a move.
+   */
   const joinSession = async (sessionId: number, move: number, fee: number) => {
     setLoading(true)
     try {
@@ -212,7 +268,6 @@ export const useRPS = () => {
       const client = getClient()
       const algorand = client.algorand
 
-      // Usa utility per commit
       const { commitHash, salt } = await createCommit(move, 32)
 
       const mbrPayment = await algorand.createTransaction.payment({
@@ -220,13 +275,14 @@ export const useRPS = () => {
         receiver: client.appAddress,
         amount: AlgoAmount.Algos(mbrs.join)
       })
+      
       const betPayment = await algorand.createTransaction.payment({
         sender: activeAddress,
         receiver: client.appAddress,
         amount: AlgoAmount.Algos(fee)
       })
 
-      await client.send.joinSession({
+      const result = await client.send.joinSession({
         args: {
           sessionId: BigInt(sessionId),
           commit: commitHash,
@@ -243,6 +299,11 @@ export const useRPS = () => {
 
       notifyUpdate()
       showAlert('Joined Battle!', 'success')
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'COMMIT'
+        })
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -251,6 +312,9 @@ export const useRPS = () => {
     }
   }
 
+  /**
+   * Reveals a previously committed move.
+   */
   const revealMove = async (sessionId: number) => {
     setLoading(true)
     try {
@@ -258,10 +322,11 @@ export const useRPS = () => {
       const key = getStorageKey(sessionId)
       const stored = key ? localStorage.getItem(key) : null
       if (!stored) throw new Error('Local data lost.')
+      
       const { move, salt } = JSON.parse(stored)
       const client = getClient()
 
-      await client.send.revealMove({
+      const result = await client.send.revealMove({
         args: { sessionId: BigInt(sessionId), choice: BigInt(move), salt: new Uint8Array(salt) },
         sender: activeAddress,
         populateAppCallResources: true
@@ -272,6 +337,11 @@ export const useRPS = () => {
       if (key) localStorage.setItem(key, JSON.stringify(updateData))
 
       showAlert('Move Revealed!', 'success')
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'REVEAL'
+        })
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -280,6 +350,11 @@ export const useRPS = () => {
     }
   }
 
+  /**
+   * Claims winnings from a completed session.
+   * 
+   * Determines winner based on revealed moves and distributes the pot.
+   */
   const claimWinnings = async (sessionId: number, entryFee: number) => {
     setLoading(true)
     try {
@@ -308,9 +383,16 @@ export const useRPS = () => {
 
       if (wonAmount >= 0) showAlert(`You won ${wonAmount} ALGO!`, 'success')
 
+        showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'CLAIM'
+        })
       refreshData()
     } catch (e: any) {
       const errorMsg = e.message || JSON.stringify(e)
+      
+      // Handle "did not win" errors by recording loss in localStorage
       if (errorMsg.includes('You did not win') || errorMsg.includes('logic eval error')) {
         const key = getStorageKey(sessionId)
         if (key) {
@@ -331,6 +413,12 @@ export const useRPS = () => {
     }
   }
 
+  /**
+   * Effect hook for initial data fetch and periodic refresh.
+   * 
+   * Fetches data immediately on mount and every 5 seconds thereafter.
+   * Cleans up interval on unmount.
+   */
   useEffect(() => {
     refreshData()
     const i = setInterval(refreshData, 5000)

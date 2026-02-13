@@ -5,7 +5,6 @@
 @tailwind utilities;
 
 :root {
-  /* Usiamo Outfit come font principale, più moderno e geometrico */
   font-family: 'Outfit', sans-serif;
 }
 
@@ -13,16 +12,13 @@ body {
   background: radial-gradient(circle at 50% 0%, #111827 0%, #050505 100%);
   min-height: 100vh;
   color: #E5E7EB;
-  /* Rendiamo il font leggermente più spesso di base per leggibilità */
   font-weight: 500;
 }
 
-/* Stile per i numeri */
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Scrollbar stilizzata */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -37,13 +33,11 @@ body {
   background: #40E0D0;
 }
 
-/* Chrome, Safari, Edge, Opera */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-/* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
 }

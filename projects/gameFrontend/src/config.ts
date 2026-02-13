@@ -3,9 +3,16 @@ export const config = {
   algodConfig: {
     server: import.meta.env.VITE_ALGOD_SERVER || 'http://localhost',
     port: import.meta.env.VITE_ALGOD_PORT || 4001,
-    token: import.meta.env.VITE_ALGOD_TOKEN || 'a'.repeat(64),
+    token: import.meta.env.VITE_ALGOD_TOKEN ?? 'a'.repeat(64),
+    network: import.meta.env.VITE_ALGOD_NETWORK || 'localnet',
   },
 
+  indexerConfig: {
+    server: import.meta.env.VITE_INDEXER_SERVER || 'http://localhost',
+    port: import.meta.env.VITE_INDEXER_PORT || 8980,
+    token: import.meta.env.VITE_INDEXER_TOKEN ?? 'a'.repeat(64),
+  },
+  
   // Registro Giochi
   games: {
     guessGame: {

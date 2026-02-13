@@ -169,3 +169,4 @@ cython_debug/
 node_modules
 
 projects/gameContract/simulation/data/agents/
+agent-wallets.json

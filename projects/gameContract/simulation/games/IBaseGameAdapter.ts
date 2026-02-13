@@ -3,7 +3,12 @@
 import { Account, Address } from 'algosdk';
 import { Agent } from '../Agent'
 
-export type GameLogger = (message: string, type?: 'thought' | 'action' | 'system' | 'game_event') => void;
+export type GameLogger = (
+    message: string, 
+    type?: 'thought' | 'action' | 'system' | 'game_event',
+    metadata?: { txId?: string; txType?: string, agentName?: string } 
+) => void;
+
 /**
  * Base Game Adapter Interface.
  * Defines the standard lifecycle methods that all game implementations must support

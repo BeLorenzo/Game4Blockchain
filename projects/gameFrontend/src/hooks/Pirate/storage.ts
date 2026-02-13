@@ -1,13 +1,19 @@
 /**
  * PIRATE GAME STORAGE UTILITIES
- * Gestisce la persistenza locale per:
- * 1. Registrazione (flag semplice)
- * 2. Voto (Salt + Voto per ogni round specifico)
- * 3. Claim (Risultato finale)
+ * 
+ * Manages local persistence for:
+ * 1. Registration (simple flag)
+ * 2. Voting (Salt + Vote for each specific round)
+ * 3. Claim (Final result)
+ * 
+ * Uses localStorage to store game state between browser sessions and
+ * across game rounds. Each storage key follows a specific naming convention
+ * to avoid collisions and enable efficient retrieval.
  */
 
-// --- Tipi di Dati Memorizzati ---
-
+/**
+ * Represents the complete game data stored for a player in a session.
+ */
 export interface StoredGameData {
   claimResult: {
     amount: number
@@ -17,73 +23,83 @@ export interface StoredGameData {
   }
 }
 
+/**
+ * Represents voting data stored for a specific game round.
+ */
 export interface StoredVoteData {
   vote: 0 | 1
-  salt: number[] // Importante: salviamo come array di numeri per serializzazione JSON
+  salt: number[] // Important: stored as number array for JSON serialization
   hasRevealed: boolean
   timestamp: number
 }
 
+/**
+ * Represents claim data for a completed game.
+ */
 export interface StoredClaimData {
   amount: number
   timestamp: number
-  isWin: boolean // Utile per UI (se amount > 0 non basta in caso di pareggio/loss)
+  isWin: boolean
 }
 
-// --- Generazione Chiavi ---
 
+/**
+ * Generates the base storage key for a player in a session.
+ */
 const getBaseKey = (appId: number, address: string, sessionId: number): string => {
   return `pirate_${appId}_${address}_${sessionId}`
 }
 
 /**
- * Genera la chiave per lo stato di registrazione
- * Schema: pirate_${appId}_${address}_${sessionId}_registered
+ * Generates the storage key for registration status.
  */
 const getRegistrationKey = (appId: number, address: string, sessionId: number): string => {
   return `${getBaseKey(appId, address, sessionId)}_registered`
 }
 
 /**
- * Genera la chiave per il voto di un round specifico
- * Schema: pirate_${appId}_${address}_${sessionId}_round${roundNumber}_vote
+ * Generates the storage key for a vote in a specific round.
  */
 const getVoteKey = (appId: number, address: string, sessionId: number, roundNumber: number): string => {
   return `${getBaseKey(appId, address, sessionId)}_round${roundNumber}_vote`
 }
 
 /**
- * Genera la chiave per il claim
- * Schema: pirate_${appId}_${address}_${sessionId}_claim
+ * Generates the storage key for claim data.
  */
 const getClaimKey = (appId: number, address: string, sessionId: number): string => {
   return `${getBaseKey(appId, address, sessionId)}_claim`
 }
 
-// --- Funzioni Exported ---
 
+/**
+ * PirateStorage - Main storage utility object for Pirate Game.
+ * 
+ * Provides methods for managing registration, voting, and claim data in localStorage.
+ * All methods are designed to be SSR-safe (check for window existence).
+ */
 export const PirateStorage = {
   
-  // 1. GESTIONE REGISTRAZIONE
-  // ------------------------------------------------------------------
-  
-  /** Salva il fatto che l'utente si è registrato alla sessione */
+  /** 
+   * Saves that the user has registered for a session.
+   */
   setRegistered: (appId: number, address: string, sessionId: number) => {
     const key = getRegistrationKey(appId, address, sessionId)
     localStorage.setItem(key, JSON.stringify({ registeredAt: Date.now() }))
   },
 
-  /** Controlla se l'utente risulta registrato localmente */
+  /** 
+   * Checks if the user is locally registered for a session.
+   */
   isRegistered: (appId: number, address: string, sessionId: number): boolean => {
     const key = getRegistrationKey(appId, address, sessionId)
     return !!localStorage.getItem(key)
   },
 
-  // 2. GESTIONE VOTO (Per Round)
-  // ------------------------------------------------------------------
-
-  /** * Salva i dati segreti del voto (COMMIT PHASE).
-   * Nota: roundNumber deve essere il round corrente della proposta.
+  /** 
+   * Saves the secret vote data (COMMIT PHASE).
+   * 
+   * Important: roundNumber must be the current proposal round.
    */
   saveVoteCommit: (
     appId: number, 
@@ -95,7 +111,6 @@ export const PirateStorage = {
   ) => {
     if (typeof window === 'undefined') return
     
-    // Normalizza il salt in array di numeri per evitare problemi con JSON
     const saltArray = Array.from(salt)
     
     const data: StoredVoteData = {
@@ -110,8 +125,8 @@ export const PirateStorage = {
   },
 
   /**
-   * Aggiorna lo stato a "Rivelato" (REVEAL PHASE).
-   * Da chiamare dopo il successo della transazione revealVote.
+   * Updates vote status to "Revealed" (REVEAL PHASE).
+   * Call after successful revealVote transaction.
    */
   markVoteRevealed: (
     appId: number, 
@@ -132,8 +147,8 @@ export const PirateStorage = {
   },
 
   /**
-   * Recupera i dati del voto (necessari per fare il Reveal).
-   * Restituisce null se non trova dati per quel round specifico.
+   * Retrieves vote data (needed for Reveal transaction).
+   * Returns null if no data found for that specific round.
    */
   getVoteData: (
     appId: number, 
@@ -154,10 +169,9 @@ export const PirateStorage = {
     }
   },
 
-  // 3. GESTIONE CLAIM
-  // ------------------------------------------------------------------
-
-  /** Salva il risultato del claim finale */
+  /** 
+   * Saves the final claim result.
+   */
   saveClaim: (
     appId: number, 
     address: string, 
@@ -167,7 +181,6 @@ export const PirateStorage = {
   ) => {
     if (typeof window === 'undefined') return
     
-    // Struttura specifica richiesta da usePlayerStats
     const data: StoredGameData = {
       claimResult: {
         amount,
@@ -183,8 +196,10 @@ export const PirateStorage = {
     window.dispatchEvent(new Event('game-storage-update'))
   },
 
-  /** Recupera info sul claim */
-getClaim: (appId: number, address: string, sessionId: number): StoredGameData['claimResult'] | null => {
+  /** 
+   * Retrieves claim information for a session.
+   */
+  getClaim: (appId: number, address: string, sessionId: number): StoredGameData['claimResult'] | null => {
     if (typeof window === 'undefined') return null
     
     const key = getClaimKey(appId, address, sessionId)
@@ -199,6 +214,9 @@ getClaim: (appId: number, address: string, sessionId: number): StoredGameData['c
     }
   },
   
+  /**
+   * Checks if a claim result exists for a session.
+   */
   hasResult: (appId: number, address: string, sessionId: number): boolean => {
       const key = getClaimKey(appId, address, sessionId)
       return !!localStorage.getItem(key)

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 
-// --- HEADER (Titolo, Badge Fase, Pot, Giocatori) ---
+// --- HEADER  ---
 export const SessionHeader = ({ session, isEnded, isTransitionRound, phaseText, customBadges }: any) => {
   const textVal = isEnded ? 'text-gray-300' : 'text-white'
   const textDim = isEnded ? 'text-gray-500' : 'text-gray-400'

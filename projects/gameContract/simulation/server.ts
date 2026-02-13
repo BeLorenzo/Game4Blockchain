@@ -17,6 +17,7 @@ import { IBaseGameAdapter } from './games/IBaseGameAdapter'
 import { IMultiRoundGameAdapter } from './games/IMultiRoundGameAdapter'
 import algosdk from 'algosdk'
 
+
 /**
  * Override BigInt.prototype.toJSON to serialize BigInt values as strings.
  * This prevents JSON serialization errors when BigInt values are included in responses.
@@ -45,7 +46,15 @@ let simulationState = {
   gameName: '',
   sessionId: '0', 
   round: 0,
-  logs: [] as { timestamp: number; agent: string; type: string; message: string; stateSnapshot: any }[]
+  logs: [] as { 
+    timestamp: number; 
+    agent: string; 
+    type: string; 
+    message: string; 
+    stateSnapshot: any; 
+    txId?: string;
+    TxType?: string; 
+  } []
 }
 
 /**
@@ -66,16 +75,20 @@ let currentGameState: any = {
  * Adds a log entry to the simulation state with a snapshot of current game state
  * This enables synchronized playback in the frontend where logs are paired with state
  */
-const addLog = (agent: string, type: 'thought' | 'action' | 'system' | 'game_event', message: string) => {
+const addLog = (agent: string, type: 'thought' | 'action' | 'system' | 'game_event', message: string, txMetadata?: { txId?: string; txType?: string, agentName?: string }) => {
   // Create a deep copy of current game state to freeze it in time
   const snapshot = JSON.parse(JSON.stringify(currentGameState));
-  
+
+  const agentName = txMetadata?.agentName || agent
+
   const logEntry = { 
       timestamp: Date.now(), 
-      agent, 
+      agent: agentName, 
       type, 
       message,
-      stateSnapshot: snapshot 
+      stateSnapshot: snapshot,
+      txId: txMetadata?.txId,
+      txType: txMetadata?.txType
   }
   
   simulationState.logs.push(logEntry)
@@ -87,7 +100,7 @@ const addLog = (agent: string, type: 'thought' | 'action' | 'system' | 'game_eve
   if (type === 'system') color = '\x1b[32m'; // Green
   if (type === 'game_event') color = '\x1b[36m'; // Cyan
   if (type === 'thought') color = '\x1b[90m'; // Gray
-  console.log(`${color}[${time}] [${type.toUpperCase()}] ${agent}: ${message}\x1b[0m`)
+  console.log(`${color}[${time}] [${type.toUpperCase()}] ${agentName}: ${message}\x1b[0m`)
 }
 
 /**
@@ -208,7 +221,6 @@ app.get('/api/history/:gameId', (req, res) => {
         const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.json'));
         let allHistory: any[] = [];
 
-        // 1. Raccogliamo tutta la storia di tutti gli agenti per questo gioco
         files.forEach(file => {
             const content = JSON.parse(fs.readFileSync(path.join(agentsDir, file), 'utf-8'));
             const agentName = content.name;
@@ -218,46 +230,37 @@ app.get('/api/history/:gameId', (req, res) => {
                 allHistory.push({
                     ...h,
                     agent: agentName,
-                    // Assicuriamo che il timestamp sia un numero valido per poter ordinare
                     timeMs: new Date(h.timestamp).getTime() || 0 
                 });
             });
         });
 
-        // 2. Ordiniamo tutto RIGOROSAMENTE in ordine cronologico
         allHistory.sort((a, b) => a.timeMs - b.timeMs);
 
-        // 3. Raggruppamento logico per creare le sessioni "Virtuali" e consecutive
         const sessionMap = new Map<number, any>();
         let virtualSessionId = 0;
         let lastOriginalSession = -1;
         let seenAgentRounds = new Set<string>();
 
         allHistory.forEach(h => {
-            // Chiave per capire se un agente sta rigiocando un round già visto
             const agentRoundKey = `${h.agent}-R${h.round}`;
             
-            // TAGLIO E NUOVA SESSIONE SE:
-            // A) L'ID sessione cambia naturalmente
-            // B) Vediamo un duplicato di agente+round (Significa che c'è stato un riavvio e l'ID originale si è azzerato)
             if (h.session !== lastOriginalSession || seenAgentRounds.has(agentRoundKey)) {
                 virtualSessionId++;
                 lastOriginalSession = h.session;
-                seenAgentRounds.clear(); // Svuotiamo la memoria dei round per la nuova sessione
+                seenAgentRounds.clear(); 
                 
                 sessionMap.set(virtualSessionId, {
-                    session: virtualSessionId,   // Questo è il numero (1, 2, 3...) che vedrà il frontend!
-                    originalSession: h.session,  // Lo teniamo per puro debug
+                    session: virtualSessionId,   
+                    originalSession: h.session, 
                     timestamp: h.timestamp,
                     game: gameId,
                     rounds: []
                 });
             }
             
-            // Segnamo che questo agente ha giocato questo round nell'attuale sessione
             seenAgentRounds.add(agentRoundKey);
 
-            // Aggiungiamo la mossa al contenitore
             const currentSession = sessionMap.get(virtualSessionId);
             currentSession.rounds.push({
                 round: h.round,
@@ -271,11 +274,9 @@ app.get('/api/history/:gameId', (req, res) => {
             });
         });
 
-        // 4. Mettiamo le sessioni dalla più recente alla più vecchia per la dashboard
         const allSessions = Array.from(sessionMap.values());
         allSessions.sort((a, b) => b.session - a.session);
         
-        // 5. All'interno della sessione, ordiniamo le mosse dal Round 1 in su
         allSessions.forEach(session => {
             session.rounds.sort((a: any, b: any) => {
                 if (a.round === b.round) return a.agent.localeCompare(b.agent);
@@ -289,6 +290,24 @@ app.get('/api/history/:gameId', (req, res) => {
         return res.json([]);
     }
 });
+
+
+function getPersistentAccounts(count: number): algosdk.Account[] {
+  const filePath = path.join(process.cwd(), 'agent-wallets.json');
+  if (fs.existsSync(filePath)) {
+    console.log(`Loading existing wallets from ${filePath}`);
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    return data.map((mnemonic: string) => algosdk.mnemonicToSecretKey(mnemonic));
+  }
+  console.log(`Creating ${count} new persistent wallets...`);
+  const accounts = Array.from({ length: count }, () => algosdk.generateAccount());
+  const mnemonics = accounts.map(acc => algosdk.secretKeyToMnemonic(acc.sk));
+  
+  fs.writeFileSync(filePath, JSON.stringify(mnemonics, null, 2));
+  console.log(`Wallets saved to ${filePath}`);
+  
+  return accounts;
+}
 
 // --- SIMULATION LOGIC ---
 
@@ -308,13 +327,20 @@ async function runGameLogic(gameName: string) {
     sessionId: '0', round: 0, phase: 'INITIALIZING', agents: {}, pot: 0
   }
 
+  const isTestNet = process.env.ALGOD_NETWORK === 'testnet'; 
+  const algorand = isTestNet ? AlgorandClient.testNet() : AlgorandClient.defaultLocalNet();
+
+  const admimMnemonic = process.env.MNEMONIC || '';
+  if (!admimMnemonic) throw new Error("MNEMONIC mancante in .env");
+  const adminAccount = algorand.account.fromMnemonic(admimMnemonic);
+
   const sessionOffset = getLastSessionId(gameName);
   const visualSessionId = sessionOffset + 1;
 
+  addLog('System', 'system', `Network: ${isTestNet ? 'TESTNET' : 'LOCALNET'} - Admin: ${adminAccount.addr.toString().substring(0,4)}...`);
   addLog('System', 'system', `Initializing ${gameName} (Session #${visualSessionId})...`)
 
   try {
-    const algorand = AlgorandClient.defaultLocalNet()
     const MODEL = 'hermes3'
     // Instantiate the selected game adapter
     let game: IBaseGameAdapter
@@ -327,18 +353,22 @@ async function runGameLogic(gameName: string) {
     }
 
     // Connect game logging and state updating to server functions
-    game.setLogger((msg, type) => addLog('Game', type || 'game_event', msg));
-    
+    game.setLogger((msg, type, metadata) => {
+      const sender = metadata?.agentName || 'Game';
+      addLog('Game', type || 'game_event', msg, metadata)
+    });
     if ('setStateUpdater' in game) {
         (game as any).setStateUpdater((updates: any) => {
             updateGameState(updates);
         });
     }
     
+    const agentAccounts = getPersistentAccounts(7);
+
     // Create 7 agents with distinct game theory strategies
     const agents = [
         new Agent(
-          algorand.account.random().account,
+          agentAccounts[0],
           'Alpha', // THE CALCULATOR: EV Maximizer
           {
             personalityDescription: `
@@ -377,7 +407,7 @@ async function runGameLogic(gameName: string) {
         ),
     
         new Agent(
-          algorand.account.random().account,
+          agentAccounts[1],
           'Beta', // THE PARANOID: Minimax Strategist
           {
             personalityDescription: `
@@ -415,7 +445,7 @@ async function runGameLogic(gameName: string) {
         ),
     
         new Agent(
-          algorand.account.random().account,
+          agentAccounts[2],
           'Gamma', // THE GAMBLER: Volatility Hunter
           {
             personalityDescription: `
@@ -454,7 +484,7 @@ async function runGameLogic(gameName: string) {
         ),
     
         new Agent(
-          algorand.account.random().account,
+          agentAccounts[3],
           'Delta', // THE MIRROR: Tit-for-Tat Reciprocator
           {
             personalityDescription: `
@@ -493,7 +523,7 @@ async function runGameLogic(gameName: string) {
         ),
     
         new Agent(
-          algorand.account.random().account,
+          agentAccounts[4],
           'Epsilon', // THE ALTRUIST: Group Welfare Maximizer
           {
             personalityDescription: `
@@ -532,7 +562,7 @@ async function runGameLogic(gameName: string) {
         ),
     
         new Agent(
-          algorand.account.random().account,
+          agentAccounts[5],
           'Zeta', // THE FOLLOWER: Momentum Trader
           {
             personalityDescription: `
@@ -571,7 +601,7 @@ async function runGameLogic(gameName: string) {
         ),
     
         new Agent(
-          algorand.account.random().account,
+          agentAccounts[6],
           'Eta', // THE CONTRARIAN: Anti-Crowd Strategist
           {
             personalityDescription: `
@@ -617,23 +647,52 @@ async function runGameLogic(gameName: string) {
         a.setLogger((name, type, msg) => {
             const newState: any = { status: type === 'thought' ? 'thinking' : 'decided' }
             if (type === 'action') newState.lastAction = msg
-            
             updateGameState({ agents: { ...currentGameState.agents, [name]: { ...currentGameState.agents[name], ...newState } } })
             addLog(name, type, msg)
         })
     })
     updateGameState({ agents: initialAgentState })
     
-    // Deploy and fund the game contract
-    const admimMnemonic = process.env.MNEMONIC || ''
-    const adminAccount = algosdk.mnemonicToSecretKey(admimMnemonic);
-    algorand.account.ensureFundedFromEnvironment(adminAccount.addr, AlgoAmount.Algos(1000))
-    addLog('System', 'system', 'Funding agents...')
-    await Promise.all(agents.map(a => algorand.account.ensureFundedFromEnvironment(a.account.addr, AlgoAmount.Algos(100))))
-    await game.deploy(adminAccount, '_sim')
-    
+    addLog('System', 'system', 'Checking Agent Funds...');
+
+    if (isTestNet) {
+        const MIN_BALANCE = 2_000_000; 
+        const TARGET_BALANCE = 3_000_000; 
+
+        const adminSigner = algosdk.makeBasicAccountTransactionSigner(adminAccount.account);
+
+        await Promise.all(agents.map(async (agent) => {
+            try {
+                const info = await algorand.account.getInformation(agent.account.addr);
+                const balance = Number(info.balance);
+                
+                if (balance < MIN_BALANCE) {
+                    const amountNeeded = TARGET_BALANCE - balance;
+                    addLog('System', 'system', `💸 Funding ${agent.name} with ${(amountNeeded/1e6).toFixed(2)} ALGO...`);
+                    
+                    await algorand.send.payment({
+                        sender: adminAccount.addr,
+                        receiver: agent.account.addr,
+                        amount: AlgoAmount.MicroAlgos(amountNeeded),
+                        signer: adminSigner
+                    });
+                } else {
+                    console.log(`[${agent.name}] Balance OK: ${(balance/1e6).toFixed(2)} ALGO`);
+                }
+            } catch (err: any) {
+                addLog('System', 'system', `❌ Funding Error for ${agent.name}: ${err.message}`);
+            }
+        }));        
+    } else {
+        await algorand.account.ensureFundedFromEnvironment(adminAccount.addr, AlgoAmount.Algos(100000));
+        await Promise.all(agents.map(a => algorand.account.ensureFundedFromEnvironment(a.account.addr, AlgoAmount.Algos(100000))));
+    }
+
+    addLog('System', 'system', 'Deploying contract...')
+    await game.deploy(adminAccount.account, '_sim')
+
     updateGameState({ phase: 'DEPLOYED' })
-    addLog('System', 'system', 'Contract deployed.')
+    addLog('System', 'system', 'Contract deployed/connected.')
 
     // Execute the game session
     const NUM_SESSIONS = 1 

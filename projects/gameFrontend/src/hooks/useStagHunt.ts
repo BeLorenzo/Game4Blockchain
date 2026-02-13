@@ -7,9 +7,17 @@ import { config } from '../config'
 import { useAlert } from '../context/AlertContext'
 import { AlgoAmount } from '@algorandfoundation/algokit-utils/types/amount'
 import { createCommit, getPhase, handleTimeout, notifyUpdate } from './gameUtils'
+import algosdk, { TransactionSigner } from 'algosdk'
+import { useTransactionToast } from '../context/TransactionToast'
 
+/**
+ * Represents the current phase of a Stag Hunt game session.
+ */
 export type StagHuntPhase = 'WAITING' | 'COMMIT' | 'REVEAL' | 'ENDED'
 
+/**
+ * Represents a Stag Hunt game session with all its state and metadata.
+ */
 export type StagHuntSession = {
   id: number
   phase: StagHuntPhase
@@ -35,10 +43,21 @@ export type StagHuntSession = {
   rounds: { start: number; endCommit: number; endReveal: number; current: number }
 }
 
+/**
+ * Custom React hook for managing Stag Hunt game interactions.
+ * 
+ * Provides:
+ * - Session state management (active, history, user's sessions)
+ * - Game actions (create, join, reveal, resolve, claim)
+ * - Real-time data synchronization with blockchain
+ * - MBR (Minimum Balance Requirement) calculation
+ * - Global jackpot tracking
+ * - Local storage persistence for user choices
+ */
 export const useStagHunt = () => {
   const { activeAddress, transactionSigner } = useWallet()
   const { showAlert } = useAlert()
-
+  const { showToast} = useTransactionToast()
   const [loading, setLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
   const [activeSessions, setActiveSessions] = useState<StagHuntSession[]>([])
@@ -49,33 +68,60 @@ export const useStagHunt = () => {
 
   const appId = config.games.stagHunt.appId
 
+  /**
+   * Generates a storage key for persisting user's session data in localStorage.
+   */
   const getStorageKey = useCallback(
     (sessionId: number) => activeAddress ? `stag_${appId}_${activeAddress}_${sessionId}` : null,
     [activeAddress, appId],
   )
 
-  const getClient = useCallback(() => {
-    const algorand = AlgorandClient.fromConfig({ algodConfig: config.algodConfig })
-    algorand.setDefaultSigner(transactionSigner)
-    return new StagHuntClient({ algorand, appId })
+  
+  /**
+   * Creates and configures a StagHuntClient instance.
+  */
+ const getClient = useCallback(() => {
+   const algorand = AlgorandClient.fromConfig({ algodConfig: config.algodConfig })
+   algorand.setDefaultSigner(transactionSigner)
+   return new StagHuntClient({ algorand, appId })
   }, [transactionSigner, appId])
+  
+  /**
+  * Creates and configures a RockPaperScissorsClient instance for the MBR simulation.
+  */
+ const getSimClient = useCallback(() => {
+ const algorand = AlgorandClient.fromConfig({ algodConfig: config.algodConfig })
+ return new StagHuntClient({ algorand, appId })
+}, [appId])
 
   // --- DATA FETCHING ---
+  
+  /**
+   * Fetches and processes all Stag Hunt session data from the blockchain.
+   * 
+   * This function:
+   * 1. Calculates MBR requirements if not already known
+   * 2. Fetches global jackpot amount
+   * 3. Reads session configuration, statistics, and balances from contract boxes
+   * 4. Computes current phase and user-specific permissions
+   * 5. Handles timeout claims for unrevealed commitments
+   * 6. Updates local state with categorized sessions
+   */
   const refreshData = useCallback(async () => {
     if (!appId || appId === 0n) return
 
     try {
-      const client = getClient()
+      const client = getSimClient()
       const algorand = client.algorand
 
-      // 1. MBR Calculation
-      if (mbrs.create === 0) {
+      if (mbrs.create === 0 && activeAddress) {
         try {
+
+          const simulationSender = activeAddress
           const composer = client.newGroup()
-          const simulatorSender = activeAddress ?? client.appAddress
-          composer.getRequiredMbr({ args: { command: 'newGame' }, sender: simulatorSender })
-          composer.getRequiredMbr({ args: { command: 'join' }, sender: simulatorSender })
-          const result = await composer.simulate({ allowUnnamedResources: true })
+          composer.getRequiredMbr({ args: { command: 'newGame' }, sender: simulationSender })
+          composer.getRequiredMbr({ args: { command: 'join' }, sender: simulationSender })
+          const result = await composer.simulate({ allowUnnamedResources: true, skipSignatures: true })
           if (result.returns[0] !== undefined && result.returns[1] !== undefined) {
             setMbrs({ create: Number(result.returns[0]) / 1e6, join: Number(result.returns[1]) / 1e6 })
           }
@@ -84,7 +130,7 @@ export const useStagHunt = () => {
         }
       }
 
-      // 2. Get Global Jackpot
+      // Get Global Jackpot
       try {
         const jackpot = await client.state.global.globalJackpot()
         setGlobalJackpot(jackpot ? Number(jackpot) / 1e6 : 0)
@@ -92,7 +138,7 @@ export const useStagHunt = () => {
         console.warn('Failed to fetch global jackpot', e)
       }
 
-      // 3. Bulk Fetch
+      // Bulk Fetch
       const boxSessionsMap = await client.state.box.gameSessions.getMap()
       const boxStatsMap = await client.state.box.stats.getMap()
       const boxBalancesMap = await client.state.box.sessionBalances.getMap()
@@ -109,25 +155,26 @@ export const useStagHunt = () => {
         const start = Number(conf.startAt)
         const endCommit = Number(conf.endCommitAt)
         const endReveal = Number(conf.endRevealAt)
-        const fee = Number(conf.participation) / 1e6
+        const fee = Number(conf.participation) / 1e6 
         const totalPot = balance ? Number(balance) / 1e6 : 0
 
+        // Extract game statistics
         const stags = stats ? Number(stats.stags) : 0
         const hares = stats ? Number(stats.hares) : 0
         const resolved = stats ? stats.resolved : false
         const successful = stats ? stats.successful : false
         const rewardPerStag = stats ? Number(stats.rewardPerStag) / 1e6 : 0
 
+        // Calculate player count based on revealed choices or pot size
         const revealedCount = stags + hares
         let playersCount = revealedCount
         if (currentRound <= endCommit && fee > 0) {
           playersCount = Math.floor(totalPot / fee)
         }
 
-        // Usa utility per calcolare fase
         const phase = getPhase(currentRound, start, endCommit, endReveal)
 
-        // Local Storage
+        // Check localStorage for user's participation data
         const myKey = getStorageKey(id)
         const localJson = myKey ? localStorage.getItem(myKey) : null
         let myChoice: number | null = null
@@ -145,7 +192,6 @@ export const useStagHunt = () => {
 
         const hasPlayed = !!localJson
 
-        // Gestione timeout usando utility
         claimResult = handleTimeout(
           myKey,
           fee,
@@ -159,10 +205,8 @@ export const useStagHunt = () => {
         const canJoin = phase === 'COMMIT' && !hasPlayed && !!activeAddress
         const canReveal = phase === 'REVEAL' && hasPlayed && !hasRevealed
 
-        // canResolve: fase ENDED, reveal finito, non ancora resolved
         const canResolve = (phase === 'ENDED' || currentRound > endReveal) && !resolved
 
-        // canClaim: resolved = true, hasRevealed = true, no claimResult
         const canClaim = resolved && hasRevealed && !claimResult
 
         allSessions.push({
@@ -198,12 +242,16 @@ export const useStagHunt = () => {
 
   // --- ACTIONS ---
 
+  /**
+   * Creates a new Stag Hunt game session.
+   */
   const createSession = async (fee: number, startDelay: number, commitLen: number, revealLen: number) => {
     setLoading(true)
     try {
       if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
       const algorand = client.algorand
+      
       const status = await algorand.client.algod.status().do()
       const currentRound = BigInt(status['lastRound'])
 
@@ -218,7 +266,7 @@ export const useStagHunt = () => {
         amount: AlgoAmount.Algos(mbrs.create),
       })
 
-      await client.send.createSession({
+      const result = await client.send.createSession({
         args: {
           config: { startAt, endCommitAt, endRevealAt, participation: BigInt(participationAmount.microAlgos) },
           mbrPayment: { txn: mbrPayment, signer: transactionSigner },
@@ -227,6 +275,11 @@ export const useStagHunt = () => {
       })
 
       showAlert('StagHunt Session created!', 'success')
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'CREATE'
+        })
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -235,10 +288,13 @@ export const useStagHunt = () => {
     }
   }
 
+  /**
+   * Joins an existing Stag Hunt session by committing to a choice.
+   */
   const joinSession = async (sessionId: number, choice: number, fee: number) => {
     setLoading(true)
     try {
-      // Validazione: choice deve essere 0 (Hare) o 1 (Stag)
+      // Input validation: choice must be 0 (Hare) or 1 (Stag)
       if (choice !== 0 && choice !== 1) {
         throw new Error('Invalid choice: must be 0 (Hare) or 1 (Stag)')
       }
@@ -247,7 +303,6 @@ export const useStagHunt = () => {
       const client = getClient()
       const algorand = client.algorand
 
-      // Usa utility per commit
       const { commitHash, salt } = await createCommit(choice, 32)
 
       const payment = await algorand.createTransaction.payment({
@@ -256,7 +311,7 @@ export const useStagHunt = () => {
         amount: AlgoAmount.Algos(fee),
       })
 
-      await client.send.joinSession({
+      const result = await client.send.joinSession({
         args: { sessionId: BigInt(sessionId), commit: commitHash, payment: { txn: payment, signer: transactionSigner } },
         sender: activeAddress,
       })
@@ -267,6 +322,11 @@ export const useStagHunt = () => {
 
       notifyUpdate()
       showAlert('Choice committed!', 'success')
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'COMMIT'
+        })
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -275,6 +335,9 @@ export const useStagHunt = () => {
     }
   }
 
+  /**
+   * Reveals a previously committed choice.
+   */
   const revealMove = async (sessionId: number) => {
     setLoading(true)
     try {
@@ -282,10 +345,11 @@ export const useStagHunt = () => {
       const key = getStorageKey(sessionId)
       const stored = key ? localStorage.getItem(key) : null
       if (!stored) throw new Error('Local data lost.')
+      
       const { choice, salt } = JSON.parse(stored)
       const client = getClient()
 
-      await client.send.revealMove({
+      const result = await client.send.revealMove({
         args: { sessionId: BigInt(sessionId), choice: BigInt(choice), salt: new Uint8Array(salt) },
         sender: activeAddress,
       })
@@ -295,6 +359,11 @@ export const useStagHunt = () => {
       if (key) localStorage.setItem(key, JSON.stringify(updateData))
 
       showAlert('Choice Revealed!', 'success')
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'REVEAL'
+        })
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -303,13 +372,18 @@ export const useStagHunt = () => {
     }
   }
 
+  /**
+   * Resolves a completed session (admin action).
+   * 
+   * Determines game outcome and distributes winnings/refunds.
+   */
   const resolveSession = async (sessionId: number) => {
     setLoading(true)
     try {
       if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
 
-      await client.send.resolveSession({
+      const result = await client.send.resolveSession({
         args: { sessionId: BigInt(sessionId) },
         sender: activeAddress,
         coverAppCallInnerTransactionFees: true,
@@ -317,6 +391,11 @@ export const useStagHunt = () => {
       })
 
       showAlert('Session Resolved!', 'success')
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'EXECUTE'
+        })
       refreshData()
     } catch (e: any) {
       showAlert(e.message, 'error')
@@ -325,11 +404,18 @@ export const useStagHunt = () => {
     }
   }
 
+  /**
+   * Claims winnings from a resolved session.
+   * 
+   * Auto-attempts to resolve session if not already resolved.
+   * Calculates net profit and updates local claim result.
+   */
   const claimWinnings = async (sessionId: number, fee: number) => {
     setLoading(true)
     try {
       if (!activeAddress) throw new Error('Connect wallet')
       const client = getClient()
+      
       const session = [...activeSessions, ...historySessions].find(s => s.id === sessionId)
       if (session && !session.gameStats.resolved) {
         try {
@@ -363,10 +449,16 @@ export const useStagHunt = () => {
 
       if (grossPayout > 0) showAlert(`You won ${grossPayout} A (Net: ${netProfit})!`, 'success')
       else showAlert('Refund claimed.', 'info')
-
+      showToast({
+        agentName: activeAddress.substring(0,6),
+        txId: result.transaction.txID(),
+        type: 'CLAIM'
+        })
       refreshData()
     } catch (e: any) {
       const errorMsg = e.message || JSON.stringify(e)
+      
+      // Handle "did not win" errors by recording loss in localStorage
       if (errorMsg.includes('You did not win') || errorMsg.includes('logic eval error')) {
         const key = getStorageKey(sessionId)
         if (key) {
@@ -387,6 +479,12 @@ export const useStagHunt = () => {
     }
   }
 
+  /**
+   * Effect hook for initial data fetch and periodic refresh.
+   * 
+   * Fetches data immediately on mount and every 5 seconds thereafter.
+   * Cleans up interval on unmount.
+   */
   useEffect(() => {
     refreshData()
     const i = setInterval(refreshData, 5000)

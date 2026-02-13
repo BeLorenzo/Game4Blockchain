@@ -8,7 +8,6 @@ import { config } from '../../../config'
 
 /**
  * GuessGame Session Item
- * Estende GenericSessionItem con la logica specifica del GuessGame
  */
 const GuessSessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) => {
   const [input, setInput] = useState('')
@@ -88,7 +87,6 @@ const GuessSessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) 
 
 /**
  * GuessGame Dashboard
- * Usa GenericGameDashboard con configurazione specifica
  */
 export const GuessGameDashboard = () => {
   return (

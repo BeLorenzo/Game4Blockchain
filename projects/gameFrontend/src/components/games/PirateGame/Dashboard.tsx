@@ -28,8 +28,6 @@ export const PirateGameDashboard = () => {
   const profit = useGameSpecificProfit('pirate', config.games.pirate.appId).profit
 
 
-
-  // Logica filtri
   const getDisplaySessions = () => {
     let list = activeTab === 'active' ? activeSessions : 
                activeTab === 'history' ? historySessions : mySessions

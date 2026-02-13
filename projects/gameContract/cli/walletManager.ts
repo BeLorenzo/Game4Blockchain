@@ -65,17 +65,21 @@ export class WalletManager {
   public async ensureFunds() {
     if (!this.account) return;
 
-    console.log(chalk.gray('💰 Checking funds...'));
-
-    // Auto-fund from KMD (Key Management Daemon) if connected to LocalNet
-    await this.algorand.account.ensureFundedFromEnvironment(
-      this.account.addr,
-      (10).algo(),
-    );
-
     const info = await this.algorand.client.algod.accountInformation(this.account.addr).do();
-    console.log(chalk.gray(`💰 Current Balance: ${algosdk.microalgosToAlgos(Number(info.amount))} ALGO`));
-    console.log('\n');
+    const balance = Number(info.amount);
+    const minBalance = (10).algo().microAlgos;
+
+    if (balance < minBalance) {
+      if (await this.algorand.client.isLocalNet()) {
+        console.log(chalk.gray('💰 Funding from LocalNet KMD...'));
+        await this.algorand.account.ensureFundedFromEnvironment(this.account.addr, (10).algo());
+      } else {
+        console.log(chalk.red(`❌ Fondi insufficienti su Testnet per ${this.shortAddr(this.account.addr.toString())}`));
+        console.log(chalk.yellow(`👉 Vai qui per ricaricare: https://bank.testnet.algorand.network/`));
+      }
+    }
+    const updatedInfo = await this.algorand.client.algod.accountInformation(this.account.addr).do();
+    console.log(chalk.gray(`💰 Current Balance: ${algosdk.microalgosToAlgos(Number(updatedInfo.amount))} ALGO`));
   }
 
   /**

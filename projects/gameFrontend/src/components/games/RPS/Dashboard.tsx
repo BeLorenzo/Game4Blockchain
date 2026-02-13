@@ -15,7 +15,6 @@ const MOVES = [
 
 /**
  * RPS Session Item
- * Estende GenericSessionItem con la logica specifica del RPS
  */
 const RPSSessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) => {
   const [selectedMove, setSelectedMove] = useState<number | null>(null)
@@ -96,7 +95,6 @@ const RPSSessionItem = ({ session, loading, onJoin, onReveal, onClaim }: any) =>
 
 /**
  * RPS Dashboard
- * Usa GenericGameDashboard con configurazione specifica
  */
 export const RPSDashboard = () => {
   return (
