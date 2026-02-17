@@ -6,6 +6,39 @@ This project serves as the unified frontend for the **Game4Blockchain** ecosyste
 2. **🤖 AI Simulation Dashboard**: Watch LLM-powered agents play against each other in real-time, complete with live logs, state matrices, and performance stats.
 
 ---
+## 🛠️ Setup & Configuration
+
+### 1. Environment Variables
+This project requires a `.env` file to link to the Algorand blockchain and the Game Smart Contracts.
+
+```bash
+cp .env.template .env
+```
+
+### 2. Choose Your Network
+Open the newly created `.env` file. You have two options:
+
+#### 🏠 Option A: LocalNet (Developers)
+*Recommended for development and running your own simulations.*
+
+1. Ensure `VITE_ALGOD_NETWORK=localnet` is active.
+2. Deploy the contracts using the CLI in `projects/gameContract` or the `npm run deploy` command.
+3. **Manually copy** the resulting App IDs into this file:
+
+```env
+VITE_RPS_APP_ID=1001
+VITE_GUESSGAME_APP_ID=1002
+...
+```
+
+#### 🌍 Option B: Public TestNet (Demo)
+*Recommended for quickly testing the UI without Docker.*
+
+1. Uncomment the **TestNet** configuration in `.env`.
+2. Use the **Public Demo IDs** provided in the comments of the `.env.template`:
+```env
+VITE_RPS_APP_ID=12345678  # Use the IDs provided in the file
+```
 
 ## 🌟 Key Features & Project Structure
 

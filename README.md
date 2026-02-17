@@ -71,6 +71,23 @@ cd projects/gameContract
 npm install
 
 ```
+### Phase 1.5: Configuration (Crucial!)
+**1. Backend & Simulation Setup**
+Set up the admin wallet and network (LocalNet by default).
+```bash
+cd projects/gameContract
+cp .env.template .env
+# Edit .env to add your MNEMONIC if running simulations
+```
+**2. Frontend Setup**
+Point the web app to the correct smart contracts.
+
+```bash
+cd projects/gameFrontend
+cp .env.template .env
+```
+> ⚠️ **Note:** If you are running on **LocalNet**, you must deploy the contracts first (`npm run cli` -> Deploy), then copy the resulting **App IDs** into `projects/gameFrontend/.env`.
+> If you are using **TestNet**, you can use the public demo IDs provided in the template.
 ---
 
 ### Phase 2: Choose Your Experience
@@ -84,7 +101,6 @@ Best for seeing the complete picture. Play games with your Web3 wallet or watch 
 ```bash
 cd projects/gameContract
 npm run server
-
 ```
 
 *Terminal 2 (Frontend UI):*
@@ -93,7 +109,6 @@ npm run server
 cd projects/gameFrontend
 npm install
 npm run dev
-
 ```
 
 **[→ Full Frontend Documentation](https://www.google.com/search?q=./projects/gameFrontend/README.md)**
@@ -105,7 +120,6 @@ Best for deploying contracts as an admin, forcing timeouts, or playing games man
 ```bash
 cd projects/gameContract
 npm run cli
-
 ```
 
 **[→ Full CLI Documentation](https://www.google.com/search?q=./projects/gameContract/cli/README.md)**
@@ -122,7 +136,6 @@ npm run simulation
 
 # When the simulation finishes, generate the ASCII analytics
 npm run stats
-
 ```
 
 **[→ Full AI Simulation Documentation](https://www.google.com/search?q=./projects/gameContract/simulation/README.md)**
