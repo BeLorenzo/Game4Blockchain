@@ -86,8 +86,14 @@ Point the web app to the correct smart contracts.
 cd projects/gameFrontend
 cp .env.template .env
 ```
-> ⚠️ **Note:** If you are running on **LocalNet**, you must deploy the contracts first (`npm run cli` -> Deploy), then copy the resulting **App IDs** into `projects/gameFrontend/.env`.
-> If you are using **TestNet**, you can use the public demo IDs provided in the template.
+> ⚠️ **Note regarding LocalNet:**
+> You must deploy the contracts to get the **App IDs**. Go to `projects/gameContract` and choose your method:
+> * **Option A (Fast):** Run `npm run deploy` to deploy all games at once.
+> * **Option B (Interactive):** Run `npm run cli` to select specific games to deploy.
+>
+> **After deployment, copy the resulting App IDs into `projects/gameFrontend/.env`.**
+>
+> *(If you are using **TestNet**, simply use the public demo IDs provided in the template)*.
 ---
 
 ### Phase 2: Choose Your Experience
@@ -110,6 +116,7 @@ cd projects/gameFrontend
 npm install
 npm run dev
 ```
+> 🤖 **AI Requirement:** To access the **Simulation Dashboard**, ensure **Ollama** is running in the background (run `ollama serve` or open the app). Without it, the agents cannot "think".
 
 **[→ Full Frontend Documentation](https://www.google.com/search?q=./projects/gameFrontend/README.md)**
 

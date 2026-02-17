@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { config } from '../config'
 
-// Tipi di transazione supportati per icone/colori diversi
 export type TransactionType = 'PROPOSE' | 'CREATE' | 'DEPLOY' | 'JOIN' | 'COMMIT' | 'REVEAL' | 'CLAIM' | 'EXECUTE' | 'GENERIC'
 
 interface ToastData {
-  id: string // ID interno del toast
-  txId: string // ID della transazione Algorand
-  agentName: string // Indirizzo wallet (Umano) o Nome Agente (Sim)
+  id: string 
+  txId: string 
+  agentName: string 
   type: TransactionType
   network: 'localnet' | 'testnet'
 }
@@ -39,10 +38,10 @@ export const TransactionToastProvider: React.FC<{ children: React.ReactNode }> =
     
     setToasts((prev) => [...prev, newToast])
 
-    // Auto-rimozione dopo 5 secondi
+    // Auto-rimozione dopo 6 secondi
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== newToast.id))
-    }, 6000) // Un po' più lungo per dare tempo di cliccare
+    }, 6000) 
   }, [currentNetwork])
 
   const removeToast = (id: string) => {
