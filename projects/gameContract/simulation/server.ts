@@ -355,7 +355,7 @@ async function runGameLogic(gameName: string) {
     // Connect game logging and state updating to server functions
     game.setLogger((msg, type, metadata) => {
       const sender = metadata?.agentName || 'Game';
-      addLog('Game', type || 'game_event', msg, metadata)
+      addLog(sender, type || 'game_event', msg, metadata)
     });
     if ('setStateUpdater' in game) {
         (game as any).setStateUpdater((updates: any) => {

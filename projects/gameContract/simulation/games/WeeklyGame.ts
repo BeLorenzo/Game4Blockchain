@@ -230,7 +230,7 @@ export class WeeklyGame implements IBaseGameAdapter {
         signer: agent.signer,
         suppressLog: true,
       })
-      this.log(`[${agent.name}] Committed: ${this.dayNames[safeChoice]}`, 'action', {txId: result.transaction.txID(), txType: 'COMMIT'})
+      this.log(`[${agent.name}] Committed: ${this.dayNames[safeChoice]}`, 'action', {txId: result.transaction.txID(), txType: 'COMMIT', agentName: agent.name})
     }
   }
 
