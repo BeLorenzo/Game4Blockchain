@@ -187,9 +187,8 @@ export class WeeklyGame extends GameContract {
    */
   public getRequiredMBR(command: 'newGame' | 'join'): uint64 {
     if (command === 'newGame') {
-      const singleBoxMBR = this.getBoxMBR(10, 56)
-      const allDaysMBR: uint64 = singleBoxMBR * 7
-      return allDaysMBR + super.getRequiredMBR('newGame')
+      const BoxMBR = this.getBoxMBR(10, 56)
+      return BoxMBR + super.getRequiredMBR('newGame')
     }
     return super.getRequiredMBR(command)
   }

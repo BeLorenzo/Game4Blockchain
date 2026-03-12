@@ -1126,20 +1126,20 @@ smart_contracts/weeklyGame/contract.algo.ts::WeeklyGame.getRequiredMBR:
     bytec_1 // "newGame"
     ==
     bz smart_contracts/weeklyGame/contract.algo.ts::WeeklyGame.getRequiredMBR_after_if_else@2
-    // smart_contracts/weeklyGame/contract.algo.ts:192
-    // return allDaysMBR + super.getRequiredMBR('newGame')
+    // smart_contracts/weeklyGame/contract.algo.ts:191
+    // return BoxMBR + super.getRequiredMBR('newGame')
     bytec_1 // "newGame"
     callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR
+    // smart_contracts/abstract_contract/contract.algo.ts:165
+    // return 2500 + 400 * (keySize + valueSize)
+    pushint 28900 // 28900
     // smart_contracts/weeklyGame/contract.algo.ts:191
-    // const allDaysMBR: uint64 = singleBoxMBR * 7
-    pushint 202300 // 202300
-    // smart_contracts/weeklyGame/contract.algo.ts:192
-    // return allDaysMBR + super.getRequiredMBR('newGame')
+    // return BoxMBR + super.getRequiredMBR('newGame')
     +
     retsub
 
 smart_contracts/weeklyGame/contract.algo.ts::WeeklyGame.getRequiredMBR_after_if_else@2:
-    // smart_contracts/weeklyGame/contract.algo.ts:194
+    // smart_contracts/weeklyGame/contract.algo.ts:193
     // return super.getRequiredMBR(command)
     frame_dig -1
     callsub smart_contracts/abstract_contract/contract.algo.ts::GameContract.getRequiredMBR
