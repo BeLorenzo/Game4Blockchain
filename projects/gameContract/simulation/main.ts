@@ -12,6 +12,8 @@ import { GuessGame } from './games/GuessGame'
 import algosdk from 'algosdk'
 import fs from 'fs';
 import path from 'path';
+import { WeeklyGame } from './games/WeeklyGame'
+import { StagHuntGame } from './games/StagHuntGame'
 
 /**
  * Type Guard to check if a game supports multi-round logic (e.g., Pirate Game).
@@ -38,7 +40,7 @@ function getPersistentAccounts(count: number): algosdk.Account[] {
 }
 
 /** Number of game sessions to simulate */
-const NUM_SESSIONS = 1
+const NUM_SESSIONS = 15
 /** Initial funding amount for each agent in microAlgos */
 const INITIAL_FUNDING = 2_000_000
 /** LLM model to use for agent decision-making */
@@ -392,13 +394,13 @@ STRATEGIC PRINCIPLES:
 
   console.log(
     sessionFound > 0
-      ? `Found ${sessionFound} previous sessions for ${game.name}`
+      ? `Found previous sessions for ${game.name}`
       : `Starting fresh - no previous sessions found for ${game.name}`,
   )
 
   // Get admin account from environment variable for contract deployment
-  const adminMem = process.env.MNEMONIC || ''
-  const admin = algosdk.mnemonicToSecretKey(adminMem);
+  const adminMem = process.env.MNEMONIC || '';
+  const admin = algorand.account.fromMnemonic(adminMem);
   const adminSigner = algorand.account.getSigner(admin.addr);
 
   if (isTestNet) {
@@ -435,14 +437,15 @@ STRATEGIC PRINCIPLES:
       agents.map(async (agent) => {
         await algorand.account.ensureFundedFromEnvironment(
             agent.account.addr, 
-            AlgoAmount.MicroAlgos(INITIAL_FUNDING)
+            AlgoAmount.MicroAlgos(INITIAL_FUNDING*NUM_SESSIONS)
         )
       }),
     )
+    await algorand.account.ensureFundedFromEnvironment(admin.addr, AlgoAmount.MicroAlgos(10_000_000)) 
   }
 
   console.log('\n--- DEPLOYMENT ---')
-  await game.deploy(admin, '') 
+  await game.deploy(admin.account, '') 
 
   console.log(`\n--- STARTING ${NUM_SESSIONS} GAMES ---`)
 

@@ -314,10 +314,9 @@ export class PirateGame extends GameContract {
         config.endCommitAt = newEndCommitAt
         config.endRevealAt = newEndRevealAt
       }
-
-      this.gameSessions(sessionID).value = clone(config)
     }
     this.gameState(sessionID).value = clone(state)
+    this.gameSessions(sessionID).value = clone(config)
   }
 
   /**

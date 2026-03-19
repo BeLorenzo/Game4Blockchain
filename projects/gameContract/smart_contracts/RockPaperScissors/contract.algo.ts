@@ -145,9 +145,7 @@ public claimWinnings(sessionID: uint64): uint64 {
           amount: finalPayout,
           fee: 0,
         }).submit()
-    } else {
-       // Ho perso. Non ricevo nulla.
-    }
+    } 
 
   if (oppClaimed || oppChoice === 4) {
         // Siamo gli ultimi a uscire, spegni la luce (Delete both boxes)
